@@ -1,7 +1,9 @@
 ﻿using Monero.Common;
 using Monero.Daemon.Common;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Numerics;
 using System.Text.RegularExpressions;
 
 using MoneroJsonRpcParams = System.Collections.Generic.Dictionary<string, object>;
@@ -136,11 +138,32 @@ namespace Monero.Daemon
             CheckConnection();
         }
 
+        public bool IsRestricted()
+        {
+            if (IsLocal()) return false;
+
+            var info = GetInfo();
+            return info.IsRestricted() == true;
+        }
+
         private void CheckConnection()
         {
             if (rpc == null || rpc.IsConnected() == true || rpc.GetUri() == null || rpc.GetUri().Length == 0) return;
 
-            rpc.CheckConnection(2000);
+            rpc.CheckConnection();
+        }
+
+        private bool IsLocal()
+        {
+            var connection = GetRpcConnection();
+
+            if (connection == null) return false;
+
+            var uri = connection.GetUri();
+
+            if (uri == null) return false;
+
+            return uri.Contains("127.0.0.1") || uri.Contains("localhost");
         }
 
         public Process? GetProcess()
@@ -233,7 +256,7 @@ namespace Monero.Daemon
             var resp = rpc.SendPathRequest("get_alt_blocks_hashes");
             CheckResponseStatus(resp);
             if (!resp.ContainsKey("blks_hashes")) return [];
-            return (List<string>)resp["blks_hashes"];
+            return ((JArray)resp["blks_hashes"]).ToObject<List<string>>();
         }
 
         public override List<MoneroAltChain> GetAltChains()
@@ -243,7 +266,7 @@ namespace Monero.Daemon
             CheckResponseStatus(result);
             List<MoneroAltChain> chains = [];
             if (!result.ContainsKey("chains")) return chains;
-            foreach (var rpcChain in (List<Dictionary<string, object>>)result["chains"]) chains.Add(ConvertRpcAltChain(rpcChain));
+            foreach (var rpcChain in (JArray)result["chains"]) chains.Add(ConvertRpcAltChain(rpcChain.ToObject<Dictionary<string, object>>()));
             return chains;
         }
 
@@ -269,7 +292,16 @@ namespace Monero.Daemon
 
         public override string GetBlockHash(ulong height)
         {
-            throw new NotImplementedException();
+            var param = new List<ulong>() { height };
+            var respMap = rpc.SendJsonStringRequest("on_get_block_hash", param);
+            var hash = respMap.Result ?? "";
+            if (!MoneroUtils.IsValidHex(hash)) 
+            {
+                if (string.IsNullOrEmpty(hash)) throw new MoneroError("Invalid response from daemon: null or empty block hash");
+                else throw new MoneroError(hash);
+            }
+
+            return respMap.Result ?? "";
         }
 
         public override List<string> GetBlockHashes(List<string> blockHashes, ulong startHeight)
@@ -283,7 +315,7 @@ namespace Monero.Daemon
             parameters.Add("hash", blockHash);
             var respMap = rpc.SendJsonRequest("get_block_header_by_hash", parameters);
             var resultMap = respMap.Result;
-            MoneroBlockHeader header = ConvertRpcBlockHeader((Dictionary<string, object>)resultMap["block_header"]);
+            MoneroBlockHeader header = ConvertRpcBlockHeader(((JObject)resultMap["block_header"]).ToObject<Dictionary<string, object>>());
             return header;
         }
 
@@ -293,7 +325,7 @@ namespace Monero.Daemon
             parameters.Add("height", blockHeight);
             var respMap = rpc.SendJsonRequest("get_block_header_by_height", parameters);
             var resultMap = respMap.Result;
-            MoneroBlockHeader header = ConvertRpcBlockHeader((Dictionary<string, object>)resultMap["block_header"]);
+            MoneroBlockHeader header = ConvertRpcBlockHeader(((JObject)resultMap["block_header"]).ToObject<Dictionary<string, object>>());
             return header;
         }
 
@@ -304,11 +336,11 @@ namespace Monero.Daemon
             parameters.Add("end_height", endHeight);
             var respMap = rpc.SendJsonRequest("get_block_headers_range", parameters);
             var resultMap = respMap.Result;
-            var rpcHeaders = (List<Dictionary<string, object>>)resultMap["headers"];
+            var rpcHeaders = (JArray)resultMap["headers"];
             List<MoneroBlockHeader> headers = [];
             foreach (var rpcHeader in rpcHeaders)
             {
-                MoneroBlockHeader header = ConvertRpcBlockHeader(rpcHeader);
+                MoneroBlockHeader header = ConvertRpcBlockHeader(rpcHeader.ToObject<Dictionary<string, object>>());
                 headers.Add(header);
             }
             return headers;
@@ -332,14 +364,14 @@ namespace Monero.Daemon
 
             // build blocks with transactions
             List<MoneroBlock> blocks = [];
-            var rpcBlocks = (List<Dictionary<string, object>>)rpcResp["blocks"];
+            var rpcBlocks = (JArray)rpcResp["blocks"];
             var rpcTxs = (List<List<Dictionary<string, object>>>)rpcResp["txs"];
             if (rpcBlocks.Count != rpcTxs.Count) throw new MoneroError("Blocks and txs count mismatch");
             for (int blockIdx = 0; blockIdx < rpcBlocks.Count; blockIdx++)
             {
 
                 // build block
-                MoneroBlock block = ConvertRpcBlock(rpcBlocks[blockIdx]);
+                MoneroBlock block = ConvertRpcBlock(rpcBlocks[blockIdx].ToObject<Dictionary<string, object>>());
                 block.SetHeight(blockHeights[blockIdx]);
                 blocks.Add(block);
 
@@ -349,7 +381,7 @@ namespace Monero.Daemon
                 {
                     var tx = new MoneroTx();
                     txs.Add(tx);
-                    List<string> txHashes = (List<string>)rpcBlocks[blockIdx]["tx_hashes"];
+                    List<string> txHashes = ((JArray)rpcBlocks[blockIdx]["tx_hashes"]).ToObject<List<string>>();
                     tx.SetHash(txHashes[txIdx]);
                     tx.SetIsConfirmed(true);
                     tx.SetInTxPool(false);
@@ -419,12 +451,12 @@ namespace Monero.Daemon
             var result = resp.Result;
             CheckResponseStatus(result);
             MoneroFeeEstimate feeEstimate = new MoneroFeeEstimate();
-            feeEstimate.SetFee((ulong)result["fee"]);
-            feeEstimate.SetQuantizationMask((ulong)result["quantization_mask"]);
+            feeEstimate.SetFee(Convert.ToUInt64(result["fee"]));
+            feeEstimate.SetQuantizationMask(Convert.ToUInt64(result["quantization_mask"]));
             if (result.ContainsKey("fees"))
             {
                 List<ulong> fees = [];
-                foreach (ulong fee in (List<ulong>)result["fees"]) fees.Add(fee);
+                foreach (var fee in ((JArray)result["fees"])) fees.Add(Convert.ToUInt64(fee));
                 feeEstimate.SetFees(fees);
             }
             return feeEstimate;
@@ -442,7 +474,7 @@ namespace Monero.Daemon
         {
             var respMap = rpc.SendJsonRequest("get_block_count");
             var resultMap = respMap.Result;
-            return ((ulong)resultMap["count"]);
+            return (Convert.ToUInt64(resultMap["count"]));
         }
 
         public override MoneroDaemonInfo GetInfo()
@@ -478,18 +510,18 @@ namespace Monero.Daemon
             List<MoneroPeer> peers = [];
             if (respMap.ContainsKey("gray_list"))
             {
-                foreach (var rpcPeer in (List<Dictionary<string, object>>)respMap["gray_list"])
+                foreach (var rpcPeer in (JArray)respMap["gray_list"])
                 {
-                    MoneroPeer peer = ConvertRpcPeer(rpcPeer);
+                    MoneroPeer peer = ConvertRpcPeer(rpcPeer.ToObject<Dictionary<string, object>>());
                     peer.SetIsOnline(false); // gray list means offline last checked
                     peers.Add(peer);
                 }
             }
             if (respMap.ContainsKey("white_list"))
             {
-                foreach (var rpcPeer in  (List<Dictionary<string, object>>)respMap["white_list"])
+                foreach (var rpcPeer in  (JArray)respMap["white_list"])
                 {
-                    MoneroPeer peer = ConvertRpcPeer(rpcPeer);
+                    MoneroPeer peer = ConvertRpcPeer(rpcPeer.ToObject<Dictionary<string, object>>());
                     peer.SetIsOnline(true); // white list means online last checked
                     peers.Add(peer);
                 }
@@ -502,7 +534,7 @@ namespace Monero.Daemon
             var respMap = rpc.SendJsonRequest("get_last_block_header");
             var resultMap = respMap.Result;
             CheckResponseStatus(resultMap);
-            MoneroBlockHeader header = ConvertRpcBlockHeader((Dictionary<string, object>)resultMap["block_header"]);
+            MoneroBlockHeader header = ConvertRpcBlockHeader(((JObject)resultMap["block_header"]).ToObject<Dictionary<string, object>>());
             return header;
         }
 
@@ -523,8 +555,8 @@ namespace Monero.Daemon
             var resultMap = respMap.Result;
             CheckResponseStatus(resultMap);
             MoneroMinerTxSum txSum = new MoneroMinerTxSum();
-            txSum.SetEmissionSum((ulong)resultMap["emission_amount"]);
-            txSum.SetFeeSum((ulong)resultMap["fee_amount"]);
+            txSum.SetEmissionSum(Convert.ToUInt64(resultMap["emission_amount"]));
+            txSum.SetFeeSum(Convert.ToUInt64(resultMap["fee_amount"]));
             return txSum;
         }
 
@@ -551,9 +583,9 @@ namespace Monero.Daemon
             // build histogram entries from response
             List<MoneroOutputHistogramEntry> entries = [];
             if (!result.ContainsKey("histogram")) return entries;
-            foreach (var rpcEntry in (List<Dictionary<string, object>>)result["histogram"])
+            foreach (var rpcEntry in (JArray)result["histogram"])
             {
-                entries.Add(ConvertRpcOutputHistogramEntry(rpcEntry));
+                entries.Add(ConvertRpcOutputHistogramEntry(rpcEntry.ToObject<Dictionary<string, object>>()));
             }
             return entries;
         }
@@ -569,12 +601,12 @@ namespace Monero.Daemon
             var result = resp.Result;
             CheckResponseStatus(result);
             List<MoneroBan> bans = [];
-            foreach (var rpcBan in (List<Dictionary<string, object>>)result["bans"])
+            foreach (var rpcBan in (JArray)result["bans"])
             {
                 MoneroBan ban = new MoneroBan();
                 ban.SetHost((string)rpcBan["host"]);
-                ban.SetIp((uint)rpcBan["ip"]);
-                ban.SetSeconds(((ulong)rpcBan["seconds"]));
+                ban.SetIp(Convert.ToUInt32(rpcBan["ip"]));
+                ban.SetSeconds(Convert.ToUInt64(rpcBan["seconds"]));
                 bans.Add(ban);
             }
             return bans;
@@ -587,9 +619,9 @@ namespace Monero.Daemon
             CheckResponseStatus(result);
             List<MoneroPeer> connections = [];
             if (!result.ContainsKey("connections")) return connections;
-            foreach (var rpcConnection in (List<Dictionary<string, object>>)result["connections"])
+            foreach (var rpcConnection in (JArray)result["connections"])
             {
-                connections.Add(ConvertRpcConnection(rpcConnection));
+                connections.Add(ConvertRpcConnection(rpcConnection.ToObject<Dictionary<string, object>>()));
             }
             return connections;
         }
@@ -629,7 +661,7 @@ namespace Monero.Daemon
             List<MoneroTx> txs = [];
             if (resp.ContainsKey("transactions"))
             {
-                foreach (var rpcTx in (List<Dictionary<string, object>>)resp["transactions"])
+                foreach (var rpcTx in (JArray)resp["transactions"])
                 {
                     var tx = new MoneroTx();
                     txs.Add(tx);
@@ -637,7 +669,7 @@ namespace Monero.Daemon
                     tx.SetIsMinerTx(false);
                     tx.SetInTxPool(true);
                     tx.SetNumConfirmations(0l);
-                    ConvertRpcTx(rpcTx, tx);
+                    ConvertRpcTx(rpcTx.ToObject<Dictionary<string, object>>(), tx);
                 }
             }
 
@@ -653,7 +685,7 @@ namespace Monero.Daemon
         {
             var resp = rpc.SendPathRequest("get_transaction_pool_stats");
             CheckResponseStatus(resp);
-            return ConvertRpcTxPoolStats((Dictionary<string, object>)resp["pool_stats"]);
+            return ConvertRpcTxPoolStats(((JObject)resp["pool_stats"]).ToObject<Dictionary<string, object>>());
         }
 
         public override List<MoneroTx> GetTxs(List<string> txHashes, bool prune = false)
@@ -678,7 +710,7 @@ namespace Monero.Daemon
             }
 
             //  interpret response
-            var rpcTxs = (List<Dictionary<string, object>>)respMap["txs"];
+            var rpcTxs = (JArray)respMap["txs"];
 
             // build transaction models
             List<MoneroTx> txs = [];
@@ -688,7 +720,7 @@ namespace Monero.Daemon
                 {
                     MoneroTx tx = new MoneroTx();
                     tx.SetIsMinerTx(false);
-                    txs.Add(ConvertRpcTx(rpcTxs[i], tx));
+                    txs.Add(ConvertRpcTx(rpcTxs[i].ToObject<Dictionary<string, object>>(), tx));
                 }
             }
             return txs;
@@ -703,8 +735,9 @@ namespace Monero.Daemon
         {
             var resp = rpc.SendJsonRequest("get_version");
             var result = resp.Result;
-            return new MoneroVersion(((int)result["version"]), (bool)result["release"]);
-
+            Int64 version64 = (Int64)result.GetValueOrDefault("version", 0);
+            var version = Convert.ToInt32(version64.ToString());
+            return new MoneroVersion(version, (bool)result["release"]);
         }
 
         public override bool IsTrusted()
@@ -723,7 +756,7 @@ namespace Monero.Daemon
             CheckResponseStatus(resultMap);
             MoneroPruneResult result = new MoneroPruneResult();
             result.SetIsPruned((bool)resultMap["pruned"]);
-            result.SetPruningSeed(((int)resultMap["pruning_seed"]));
+            result.SetPruningSeed(Convert.ToInt32(resultMap["pruning_seed"]));
             return result;
         }
 
@@ -869,10 +902,10 @@ namespace Monero.Daemon
         {
             var resp = rpc.SendPathRequest("get_limit");
             CheckResponseStatus(resp);
-            return new List<int> { ((int)resp["limit_down"]), ((int)resp["limit_up"]) };
+            return new List<int> { Convert.ToInt32(resp["limit_down"]), Convert.ToInt32(resp["limit_up"]) };
         }
 
-        private List<int> SetBandwidthLimits(int downLimit, int upLimit)
+        private List<int> SetBandwidthLimits(int? downLimit, int? upLimit)
         {
             if (downLimit == null) downLimit = 0;
             if (upLimit == null) upLimit = 0;
@@ -881,12 +914,12 @@ namespace Monero.Daemon
             parameters.Add("limit_up", upLimit);
             var resp = rpc.SendPathRequest("set_limit", parameters);
             CheckResponseStatus(resp);
-            return new List<int> { ((int)resp["limit_down"]), ((int)resp["limit_up"]) };
+            return new List<int> { Convert.ToInt32(resp["limit_down"]), Convert.ToInt32(resp["limit_up"]) };
         }
 
         private List<MoneroBlock> GetMaxBlocks(ulong? startHeight = null, ulong? maxHeight = null, ulong? chunkSize = null)
         {
-            if (startHeight == null) startHeight = 0l;
+            if (startHeight == null) startHeight = 0;
             if (maxHeight == null) maxHeight = GetHeight() - 1;
             if (chunkSize == null) chunkSize = MAX_REQ_SIZE;
 
@@ -915,7 +948,7 @@ namespace Monero.Daemon
         private MoneroBlockHeader GetBlockHeaderByHeightCached(ulong height, ulong maxHeight)
         {
             // get header from cache
-            MoneroBlockHeader? cachedHeader = cachedHeaders[height];
+            MoneroBlockHeader? cachedHeader = cachedHeaders.GetValueOrDefault(height);
             if (cachedHeader != null) return cachedHeader;
 
             // fetch and cache headers if not in cache
@@ -958,23 +991,23 @@ namespace Monero.Daemon
                 else if (key.Equals("block_timestamp"))
                 {
                     if (block == null) block = new MoneroBlock();
-                    block.SetTimestamp(GenUtils.Reconcile(block.GetTimestamp(), ((ulong)val)));
+                    block.SetTimestamp(GenUtils.Reconcile(block.GetTimestamp(), Convert.ToUInt64(val)));
                 }
                 else if (key.Equals("block_height"))
                 {
                     if (block == null) block = new MoneroBlock();
-                    block.SetHeight(GenUtils.Reconcile(block.GetHeight(), ((ulong)val)));
+                    block.SetHeight(GenUtils.Reconcile(block.GetHeight(), Convert.ToUInt64(val)));
                 }
-                else if (key.Equals("last_relayed_time")) tx.SetLastRelayedTimestamp(GenUtils.Reconcile(tx.GetLastRelayedTimestamp(), ((ulong)val)));
-                else if (key.Equals("receive_time") || key.Equals("received_timestamp")) tx.SetReceivedTimestamp(GenUtils.Reconcile(tx.GetReceivedTimestamp(), ((ulong)val)));
-                else if (key.Equals("confirmations")) tx.SetNumConfirmations(GenUtils.Reconcile(tx.GetNumConfirmations(), ((ulong)val)));
+                else if (key.Equals("last_relayed_time")) tx.SetLastRelayedTimestamp(GenUtils.Reconcile(tx.GetLastRelayedTimestamp(), Convert.ToUInt64(val)));
+                else if (key.Equals("receive_time") || key.Equals("received_timestamp")) tx.SetReceivedTimestamp(GenUtils.Reconcile(tx.GetReceivedTimestamp(), Convert.ToUInt64(val)));
+                else if (key.Equals("confirmations")) tx.SetNumConfirmations(GenUtils.Reconcile(tx.GetNumConfirmations(), Convert.ToUInt64(val)));
                 else if (key.Equals("in_pool"))
                 {
                     tx.SetIsConfirmed(GenUtils.Reconcile(tx.IsConfirmed(), !(bool)val));
                     tx.SetInTxPool(GenUtils.Reconcile(tx.InTxPool(), (bool)val));
                 }
                 else if (key.Equals("double_spend_seen")) tx.SetIsDoubleSpendSeen(GenUtils.Reconcile(tx.IsDoubleSpendSeen(), (bool)val));
-                else if (key.Equals("version")) tx.SetVersion(GenUtils.Reconcile(tx.GetVersion(), ((uint)val)));
+                else if (key.Equals("version")) tx.SetVersion(GenUtils.Reconcile(tx.GetVersion(), Convert.ToUInt32(val)));
                 else if (key.Equals("extra"))
                 {
                     if (val is string) {
@@ -982,77 +1015,77 @@ namespace Monero.Daemon
                     } else
                     {
                         List<byte> bytes = [];
-                        foreach (ulong bi in (List<ulong>)val) bytes.Add((byte)bi);
+                        foreach (ulong bi in (JArray)val) bytes.Add((byte)bi);
                         tx.SetExtra(GenUtils.Reconcile(tx.GetExtra(), GenUtils.ListToByteArray(bytes)));
                     }
                 }
                 else if (key.Equals("vin")) {
-                    List<Dictionary<string, object>> rpcInputs = (List<Dictionary<string, object>>)val;
+                    var rpcInputs = ((JArray)val).ToObject<List<Dictionary<string, object>>>();
                     if (rpcInputs.Count != 1 || !rpcInputs[0].ContainsKey("gen")) {  // ignore miner input TODO: why? probably needs re-enabled
                         List<MoneroOutput> inputs = [];
                         foreach (Dictionary<string, object> rpcInput in rpcInputs) inputs.Add(ConvertRpcOutput(rpcInput, tx));
                         tx.SetInputs(inputs);
                     }
-            }
-                    else if (key.Equals("vout"))
-            {
-                List<Dictionary<string, object>> rpcOutputs = (List<Dictionary<string, object>>)val;
-                List<MoneroOutput> outputs = [];
-                foreach (Dictionary<string, object> rpcOutput in rpcOutputs) outputs.Add(ConvertRpcOutput(rpcOutput, tx));
-                tx.SetOutputs(outputs);
-            }
-            else if (key.Equals("rct_signatures"))
-            {
-                Dictionary<string, object> rctSignaturesMap = (Dictionary<string, object>)val;
-                tx.SetRctSignatures(GenUtils.Reconcile(tx.GetRctSignatures(), rctSignaturesMap));
-                if (rctSignaturesMap.ContainsKey("txnFee")) tx.SetFee(GenUtils.Reconcile(tx.GetFee(), (ulong)rctSignaturesMap["txnFee"]));
-            }
-            else if (key.Equals("rctsig_prunable")) tx.SetRctSigPrunable(GenUtils.Reconcile(tx.GetRctSigPrunable(), val));
-            else if (key.Equals("unlock_time")) tx.SetUnlockTime(GenUtils.Reconcile(tx.GetUnlockTime(), (ulong)val));
-            else if (key.Equals("as_json") || key.Equals("tx_json")) { }  // handled last so tx is as initialized as possible
-            else if (key.Equals("as_hex") || key.Equals("tx_blob")) tx.SetFullHex(GenUtils.Reconcile(tx.GetFullHex(), "".Equals(val) ? null : (string)val));
-            else if (key.Equals("blob_size")) tx.SetSize(GenUtils.Reconcile(tx.GetSize(), ((ulong)val)));
-            else if (key.Equals("weight")) tx.SetWeight(GenUtils.Reconcile(tx.GetWeight(), ((ulong)val)));
-            else if (key.Equals("fee")) tx.SetFee(GenUtils.Reconcile(tx.GetFee(), (ulong)val));
-            else if (key.Equals("relayed")) tx.SetIsRelayed(GenUtils.Reconcile(tx.IsRelayed(), (bool)val));
-            else if (key.Equals("output_indices"))
-            {
-                List<ulong> indices = [];
-                foreach (ulong bi in (List<ulong>)val) indices.Add(bi);
-                tx.SetOutputIndices(GenUtils.Reconcile(tx.GetOutputIndices(), indices));
-            }
-            else if (key.Equals("do_not_relay")) tx.SetRelay(GenUtils.Reconcile(tx.GetRelay(), !(bool)val));
-            else if (key.Equals("kept_by_block")) tx.SetIsKeptByBlock(GenUtils.Reconcile(tx.IsKeptByBlock(), (bool)val));
-            else if (key.Equals("signatures")) tx.SetSignatures(GenUtils.Reconcile(tx.GetSignatures(), (List<string>)val));
-            else if (key.Equals("last_failed_height"))
-            {
-                ulong lastFailedHeight = ((ulong)val);
-                if (lastFailedHeight == 0) tx.SetIsFailed(GenUtils.Reconcile(tx.IsFailed(), false));
-                else
+                }
+                else if (key.Equals("vout"))
                 {
-                    tx.SetIsFailed(GenUtils.Reconcile(tx.IsFailed(), true));
-                    tx.SetLastFailedHeight(GenUtils.Reconcile(tx.GetLastFailedHeight(), lastFailedHeight));
+                    List<Dictionary<string, object>> rpcOutputs = ((JArray)val).ToObject<List<Dictionary<string, object>>>();
+                    List<MoneroOutput> outputs = [];
+                    foreach (Dictionary<string, object> rpcOutput in rpcOutputs) outputs.Add(ConvertRpcOutput(rpcOutput, tx));
+                    tx.SetOutputs(outputs);
                 }
-            }
-            else if (key.Equals("last_failed_id_hash"))
-            {
-                if (DEFAULT_ID.Equals(val)) tx.SetIsFailed(GenUtils.Reconcile(tx.IsFailed(), false));
-                else
+                else if (key.Equals("rct_signatures"))
                 {
-                    tx.SetIsFailed(GenUtils.Reconcile(tx.IsFailed(), true));
-                    tx.SetLastFailedHash(GenUtils.Reconcile(tx.GetLastFailedHash(), (string)val));
+                    Dictionary<string, object> rctSignaturesMap = ((JObject)val).ToObject<Dictionary<string, object>>();
+                    tx.SetRctSignatures(GenUtils.Reconcile(tx.GetRctSignatures(), rctSignaturesMap));
+                    if (rctSignaturesMap.ContainsKey("txnFee")) tx.SetFee(GenUtils.Reconcile(tx.GetFee(), Convert.ToUInt64(rctSignaturesMap["txnFee"])));
                 }
+                else if (key.Equals("rctsig_prunable")) tx.SetRctSigPrunable(GenUtils.Reconcile(tx.GetRctSigPrunable(), val));
+                else if (key.Equals("unlock_time")) tx.SetUnlockTime(GenUtils.Reconcile(tx.GetUnlockTime(), Convert.ToUInt64(val)));
+                else if (key.Equals("as_json") || key.Equals("tx_json")) { }  // handled last so tx is as initialized as possible
+                else if (key.Equals("as_hex") || key.Equals("tx_blob")) tx.SetFullHex(GenUtils.Reconcile(tx.GetFullHex(), "".Equals(val) ? null : (string)val));
+                else if (key.Equals("blob_size")) tx.SetSize(GenUtils.Reconcile(tx.GetSize(), Convert.ToUInt64(val)));
+                else if (key.Equals("weight")) tx.SetWeight(GenUtils.Reconcile(tx.GetWeight(), Convert.ToUInt64(val)));
+                else if (key.Equals("fee")) tx.SetFee(GenUtils.Reconcile(tx.GetFee(), Convert.ToUInt64(val)));
+                else if (key.Equals("relayed")) tx.SetIsRelayed(GenUtils.Reconcile(tx.IsRelayed(), (bool)val));
+                else if (key.Equals("output_indices"))
+                {
+                    List<ulong> indices = [];
+                    foreach (var bi in (JArray)val) indices.Add(Convert.ToUInt64(bi));
+                    tx.SetOutputIndices(GenUtils.Reconcile(tx.GetOutputIndices(), indices));
+                }
+                else if (key.Equals("do_not_relay")) tx.SetRelay(GenUtils.Reconcile(tx.GetRelay(), !(bool)val));
+                else if (key.Equals("kept_by_block")) tx.SetIsKeptByBlock(GenUtils.Reconcile(tx.IsKeptByBlock(), (bool)val));
+                else if (key.Equals("signatures")) tx.SetSignatures(GenUtils.Reconcile(tx.GetSignatures(), (List<string>)val));
+                else if (key.Equals("last_failed_height"))
+                {
+                    ulong lastFailedHeight = Convert.ToUInt64(val);
+                    if (lastFailedHeight == 0) tx.SetIsFailed(GenUtils.Reconcile(tx.IsFailed(), false));
+                    else
+                    {
+                        tx.SetIsFailed(GenUtils.Reconcile(tx.IsFailed(), true));
+                        tx.SetLastFailedHeight(GenUtils.Reconcile(tx.GetLastFailedHeight(), lastFailedHeight));
+                    }
+                }
+                else if (key.Equals("last_failed_id_hash"))
+                {
+                    if (DEFAULT_ID.Equals(val)) tx.SetIsFailed(GenUtils.Reconcile(tx.IsFailed(), false));
+                    else
+                    {
+                        tx.SetIsFailed(GenUtils.Reconcile(tx.IsFailed(), true));
+                        tx.SetLastFailedHash(GenUtils.Reconcile(tx.GetLastFailedHash(), (string)val));
+                    }
+                }
+                else if (key.Equals("max_used_block_height")) tx.SetMaxUsedBlockHeight(GenUtils.Reconcile(tx.GetMaxUsedBlockHeight(), Convert.ToUInt64(val)));
+                else if (key.Equals("max_used_block_id_hash")) tx.SetMaxUsedBlockHash(GenUtils.Reconcile(tx.GetMaxUsedBlockHash(), (string)val));
+                else if (key.Equals("prunable_hash")) tx.SetPrunableHash(GenUtils.Reconcile(tx.GetPrunableHash(), "".Equals(val) ? null : (string)val));
+                else if (key.Equals("prunable_as_hex")) tx.SetPrunableHex(GenUtils.Reconcile(tx.GetPrunableHex(), "".Equals(val) ? null : (string)val));
+                else if (key.Equals("pruned_as_hex")) tx.SetPrunedHex(GenUtils.Reconcile(tx.GetPrunedHex(), "".Equals(val) ? null : (string)val));
+                else MoneroUtils.Log(0, "ignoring unexpected field in rpc tx: " + key + ": " + val);
             }
-            else if (key.Equals("max_used_block_height")) tx.SetMaxUsedBlockHeight(GenUtils.Reconcile(tx.GetMaxUsedBlockHeight(), ((ulong)val)));
-            else if (key.Equals("max_used_block_id_hash")) tx.SetMaxUsedBlockHash(GenUtils.Reconcile(tx.GetMaxUsedBlockHash(), (string)val));
-            else if (key.Equals("prunable_hash")) tx.SetPrunableHash(GenUtils.Reconcile(tx.GetPrunableHash(), "".Equals(val) ? null : (string)val));
-            else if (key.Equals("prunable_as_hex")) tx.SetPrunableHex(GenUtils.Reconcile(tx.GetPrunableHex(), "".Equals(val) ? null : (string)val));
-            else if (key.Equals("pruned_as_hex")) tx.SetPrunedHex(GenUtils.Reconcile(tx.GetPrunedHex(), "".Equals(val) ? null : (string)val));
-            else MoneroUtils.Log(0, "ignoring unexpected field in rpc tx: " + key + ": " + val);
-                }
     
-                // link block and tx
-                if (block != null) tx.SetBlock(block.SetTxs([tx]));
+            // link block and tx
+            if (block != null) tx.SetBlock(block.SetTxs([tx]));
 
             // TODO monerod: unconfirmed txs misreport block height and timestamp
             if (tx.GetBlock() != null && tx.GetBlock().GetHeight() != null && (ulong)tx.GetBlock().GetHeight() == tx.GetBlock().GetTimestamp())
@@ -1097,16 +1130,16 @@ namespace Monero.Daemon
                 object val = rpcTemplate[key];
                 if (key.Equals("blockhashing_blob")) template.SetBlockHashingBlob((string)val);
                 else if (key.Equals("blocktemplate_blob")) template.SetBlockTemplateBlob((string)val);
-                else if (key.Equals("expected_reward")) template.SetExpectedReward((ulong)val);
+                else if (key.Equals("expected_reward")) template.SetExpectedReward(Convert.ToUInt64(val));
                 else if (key.Equals("difficulty")) { }  // handled by wide_difficulty
                 else if (key.Equals("difficulty_top64")) { }  // handled by wide_difficulty
                 else if (key.Equals("wide_difficulty")) template.SetDifficulty(GenUtils.Reconcile(template.GetDifficulty(), PrefixedHexToUulong((string)val)));
-                else if (key.Equals("height")) template.SetHeight(((ulong)val));
+                else if (key.Equals("height")) template.SetHeight(Convert.ToUInt64(val));
                 else if (key.Equals("prev_hash")) template.SetPrevHash((string)val);
-                else if (key.Equals("reserved_offset")) template.SetReservedOffset(((ulong)val));
+                else if (key.Equals("reserved_offset")) template.SetReservedOffset(Convert.ToUInt64(val));
                 else if (key.Equals("status")) { }  // handled elsewhere
                 else if (key.Equals("untrusted")) { }  // handled elsewhere
-                else if (key.Equals("seed_height")) template.SetSeedHeight(((ulong)val));
+                else if (key.Equals("seed_height")) template.SetSeedHeight(Convert.ToUInt64(val));
                 else if (key.Equals("seed_hash")) template.SetSeedHash((string)val);
                 else if (key.Equals("next_seed_hash")) template.SetNextSeedHash((string)val);
                 else MoneroUtils.Log(0, "ignoring unexpected field in block template: " + key + ": " + val);
@@ -1115,14 +1148,15 @@ namespace Monero.Daemon
             return template;
         }
 
-        private static MoneroBlockHeader ConvertRpcBlockHeader(Dictionary<string, object> rpcHeader, MoneroBlockHeader? header = null)
+        private static MoneroBlockHeader ConvertRpcBlockHeader(Dictionary<string, object>? rpcHeader, MoneroBlockHeader? header = null)
         {
             if (header == null) header = new MoneroBlockHeader();
+            if (rpcHeader == null) throw new MoneroError("Header is null");
             foreach (string key in rpcHeader.Keys)
             {
                 object val = rpcHeader[key];
-                if (key.Equals("block_size")) header.SetSize(GenUtils.Reconcile(header.GetSize(), ((ulong)val)));
-                else if (key.Equals("depth")) header.SetDepth(GenUtils.Reconcile(header.GetDepth(), ((ulong)val)));
+                if (key.Equals("block_size")) header.SetSize(GenUtils.Reconcile(header.GetSize(), Convert.ToUInt64(val)));
+                else if (key.Equals("depth")) header.SetDepth(GenUtils.Reconcile(header.GetDepth(), Convert.ToUInt64(val)));
                 else if (key.Equals("difficulty")) { }  // handled by wide_difficulty
                 else if (key.Equals("cumulative_difficulty")) { } // handled by wide_cumulative_difficulty
                 else if (key.Equals("difficulty_top64")) { }  // handled by wide_difficulty
@@ -1130,17 +1164,17 @@ namespace Monero.Daemon
                 else if (key.Equals("wide_difficulty")) header.SetDifficulty(GenUtils.Reconcile(header.GetDifficulty(), PrefixedHexToUulong((string)val)));
                 else if (key.Equals("wide_cumulative_difficulty")) header.SetCumulativeDifficulty(GenUtils.Reconcile(header.GetCumulativeDifficulty(), PrefixedHexToUulong((string)val)));
                 else if (key.Equals("hash")) header.SetHash(GenUtils.Reconcile(header.GetHash(), (string)val));
-                else if (key.Equals("height")) header.SetHeight(GenUtils.Reconcile(header.GetHeight(), ((ulong)val)));
-                else if (key.Equals("major_version")) header.SetMajorVersion(GenUtils.Reconcile(header.GetMajorVersion(), ((uint)val)));
-                else if (key.Equals("minor_version")) header.SetMinorVersion(GenUtils.Reconcile(header.GetMinorVersion(), ((uint)val)));
-                else if (key.Equals("nonce")) header.SetNonce(GenUtils.Reconcile(header.GetNonce(), ((ulong)val)));
-                else if (key.Equals("num_txes")) header.SetNumTxs(GenUtils.Reconcile(header.GetNumTxs(), ((uint)val)));
+                else if (key.Equals("height")) header.SetHeight(GenUtils.Reconcile(header.GetHeight(), Convert.ToUInt64(val)));
+                else if (key.Equals("major_version")) header.SetMajorVersion(GenUtils.Reconcile(header.GetMajorVersion(), Convert.ToUInt32(val)));
+                else if (key.Equals("minor_version")) header.SetMinorVersion(GenUtils.Reconcile(header.GetMinorVersion(), Convert.ToUInt32(val)));
+                else if (key.Equals("nonce")) header.SetNonce(GenUtils.Reconcile(header.GetNonce(), Convert.ToUInt64(val)));
+                else if (key.Equals("num_txes")) header.SetNumTxs(GenUtils.Reconcile(header.GetNumTxs(), Convert.ToUInt32(val)));
                 else if (key.Equals("orphan_status")) header.SetOrphanStatus(GenUtils.Reconcile(header.GetOrphanStatus(), (bool)val));
                 else if (key.Equals("prev_hash") || key.Equals("prev_id")) header.SetPrevHash(GenUtils.Reconcile(header.GetPrevHash(), (string)val));
-                else if (key.Equals("reward")) header.SetReward(GenUtils.Reconcile(header.GetReward(), (ulong)val));
-                else if (key.Equals("timestamp")) header.SetTimestamp(GenUtils.Reconcile(header.GetTimestamp(), ((ulong)val)));
-                else if (key.Equals("block_weight")) header.SetWeight(GenUtils.Reconcile(header.GetWeight(), ((ulong)val)));
-                else if (key.Equals("long_term_weight")) header.SetLongTermWeight(GenUtils.Reconcile(header.GetLongTermWeight(), ((ulong)val)));
+                else if (key.Equals("reward")) header.SetReward(GenUtils.Reconcile(header.GetReward(), Convert.ToUInt64(val)));
+                else if (key.Equals("timestamp")) header.SetTimestamp(GenUtils.Reconcile(header.GetTimestamp(), Convert.ToUInt64(val)));
+                else if (key.Equals("block_weight")) header.SetWeight(GenUtils.Reconcile(header.GetWeight(), Convert.ToUInt64(val)));
+                else if (key.Equals("long_term_weight")) header.SetLongTermWeight(GenUtils.Reconcile(header.GetLongTermWeight(), Convert.ToUInt64(val)));
                 else if (key.Equals("pow_hash")) header.SetPowHash(GenUtils.Reconcile(header.GetPowHash(), "".Equals(val) ? null : (string)val));
                 else if (key.Equals("tx_hashes")) { }  // used in block model, not header model
                 else if (key.Equals("miner_tx")) { }   // used in block model, not header model
@@ -1152,7 +1186,32 @@ namespace Monero.Daemon
 
         private static MoneroBlock ConvertRpcBlock(Dictionary<string, object> rpcBlock)
         {
-            throw new NotImplementedException();
+            // build block
+            var block = new MoneroBlock();
+            ConvertRpcBlockHeader(rpcBlock.ContainsKey("block_header") ? ((JObject)rpcBlock["block_header"]).ToObject<Dictionary<string, object>>() : rpcBlock, block);
+            block.SetHex((string)rpcBlock["blob"]);
+            block.SetTxHashes(rpcBlock.ContainsKey("tx_hashes") ? ((JArray)rpcBlock["tx_hashes"]).ToObject<List<string>>() : new List<string>());
+
+            // build miner tx
+            Dictionary<string, object> rpcMinerTx;
+            if (rpcBlock.ContainsKey("json"))
+            {
+                rpcMinerTx = ((JObject)JsonConvert.DeserializeObject<Dictionary<string, object>>((string)rpcBlock["json"])["miner_tx"]).ToObject<Dictionary<string, object>>();
+            }
+            else if (rpcBlock.ContainsKey("miner_tx"))
+            {
+                rpcMinerTx = ((JObject)rpcBlock["miner_tx"]).ToObject<Dictionary<string, object>>();
+            }
+            else
+            {
+                throw new MoneroError("Block does not contain miner tx");
+            }
+            
+            MoneroTx minerTx = new MoneroTx().SetIsConfirmed(true).SetInTxPool(false).SetIsMinerTx(true);
+            ConvertRpcTx(rpcMinerTx, minerTx);
+            block.SetMinerTx(minerTx);
+
+            return block;
         }
 
         private static MoneroOutput ConvertRpcOutput(Dictionary<string, object> rpcOutput, MoneroTx tx)
@@ -1165,18 +1224,18 @@ namespace Monero.Daemon
                 if (key.Equals("gen")) throw new MoneroError("Output with 'gen' from daemon rpc is miner tx which we ignore (i.e. each miner input is null)");
                 else if (key.Equals("key"))
                 {
-                    var rpcKey = (Dictionary<string, object>)val;
-                    output.SetAmount(GenUtils.Reconcile(output.GetAmount(), (ulong)rpcKey["amount"]));
+                    var rpcKey = ((JObject)val).ToObject<Dictionary<string, object>>();
+                    output.SetAmount(GenUtils.Reconcile(output.GetAmount(), Convert.ToUInt64(rpcKey["amount"])));
                     output.SetKeyImage(GenUtils.Reconcile(output.GetKeyImage(), new MoneroKeyImage((string)rpcKey["k_image"])));
                     List<ulong> ringOutputIndices = [];
-                    foreach (ulong bi in (List<ulong>)rpcKey["key_offsets"]) ringOutputIndices.Add(bi);
+                    foreach (ulong bi in (JArray)rpcKey["key_offsets"]) ringOutputIndices.Add(Convert.ToUInt64(bi));
                     output.SetRingOutputIndices(GenUtils.Reconcile(output.GetRingOutputIndices(), ringOutputIndices));
                 }
-                else if (key.Equals("amount")) output.SetAmount(GenUtils.Reconcile(output.GetAmount(), (ulong)val));
+                else if (key.Equals("amount")) output.SetAmount(GenUtils.Reconcile(output.GetAmount(), Convert.ToUInt64(val)));
                 else if (key.Equals("target"))
                 {
-                    var valMap = (Dictionary<string, object>)val;
-                    string pubKey = valMap.ContainsKey("key") ? (string)valMap["key"] : ((Dictionary<string, string>)valMap["tagged_key"])["key"]; // TODO (monerod): rpc json uses {tagged_key={key=...}}, binary blocks use {key=...}
+                    var valMap = ((JObject)val).ToObject<Dictionary<string, object>>();
+                    string pubKey = valMap.ContainsKey("key") ? (string)valMap["key"] : (((JObject)valMap["tagged_key"])).ToObject<Dictionary<string, string>>()["key"]; // TODO (monerod): rpc json uses {tagged_key={key=...}}, binary blocks use {key=...}
                     output.SetStealthPublicKey(GenUtils.Reconcile(output.GetStealthPublicKey(), pubKey));
                 }
                 else MoneroUtils.Log(0, "ignoring unexpected field output: " + key + ": " + val);
@@ -1213,25 +1272,25 @@ namespace Monero.Daemon
             foreach (string key in rpcStats.Keys)
             {
                 object val = rpcStats[key];
-                if (key.Equals("bytes_max")) stats.SetBytesMax(((ulong)val));
-                else if (key.Equals("bytes_med")) stats.SetBytesMed(((ulong)val));
-                else if (key.Equals("bytes_min")) stats.SetBytesMin(((ulong)val));
-                else if (key.Equals("bytes_total")) stats.SetBytesTotal(((ulong)val));
-                else if (key.Equals("histo_98pc")) stats.SetHisto98pc(((ulong)val));
-                else if (key.Equals("num_10m")) stats.SetNum10m(((int)val));
-                else if (key.Equals("num_double_spends")) stats.SetNumDoubleSpends(((int)val));
-                else if (key.Equals("num_failing")) stats.SetNumFailing(((int)val));
-                else if (key.Equals("num_not_relayed")) stats.SetNumNotRelayed(((int)val));
-                else if (key.Equals("oldest")) stats.SetOldestTimestamp(((ulong)val));
-                else if (key.Equals("txs_total")) stats.SetNumTxs(((int)val));
-                else if (key.Equals("fee_total")) stats.SetFeeTotal((ulong)val);
+                if (key.Equals("bytes_max")) stats.SetBytesMax(Convert.ToUInt64(val));
+                else if (key.Equals("bytes_med")) stats.SetBytesMed(Convert.ToUInt64(val));
+                else if (key.Equals("bytes_min")) stats.SetBytesMin(Convert.ToUInt64(val));
+                else if (key.Equals("bytes_total")) stats.SetBytesTotal(Convert.ToUInt64(val));
+                else if (key.Equals("histo_98pc")) stats.SetHisto98pc(Convert.ToUInt64(val));
+                else if (key.Equals("num_10m")) stats.SetNum10m(Convert.ToInt32(val));
+                else if (key.Equals("num_double_spends")) stats.SetNumDoubleSpends(Convert.ToInt32(val));
+                else if (key.Equals("num_failing")) stats.SetNumFailing(Convert.ToInt32(val));
+                else if (key.Equals("num_not_relayed")) stats.SetNumNotRelayed(Convert.ToInt32(val));
+                else if (key.Equals("oldest")) stats.SetOldestTimestamp(Convert.ToUInt64(val));
+                else if (key.Equals("txs_total")) stats.SetNumTxs(Convert.ToInt32(val));
+                else if (key.Equals("fee_total")) stats.SetFeeTotal(Convert.ToUInt64(val));
                 else if (key.Equals("histo"))
                 {
                     stats.SetHisto([]);
-                    foreach (var elem in (List<Dictionary<string, int>>)val)
-                    {
+                    //foreach (var elem in (List<Dictionary<string, int>>)val)
+                    //{
                         //stats.GetHisto().Add(elem["bytes"], elem["txs"]);
-                    }
+                    //}
                 }
                 else MoneroUtils.Log(0, "ignoring unexpected field in tx pool stats: '" + key + "': " + val);
             }
@@ -1267,11 +1326,11 @@ namespace Monero.Daemon
                 if (key.Equals("host")) peer.SetHost((string)val);
                 else if (key.Equals("id")) peer.SetId("" + val);  // TODO monero-wallet-rpc: peer id is big integer but string in `get_connections`
                 else if (key.Equals("ip")) { } // host used instead which is consistently a string
-                else if (key.Equals("last_seen")) peer.SetLastSeenTimestamp(((ulong)val));
-                else if (key.Equals("port")) peer.SetPort(((int)val));
-                else if (key.Equals("rpc_port")) peer.SetRpcPort(((int)val));
-                else if (key.Equals("pruning_seed")) peer.SetPruningSeed(((int)val));
-                else if (key.Equals("rpc_credits_per_hash")) peer.SetRpcCreditsPerHash((ulong)val);
+                else if (key.Equals("last_seen")) peer.SetLastSeenTimestamp(Convert.ToUInt64(val));
+                else if (key.Equals("port")) peer.SetPort(Convert.ToInt32(val));
+                else if (key.Equals("rpc_port")) peer.SetRpcPort(Convert.ToInt32(val));
+                else if (key.Equals("pruning_seed")) peer.SetPruningSeed(Convert.ToInt32(val));
+                else if (key.Equals("rpc_credits_per_hash")) peer.SetRpcCreditsPerHash(Convert.ToUInt64(val));
                 else MoneroUtils.Log(0, "ignoring unexpected field in rpc peer: " + key + ": " + val);
             }
             return peer;
@@ -1295,7 +1354,7 @@ namespace Monero.Daemon
                 else if (key.Equals("reason")) result.SetReason("".Equals(val) ? null : (string)val);
                 else if (key.Equals("too_big")) result.SetIsTooBig((bool)val);
                 else if (key.Equals("sanity_check_failed")) result.SetSanityCheckFailed((bool)val);
-                else if (key.Equals("credits")) result.SetCredits((ulong)val);
+                else if (key.Equals("credits")) result.SetCredits(Convert.ToUInt64(val));
                 else if (key.Equals("status") || key.Equals("untrusted")) { }  // handled elsewhere
                 else if (key.Equals("top_hash")) result.SetTopBlockHash("".Equals(val) ? null : (string)val);
                 else if (key.Equals("tx_extra_too_big")) result.SetIsTxExtraTooBig((bool)val);
@@ -1313,32 +1372,32 @@ namespace Monero.Daemon
             {
                 object val = rpcConnection[key];
                 if (key.Equals("address")) peer.SetAddress((string)val);
-                else if (key.Equals("avg_download")) peer.SetAvgDownload(((ulong)val));
-                else if (key.Equals("avg_upload")) peer.SetAvgUpload(((ulong)val));
+                else if (key.Equals("avg_download")) peer.SetAvgDownload(Convert.ToUInt64(val));
+                else if (key.Equals("avg_upload")) peer.SetAvgUpload(Convert.ToUInt64(val));
                 else if (key.Equals("connection_id")) peer.SetHash((string)val);
-                else if (key.Equals("current_download")) peer.SetCurrentDownload(((ulong)val));
-                else if (key.Equals("current_upload")) peer.SetCurrentUpload(((ulong)val));
-                else if (key.Equals("height")) peer.SetHeight(((ulong)val));
+                else if (key.Equals("current_download")) peer.SetCurrentDownload(Convert.ToUInt64(val));
+                else if (key.Equals("current_upload")) peer.SetCurrentUpload(Convert.ToUInt64(val));
+                else if (key.Equals("height")) peer.SetHeight(Convert.ToUInt64(val));
                 else if (key.Equals("host")) peer.SetHost((string)val);
                 else if (key.Equals("ip")) { } // host used instead which is consistently a string
                 else if (key.Equals("incoming")) peer.SetIsIncoming((bool)val);
-                else if (key.Equals("live_time")) peer.SetLiveTime(((ulong)val));
+                else if (key.Equals("live_time")) peer.SetLiveTime(Convert.ToUInt64(val));
                 else if (key.Equals("local_ip")) peer.SetIsLocalIp((bool)val);
                 else if (key.Equals("localhost")) peer.SetIsLocalHost((bool)val);
                 else if (key.Equals("peer_id")) peer.SetId((string)val);
-                else if (key.Equals("port")) peer.SetPort((int)val);
-                else if (key.Equals("rpc_port")) peer.SetRpcPort(((int)val));
-                else if (key.Equals("recv_count")) peer.SetNumReceives(((int)val));
-                else if (key.Equals("recv_idle_time")) peer.SetReceiveIdleTime(((ulong)val));
-                else if (key.Equals("send_count")) peer.SetNumSends(((int)val));
-                else if (key.Equals("send_idle_time")) peer.SetSendIdleTime(((ulong)val));
+                else if (key.Equals("port")) peer.SetPort(Convert.ToInt32(val));
+                else if (key.Equals("rpc_port")) peer.SetRpcPort(Convert.ToInt32(val));
+                else if (key.Equals("recv_count")) peer.SetNumReceives(Convert.ToInt32(val));
+                else if (key.Equals("recv_idle_time")) peer.SetReceiveIdleTime(Convert.ToUInt64(val));
+                else if (key.Equals("send_count")) peer.SetNumSends(Convert.ToInt32(val));
+                else if (key.Equals("send_idle_time")) peer.SetSendIdleTime(Convert.ToUInt64(val));
                 else if (key.Equals("state")) peer.SetState((string)val);
-                else if (key.Equals("support_flags")) peer.SetNumSupportFlags(((int)val));
-                else if (key.Equals("pruning_seed")) peer.SetPruningSeed(((int)val));
-                else if (key.Equals("rpc_credits_per_hash")) peer.SetRpcCreditsPerHash((ulong)val);
+                else if (key.Equals("support_flags")) peer.SetNumSupportFlags(Convert.ToInt32(val));
+                else if (key.Equals("pruning_seed")) peer.SetPruningSeed(Convert.ToInt32(val));
+                else if (key.Equals("rpc_credits_per_hash")) peer.SetRpcCreditsPerHash(Convert.ToUInt64(val));
                 else if (key.Equals("address_type"))
                 {
-                    int rpcType = ((int)val);
+                    int rpcType = Convert.ToInt32(val);
                     if (rpcType == 0) peer.SetType(MoneroConnectionType.INVALID);
                     else if (rpcType == 1) peer.SetType(MoneroConnectionType.IPV4);
                     else if (rpcType == 2) peer.SetType(MoneroConnectionType.IPV6);
@@ -1357,10 +1416,10 @@ namespace Monero.Daemon
             foreach (string key in rpcEntry.Keys)
             {
                 object val = rpcEntry[key];
-                if (key.Equals("amount")) entry.SetAmount((ulong)val);
-                else if (key.Equals("total_instances")) entry.SetNumInstances(((ulong)val));
-                else if (key.Equals("unlocked_instances")) entry.SetNumUnlockedInstances(((ulong)val));
-                else if (key.Equals("recent_instances")) entry.SetNumRecentInstances(((ulong)val));
+                if (key.Equals("amount")) entry.SetAmount(Convert.ToUInt64(val));
+                else if (key.Equals("total_instances")) entry.SetNumInstances(Convert.ToUInt64(val));
+                else if (key.Equals("unlocked_instances")) entry.SetNumUnlockedInstances(Convert.ToUInt64(val));
+                else if (key.Equals("recent_instances")) entry.SetNumRecentInstances(Convert.ToUInt64(val));
                 else MoneroUtils.Log(0, "ignoring unexpected field in output histogram: " + key + ": " + val);
             }
             return entry;
@@ -1374,11 +1433,11 @@ namespace Monero.Daemon
             {
                 object val = rpcInfo[key];
                 if (key.Equals("version")) info.SetVersion((string)val);
-                else if (key.Equals("alt_blocks_count")) info.SetNumAltBlocks(((ulong)val));
-                else if (key.Equals("block_size_limit")) info.SetBlockSizeLimit(((ulong)val));
-                else if (key.Equals("block_size_median")) info.SetBlockSizeMedian(((ulong)val));
-                else if (key.Equals("block_weight_limit")) info.SetBlockWeightLimit(((ulong)val));
-                else if (key.Equals("block_weight_median")) info.SetBlockWeightMedian(((ulong)val));
+                else if (key.Equals("alt_blocks_count")) info.SetNumAltBlocks(Convert.ToUInt64(val));
+                else if (key.Equals("block_size_limit")) info.SetBlockSizeLimit(Convert.ToUInt64(val));
+                else if (key.Equals("block_size_median")) info.SetBlockSizeMedian(Convert.ToUInt64(val));
+                else if (key.Equals("block_weight_limit")) info.SetBlockWeightLimit(Convert.ToUInt64(val));
+                else if (key.Equals("block_weight_median")) info.SetBlockWeightMedian(Convert.ToUInt64(val));
                 else if (key.Equals("bootstrap_daemon_address")) { if (((string)val).Length > 0) info.SetBootstrapDaemonAddress((string)val); }
                 else if (key.Equals("difficulty")) { }  // handled by wide_difficulty
                 else if (key.Equals("cumulative_difficulty")) { } // handled by wide_cumulative_difficulty
@@ -1386,31 +1445,31 @@ namespace Monero.Daemon
                 else if (key.Equals("cumulative_difficulty_top64")) { } // handled by wide_cumulative_difficulty
                 else if (key.Equals("wide_difficulty")) info.SetDifficulty(GenUtils.Reconcile(info.GetDifficulty(), PrefixedHexToUulong((string)val)));
                 else if (key.Equals("wide_cumulative_difficulty")) info.SetCumulativeDifficulty(GenUtils.Reconcile(info.GetCumulativeDifficulty(), PrefixedHexToUulong((string)val)));
-                else if (key.Equals("free_space")) info.SetFreeSpace((ulong)val);
-                else if (key.Equals("database_size")) info.SetDatabaseSize(((ulong)val));
-                else if (key.Equals("grey_peerlist_size")) info.SetNumOfflinePeers(((uint)val));
-                else if (key.Equals("height")) info.SetHeight(((ulong)val));
-                else if (key.Equals("height_without_bootstrap")) info.SetHeightWithoutBootstrap(((ulong)val));
-                else if (key.Equals("incoming_connections_count")) info.SetNumIncomingConnections(((uint)val));
+                else if (key.Equals("free_space")) info.SetFreeSpace(Convert.ToUInt64(val.ToString()));
+                else if (key.Equals("database_size")) info.SetDatabaseSize(Convert.ToUInt64(val));
+                else if (key.Equals("grey_peerlist_size")) info.SetNumOfflinePeers(Convert.ToUInt32(val));
+                else if (key.Equals("height")) info.SetHeight(Convert.ToUInt64(val));
+                else if (key.Equals("height_without_bootstrap")) info.SetHeightWithoutBootstrap(Convert.ToUInt64(val));
+                else if (key.Equals("incoming_connections_count")) info.SetNumIncomingConnections(Convert.ToUInt32(val));
                 else if (key.Equals("offline")) info.SetIsOffline((bool)val);
-                else if (key.Equals("outgoing_connections_count")) info.SetNumOutgoingConnections(((uint)val));
-                else if (key.Equals("rpc_connections_count")) info.SetNumRpcConnections(((uint)val));
-                else if (key.Equals("start_time")) info.SetStartTimestamp(((ulong)val));
-                else if (key.Equals("adjusted_time")) info.SetAdjustedTimestamp(((ulong)val));
+                else if (key.Equals("outgoing_connections_count")) info.SetNumOutgoingConnections(Convert.ToUInt32(val));
+                else if (key.Equals("rpc_connections_count")) info.SetNumRpcConnections(Convert.ToUInt32(val));
+                else if (key.Equals("start_time")) info.SetStartTimestamp(Convert.ToUInt64(val));
+                else if (key.Equals("adjusted_time")) info.SetAdjustedTimestamp(Convert.ToUInt64(val));
                 else if (key.Equals("status")) { }  // handled elsewhere
-                else if (key.Equals("target")) info.SetTarget(((ulong)val));
-                else if (key.Equals("target_height")) info.SetTargetHeight(((ulong)val));
-                else if (key.Equals("tx_count")) info.SetNumTxs(((uint)val));
-                else if (key.Equals("tx_pool_size")) info.SetNumTxsPool(((uint)val));
+                else if (key.Equals("target")) info.SetTarget(Convert.ToUInt64(val));
+                else if (key.Equals("target_height")) info.SetTargetHeight(Convert.ToUInt64(val));
+                else if (key.Equals("tx_count")) info.SetNumTxs(Convert.ToUInt32(val));
+                else if (key.Equals("tx_pool_size")) info.SetNumTxsPool(Convert.ToUInt32(val));
                 else if (key.Equals("untrusted")) { } // handled elsewhere
                 else if (key.Equals("was_bootstrap_ever_used")) info.SetWasBootstrapEverUsed((bool)val);
-                else if (key.Equals("white_peerlist_size")) info.SetNumOnlinePeers(((uint)val));
+                else if (key.Equals("white_peerlist_size")) info.SetNumOnlinePeers(Convert.ToUInt32(val));
                 else if (key.Equals("update_available")) info.SetUpdateAvailable((bool)val);
                 else if (key.Equals("nettype")) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetwork.Parse((string)val)));
                 else if (key.Equals("mainnet")) { if ((bool)val) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.MAINNET)); }
                 else if (key.Equals("testnet")) { if ((bool)val) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.TESTNET)); }
                 else if (key.Equals("stagenet")) { if ((bool)val) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.STAGENET)); }
-                else if (key.Equals("credits")) info.SetCredits((ulong)val);
+                else if (key.Equals("credits")) info.SetCredits(Convert.ToUInt64(val));
                 else if (key.Equals("top_block_hash") || key.Equals("top_hash")) info.SetTopBlockHash(GenUtils.Reconcile(info.GetTopBlockHash(), "".Equals(val) ? null : (string)val));  // TODO monero-wallet-rpc: daemon info top_hash is redundant with top_block_hash, only returned if pay-for-service enabled
                 else if (key.Equals("busy_syncing")) info.SetIsBusySyncing((bool)val);
                 else if (key.Equals("synchronized")) info.SetIsSynchronized((bool)val);
@@ -1426,28 +1485,28 @@ namespace Monero.Daemon
             foreach (string key in rpcSyncInfo.Keys)
             {
                 object val = rpcSyncInfo[key];
-                if (key.Equals("height")) syncInfo.SetHeight(((ulong)val));
+                if (key.Equals("height")) syncInfo.SetHeight(Convert.ToUInt64(val));
                 else if (key.Equals("peers"))
                 {
                     syncInfo.SetPeers([]);
-                    var rpcConnections = (List<Dictionary<string, object>>)val;
+                    var rpcConnections = ((JArray)val).ToObject<List<Dictionary<string, object>>>();
                     foreach (var rpcConnection in rpcConnections)
                     {
-                        syncInfo.GetPeers().Add(ConvertRpcConnection((Dictionary<string, object>)rpcConnection["info"]));
+                        syncInfo.GetPeers().Add(ConvertRpcConnection(((JObject)rpcConnection["info"]).ToObject<Dictionary<string, object>> ()));
                     }
                 }
                 else if (key.Equals("spans"))
                 {
                     syncInfo.SetSpans([]);
-                    var rpcSpans = (List<Dictionary<string, object>>)val;
+                    var rpcSpans = ((JArray)val).ToObject<List<Dictionary<string, object>>>();
                     foreach (var rpcSpan in rpcSpans)
                     {
                         syncInfo.GetSpans().Add(ConvertRpcConnectionSpan(rpcSpan));
                     }
                 }
                 else if (key.Equals("status")) { }   // handled elsewhere
-                else if (key.Equals("target_height")) syncInfo.SetTargetHeight(((ulong)val));
-                else if (key.Equals("next_needed_pruning_seed")) syncInfo.SetNextNeededPruningSeed(((uint)val));
+                else if (key.Equals("target_height")) syncInfo.SetTargetHeight(Convert.ToUInt64(val));
+                else if (key.Equals("next_needed_pruning_seed")) syncInfo.SetNextNeededPruningSeed(Convert.ToUInt32(val));
                 else if (key.Equals("overview"))
                 {  // this returns [] without pruning
                     try
@@ -1461,7 +1520,7 @@ namespace Monero.Daemon
                         MoneroUtils.Log(0, "Failed to parse 'overview' field: " + val);
                     }
                 }
-                else if (key.Equals("credits")) syncInfo.SetCredits((ulong)val);
+                else if (key.Equals("credits")) syncInfo.SetCredits(Convert.ToUInt64(val));
                 else if (key.Equals("top_hash")) syncInfo.SetTopBlockHash("".Equals(val) ? null : (string)val);
                 else if (key.Equals("untrusted")) { }  // handled elsewhere
                 else MoneroUtils.Log(0, "ignoring unexpected field in sync info: " + key + ": " + val);
@@ -1475,17 +1534,17 @@ namespace Monero.Daemon
             foreach (string key in rpcHardForkInfo.Keys)
             {
                 object val = rpcHardForkInfo[key];
-                if (key.Equals("earliest_height")) info.SetEarliestHeight(((ulong)val));
+                if (key.Equals("earliest_height")) info.SetEarliestHeight(Convert.ToUInt64(val));
                 else if (key.Equals("enabled")) info.SetIsEnabled((bool)val);
-                else if (key.Equals("state")) info.SetState(((uint)val));
+                else if (key.Equals("state")) info.SetState(Convert.ToUInt32(val));
                 else if (key.Equals("status")) { }     // handled elsewhere
                 else if (key.Equals("untrusted")) { }  // handled elsewhere
-                else if (key.Equals("threshold")) info.SetThreshold(((uint)val));
-                else if (key.Equals("version")) info.SetVersion(((uint)val));
-                else if (key.Equals("votes")) info.SetNumVotes(((uint)val));
-                else if (key.Equals("voting")) info.SetVoting(((uint)val));
-                else if (key.Equals("window")) info.SetWindow(((uint)val));
-                else if (key.Equals("credits")) info.SetCredits((uint)val);
+                else if (key.Equals("threshold")) info.SetThreshold(Convert.ToUInt32(val));
+                else if (key.Equals("version")) info.SetVersion(Convert.ToUInt32(val));
+                else if (key.Equals("votes")) info.SetNumVotes(Convert.ToUInt32(val));
+                else if (key.Equals("voting")) info.SetVoting(Convert.ToUInt32(val));
+                else if (key.Equals("window")) info.SetWindow(Convert.ToUInt32(val));
+                else if (key.Equals("credits")) info.SetCredits(Convert.ToUInt32(val));
                 else if (key.Equals("top_hash")) info.SetTopBlockHash("".Equals(val) ? null : (string)val);
                 else MoneroUtils.Log(0, "ignoring unexpected field in hard fork info: " + key + ": " + val);
             }
@@ -1499,12 +1558,12 @@ namespace Monero.Daemon
             {
                 object val = rpcConnectionSpan[key];
                 if (key.Equals("connection_id")) span.SetConnectionId((string)val);
-                else if (key.Equals("nblocks")) span.SetNumBlocks(((ulong)val));
-                else if (key.Equals("rate")) span.SetRate(((ulong)val));
+                else if (key.Equals("nblocks")) span.SetNumBlocks(Convert.ToUInt64(val));
+                else if (key.Equals("rate")) span.SetRate(Convert.ToUInt64(val));
                 else if (key.Equals("remote_address")) { if (!"".Equals(val)) span.SetRemoteAddress((string)val); }
-                else if (key.Equals("size")) span.SetSize(((ulong)val));
-                else if (key.Equals("speed")) span.SetSpeed(((ulong)val));
-                else if (key.Equals("start_block_height")) span.SetStartHeight(((ulong)val));
+                else if (key.Equals("size")) span.SetSize(Convert.ToUInt64(val));
+                else if (key.Equals("speed")) span.SetSpeed(Convert.ToUInt64(val));
+                else if (key.Equals("start_block_height")) span.SetStartHeight(Convert.ToUInt64(val));
                 else MoneroUtils.Log(0, "ignoring unexpected field in daemon connection span: " + key + ": " + val);
             }
             return span;
@@ -1524,8 +1583,8 @@ namespace Monero.Daemon
         {
             var status = new MoneroMiningStatus();
             status.SetIsActive((bool)rpcStatus["active"]);
-            status.SetSpeed(((ulong)rpcStatus["speed"]));
-            status.SetNumThreads(((uint)rpcStatus["threads_count"]));
+            status.SetSpeed(Convert.ToUInt64(rpcStatus["speed"]));
+            status.SetNumThreads(Convert.ToUInt32(rpcStatus["threads_count"]));
             if (status.IsActive() == true)
             {
                 status.SetAddress((string)rpcStatus["address"]);
@@ -1543,10 +1602,10 @@ namespace Monero.Daemon
                 if (key.Equals("block_hash")) { }  // using block_hashes instead
                 else if (key.Equals("difficulty")) { } // handled by wide_difficulty
                 else if (key.Equals("difficulty_top64")) { }  // handled by wide_difficulty
-                else if (key.Equals("wide_difficulty")) chain.SetDifficulty(GenUtils.Reconcile((ulong)chain.GetDifficulty(), PrefixedHexToUulong((string)val)));
-                else if (key.Equals("height")) chain.SetHeight(((ulong)val));
-                else if (key.Equals("length")) chain.SetLength(((ulong)val));
-                else if (key.Equals("block_hashes")) chain.SetBlockHashes((List<string>)val);
+                else if (key.Equals("wide_difficulty")) chain.SetDifficulty(GenUtils.Reconcile(Convert.ToUInt64(chain.GetDifficulty()), PrefixedHexToUulong((string)val)));
+                else if (key.Equals("height")) chain.SetHeight(Convert.ToUInt64(val));
+                else if (key.Equals("length")) chain.SetLength(Convert.ToUInt64(val));
+                else if (key.Equals("block_hashes")) chain.SetBlockHashes(((JArray)val).ToObject<List<string>>());
                 else if (key.Equals("main_chain_parent_block")) chain.SetMainChainParentBlockHash((string)val);
                 else MoneroUtils.Log(0, "ignoring unexpected field in alternative chain: " + key + ": " + val);
             }

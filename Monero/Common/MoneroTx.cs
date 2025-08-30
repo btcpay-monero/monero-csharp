@@ -28,9 +28,9 @@ namespace Monero.Common
         private string? prunableHash;
         private ulong? size;
         private ulong? weight;
-        private List<MoneroOutput> inputs = [];
-        private List<MoneroOutput> outputs = [];
-        private List<ulong> outputIndices = [];
+        private List<MoneroOutput>? inputs;
+        private List<MoneroOutput>? outputs;
+        private List<ulong>? outputIndices;
         private string? metadata;
         private byte[]? extra; // TODO: switch to string for consistency with MoneroTxWallet?
         private object? rctSignatures; // TODO: implement
@@ -41,7 +41,7 @@ namespace Monero.Common
         private string? lastFailedHash;
         private ulong? maxUsedBlockHeight;
         private string? maxUsedBlockHash;
-        private List<string> signatures = [];
+        private List<string>? signatures;
 
         public MoneroTx()
         {
@@ -359,34 +359,34 @@ namespace Monero.Common
             return this;
         }
 
-        public List<MoneroOutput> GetInputs()
+        public List<MoneroOutput>? GetInputs()
         {
             return inputs;
         }
 
-        public virtual MoneroTx SetInputs(List<MoneroOutput> inputs)
+        public virtual MoneroTx SetInputs(List<MoneroOutput>? inputs)
         {
             this.inputs = inputs;
             return this;
         }
 
-        public List<MoneroOutput> GetOutputs()
+        public List<MoneroOutput>? GetOutputs()
         {
             return outputs;
         }
 
-        public virtual MoneroTx SetOutputs(List<MoneroOutput> outputs)
+        public virtual MoneroTx SetOutputs(List<MoneroOutput>? outputs)
         {
             this.outputs = outputs;
             return this;
         }
 
-        public List<ulong> GetOutputIndices()
+        public List<ulong>? GetOutputIndices()
         {
             return outputIndices;
         }
 
-        public virtual MoneroTx SetOutputIndices(List<ulong> outputIndices)
+        public virtual MoneroTx SetOutputIndices(List<ulong>? outputIndices)
         {
             this.outputIndices = outputIndices;
             return this;
@@ -502,12 +502,12 @@ namespace Monero.Common
             return this;
         }
 
-        public List<string> GetSignatures()
+        public List<string>? GetSignatures()
         {
             return signatures;
         }
 
-        public virtual MoneroTx SetSignatures(List<string> signatures)
+        public virtual MoneroTx SetSignatures(List<string>? signatures)
         {
             this.signatures = signatures;
             return this;

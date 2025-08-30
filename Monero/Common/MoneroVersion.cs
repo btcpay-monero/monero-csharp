@@ -1,4 +1,6 @@
 ﻿
+using System.Numerics;
+
 namespace Monero.Common
 {
     public class MoneroVersion

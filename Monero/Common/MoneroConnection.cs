@@ -12,7 +12,7 @@ namespace Monero.Common
         protected Dictionary<string, string?> _attributes = [];
         protected bool? _isOnline;
 
-        public MoneroConnection(string? uri = null, string? proxyUri = null, int priority = 0, ulong timeoutMs = 2000)
+        public MoneroConnection(string? uri = null, string? proxyUri = null, int priority = 0, ulong timeoutMs = 20000)
         {
             _uri = uri;
             _proxyUri = proxyUri;

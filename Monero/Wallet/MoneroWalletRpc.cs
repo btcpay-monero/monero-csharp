@@ -1,7 +1,7 @@
 ﻿using Monero.Common;
 using Monero.Wallet.Common;
 using System.Diagnostics;
-
+using System.Text;
 using MoneroJsonRpcParams = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Monero.Wallet
@@ -40,6 +40,109 @@ namespace Monero.Wallet
         {
             rpc = new MoneroRpcConnection(url, username, password);
             CheckRpcConnection();
+        }
+
+        public MoneroWalletRpc(List<string> cmd)
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = cmd[0],
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            if (cmd.Count > 1)
+            {
+                startInfo.Arguments = string.Join(" ", cmd.Skip(1));
+                Console.WriteLine("Starting monero wallet rpc with arguments: " + startInfo.Arguments); // debug log
+            }
+
+            startInfo.Environment["LANG"] = "en_US.UTF-8";
+
+            process = new Process { StartInfo = startInfo };
+            process.Start();
+
+            var sb = new StringBuilder();
+            string uri = null;
+            bool success = false;
+
+            using (var reader = process.StandardOutput)
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    Console.WriteLine(line); // debug log
+
+                    sb.AppendLine(line);
+
+                    const string uriLineContains = "Binding on ";
+                    int idx = line.IndexOf(uriLineContains, StringComparison.Ordinal);
+                    if (idx >= 0)
+                    {
+                        string host = line.Substring(idx + uriLineContains.Length,
+                                                     line.LastIndexOf(' ') - (idx + uriLineContains.Length));
+                        string port = line.Substring(line.LastIndexOf(':') + 1);
+                        bool sslEnabled = false;
+                        int sslIdx = cmd.IndexOf("--rpc-ssl");
+                        if (sslIdx >= 0 && sslIdx + 1 < cmd.Count)
+                        {
+                            sslEnabled = string.Equals(cmd[sslIdx + 1], "enabled", StringComparison.OrdinalIgnoreCase);
+                        }
+                        uri = (sslEnabled ? "https" : "http") + "://" + host + ":" + port;
+                    }
+
+                    if (line.Contains("Starting wallet RPC server"))
+                    {
+                        Task.Run(() =>
+                        {
+                            try
+                            {
+                                string l;
+                                while ((l = reader.ReadLine()) != null)
+                                {
+                                    Console.WriteLine(l);
+                                }
+                            }
+                            catch (IOException)
+                            {
+                            }
+                        });
+
+                        success = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!success)
+            {
+                throw new MoneroError("Failed to start monero-wallet-rpc server:\n\n" + sb.ToString().Trim());
+            }
+
+            string username = null;
+            string password = null;
+            int userPassIdx = cmd.IndexOf("--rpc-login");
+            if (userPassIdx >= 0 && userPassIdx + 1 < cmd.Count)
+            {
+                string userPass = cmd[userPassIdx + 1];
+                int sep = userPass.IndexOf(':');
+                if (sep >= 0)
+                {
+                    username = userPass.Substring(0, sep);
+                    password = userPass.Substring(sep + 1);
+                }
+            }
+
+            string zmqUri = null;
+            int zmqUriIdx = cmd.IndexOf("--zmq-pub");
+            if (zmqUriIdx >= 0 && zmqUriIdx + 1 < cmd.Count)
+            {
+                zmqUri = cmd[zmqUriIdx + 1];
+            }
+
+            rpc = new MoneroRpcConnection(uri, username, password, zmqUri);
         }
 
         #region RPC Wallet Methods
@@ -190,6 +293,51 @@ namespace Monero.Wallet
             if (e.Message.Equals("Cannot create wallet. Already exists.")) throw new MoneroRpcError("Wallet already exists: " + name, e.GetCode(), e.GetRpcMethod(), e.GetRpcParams());
             if (e.Message.Equals("Electrum-style word list failed verification")) throw new MoneroRpcError("Invalid mnemonic", e.GetCode(), e.GetRpcMethod(), e.GetRpcParams());
             throw e;
+        }
+
+        public Process? GetProcess() { return process; }
+
+        public int StopProcess(bool force = false)
+        {
+            if (process == null)
+            {
+                throw new MoneroError("MoneroWalletRpc instance not created from new process");
+            }
+
+            Clear();
+
+            if (force)
+            {
+                try
+                {
+                    process.Kill(true);
+                }
+                catch (Exception e)
+                {
+                    throw new MoneroError(e);
+                }
+            }
+            else
+            {
+                try
+                {
+                    process.Close();
+                }
+                catch (Exception e)
+                {
+                    throw new MoneroError(e);
+                }
+            }
+
+            try
+            {
+                process.WaitForExit();
+                return process.ExitCode;
+            }
+            catch (Exception e)
+            {
+                throw new MoneroError(e);
+            }
         }
 
         public MoneroRpcConnection GetRpcConnection() { return rpc; }
@@ -344,7 +492,7 @@ namespace Monero.Wallet
 
         public override string GetAddress(uint accountIdx, uint subaddressIdx)
         {
-            Dictionary<uint, string>? subaddressMap = addressCache[accountIdx];
+            Dictionary<uint, string>? subaddressMap = addressCache.GetValueOrDefault(accountIdx);
             if (subaddressMap == null)
             {
                 GetSubaddresses(accountIdx, null, true);      // cache's all addresses at this account

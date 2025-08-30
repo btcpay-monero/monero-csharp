@@ -2,7 +2,6 @@
 
 namespace Monero.Common
 {
-
     public class MoneroJsonRpcRequest : MoneroHttpRequest
     {
         [JsonProperty("jsonrpc", Order = 0)]
@@ -12,19 +11,30 @@ namespace Monero.Common
         public readonly string Method;
 
         [JsonProperty("params", Order = 2, NullValueHandling = NullValueHandling.Ignore)]
-        public Dictionary<string, object>? Params;
+        public object? Params;
 
-        public MoneroJsonRpcRequest(string method, Dictionary<string, object>? parameters = null)
+        public MoneroJsonRpcRequest(string method, object? parameters = null)
         {
             Method = method;
             Params = parameters;
         }
-
     }
 
     public class MoneroJsonRpcResponse
     {
         [JsonProperty("result")]
         public Dictionary<string, object>? Result;
+
+        [JsonProperty("error")]
+        public Dictionary<string, object>? Error;
+    }
+
+    public class MoneroJsonRpcStringResponse
+    {
+        [JsonProperty("result")]
+        public string? Result;
+
+        [JsonProperty("error")]
+        public Dictionary<string, object>? Error;
     }
 }

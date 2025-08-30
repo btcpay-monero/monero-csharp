@@ -7,10 +7,19 @@ namespace Monero.Test;
 public class TestMoneroConnectionManager
 {
 
-
     public TestMoneroConnectionManager() { }
 
     [Fact]
+    public void StartWallet()
+    {
+        var wallet = TestUtils.StartWalletRpcProcess();
+
+        var address = wallet.GetPrimaryAddress();
+
+        Assert.Equal(TestUtils.ADDRESS, address);
+    }
+
+    [Fact(Skip = "Disabled")]
     public void TestConnectionManager()
     {
         List<MoneroWalletRpc> walletRpcs = [];

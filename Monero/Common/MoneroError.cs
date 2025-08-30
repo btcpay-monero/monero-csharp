@@ -10,6 +10,8 @@ namespace Monero.Common
             _code = code;
         }
 
+        public MoneroError(Exception e) : base(e.Message) { }
+
         public int? GetCode()
         {
             return _code;

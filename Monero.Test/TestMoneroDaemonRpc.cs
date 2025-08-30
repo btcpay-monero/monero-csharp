@@ -10,13 +10,14 @@ namespace Monero.Test;
 
 public class TestMoneroDaemonRpc
 {
-    private static MoneroDaemonRpc daemon;
+    private static MoneroDaemonRpc daemon = TestUtils.GetDaemonRpc();
     private static MoneroWalletRpc wallet;
 
     private static readonly bool LITE_MODE = false;
     private static readonly bool TEST_NON_RELAYS = true;
     private static readonly bool TEST_RELAYS = true; // creates and relays outgoing txs
     private static readonly bool TEST_NOTIFICATIONS = true;
+    private static readonly bool RESTRICTED_RPC = daemon.IsRestricted();
 
     private static readonly TestContext BINARY_BLOCK_CTX = new();
 
@@ -31,9 +32,11 @@ public class TestMoneroDaemonRpc
         BINARY_BLOCK_CTX.txContext.fromGetTxPool = false;
         BINARY_BLOCK_CTX.txContext.hasOutputIndices = false;
         BINARY_BLOCK_CTX.txContext.fromBinaryBlock = true;
-        daemon = TestUtils.GetDaemonRpc();
-        wallet = TestUtils.GetWalletRpc();
         TestUtils.WALLET_TX_TRACKER.Reset();
+
+        var rpcConnection = daemon.GetRpcConnection();
+        
+        Assert.True(rpcConnection.IsConnected(), "Daemon offline");
     }
 
     #region Non Relays Tests
@@ -104,7 +107,7 @@ public class TestMoneroDaemonRpc
         string hash = daemon.GetBlockHash((ulong)lastHeader.GetHeight());
         MoneroBlockHeader header = daemon.GetBlockHeaderByHash(hash);
         TestBlockHeader(header, true);
-        Assert.True(lastHeader == header);
+        Assert.True(lastHeader.Equals(header));
 
         // retrieve by hash of previous to last block
         hash = daemon.GetBlockHash((ulong)lastHeader.GetHeight() - 1);
@@ -123,7 +126,7 @@ public class TestMoneroDaemonRpc
         MoneroBlockHeader lastHeader = daemon.GetLastBlockHeader();
         MoneroBlockHeader header = daemon.GetBlockHeaderByHeight((ulong)lastHeader.GetHeight());
         TestBlockHeader(header, true);
-        Assert.True(lastHeader == header);
+        Assert.True(lastHeader.Equals(header));
 
         // retrieve by height of previous to last block
         header = daemon.GetBlockHeaderByHeight((ulong)lastHeader.GetHeight() - 1);
@@ -133,7 +136,7 @@ public class TestMoneroDaemonRpc
 
     // Can get block headers by range
     // TODO: test start with no end, vice versa, inclusivity
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetBlockHeadersByRange()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -177,19 +180,19 @@ public class TestMoneroDaemonRpc
         string hash = daemon.GetBlockHash((ulong)lastHeader.GetHeight());
         MoneroBlock block = daemon.GetBlockByHash(hash);
         TestBlock(block, ctx);
-        Assert.True(daemon.GetBlockByHeight((ulong)block.GetHeight()) == block);
+        Assert.True(daemon.GetBlockByHeight((ulong)block.GetHeight()).Equals(block));
         Assert.Null(block.GetTxs());
 
         // retrieve by hash of previous to last block
         hash = daemon.GetBlockHash((ulong)lastHeader.GetHeight() - 1);
         block = daemon.GetBlockByHash(hash);
         TestBlock(block, ctx);
-        Assert.True(daemon.GetBlockByHeight((ulong)lastHeader.GetHeight() - 1) == block);
+        Assert.True(daemon.GetBlockByHeight((ulong)lastHeader.GetHeight() - 1).Equals(block));
         Assert.Null(block.GetTxs());
     }
 
     // Can get blocks by hash which includes transactions (binary)
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetBlocksByHashBinary()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -203,7 +206,7 @@ public class TestMoneroDaemonRpc
         Assert.True(TEST_NON_RELAYS);
 
         // config for testing blocks
-        TestContext ctx = new TestContext();
+        var ctx = new TestContext();
         ctx.hasHex = true;
         ctx.headerIsFull = true;
         ctx.hasTxs = false;
@@ -212,7 +215,7 @@ public class TestMoneroDaemonRpc
         MoneroBlockHeader lastHeader = daemon.GetLastBlockHeader();
         MoneroBlock block = daemon.GetBlockByHeight((ulong)lastHeader.GetHeight());
         TestBlock(block, ctx);
-        Assert.True(daemon.GetBlockByHeight((ulong)block.GetHeight()) == block);
+        Assert.True(daemon.GetBlockByHeight((ulong)block.GetHeight()).Equals(block));
 
         // retrieve by height of previous to last block
         block = daemon.GetBlockByHeight((ulong)lastHeader.GetHeight() - 1);
@@ -221,7 +224,7 @@ public class TestMoneroDaemonRpc
     }
 
     // Can get blocks by height which includes transactions (binary)
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetBlocksByHeightBinary()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -254,7 +257,7 @@ public class TestMoneroDaemonRpc
     }
 
     // Can get blocks by range in a single request
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetBlocksByRange()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -280,7 +283,7 @@ public class TestMoneroDaemonRpc
     }
 
     // Can get blocks by range using chunked requests
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetBlocksByRangeChunked()
     {
         Assert.True(TEST_NON_RELAYS && !LITE_MODE);
@@ -304,7 +307,7 @@ public class TestMoneroDaemonRpc
     }
 
     // Can get block hashes (binary)
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetBlockIdsBinary()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -532,6 +535,7 @@ public class TestMoneroDaemonRpc
     public void TestGetMinerTxSum()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         MoneroMinerTxSum sum = daemon.GetMinerTxSum(0l, Math.Min(50000l, daemon.GetHeight()));
         TestMinerTxSum(sum);
     }
@@ -542,10 +546,10 @@ public class TestMoneroDaemonRpc
     {
         Assert.True(TEST_NON_RELAYS);
         MoneroFeeEstimate feeEstimate = daemon.GetFeeEstimate();
-        //TestUtils.testUnsignedBigInteger(feeEstimate.GetFee(), true);
+        TestUtils.TestUnsignedBigInteger(feeEstimate.GetFee(), true);
         Assert.True(feeEstimate.GetFees().Count == 4); // slow, normal, fast, fastest
-        //for (int i = 0; i < 4; i++) TestUtils.testUnsignedBigInteger(feeEstimate.GetFees()[i], true);
-        //TestUtils.testUnsignedBigInteger(feeEstimate.GetQuantizationMask(), true);
+        for (int i = 0; i < 4; i++) TestUtils.TestUnsignedBigInteger(feeEstimate.GetFees()[i], true);
+        TestUtils.TestUnsignedBigInteger(feeEstimate.GetQuantizationMask(), true);
     }
 
     // Can get all transactions in the transaction pool
@@ -583,7 +587,7 @@ public class TestMoneroDaemonRpc
     }
 
     // Can get hashes of transactions in the transaction pool (binary)
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetIdsOfTxsInPoolBin()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -592,7 +596,7 @@ public class TestMoneroDaemonRpc
     }
 
     // Can get the transaction pool backlog (binary)
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetTxPoolBacklogBin()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -642,6 +646,7 @@ public class TestMoneroDaemonRpc
     public void TestFlushTxsFromPool()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(wallet);
 
         // preserve original transactions in the pool
@@ -679,6 +684,7 @@ public class TestMoneroDaemonRpc
     public void TestFlushTxFromPoolByHash()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(wallet);
 
         // preserve original transactions in the pool
@@ -718,6 +724,7 @@ public class TestMoneroDaemonRpc
     public void TestFlushTxsFromPoolByHashes()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(wallet);
 
         // preserve original transactions in the pool
@@ -791,7 +798,7 @@ public class TestMoneroDaemonRpc
     }
 
     // Can get output indices given a list of transaction hashes (binary)
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetOutputIndicesFromTxIdsBinary()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -799,7 +806,7 @@ public class TestMoneroDaemonRpc
     }
 
     // Can get outputs given a list of output amounts and indices (binary)
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetOutputsFromAmountsAndIndicesBinary()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -807,7 +814,7 @@ public class TestMoneroDaemonRpc
     }
 
     // Can get an output histogram (binary)
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetOutputHistogramBinary()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -820,7 +827,7 @@ public class TestMoneroDaemonRpc
     }
 
     // Can get an output distribution (binary)
-    [Fact]
+    [Fact(Skip = "Binary request not implemented")]
     public void TestGetOutputDistributionBinary()
     {
         Assert.True(TEST_NON_RELAYS);
@@ -854,6 +861,7 @@ public class TestMoneroDaemonRpc
     public void TestGetSyncInformation()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         MoneroDaemonSyncInfo syncInfo = daemon.GetSyncInfo();
         TestSyncInfo(syncInfo);
     }
@@ -872,6 +880,7 @@ public class TestMoneroDaemonRpc
     public void TestGetAlternativeChains()
     {
         Assert.True(TEST_NON_RELAYS);
+        //Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         List<MoneroAltChain> altChains = daemon.GetAltChains();
         foreach (MoneroAltChain altChain in altChains)
         {
@@ -897,6 +906,7 @@ public class TestMoneroDaemonRpc
     public void TestSetDownloadBandwidth()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         int initVal = daemon.GetDownloadLimit();
         Assert.True(initVal > 0);
         int setVal = initVal * 2;
@@ -923,6 +933,7 @@ public class TestMoneroDaemonRpc
     public void TestSetUploadBandwidth()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         int initVal = daemon.GetUploadLimit();
         Assert.True(initVal > 0);
         int setVal = initVal * 2;
@@ -949,6 +960,7 @@ public class TestMoneroDaemonRpc
     public void TestGetPeers()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         List<MoneroPeer> peers = daemon.GetPeers();
         Assert.True(peers.Count > 0, "Daemon has no incoming or outgoing peers to test");
         foreach (MoneroPeer peer in peers)
@@ -962,6 +974,7 @@ public class TestMoneroDaemonRpc
     public void TestGetKnownPeers()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         List<MoneroPeer> peers = daemon.GetKnownPeers();
         Assert.True(peers.Count > 0, "Daemon has no known peers to test");
         foreach (MoneroPeer peer in peers)
@@ -975,6 +988,7 @@ public class TestMoneroDaemonRpc
     public void TestSetOutgoingPeerLimit()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         daemon.SetOutgoingPeerLimit(0);
         daemon.SetOutgoingPeerLimit(8);
         daemon.SetOutgoingPeerLimit(10);
@@ -985,6 +999,7 @@ public class TestMoneroDaemonRpc
     public void TestSetIncomingPeerLimit()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         daemon.SetIncomingPeerLimit(0);
         daemon.SetIncomingPeerLimit(8);
         daemon.SetIncomingPeerLimit(10);
@@ -995,6 +1010,7 @@ public class TestMoneroDaemonRpc
     public void TestBanPeer()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
 
         // set ban
         MoneroBan ban = new MoneroBan();
@@ -1019,6 +1035,7 @@ public class TestMoneroDaemonRpc
     public void TestBanPeers()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
 
         // set bans
         MoneroBan ban1 = new MoneroBan();
@@ -1053,6 +1070,7 @@ public class TestMoneroDaemonRpc
     public void TestMining()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
 
         // stop mining at beginning of test
         try { daemon.StopMining(); }
@@ -1073,6 +1091,7 @@ public class TestMoneroDaemonRpc
     public void TestGetMiningStatus()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
 
         try
         {
@@ -1143,6 +1162,7 @@ public class TestMoneroDaemonRpc
     public void TestPruneBlockchain()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         MoneroPruneResult result = daemon.PruneBlockchain(true);
         if (result.IsPruned() == true)
         {
@@ -1159,6 +1179,7 @@ public class TestMoneroDaemonRpc
     public void TestCheckForUpdate()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         MoneroDaemonUpdateCheckResult result = daemon.CheckForUpdate();
         TestUpdateCheckResult(result);
     }
@@ -1168,6 +1189,7 @@ public class TestMoneroDaemonRpc
     public void TestDownloadUpdate()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
 
         // download to default path
         MoneroDaemonUpdateDownloadResult result = daemon.DownloadUpdate();
@@ -1195,10 +1217,11 @@ public class TestMoneroDaemonRpc
     }
 
     // Can be stopped
-    [Fact(Skip = "Disable")]
+    [Fact(Skip = "Disabled")]
     public void TestStop()
     {
         Assert.True(TEST_NON_RELAYS);
+        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
 
         // stop the daemon
         daemon.Stop();
@@ -1477,8 +1500,8 @@ public class TestMoneroDaemonRpc
         }
         else
         {
-            Assert.NotNull(ctx.txContext);
-            Assert.NotNull(block.GetTxs());
+            Assert.Null(ctx.txContext);
+            Assert.Null(block.GetTxs());
         }
     }
 
@@ -1524,7 +1547,7 @@ public class TestMoneroDaemonRpc
         Assert.NotNull(tx.GetInputs());
         Assert.NotNull(tx.GetOutputs());
         Assert.True(tx.GetExtra().Length > 0);
-        //TestUtils.testUnsignedBigInteger(tx.GetFee(), true);
+        TestUtils.TestUnsignedBigInteger(tx.GetFee(), true);
 
         // test presence of output indices
         // TODO: change this over to outputs only
@@ -1707,7 +1730,7 @@ public class TestMoneroDaemonRpc
 
     private static void TestOutput(MoneroOutput output)
     {
-        //TestUtils.testUnsignedBigInteger(output.GetAmount());
+        TestUtils.TestUnsignedBigInteger(output.GetAmount());
     }
 
     private static void TestTxCopy(MoneroTx tx, TestContext ctx)
@@ -1756,8 +1779,8 @@ public class TestMoneroDaemonRpc
 
     private static void TestMinerTxSum(MoneroMinerTxSum txSum)
     {
-        //TestUtils.testUnsignedBigInteger(txSum.GetEmissionSum(), true);
-        //TestUtils.testUnsignedBigInteger(txSum.GetFeeSum(), true);
+        TestUtils.TestUnsignedBigInteger(txSum.GetEmissionSum(), true);
+        TestUtils.TestUnsignedBigInteger(txSum.GetFeeSum(), true);
     }
 
     private static void TestTxPoolStats(MoneroTxPoolStats? stats)
@@ -1842,7 +1865,7 @@ public class TestMoneroDaemonRpc
 
     private static void TestOutputDistributionEntry(MoneroOutputDistributionEntry entry)
     {
-        //TestUtils.testUnsignedBigInteger(entry.GetAmount());
+        TestUtils.TestUnsignedBigInteger(entry.GetAmount());
         Assert.True(entry.GetBase() >= 0);
         Assert.True(entry.GetDistribution().Count > 0);
         Assert.True(entry.GetStartHeight() >= 0);
@@ -1855,18 +1878,16 @@ public class TestMoneroDaemonRpc
         Assert.True(info.GetBlockSizeLimit() > 0);
         Assert.True(info.GetBlockSizeMedian() > 0);
         Assert.True(info.GetBootstrapDaemonAddress() == null || info.GetBootstrapDaemonAddress().Length > 0);
-        //TestUtils.testUnsignedBigInteger(info.GetCumulativeDifficulty());
-        //TestUtils.testUnsignedBigInteger(info.GetFreeSpace());
+        TestUtils.TestUnsignedBigInteger(info.GetCumulativeDifficulty());
+        TestUtils.TestUnsignedBigInteger(info.GetFreeSpace());
         Assert.True(info.GetNumOfflinePeers() >= 0);
         Assert.True(info.GetNumOnlinePeers() >= 0);
         Assert.True(info.GetHeight() >= 0);
-        Assert.True(info.GetHeightWithoutBootstrap() > 0);
         Assert.True(info.GetNumIncomingConnections() >= 0);
         Assert.NotNull(info.GetNetworkType());
         Assert.NotNull(info.IsOffline());
         Assert.True(info.GetNumOutgoingConnections() >= 0);
         Assert.True(info.GetNumRpcConnections() >= 0);
-        Assert.True(info.GetStartTimestamp() > 0);
         Assert.True(info.GetAdjustedTimestamp() > 0);
         Assert.True(info.GetTarget() > 0);
         Assert.True(info.GetTargetHeight() >= 0);
@@ -1877,10 +1898,18 @@ public class TestMoneroDaemonRpc
         Assert.True(info.GetBlockWeightMedian() > 0);
         Assert.True(info.GetDatabaseSize() > 0);
         Assert.NotNull(info.GetUpdateAvailable());
-        //TestUtils.testUnsignedBigInteger(info.GetCredits(), false); // 0 credits
-        Assert.True(info.GetTopBlockHash().Length > 0);
+        TestUtils.TestUnsignedBigInteger(info.GetCredits(), false); // 0 credits
+        var topBlockHash = info.GetTopBlockHash();
+        Assert.NotNull(topBlockHash);
+        Assert.True(topBlockHash.Length > 0);
         Assert.NotNull(info.IsBusySyncing());
         Assert.NotNull(info.IsSynchronized());
+
+        if (info.IsRestricted() == false)
+        {
+            Assert.True(info.GetHeightWithoutBootstrap() > 0);
+            Assert.True(info.GetStartTimestamp() > 0);
+        }
     }
 
     private static void TestSyncInfo(MoneroDaemonSyncInfo syncInfo)
@@ -1907,7 +1936,7 @@ public class TestMoneroDaemonRpc
         }
         Assert.True(syncInfo.GetNextNeededPruningSeed() >= 0);
         Assert.Null(syncInfo.GetOverview());
-        //TestUtils.testUnsignedBigInteger(syncInfo.GetCredits(), false); // 0 credits
+        TestUtils.TestUnsignedBigInteger(syncInfo.GetCredits(), false); // 0 credits
         Assert.Null(syncInfo.GetTopBlockHash());
     }
 
@@ -1934,7 +1963,7 @@ public class TestMoneroDaemonRpc
         Assert.NotNull(hardForkInfo.GetNumVotes());
         Assert.NotNull(hardForkInfo.GetVoting());
         Assert.NotNull(hardForkInfo.GetWindow());
-        //TestUtils.testUnsignedBigInteger(hardForkInfo.GetCredits(), false); // 0 credits
+        TestUtils.TestUnsignedBigInteger(hardForkInfo.GetCredits(), false); // 0 credits
         Assert.Null(hardForkInfo.GetTopBlockHash());
     }
 
@@ -1949,7 +1978,7 @@ public class TestMoneroDaemonRpc
     {
         Assert.NotNull((altChain));
         Assert.True(altChain.GetBlockHashes().Count > 0);
-        //TestUtils.testUnsignedBigInteger(altChain.GetDifficulty(), true);
+        TestUtils.TestUnsignedBigInteger(altChain.GetDifficulty(), true);
         Assert.True(altChain.GetHeight() > 0);
         Assert.True(altChain.GetLength() > 0);
         Assert.True(64 == altChain.GetMainChainParentBlockHash().Length);
@@ -2044,7 +2073,7 @@ public class TestMoneroDaemonRpc
             Assert.False(result.IsOverspend());
             Assert.False(result.IsTooBig());
             Assert.False(result.GetSanityCheckFailed());
-            //TestUtils.testUnsignedBigInteger(result.getCredits(), false); // 0 credits
+            TestUtils.TestUnsignedBigInteger(result.GetCredits(), false); // 0 credits
             Assert.Null(result.GetTopBlockHash());
             Assert.False(result.IsTxExtraTooBig());
             Assert.True(result.IsGood());
@@ -2087,7 +2116,7 @@ public class TestMoneroDaemonRpc
 
     private static void TestOutputHistogramEntry(MoneroOutputHistogramEntry entry)
     {
-        //TestUtils.testUnsignedBigInteger(entry.getAmount());
+        TestUtils.TestUnsignedBigInteger(entry.GetAmount());
         Assert.True(entry.GetNumInstances() >= 0);
         Assert.True(entry.GetNumUnlockedInstances() >= 0);
         Assert.True(entry.GetNumRecentInstances() >= 0);

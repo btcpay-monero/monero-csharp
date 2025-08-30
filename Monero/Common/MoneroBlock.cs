@@ -5,17 +5,17 @@ namespace Monero.Common
     {
         private string? hex;
         private MoneroTx? minerTx;
-        private List<MoneroTx> txs = [];
-        private List<string> txHashes = [];
+        private List<MoneroTx>? txs;
+        private List<string>? txHashes;
 
         public MoneroBlock() : base() { }
 
         public MoneroBlock(MoneroBlockHeader header) : base(header)
         {
-            this.hex = null;
-            this.minerTx = null;
-            this.txs = [];
-            this.txHashes = [];
+            hex = null;
+            minerTx = null;
+            txs = null;
+            txHashes = null;
         }
 
         public MoneroBlock(MoneroBlock block) : base(block)
@@ -164,17 +164,20 @@ namespace Monero.Common
             return this;
         }
 
-        public List<MoneroTx> GetTxs()
+        public List<MoneroTx>? GetTxs()
         {
             return txs;
         }
 
-        public MoneroBlock SetTxs(List<MoneroTx> txs)
+        public MoneroBlock SetTxs(List<MoneroTx>? txs)
         {
             this.txs = txs;
-            foreach (MoneroTx tx in txs)
+            if (txs != null)
             {
-                tx.SetBlock(this);
+                foreach (MoneroTx tx in txs)
+                {
+                    tx.SetBlock(this);
+                }
             }
             return this;
         }
@@ -192,12 +195,12 @@ namespace Monero.Common
             return this;
         }
 
-        public List<string> GetTxHashes()
+        public List<string>? GetTxHashes()
         {
             return txHashes;
         }
 
-        public MoneroBlock SetTxHashes(List<string> txHashes)
+        public MoneroBlock SetTxHashes(List<string>? txHashes)
         {
             this.txHashes = txHashes;
             return this;

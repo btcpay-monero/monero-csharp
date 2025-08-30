@@ -236,12 +236,38 @@ namespace Monero.Common
                 throw new MoneroError("Invalid hex: " + str);
         }
 
+        public static bool IsValidHex(string str)
+        {
+            try
+            {
+                ValidateHex(str);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static void ValidateBase58(string standardAddress)
         {
             foreach (char c in standardAddress)
             {
                 if (!CHARS.Contains(c))
                     throw new MoneroError("Invalid Base58 " + standardAddress);
+            }
+        }
+
+        public static bool IsValidBase58(string standardAddress)
+        {
+            try
+            {
+                ValidateBase58(standardAddress);
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
