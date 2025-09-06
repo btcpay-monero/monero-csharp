@@ -28,3 +28,10 @@ jobs:
 
       - name: Build
         run: dotnet build --no-restore
+
+      - name: Run integration tests
+        run: docker compose -f Monero.Test/docker-compose.yml run tests
+
+      - name: Cleanup Docker containers
+        if: always()
+        run: docker compose -f Monero.Test/docker-compose.yml down -v
