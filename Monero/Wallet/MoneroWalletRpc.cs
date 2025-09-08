@@ -2096,7 +2096,7 @@ namespace Monero.Wallet
                 tx.SetIsRelayed(relay);
                 tx.SetIsMinerTx(false);
                 tx.SetIsFailed(false);
-                tx.SetRingSize(MoneroUtils.RING_SIZE);
+                tx.SetRingSize(MoneroUtils.RingSize);
                 MoneroOutgoingTransfer transfer = tx.GetOutgoingTransfer();
                 transfer.SetAccountIndex(config.GetAccountIndex());
                 if (config.GetSubaddressIndices().Count == 1) transfer.SetSubaddressIndices([.. config.GetSubaddressIndices()]);
@@ -2200,7 +2200,7 @@ namespace Monero.Wallet
             tx.SetIsMinerTx(false);
             tx.SetIsFailed(false);
             tx.SetIsLocked(true);
-            tx.SetRingSize(MoneroUtils.RING_SIZE);
+            tx.SetRingSize(MoneroUtils.RingSize);
             MoneroOutgoingTransfer transfer = new MoneroOutgoingTransfer().SetTx(tx);
             if (config.GetSubaddressIndices() != null && config.GetSubaddressIndices().Count == 1) transfer.SetSubaddressIndices([.. config.GetSubaddressIndices()]); // we know src subaddress indices iff request specifies 1
             if (copyDestinations)
@@ -2434,7 +2434,7 @@ namespace Monero.Wallet
                 }
                 else if (key.Equals("payment_id"))
                 {
-                    if (!"".Equals(val) && !MoneroTxWallet.DEFAULT_PAYMENT_ID.Equals(val)) tx.SetPaymentId((string)val);  // default is undefined
+                    if (!"".Equals(val) && !MoneroTxWallet.DefaultPaymentId.Equals(val)) tx.SetPaymentId((string)val);  // default is undefined
                 }
                 else if (key.Equals("subaddr_index"))
                 {
@@ -2514,7 +2514,7 @@ namespace Monero.Wallet
             }
 
             // link block and tx
-            if (header != null) tx.SetBlock(new MoneroBlock(header).SetTxs(tx));
+            if (header != null) tx.SetBlock(new MoneroBlock(header).SetTxs([tx]));
 
             // initialize final fields
             if (transfer != null)
@@ -2573,7 +2573,7 @@ namespace Monero.Wallet
                 else if (key.Equals("block_height"))
                 {
                     ulong height = ((ulong)val);
-                    tx.SetBlock(new MoneroBlock().SetHeight(height).SetTxs(tx));
+                    tx.SetBlock(new MoneroBlock().SetHeight(height).SetTxs([tx]));
                 }
                 else MoneroUtils.Log(0, "ignoring unexpected transaction field with output: " + key + ": " + val);
             }

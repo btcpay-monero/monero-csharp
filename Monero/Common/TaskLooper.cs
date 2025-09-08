@@ -1,15 +1,12 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
+﻿
 namespace Monero.Common
 {
-    public class TaskLooper
+    public class TaskLooper: IDisposable
     {
         private readonly Action _task;
         private ulong _periodInMs;
-        private CancellationTokenSource _cts;
-        private Task _loopTask;
+        private CancellationTokenSource? _cts;
+        private Task? _loopTask;
         private readonly object _lock = new object();
 
         public TaskLooper(Action task)
@@ -103,6 +100,12 @@ namespace Monero.Common
             {
                 _periodInMs = periodInMs;
             }
+        }
+
+        public void Dispose()
+        {
+            Stop();
+            _loopTask?.Dispose();
         }
     }
 }

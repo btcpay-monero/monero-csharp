@@ -38,7 +38,7 @@ namespace Monero.Test.Utils
   
         // test wallet constants
         public static readonly ulong MAX_FEE = 75000000000;
-        public static readonly MoneroNetworkType NETWORK_TYPE = MoneroNetworkType.TESTNET;
+        public static readonly MoneroNetworkType NETWORK_TYPE = MoneroNetworkType.Testnet;
         public static readonly string LANGUAGE = "English";
         public static readonly string SEED = "silk mocked cucumber lettuce hope adrenalin aching lush roles fuel revamp baptism wrist ulong tender teardrop midst pastry pigment equip frying inbound pinched ravine frying";
         public static readonly string ADDRESS = "A1y9sbVt8nqhZAVm3me1U18rUVXcjeNKuBd1oE2cTs8biA9cozPMeyYLhe77nPv12JA3ejJN3qprmREriit2fi6tJDi99RR";

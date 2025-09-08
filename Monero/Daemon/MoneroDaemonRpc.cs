@@ -1339,10 +1339,10 @@ namespace Monero.Daemon
                 else if (key.Equals("address_type"))
                 {
                     int rpcType = ((int)val);
-                    if (rpcType == 0) peer.SetType(MoneroConnectionType.INVALID);
-                    else if (rpcType == 1) peer.SetType(MoneroConnectionType.IPV4);
-                    else if (rpcType == 2) peer.SetType(MoneroConnectionType.IPV6);
-                    else if (rpcType == 3) peer.SetType(MoneroConnectionType.TOR);
+                    if (rpcType == 0) peer.SetType(MoneroConnectionType.Invalid);
+                    else if (rpcType == 1) peer.SetType(MoneroConnectionType.Ipv4);
+                    else if (rpcType == 2) peer.SetType(MoneroConnectionType.Ipv6);
+                    else if (rpcType == 3) peer.SetType(MoneroConnectionType.Tor);
                     else if (rpcType == 4) peer.SetType(MoneroConnectionType.I2P);
                     else throw new MoneroError("Invalid RPC peer type, expected 0-4: " + rpcType);
                 }
@@ -1407,9 +1407,9 @@ namespace Monero.Daemon
                 else if (key.Equals("white_peerlist_size")) info.SetNumOnlinePeers(((uint)val));
                 else if (key.Equals("update_available")) info.SetUpdateAvailable((bool)val);
                 else if (key.Equals("nettype")) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetwork.Parse((string)val)));
-                else if (key.Equals("mainnet")) { if ((bool)val) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.MAINNET)); }
-                else if (key.Equals("testnet")) { if ((bool)val) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.TESTNET)); }
-                else if (key.Equals("stagenet")) { if ((bool)val) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.STAGENET)); }
+                else if (key.Equals("mainnet")) { if ((bool)val) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.Mainnet)); }
+                else if (key.Equals("testnet")) { if ((bool)val) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.Testnet)); }
+                else if (key.Equals("stagenet")) { if ((bool)val) info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.Stagenet)); }
                 else if (key.Equals("credits")) info.SetCredits((ulong)val);
                 else if (key.Equals("top_block_hash") || key.Equals("top_hash")) info.SetTopBlockHash(GenUtils.Reconcile(info.GetTopBlockHash(), "".Equals(val) ? null : (string)val));  // TODO monero-wallet-rpc: daemon info top_hash is redundant with top_block_hash, only returned if pay-for-service enabled
                 else if (key.Equals("busy_syncing")) info.SetIsBusySyncing((bool)val);

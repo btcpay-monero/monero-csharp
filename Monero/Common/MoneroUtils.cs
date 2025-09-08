@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using Monero.Wallet.Common;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Utilities.Encoders;
 
@@ -9,22 +10,21 @@ namespace Monero.Common
 {
     public static class MoneroUtils
     {
-        private static readonly ulong XMR_AU_MULTIPLIER = 1000000000000;
+        private static readonly ulong XmrAuMultiplier = 1000000000000;
 
         public static string GetVersion()
         {
             return "0.0.1";
         }
 
-        public static readonly uint RING_SIZE = 16;
-        private static int LOG_LEVEL = 0;
-        private static ulong AU_PER_XMR = 1000000000000;
-        private static readonly int NUM_MNEMONIC_WORDS = 25;
-        private static readonly int VIEW_KEY_LENGTH = 64;
-        private static readonly string ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-        private static readonly char[] CHARS = ALPHABET.ToCharArray();
-        private static readonly int ALPHABET_SIZE = ALPHABET.Length;
-        private static readonly Dictionary<int, int> ENCODED_BLOCK_SIZE = new Dictionary<int, int>
+        public static readonly uint RingSize = 16;
+        private static int _logLevel = 0;
+        private static readonly int NumMnemonicWords = 25;
+        private static readonly int ViewKeyLength = 64;
+        private static readonly string Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+        private static readonly char[] Chars = Alphabet.ToCharArray();
+        private static readonly int AlphabetSize = Alphabet.Length;
+        private static readonly Dictionary<int, int> EncodedBlockSize = new Dictionary<int, int>
         {
             { 0, 0 },
             { 2, 1 },
@@ -37,13 +37,13 @@ namespace Monero.Common
             { 11, 8 }
         };
 
-        private const int FULL_BLOCK_SIZE = 8;
-        private const int FULL_ENCODED_BLOCK_SIZE = 11;
+        private const int FullBlockSize = 8;
+        private const int FullEncodedBlockSize = 11;
 
-        private static readonly ulong UINT64_MAX = ulong.MaxValue;
+        private static readonly ulong Uint64Max = ulong.MaxValue;
 
-        private static readonly Regex STANDARD_ADDRESS_PATTERN = new("^[" + ALPHABET + "]{95}$", RegexOptions.Compiled);
-        private static readonly Regex INTEGRATED_ADDRESS_PATTERN = new("^[" + ALPHABET + "]{106}$", RegexOptions.Compiled);
+        private static readonly Regex StandardAddressPattern = new("^[" + Alphabet + "]{95}$", RegexOptions.Compiled);
+        private static readonly Regex IntegratedAddressPattern = new("^[" + Alphabet + "]{106}$", RegexOptions.Compiled);
 
         public static bool WalletExists(string? path)
         {
@@ -70,7 +70,7 @@ namespace Monero.Common
 
         public static void ValidateLanguage(string? language)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("MoneroUtils.ValidateLanguage(): not implemented.");
         }
 
         public static void ValidateMnemonic(string? mnemonic)
@@ -84,13 +84,13 @@ namespace Monero.Common
                 throw new MoneroError("Mnemonic phrase is empty");
             }
             string[] words = mnemonic.Split(" ");
-            if (words.Length != NUM_MNEMONIC_WORDS) throw new MoneroError("Mnemonic phrase is " + words.Length + " words but must be " + NUM_MNEMONIC_WORDS);
+            if (words.Length != NumMnemonicWords) throw new MoneroError("Mnemonic phrase is " + words.Length + " words but must be " + NumMnemonicWords);
         }
 
         public static void ValidateViewKey(string viewKey)
         {
             if (viewKey == null) throw new MoneroError("View key is null");
-            if (viewKey.Length != VIEW_KEY_LENGTH) throw new MoneroError("View key is " + viewKey.Length + " characters but must be " + VIEW_KEY_LENGTH);
+            if (viewKey.Length != ViewKeyLength) throw new MoneroError("View key is " + viewKey.Length + " characters but must be " + ViewKeyLength);
         }
 
         public static bool IsValidLanguage(string? language)
@@ -126,7 +126,7 @@ namespace Monero.Common
                 ValidatePrivateViewKey(privateViewKey);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -139,7 +139,7 @@ namespace Monero.Common
                 ValidatePublicViewKey(publicViewKey);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -152,7 +152,7 @@ namespace Monero.Common
                 ValidatePrivateSpendKey(privateSpendKey);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -165,7 +165,7 @@ namespace Monero.Common
                 ValidatePublicSpendKey(publicSpendKey);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -198,7 +198,7 @@ namespace Monero.Common
                 ValidateAddress(address, networkType);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -236,43 +236,66 @@ namespace Monero.Common
                 throw new MoneroError("Invalid hex: " + str);
         }
 
+        public static bool IsValidHex(string str)
+        {
+            try
+            {
+                ValidateHex(str);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static void ValidateBase58(string standardAddress)
         {
             foreach (char c in standardAddress)
             {
-                if (!CHARS.Contains(c))
+                if (!Chars.Contains(c))
                     throw new MoneroError("Invalid Base58 " + standardAddress);
+            }
+        }
+
+        public static bool IsValidBase58(string standardAddress)
+        {
+            try
+            {
+                ValidateBase58(standardAddress);
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
         public static void Log(int level, string message)
         {
             if (level < 0) throw new MoneroError("Log level must be an integer >= 0");
-            if (LOG_LEVEL >= level) Console.WriteLine(message);
+            if (_logLevel >= level) Console.WriteLine(message);
         }
 
-        public static int GetLogLevel() { return LOG_LEVEL; }
+        public static int GetLogLevel() { return _logLevel; }
 
         public static void SetLogLevel(int level)
         {
             if (level < 0) throw new MoneroError("Log level must be an integer >= 0");
-            LOG_LEVEL = level;
+            _logLevel = level;
         }
 
         public static ulong XmrToAtomicUnits(double amountXmr)
         {
-            // Usa decimal per precisione e converte a BigInteger con arrotondamento
-            decimal precise = Math.Round((decimal)amountXmr * XMR_AU_MULTIPLIER, 0, MidpointRounding.AwayFromZero);
+            decimal precise = Math.Round((decimal)amountXmr * XmrAuMultiplier, 0, MidpointRounding.AwayFromZero);
             return ((ulong)new BigInteger(precise));
         }
 
         public static double AtomicUnitsToXmr(ulong amountAtomicUnits)
         {
-            // Converti BigInteger in decimal per la divisione
-            decimal atomicDecimal = (decimal)amountAtomicUnits;
-            decimal result = atomicDecimal / XMR_AU_MULTIPLIER;
+            decimal atomicDecimal = amountAtomicUnits;
+            decimal result = atomicDecimal / XmrAuMultiplier;
 
-            // Arrotonda a 12 cifre decimali come in Java
             return Math.Round((double)result, 12, MidpointRounding.AwayFromZero);
         }
 
@@ -282,9 +305,9 @@ namespace Monero.Common
 
             // determine if address has integrated address pattern
             bool isIntegrated = false;
-            if (!STANDARD_ADDRESS_PATTERN.IsMatch(address))
+            if (!StandardAddressPattern.IsMatch(address))
             {
-                if (INTEGRATED_ADDRESS_PATTERN.IsMatch(address))
+                if (IntegratedAddressPattern.IsMatch(address))
                 {
                     isIntegrated = true;
                 }
@@ -311,21 +334,21 @@ namespace Monero.Common
                 if (addressCode == aNetworkType.GetPrimaryAddressCode())
                 {
                     if (isIntegrated) throw new MoneroError("Address has primary address code but integrated address pattern");
-                    addressType = MoneroAddressType.PRIMARY_ADDRESS;
+                    addressType = MoneroAddressType.PrimaryAddress;
                     networkType = aNetworkType;
                     break;
                 }
                 else if (addressCode == aNetworkType.GetIntegratedAddressCode())
                 {
                     if (!isIntegrated) throw new MoneroError("Address has integrated address code but non-integrated address pattern");
-                    addressType = MoneroAddressType.INTEGRATED_ADDRESS;
+                    addressType = MoneroAddressType.IntegratedAddress;
                     networkType = aNetworkType;
                     break;
                 }
                 else if (addressCode == aNetworkType.GetSubaddressCode())
                 {
                     if (isIntegrated) throw new MoneroError("Address has subaddress code but integrated address pattern");
-                    addressType = MoneroAddressType.SUBADDRESS;
+                    addressType = MoneroAddressType.Subaddress;
                     networkType = aNetworkType;
                     break;
                 }
@@ -340,7 +363,24 @@ namespace Monero.Common
 
         public static MoneroIntegratedAddress GetIntegratedAddress(MoneroNetworkType networkType, string standardAddress, string? paymentId = null)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("MoneroUtils.GetIntegratedAddress(): not implemented.");
+        }
+
+        public static Uri ParseUri(string uri)
+        {
+            if (!string.IsNullOrEmpty(uri) && !Regex.IsMatch(uri.ToLower(), @"^\w+://.+"))
+            {
+                uri = "http://" + uri; // assume http if protocol not given
+            }
+
+            try
+            {
+                return new Uri(uri);
+            }
+            catch (Exception e)
+            {
+                throw new MoneroError(e);
+            }
         }
 
         private static bool IsValidAddressHash(string decodedAddrStr)
@@ -380,24 +420,24 @@ namespace Monero.Common
                 bin[i] = address[i];
             }
 
-            int fullBlockCount = (int)Math.Floor((float)bin.Length / FULL_ENCODED_BLOCK_SIZE);
-            int lastBlockSize = bin.Length % FULL_ENCODED_BLOCK_SIZE;
-            int lastBlockDecodedSize = ENCODED_BLOCK_SIZE[lastBlockSize];
+            int fullBlockCount = (int)Math.Floor((float)bin.Length / FullEncodedBlockSize);
+            int lastBlockSize = bin.Length % FullEncodedBlockSize;
+            int lastBlockDecodedSize = EncodedBlockSize[lastBlockSize];
             if (lastBlockDecodedSize < 0)
             {
                 throw new ArgumentException("Invalid encoded length");
             }
 
-            int dataSize = fullBlockCount * FULL_BLOCK_SIZE + lastBlockDecodedSize;
+            int dataSize = fullBlockCount * FullBlockSize + lastBlockDecodedSize;
             int[] data = new int[dataSize];
             for (int i = 0; i < fullBlockCount; i++)
             {
-                data = DecodeBlock(GenUtils.Subarray(bin, i * FULL_ENCODED_BLOCK_SIZE, i * FULL_ENCODED_BLOCK_SIZE + FULL_ENCODED_BLOCK_SIZE), data, i * FULL_BLOCK_SIZE);
+                data = DecodeBlock(GenUtils.Subarray(bin, i * FullEncodedBlockSize, i * FullEncodedBlockSize + FullEncodedBlockSize)!, data, i * FullBlockSize);
             }
             if (lastBlockSize > 0)
             {
-                int[] subarray = GenUtils.Subarray(bin, fullBlockCount * FULL_ENCODED_BLOCK_SIZE, fullBlockCount * FULL_ENCODED_BLOCK_SIZE + FULL_BLOCK_SIZE);
-                data = DecodeBlock(subarray, data, fullBlockCount * FULL_BLOCK_SIZE);
+                int[] subarray = GenUtils.Subarray(bin, fullBlockCount * FullEncodedBlockSize, fullBlockCount * FullEncodedBlockSize + FullBlockSize)!;
+                data = DecodeBlock(subarray, data, fullBlockCount * FullBlockSize);
             }
 
             return BinToHex(data);
@@ -406,12 +446,12 @@ namespace Monero.Common
         private static int[] DecodeBlock(int[] data, int[] buf, int index)
         {
 
-            if (data.Length < 1 || data.Length > FULL_ENCODED_BLOCK_SIZE)
+            if (data.Length < 1 || data.Length > FullEncodedBlockSize)
             {
                 throw new MoneroError("Invalid block length: " + data.Length);
             }
 
-            int resSize = ENCODED_BLOCK_SIZE[data.Length];
+            int resSize = EncodedBlockSize[data.Length];
             if (resSize <= 0)
             {
                 throw new MoneroError("Invalid block size");
@@ -420,26 +460,26 @@ namespace Monero.Common
             BigInteger order = 1;
             for (int i = data.Length - 1; i >= 0; i--)
             {
-                int digit = ALPHABET.IndexOf((char)data[i]);
+                int digit = Alphabet.IndexOf((char)data[i]);
                 if (digit < 0)
                 {
                     throw new MoneroError("Invalid symbol");
                 }
                 BigInteger product = (order * digit) + resNum;
                 // if product > UINT64_MAX
-                if (product.CompareTo(UINT64_MAX) > 0)
+                if (product.CompareTo(Uint64Max) > 0)
                 {
                     throw new MoneroError("Overflow");
                 }
                 resNum = product;
-                order = order * ALPHABET_SIZE;
+                order = order * AlphabetSize;
             }
-            if (resSize < FULL_BLOCK_SIZE && (BigInteger.Pow(2, 8 * resSize).CompareTo(resNum) <= 0))
+            if (resSize < FullBlockSize && (BigInteger.Pow(2, 8 * resSize).CompareTo(resNum) <= 0))
             {
                 throw new MoneroError("Overflow 2");
             }
 
-            int[] tmpBuf = Uint64To8be(resNum, resSize);
+            int[] tmpBuf = Uint64To8Be(resNum, resSize);
             for (int j = 0; j < tmpBuf.Length; j++)
             {
                 buf[j + index] = tmpBuf[j];
@@ -448,7 +488,7 @@ namespace Monero.Common
             return buf;
         }
 
-        private static int[] Uint64To8be(BigInteger num, int size)
+        private static int[] Uint64To8Be(BigInteger num, int size)
         {
             int[] res = new int[size];
             if (size < 1 || size > 8)
@@ -464,23 +504,6 @@ namespace Monero.Common
             return res;
         }
 
-        private static byte[]? HexToBin(string? hexStr)
-        {
-            if (string.IsNullOrEmpty(hexStr) || hexStr.Length % 2 != 0)
-            {
-                return null;
-            }
-
-            byte[] res = new byte[hexStr.Length / 2];
-            for (int i = 0; i < res.Length; ++i)
-            {
-                res[i] = Convert.ToByte(hexStr.Substring(i * 2, 2), 16);
-            }
-
-            return res;
-        }
-
-
         private static string BinToHex(int[] data)
         {
             var builder = new StringBuilder();
@@ -493,7 +516,33 @@ namespace Monero.Common
 
         public static Dictionary<string, object> BinaryBlocksToMap(byte[] blocks)
         {
-            throw new NotImplementedException("");
+            throw new NotImplementedException("MoneroUtils.BinaryBlocksToMap(): not implemented");
+        }
+
+        public static void MergeTx(List<MoneroTx> txs, MoneroTx tx)
+        {
+            foreach (MoneroTx aTx in txs)
+            {
+                if (aTx.GetHash()!.Equals(tx.GetHash()))
+                {
+                    aTx.Merge(tx);
+                    return;
+                }
+            }
+            txs.Add(tx);
+        }
+
+        public static void MergeTx(List<MoneroTxWallet> txs, MoneroTxWallet tx)
+        {
+            foreach (MoneroTx aTx in txs)
+            {
+                if (aTx.GetHash()!.Equals(tx.GetHash()))
+                {
+                    aTx.Merge(tx);
+                    return;
+                }
+            }
+            txs.Add(tx);
         }
     }
 }

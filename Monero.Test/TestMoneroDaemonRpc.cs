@@ -767,13 +767,13 @@ public class TestMoneroDaemonRpc
         daemon.FlushTxPool(txHashes);
 
         // key images are not spent
-        TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.NOT_SPENT);
+        TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.NotSpent);
 
         // submit txs to the pool but don't relay
         foreach (MoneroTx tx in txs) daemon.SubmitTxHex(tx.GetFullHex(), true);
 
         // key images are in the tx pool
-        TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.TX_POOL);
+        TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.TxPool);
 
         // collect key images of confirmed txs
         keyImages = [];
@@ -784,7 +784,7 @@ public class TestMoneroDaemonRpc
         }
 
         // key images are all spent
-        TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.CONFIRMED);
+        TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.Confirmed);
 
         // flush this test's txs from pool
         daemon.FlushTxPool(txHashes);

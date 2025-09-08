@@ -3,33 +3,33 @@ namespace Monero.Common
 {
     public abstract class MoneroNetwork
     {
-        private readonly int primaryAddressCode;
-        private readonly int integratedAddressCode;
-        private readonly int subaddressCode;
+        private readonly int _primaryAddressCode;
+        private readonly int _integratedAddressCode;
+        private readonly int _subaddressCode;
 
         public readonly MoneroNetworkType Type;
 
         public MoneroNetwork(int primaryAddressCode, int integratedAddressCode, int subaddressCode, MoneroNetworkType type)
         {
-            this.primaryAddressCode = primaryAddressCode;
-            this.integratedAddressCode = integratedAddressCode;
-            this.subaddressCode = subaddressCode;
+            _primaryAddressCode = primaryAddressCode;
+            _integratedAddressCode = integratedAddressCode;
+            _subaddressCode = subaddressCode;
             Type = type;
         }
 
         public int GetPrimaryAddressCode()
         {
-            return primaryAddressCode;
+            return _primaryAddressCode;
         }
 
         public int GetIntegratedAddressCode()
         {
-            return integratedAddressCode;
+            return _integratedAddressCode;
         }
 
         public int GetSubaddressCode()
         {
-            return subaddressCode;
+            return _subaddressCode;
         }
 
         public static MoneroNetworkType Parse(string? networkTypeStr)
@@ -37,19 +37,19 @@ namespace Monero.Common
             if (networkTypeStr == null) throw new MoneroError("Cannot parse null network type");
             return networkTypeStr.ToLower() switch
             {
-                "mainnet" => MoneroNetworkType.MAINNET,
-                "testnet" => MoneroNetworkType.TESTNET,
-                "stagenet" => MoneroNetworkType.STAGENET,
+                "mainnet" => MoneroNetworkType.Mainnet,
+                "testnet" => MoneroNetworkType.Testnet,
+                "stagenet" => MoneroNetworkType.Stagenet,
                 _ => throw new MoneroError("Invalid network type to parse: " + networkTypeStr),
             };
         }
 
-        public static MoneroNetworkType Parse(int? netttype)
+        public static MoneroNetworkType Parse(int? nettype)
         {
-            if (netttype == null) throw new MoneroError("Cannot parse null network type");
-            if (netttype == 0) return MoneroNetworkType.MAINNET;
-            else if (netttype == 1) return MoneroNetworkType.TESTNET;
-            else return MoneroNetworkType.STAGENET;
+            if (nettype == null) throw new MoneroError("Cannot parse null network type");
+            if (nettype == 0) return MoneroNetworkType.Mainnet;
+            else if (nettype == 1) return MoneroNetworkType.Testnet;
+            else return MoneroNetworkType.Stagenet;
         }
 
         public static readonly MoneroNetwork[] Types = [new MoneroNetworkMainnet(), new MoneroNetworkTestnet(), new MoneroNetworkStagenet()];
@@ -57,16 +57,16 @@ namespace Monero.Common
 
     public class MoneroNetworkMainnet : MoneroNetwork
     {
-        public MoneroNetworkMainnet(): base(18, 19, 42, MoneroNetworkType.MAINNET) { }
+        public MoneroNetworkMainnet(): base(18, 19, 42, MoneroNetworkType.Mainnet) { }
     }
 
     public class MoneroNetworkTestnet : MoneroNetwork
     {
-        public MoneroNetworkTestnet() : base(53, 54, 63, MoneroNetworkType.TESTNET) { }
+        public MoneroNetworkTestnet() : base(53, 54, 63, MoneroNetworkType.Testnet) { }
     }
 
     public class MoneroNetworkStagenet : MoneroNetwork
     {
-        public MoneroNetworkStagenet() : base(24, 25, 36, MoneroNetworkType.STAGENET) { }
+        public MoneroNetworkStagenet() : base(24, 25, 36, MoneroNetworkType.Stagenet) { }
     }
 }

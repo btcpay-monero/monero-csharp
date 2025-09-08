@@ -7,6 +7,11 @@ namespace Monero.Common
         private string? _paymentId;
         private string? _integratedAddress;
 
+        public override string ToString()
+        {
+            return _integratedAddress ?? "";
+        }
+
         public MoneroIntegratedAddress(string? standardAddress = null, string? paymentId = null, string? integratedAddress = null)
         {
             _standardAddress = standardAddress;
@@ -57,6 +62,16 @@ namespace Monero.Common
         {
             _integratedAddress = integratedAddress;
             return this;
+        }
+
+        public bool Equals(MoneroIntegratedAddress? other)
+        {
+            if (other == null) return false;
+            if (this == other) return true;
+
+            return _standardAddress == other._standardAddress &&
+                   _paymentId == other._paymentId &&
+                   _integratedAddress == other._integratedAddress;
         }
     }
 }

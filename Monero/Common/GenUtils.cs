@@ -2,12 +2,17 @@
 
 namespace Monero.Common
 {
-    public class GenUtils
+    public abstract class GenUtils
     {
+        public static string GetGuid()
+        {
+            return Guid.NewGuid().ToString();
+        }
+
         public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined = null, bool? resolveTrue = null, bool? resolveMax = null)
         {
             // check for same reference
-            if (object.ReferenceEquals(val1, val2)) return val1;
+            if (ReferenceEquals(val1, val2)) return val1;
 
             int? comparison = null;
 
@@ -18,11 +23,16 @@ namespace Monero.Common
                 if (comparison == 0) return val1;
             }
 
+            if (val1 is bool bool1 && val2 is bool bool2)
+            {
+                if (bool1 ==  bool2) return val1;
+            }
+
             // resolve one value null
             if (val1 == null || val2 == null)
             {
                 if (resolveDefined == false) return default!;
-                return val1 == null ? val2 : val1!;
+                return val1 == null ? val2 : val1;
             }
 
             // resolve different booleans
@@ -63,7 +73,7 @@ namespace Monero.Common
             return val1;
         }
 
-        public static byte[] ReconcileByteArrays(byte[] arr1, byte[] arr2)
+        public static byte[]? ReconcileByteArrays(byte[]? arr1, byte[]? arr2)
         {
 
             // check for same reference or null
@@ -88,7 +98,7 @@ namespace Monero.Common
             return bytes;
         }
 
-        public static int[] Subarray(int[] array, int startIndexInclusive, int endIndexExclusive)
+        public static int[]? Subarray(int[]? array, int startIndexInclusive, int endIndexExclusive)
         {
             if (array == null) return null;
             if (startIndexInclusive < 0) startIndexInclusive = 0;
@@ -100,6 +110,34 @@ namespace Monero.Common
             int[] subarray = new int[newSize];
             Array.Copy(array, startIndexInclusive, subarray, 0, newSize);
             return subarray;
+        }
+
+        public static void WaitFor(ulong durationMs) {
+            WaitFor((int)durationMs);
+        }
+
+        public static void WaitFor(int durationMs)
+        {
+            try
+            {
+                // brutto, non mi piace
+                Thread.Sleep(durationMs);
+            }
+            catch (ThreadInterruptedException)
+            {
+                throw new Exception("Thread was interrupted while sleeping");
+            }
+        }
+        
+        public static string KvLine(object? key, object? value, int indent, bool newline = true, bool ignoreUndefined = true) {
+            if (value == null && ignoreUndefined) return "";
+            return GetIndent(indent) + key + ": " + value + (newline ? '\n' : "");
+        }
+        
+        public static string GetIndent(int length) {
+            string str = "";
+            for (int i = 0; i < length; i++) str += "  "; // two spaces
+            return str;
         }
     }
 }

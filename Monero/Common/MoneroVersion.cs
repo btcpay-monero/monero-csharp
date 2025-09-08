@@ -1,5 +1,4 @@
-﻿
-namespace Monero.Common
+﻿namespace Monero.Common
 {
     public class MoneroVersion
     {

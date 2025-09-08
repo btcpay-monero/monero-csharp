@@ -1,62 +1,61 @@
-﻿
-namespace Monero.Common
+﻿namespace Monero.Common
 {
     public class SslOptions
     {
-        private string privateKeyPath;
-        private string certificatePath;
-        private string certificateAuthorityFile;
-        private List<string> allowedFingerprints;
-        private bool allowAnyCert;
+        private string? _privateKeyPath;
+        private string? _certificatePath;
+        private string? _certificateAuthorityFile;
+        private List<string>? _allowedFingerprints;
+        private bool _allowAnyCert;
 
-        public string GetPrivateKeyPath()
+        public string? GetPrivateKeyPath()
         {
-            return privateKeyPath;
+            return _privateKeyPath;
         }
 
-        public void SetPrivateKeyPath(string privateKeyPath)
+        public void SetPrivateKeyPath(string? privateKeyPath)
         {
-            this.privateKeyPath = privateKeyPath;
+            _privateKeyPath = privateKeyPath;
         }
 
-        public string GetCertificatePath()
+        public string? GetCertificatePath()
         {
-            return certificatePath;
+            return _certificatePath;
         }
 
-        public void SetCertificatePath(string certificatePath)
+        public void SetCertificatePath(string? certificatePath)
         {
-            this.certificatePath = certificatePath;
+            _certificatePath = certificatePath;
         }
 
-        public string GetCertificateAuthorityFile()
+        public string? GetCertificateAuthorityFile()
         {
-            return certificateAuthorityFile;
+            return _certificateAuthorityFile;
         }
 
-        public void SetCertificateAuthorityFile(string certificateAuthorityFile)
+        public void SetCertificateAuthorityFile(string? certificateAuthorityFile)
         {
-            this.certificateAuthorityFile = certificateAuthorityFile;
+            _certificateAuthorityFile = certificateAuthorityFile;
         }
 
-        public List<string> GetAllowedFingerprints()
+        public List<string>? GetAllowedFingerprints()
         {
-            return allowedFingerprints;
+            return _allowedFingerprints;
         }
 
-        public void SetAllowedFingerprints(List<string> allowedFingerprints)
+        public void SetAllowedFingerprints(List<string>? allowedFingerprints)
         {
-            this.allowedFingerprints = allowedFingerprints;
+            _allowedFingerprints = allowedFingerprints;
         }
 
         public bool GetAllowAnyCert()
         {
-            return allowAnyCert;
+            return _allowAnyCert;
         }
 
         public void SetAllowAnyCert(bool allowAnyCert)
         {
-            this.allowAnyCert = allowAnyCert;
+            _allowAnyCert = allowAnyCert;
         }
     }
 }
