@@ -66,8 +66,15 @@ namespace Monero.Common
 
         public bool Equals(MoneroIntegratedAddress? other)
         {
-            if (other == null) return false;
-            if (this == other) return true;
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (this == other)
+            {
+                return true;
+            }
 
             return _standardAddress == other._standardAddress &&
                    _paymentId == other._paymentId &&

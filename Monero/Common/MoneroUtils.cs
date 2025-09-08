@@ -11,7 +11,7 @@ namespace Monero.Common
     public static class MoneroUtils
     {
         private static readonly ulong XmrAuMultiplier = 1000000000000;
-
+        private static readonly string UriPattern = @"^\w+://.+";
         public static string GetVersion()
         {
             return "0.0.1";
@@ -58,7 +58,9 @@ namespace Monero.Common
         private static bool IsHex(string? str)
         {
             if (string.IsNullOrEmpty(str))
+            {
                 return false;
+            }
 
             return Regex.IsMatch(str, @"^-?[0-9a-fA-F]+$");
         }
@@ -83,14 +85,25 @@ namespace Monero.Common
             {
                 throw new MoneroError("Mnemonic phrase is empty");
             }
+            
             string[] words = mnemonic.Split(" ");
-            if (words.Length != NumMnemonicWords) throw new MoneroError("Mnemonic phrase is " + words.Length + " words but must be " + NumMnemonicWords);
+            if (words.Length != NumMnemonicWords)
+            {
+                throw new MoneroError("Mnemonic phrase is " + words.Length + " words but must be " + NumMnemonicWords);
+            }
         }
 
         public static void ValidateViewKey(string viewKey)
         {
-            if (viewKey == null) throw new MoneroError("View key is null");
-            if (viewKey.Length != ViewKeyLength) throw new MoneroError("View key is " + viewKey.Length + " characters but must be " + ViewKeyLength);
+            if (viewKey == null)
+            {
+                throw new MoneroError("View key is null");
+            }
+
+            if (viewKey.Length != ViewKeyLength)
+            {
+                throw new MoneroError("View key is " + viewKey.Length + " characters but must be " + ViewKeyLength);
+            }
         }
 
         public static bool IsValidLanguage(string? language)
@@ -173,22 +186,34 @@ namespace Monero.Common
 
         public static void ValidatePrivateViewKey(string? privateViewKey)
         {
-            if (!IsHex64(privateViewKey)) throw new MoneroError("private view key expected to be 64 hex characters");
+            if (!IsHex64(privateViewKey))
+            {
+                throw new MoneroError("private view key expected to be 64 hex characters");
+            }
         }
 
         public static void ValidatePublicViewKey(string publicViewKey)
         {
-            if (!IsHex64(publicViewKey)) throw new MoneroError("public view key expected to be 64 hex characters");
+            if (!IsHex64(publicViewKey))
+            {
+                throw new MoneroError("public view key expected to be 64 hex characters");
+            }
         }
 
         public static void ValidatePrivateSpendKey(string privateSpendKey)
         {
-            if (!IsHex64(privateSpendKey)) throw new MoneroError("private spend key expected to be 64 hex characters");
+            if (!IsHex64(privateSpendKey))
+            {
+                throw new MoneroError("private spend key expected to be 64 hex characters");
+            }
         }
 
         public static void ValidatePublicSpendKey(string publicSpendKey)
         {
-            if (!IsHex64(publicSpendKey)) throw new MoneroError("public spend key expected to be 64 hex characters");
+            if (!IsHex64(publicSpendKey))
+            {
+                throw new MoneroError("public spend key expected to be 64 hex characters");
+            }
         }
 
         public static bool IsValidAddress(string? address, MoneroNetworkType networkType)
@@ -206,15 +231,27 @@ namespace Monero.Common
 
         public static void ValidateAddress(string? address, MoneroNetworkType networkType)
         {
-            if (address == null) throw new MoneroError("Address is null");
+            if (address == null)
+            {
+                throw new MoneroError("Address is null");
+            }
+            
             DecodeAddress(address);
         }
 
-        public static void ValidatePaymentId(string paymentId)
+        public static void ValidatePaymentId(string? paymentId)
         {
+            if (paymentId == null)
+            {
+                throw new MoneroInvalidPaymentIdError("Payment id is null");
+            }
+            
             bool result = paymentId.Length == 16 || paymentId.Length == 64;
 
-            if (!result) throw new MoneroInvalidPaymentIdError(paymentId);
+            if (!result)
+            {
+                throw new MoneroInvalidPaymentIdError(paymentId);
+            }
         }
 
         public static bool IsValidPaymentId(string paymentId)
@@ -230,10 +267,16 @@ namespace Monero.Common
             }
         }
 
-        public static void ValidateHex(string str)
+        public static void ValidateHex(string? str)
         {
+            if (str == null)
+            {
+                throw new MoneroError("Invalid hex: null");
+            }
             if (!Regex.IsMatch(str, @"^([0-9A-Fa-f]{2})+$"))
+            {
                 throw new MoneroError("Invalid hex: " + str);
+            }
         }
 
         public static bool IsValidHex(string str)
@@ -254,7 +297,9 @@ namespace Monero.Common
             foreach (char c in standardAddress)
             {
                 if (!Chars.Contains(c))
+                {
                     throw new MoneroError("Invalid Base58 " + standardAddress);
+                }
             }
         }
 
@@ -271,17 +316,27 @@ namespace Monero.Common
             }
         }
 
-        public static void Log(int level, string message)
+        public static void Log(int? level, string? message)
         {
-            if (level < 0) throw new MoneroError("Log level must be an integer >= 0");
-            if (_logLevel >= level) Console.WriteLine(message);
+            if (level == null || level < 0)
+            {
+                throw new MoneroError("Log level must be an integer >= 0");
+            }
+
+            if (_logLevel >= level)
+            {
+                Console.WriteLine(message);
+            }
         }
 
         public static int GetLogLevel() { return _logLevel; }
 
         public static void SetLogLevel(int level)
         {
-            if (level < 0) throw new MoneroError("Log level must be an integer >= 0");
+            if (level < 0)
+            {
+                throw new MoneroError("Log level must be an integer >= 0");
+            }
             _logLevel = level;
         }
 
@@ -301,7 +356,10 @@ namespace Monero.Common
 
         public static MoneroDecodedAddress DecodeAddress(string? address)
         {
-            if (address == null) throw new MoneroError("Address is null");
+            if (address == null)
+            {
+                throw new MoneroError("Address is null");
+            }
 
             // determine if address has integrated address pattern
             bool isIntegrated = false;
@@ -321,7 +379,10 @@ namespace Monero.Common
             string addressHex = DecodeAddressToHex(address);
 
             // validate address hash
-            if (!IsValidAddressHash(addressHex)) throw new MoneroError("Address has invalid hash");
+            if (!IsValidAddressHash(addressHex))
+            {
+                throw new MoneroError("Address has invalid hash");
+            }
 
             // get address code
             int addressCode = Convert.ToByte(addressHex.Substring(0, 2), 16);
@@ -333,21 +394,30 @@ namespace Monero.Common
             {
                 if (addressCode == aNetworkType.GetPrimaryAddressCode())
                 {
-                    if (isIntegrated) throw new MoneroError("Address has primary address code but integrated address pattern");
+                    if (isIntegrated)
+                    {
+                        throw new MoneroError("Address has primary address code but integrated address pattern");
+                    }
                     addressType = MoneroAddressType.PrimaryAddress;
                     networkType = aNetworkType;
                     break;
                 }
                 else if (addressCode == aNetworkType.GetIntegratedAddressCode())
                 {
-                    if (!isIntegrated) throw new MoneroError("Address has integrated address code but non-integrated address pattern");
+                    if (!isIntegrated)
+                    {
+                        throw new MoneroError("Address has integrated address code but non-integrated address pattern");
+                    }
                     addressType = MoneroAddressType.IntegratedAddress;
                     networkType = aNetworkType;
                     break;
                 }
                 else if (addressCode == aNetworkType.GetSubaddressCode())
                 {
-                    if (isIntegrated) throw new MoneroError("Address has subaddress code but integrated address pattern");
+                    if (isIntegrated)
+                    {
+                        throw new MoneroError("Address has subaddress code but integrated address pattern");
+                    }
                     addressType = MoneroAddressType.Subaddress;
                     networkType = aNetworkType;
                     break;
@@ -355,7 +425,10 @@ namespace Monero.Common
             }
 
             // validate address and network types
-            if (addressType == null || networkType == null) throw new MoneroError("Address has invalid code: " + addressCode);
+            if (addressType == null || networkType == null)
+            {
+                throw new MoneroError("Address has invalid code: " + addressCode);
+            }
 
             // return decoded address
             return new MoneroDecodedAddress(address, (MoneroAddressType)addressType, networkType.Type);
@@ -368,7 +441,7 @@ namespace Monero.Common
 
         public static Uri ParseUri(string uri)
         {
-            if (!string.IsNullOrEmpty(uri) && !Regex.IsMatch(uri.ToLower(), @"^\w+://.+"))
+            if (!string.IsNullOrEmpty(uri) && !Regex.IsMatch(uri.ToLower(), UriPattern))
             {
                 uri = "http://" + uri; // assume http if protocol not given
             }
@@ -386,7 +459,9 @@ namespace Monero.Common
         private static bool IsValidAddressHash(string decodedAddrStr)
         {
             if (string.IsNullOrEmpty(decodedAddrStr) || decodedAddrStr.Length < 8)
+            {
                 return false;
+            }
 
             string checksumCheck = decodedAddrStr.Substring(decodedAddrStr.Length - 8);
             string withoutChecksumStr = decodedAddrStr.Substring(0, decodedAddrStr.Length - 8);
@@ -443,9 +518,12 @@ namespace Monero.Common
             return BinToHex(data);
         }
 
-        private static int[] DecodeBlock(int[] data, int[] buf, int index)
+        private static int[] DecodeBlock(int[]? data, int[] buf, int index)
         {
-
+            if (data == null)
+            {
+                throw new MoneroError("Block data is null");
+            }
             if (data.Length < 1 || data.Length > FullEncodedBlockSize)
             {
                 throw new MoneroError("Invalid block length: " + data.Length);

@@ -52,7 +52,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetHash(string? hash)
         {
-            this._hash = hash;
+            _hash = hash;
             return this;
         }
 
@@ -63,7 +63,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetHeight(ulong? height)
         {
-            this._height = height;
+            _height = height;
             return this;
         }
 
@@ -74,7 +74,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetTimestamp(ulong? timestamp)
         {
-            this._timestamp = timestamp;
+            _timestamp = timestamp;
             return this;
         }
 
@@ -85,7 +85,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetSize(ulong? size)
         {
-            this._size = size;
+            _size = size;
             return this;
         }
 
@@ -96,7 +96,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetWeight(ulong? weight)
         {
-            this._weight = weight;
+            _weight = weight;
             return this;
         }
 
@@ -107,7 +107,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetLongTermWeight(ulong? longTermWeight)
         {
-            this._longTermWeight = longTermWeight;
+            _longTermWeight = longTermWeight;
             return this;
         }
 
@@ -118,7 +118,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetDepth(ulong? depth)
         {
-            this._depth = depth;
+            _depth = depth;
             return this;
         }
 
@@ -129,7 +129,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetDifficulty(ulong? difficulty)
         {
-            this._difficulty = difficulty;
+            _difficulty = difficulty;
             return this;
         }
 
@@ -140,7 +140,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetCumulativeDifficulty(ulong? cumulativeDifficulty)
         {
-            this._cumulativeDifficulty = cumulativeDifficulty;
+            _cumulativeDifficulty = cumulativeDifficulty;
             return this;
         }
 
@@ -151,7 +151,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetMajorVersion(uint? majorVersion)
         {
-            this._majorVersion = majorVersion;
+            _majorVersion = majorVersion;
             return this;
         }
 
@@ -162,7 +162,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetMinorVersion(uint? minorVersion)
         {
-            this._minorVersion = minorVersion;
+            _minorVersion = minorVersion;
             return this;
         }
 
@@ -173,7 +173,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetNonce(ulong? nonce)
         {
-            this._nonce = nonce;
+            _nonce = nonce;
             return this;
         }
 
@@ -184,7 +184,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetMinerTxHash(string? minerTxHash)
         {
-            this._minerTxHash = minerTxHash;
+            _minerTxHash = minerTxHash;
             return this;
         }
 
@@ -195,7 +195,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetNumTxs(uint? numTxs)
         {
-            this._numTxs = numTxs;
+            _numTxs = numTxs;
             return this;
         }
 
@@ -206,7 +206,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetOrphanStatus(bool? orphanStatus)
         {
-            this._orphanStatus = orphanStatus;
+            _orphanStatus = orphanStatus;
             return this;
         }
 
@@ -217,7 +217,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetPrevHash(string? prevHash)
         {
-            this._prevHash = prevHash;
+            _prevHash = prevHash;
             return this;
         }
 
@@ -228,7 +228,7 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetReward(ulong? reward)
         {
-            this._reward = reward;
+            _reward = reward;
             return this;
         }
 
@@ -239,38 +239,54 @@ namespace Monero.Common
 
         public virtual MoneroBlockHeader SetPowHash(string? powHash)
         {
-            this._powHash = powHash;
+            _powHash = powHash;
             return this;
         }
 
         public virtual MoneroBlockHeader Merge(MoneroBlockHeader? header)
         {
-            if (header == null) throw new ArgumentNullException(nameof(header), "Cannot merge null header into block header");
-            if (this == header) return this;
-            this.SetHash(GenUtils.Reconcile(this.GetHash(), header.GetHash()));
-            this.SetHeight(GenUtils.Reconcile(this.GetHeight(), header.GetHeight(), null, null, true));  // height can increase
-            this.SetTimestamp(GenUtils.Reconcile(this.GetTimestamp(), header.GetTimestamp(), null, null, true));  // block timestamp can increase
-            this.SetSize(GenUtils.Reconcile(this.GetSize(), header.GetSize()));
-            this.SetWeight(GenUtils.Reconcile(this.GetWeight(), header.GetWeight()));
-            this.SetDepth(GenUtils.Reconcile(this.GetDepth(), header.GetDepth()));
-            this.SetDifficulty(GenUtils.Reconcile(this.GetDifficulty(), header.GetDifficulty()));
-            this.SetCumulativeDifficulty(GenUtils.Reconcile(this.GetCumulativeDifficulty(), header.GetCumulativeDifficulty()));
-            this.SetMajorVersion(GenUtils.Reconcile(this.GetMajorVersion(), header.GetMajorVersion()));
-            this.SetMinorVersion(GenUtils.Reconcile(this.GetMinorVersion(), header.GetMinorVersion()));
-            this.SetNonce(GenUtils.Reconcile(this.GetNonce(), header.GetNonce()));
-            this.SetMinerTxHash(GenUtils.Reconcile(this.GetMinerTxHash(), header.GetMinerTxHash()));
-            this.SetNumTxs(GenUtils.Reconcile(this.GetNumTxs(), header.GetNumTxs()));
-            this.SetOrphanStatus(GenUtils.Reconcile(this.GetOrphanStatus(), header.GetOrphanStatus()));
-            this.SetPrevHash(GenUtils.Reconcile(this.GetPrevHash(), header.GetPrevHash()));
-            this.SetReward(GenUtils.Reconcile(this.GetReward(), header.GetReward()));
-            this.SetPowHash(GenUtils.Reconcile(this.GetPowHash(), header.GetPowHash()));
+            if (header == null)
+            {
+                throw new ArgumentNullException(nameof(header), "Cannot merge null header into block header");
+            }
+            
+            if (this == header)
+            {
+                return this;
+            }
+            
+            SetHash(GenUtils.Reconcile(GetHash(), header.GetHash()));
+            SetHeight(GenUtils.Reconcile(GetHeight(), header.GetHeight(), null, null, true));  // height can increase
+            SetTimestamp(GenUtils.Reconcile(GetTimestamp(), header.GetTimestamp(), null, null, true));  // block timestamp can increase
+            SetSize(GenUtils.Reconcile(GetSize(), header.GetSize()));
+            SetWeight(GenUtils.Reconcile(GetWeight(), header.GetWeight()));
+            SetDepth(GenUtils.Reconcile(GetDepth(), header.GetDepth()));
+            SetDifficulty(GenUtils.Reconcile(GetDifficulty(), header.GetDifficulty()));
+            SetCumulativeDifficulty(GenUtils.Reconcile(GetCumulativeDifficulty(), header.GetCumulativeDifficulty()));
+            SetMajorVersion(GenUtils.Reconcile(GetMajorVersion(), header.GetMajorVersion()));
+            SetMinorVersion(GenUtils.Reconcile(GetMinorVersion(), header.GetMinorVersion()));
+            SetNonce(GenUtils.Reconcile(GetNonce(), header.GetNonce()));
+            SetMinerTxHash(GenUtils.Reconcile(GetMinerTxHash(), header.GetMinerTxHash()));
+            SetNumTxs(GenUtils.Reconcile(GetNumTxs(), header.GetNumTxs()));
+            SetOrphanStatus(GenUtils.Reconcile(GetOrphanStatus(), header.GetOrphanStatus()));
+            SetPrevHash(GenUtils.Reconcile(GetPrevHash(), header.GetPrevHash()));
+            SetReward(GenUtils.Reconcile(GetReward(), header.GetReward()));
+            SetPowHash(GenUtils.Reconcile(GetPowHash(), header.GetPowHash()));
             return this;
         }
         
         public virtual bool Equals(MoneroBlockHeader? other)
         {
-            if (other == null) return false;
-            if (other == this) return true;
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (other == this)
+            {
+                return true;
+            }
+            
             return _hash == other._hash && 
                    _height == other._height && 
                    _timestamp == other._timestamp && 

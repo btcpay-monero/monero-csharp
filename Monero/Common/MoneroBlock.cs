@@ -21,13 +21,24 @@ namespace Monero.Common
         public MoneroBlock(MoneroBlock block) : base(block)
         {
             _hex = block.GetHex();
-            if (block._minerTx != null) _minerTx = block._minerTx.Clone().SetBlock(this);
+            if (block._minerTx != null)
+            {
+                _minerTx = block._minerTx.Clone().SetBlock(this);
+            }
+            
             if (block._txs != null)
             {
-                _txs = new List<MoneroTx>();
-                foreach (MoneroTx tx in block._txs) _txs.Add(tx.Clone().SetBlock(this));
+                _txs = [];
+                foreach (MoneroTx tx in block._txs)
+                {
+                    _txs.Add(tx.Clone().SetBlock(this));
+                }
             }
-            if (block.GetTxHashes() != null) _txHashes = [..block.GetTxHashes()!];
+
+            if (block.GetTxHashes() != null)
+            {
+                _txHashes = [..block.GetTxHashes()!];
+            }
         }
 
         #region Override Base Methods
@@ -184,8 +195,16 @@ namespace Monero.Common
 
         public MoneroBlock AddTx(MoneroTx? tx)
         {
-            if (tx == null) throw new ArgumentNullException(nameof(tx), "Transaction cannot be null");
-            if (_txs == null) _txs = [];
+            if (tx == null)
+            {
+                throw new ArgumentNullException(nameof(tx), "Transaction cannot be null");
+            }
+            
+            if (_txs == null)
+            {
+                _txs = [];
+            }
+            
             _txs.Add(tx.SetBlock(this));
             return this;
         }

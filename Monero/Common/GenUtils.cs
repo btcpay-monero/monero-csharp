@@ -1,4 +1,5 @@
-﻿using Org.BouncyCastle.Utilities;
+﻿using System.Text;
+using Org.BouncyCastle.Utilities;
 
 namespace Monero.Common
 {
@@ -12,7 +13,10 @@ namespace Monero.Common
         public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined = null, bool? resolveTrue = null, bool? resolveMax = null)
         {
             // check for same reference
-            if (ReferenceEquals(val1, val2)) return val1;
+            if (ReferenceEquals(val1, val2))
+            {
+                return val1;
+            }
 
             int? comparison = null;
 
@@ -20,18 +24,28 @@ namespace Monero.Common
             if (val1 is ulong b1 && val2 is ulong b2)
             {
                 comparison = b1.CompareTo(b2);
-                if (comparison == 0) return val1;
+                if (comparison == 0)
+                {
+                    return val1;
+                }
             }
 
             if (val1 is bool bool1 && val2 is bool bool2)
             {
-                if (bool1 ==  bool2) return val1;
+                if (bool1 == bool2)
+                {
+                    return val1;
+                }
             }
 
             // resolve one value null
             if (val1 == null || val2 == null)
             {
-                if (resolveDefined == false) return default!;
+                if (resolveDefined == false)
+                {
+                    return default!;
+                }
+                
                 return val1 == null ? val2 : val1;
             }
 
@@ -100,27 +114,29 @@ namespace Monero.Common
 
         public static int[]? Subarray(int[]? array, int startIndexInclusive, int endIndexExclusive)
         {
-            if (array == null) return null;
+            if (array == null)
+            {
+                return null;
+            }
+            
             if (startIndexInclusive < 0) startIndexInclusive = 0;
             if (endIndexExclusive > array.Length) endIndexExclusive = array.Length;
 
             int newSize = endIndexExclusive - startIndexInclusive;
-            if (newSize <= 0) return [];
+            if (newSize <= 0)
+            {
+                return [];
+            }
 
             int[] subarray = new int[newSize];
             Array.Copy(array, startIndexInclusive, subarray, 0, newSize);
             return subarray;
         }
-
-        public static void WaitFor(ulong durationMs) {
-            WaitFor((int)durationMs);
-        }
-
+        
         public static void WaitFor(int durationMs)
         {
             try
             {
-                // brutto, non mi piace
                 Thread.Sleep(durationMs);
             }
             catch (ThreadInterruptedException)
@@ -129,15 +145,23 @@ namespace Monero.Common
             }
         }
         
-        public static string KvLine(object? key, object? value, int indent, bool newline = true, bool ignoreUndefined = true) {
-            if (value == null && ignoreUndefined) return "";
+        public static string KvLine(string key, object? value, int indent, bool newline = true, bool ignoreUndefined = true) {
+            if (value == null && ignoreUndefined)
+            {
+                return "";
+            }
+            
             return GetIndent(indent) + key + ": " + value + (newline ? '\n' : "");
         }
         
-        public static string GetIndent(int length) {
-            string str = "";
-            for (int i = 0; i < length; i++) str += "  "; // two spaces
-            return str;
+        public static string GetIndent(int length)
+        {
+            var sb = new StringBuilder(length * 2);
+            for (int i = 0; i < length; i++)
+            {
+                sb.Append("  "); // two spaces
+            }
+            return sb.ToString();
         }
     }
 }

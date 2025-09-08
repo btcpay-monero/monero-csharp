@@ -30,7 +30,9 @@ namespace Monero.Common
         public TaskLooper Start(ulong periodInMs, bool targetFixedPeriod = false)
         {
             if (periodInMs <= 0)
+            {
                 throw new ArgumentException("Period must be greater than 0 ms", nameof(periodInMs));
+            }
 
             lock (_lock)
             {
@@ -94,7 +96,9 @@ namespace Monero.Common
         public void SetPeriodInMs(ulong periodInMs)
         {
             if (periodInMs <= 0)
+            {
                 throw new ArgumentException("Period must be greater than 0 ms");
+            }
 
             lock (_lock)
             {

@@ -43,24 +43,38 @@ namespace Monero.Common
         private string? _maxUsedBlockHash;
         private List<string>? _signatures;
 
-        public virtual bool Equals(MoneroTx other, bool checkInputs = true, bool checkOutputs = true)
+        public virtual bool Equals(MoneroTx? other, bool checkInputs = true, bool checkOutputs = true)
         {
-            if (this == other) return true;
+            if (other == null)
+            {
+                return false;
+            }
+            
+            if (this == other)
+            {
+                return true;
+            }
 
             if (checkInputs)
             {
                 var inputs = GetInputs() ?? [];
                 var otherInputs = other.GetInputs() ?? [];
 
-                if (inputs.Count != otherInputs.Count) return false;
+                if (inputs.Count != otherInputs.Count)
+                {
+                    return false;
+                }
                 int i = 0;
                 foreach (var input in inputs)
                 {
                     var otherInput = otherInputs[i]!;
-                    if (!input.Equals(otherInput)) return false;
+                    if (!input.Equals(otherInput))
+                    {
+                        return false;
+                    }
+                    i++;
                 }
 
-                i++;
             }
             
             if (checkOutputs)
@@ -68,39 +82,57 @@ namespace Monero.Common
                 var outputs = GetOutputs() ?? [];
                 var otherOutputs = other.GetOutputs() ?? [];
 
-                if (outputs.Count != otherOutputs.Count) return false;
+                if (outputs.Count != otherOutputs.Count)
+                {
+                    return false;
+                }
                 int i = 0;
                 foreach (var output in outputs)
                 {
                     var otherOutput = otherOutputs[i]!;
-                    if (!output.Equals(otherOutput)) return false;
+                    if (!output.Equals(otherOutput))
+                    {
+                        return false;
+                    }
                     i++;
                 }
             }
 
             var signatures = GetSignatures() ?? [];
             var otherSignatures = other.GetSignatures() ?? [];
-            
-            if (signatures.Count != otherSignatures.Count) return false;
+
+            if (signatures.Count != otherSignatures.Count)
+            {
+                return false;
+            }
 
             int j = 0;
 
             foreach (var signature in signatures)
             {
-                if (signature != otherSignatures[j]) return false;
+                if (signature != otherSignatures[j])
+                {
+                    return false;
+                }
                 j++;
             }
 
             var indices = GetOutputIndices() ?? [];
             var otherIndices = other.GetOutputIndices() ?? [];
 
-            if (indices.Count != otherIndices.Count) return false;
+            if (indices.Count != otherIndices.Count)
+            {
+                return false;
+            }
 
             int k = 0;
 
             foreach (var index in indices)
             {
-                if (index != otherIndices[k]) return false;
+                if (index != otherIndices[k])
+                {
+                    return false;
+                }
                 k++;
             }
             
@@ -170,16 +202,29 @@ namespace Monero.Common
             if (tx._inputs != null)
             {
                 _inputs = new List<MoneroOutput>();
-                foreach (MoneroOutput input in tx._inputs) _inputs.Add(input.Clone().SetTx(this));
+                foreach (MoneroOutput input in tx._inputs)
+                {
+                    _inputs.Add(input.Clone().SetTx(this));
+                }
             }
             if (tx._outputs != null)
             {
                 _outputs = new List<MoneroOutput>();
-                foreach (MoneroOutput output in tx._outputs) _outputs.Add(output.Clone().SetTx(this));
+                foreach (MoneroOutput output in tx._outputs)
+                {
+                    _outputs.Add(output.Clone().SetTx(this));
+                }
             }
-            if (tx._outputIndices != null) _outputIndices = new List<ulong>(tx._outputIndices);
+
+            if (tx._outputIndices != null)
+            {
+                _outputIndices = [..tx._outputIndices];
+            }
             _metadata = tx._metadata;
-            if (tx._extra != null) _extra = tx._extra;
+            if (tx._extra != null)
+            {
+                _extra = tx._extra;
+            }
             _rctSignatures = tx._rctSignatures;
             _rctSigPrunable = tx._rctSigPrunable;
             _isKeptByBlock = tx._isKeptByBlock;
@@ -188,7 +233,10 @@ namespace Monero.Common
             _lastFailedHash = tx._lastFailedHash;
             _maxUsedBlockHeight = tx._maxUsedBlockHeight;
             _maxUsedBlockHash = tx._maxUsedBlockHash;
-            if (tx._signatures != null) _signatures = new List<string>(tx._signatures);
+            if (tx._signatures != null)
+            {
+                _signatures = [..tx._signatures];
+            }
         }
 
         public virtual MoneroTx Clone()
@@ -608,9 +656,16 @@ namespace Monero.Common
             return this;
         }
 
-        public virtual MoneroTx Merge(MoneroTx tx)
+        public virtual MoneroTx Merge(MoneroTx? tx)
         {
-            if (this == tx) return this;
+            if (tx == null)
+            {
+                throw new MoneroError("Cannot merge null transaction");
+            }
+            if (this == tx)
+            {
+                return this;
+            }
             var block = GetBlock();
             
             // merge blocks if they're different
@@ -670,7 +725,10 @@ namespace Monero.Common
                 {
                     bool merged = false;
                     merger.SetTx(this);
-                    if (GetInputs() == null) SetInputs([]);
+                    if (GetInputs() == null)
+                    {
+                        SetInputs([]);
+                    }
                     foreach (MoneroOutput mergee in GetInputs()!)
                     {
                         if (mergee.GetKeyImage()!.GetHex()!.Equals(merger.GetKeyImage()!.GetHex()))
@@ -680,18 +738,27 @@ namespace Monero.Common
                             break;
                         }
                     }
-                    if (!merged) GetInputs()!.Add(merger);
+
+                    if (!merged)
+                    {
+                        GetInputs()!.Add(merger);
+                    }
                 }
             }
 
             // merge outputs
             if (tx.GetOutputs() != null)
             {
-                foreach (MoneroOutput output in tx.GetOutputs()!) output.SetTx(this);
-                if (GetOutputs() == null) SetOutputs(tx.GetOutputs());
+                foreach (MoneroOutput output in tx.GetOutputs()!)
+                {
+                    output.SetTx(this);
+                }
+                if (GetOutputs() == null)
+                {
+                    SetOutputs(tx.GetOutputs());
+                }
                 else
                 {
-
                     // merge outputs if key image or stealth public key present, otherwise append
                     foreach (MoneroOutput merger in tx.GetOutputs()!)
                     {
@@ -707,7 +774,9 @@ namespace Monero.Common
                                 break;
                             }
                         }
-                        if (!merged) GetOutputs()!.Add(merger); // append output
+                        if (!merged) {
+                            GetOutputs()!.Add(merger); // append output
+                        }
                     }
                 }
             }

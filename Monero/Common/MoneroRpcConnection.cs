@@ -59,14 +59,24 @@ namespace Monero.Common
         }
 
         public bool IsClearnet() {
-            if (string.IsNullOrEmpty(_uri)) return false;
+            if (string.IsNullOrEmpty(_uri))
+            {
+                return false;
+            }
             return !IsOnion() && !IsI2P();
         }
 
         public bool Equals(MoneroRpcConnection? other)
         {
-            if (other == null) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
             return _username == other._username &&
                    _password == other._password &&
                    _uri == other._uri &&
@@ -151,7 +161,10 @@ namespace Monero.Common
 
         public override bool? IsConnected()
         {
-            if (_isAuthenticated != null) return _isOnline == true && _isAuthenticated == true;
+            if (_isAuthenticated != null)
+            {
+                return _isOnline == true && _isAuthenticated == true;
+            }
             return _isOnline;
         }
 
@@ -204,7 +217,10 @@ namespace Monero.Common
                     }
                 }
                 var now = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                if (_isOnline == true) _responseTime = now - startTime;
+                if (_isOnline == true)
+                {
+                    _responseTime = now - startTime;
+                }
                 return isOnlineBefore != _isOnline || isAuthenticatedBefore != _isAuthenticated;
             }
         }
@@ -248,16 +264,24 @@ namespace Monero.Common
         {
             try
             {
-                if (_httpClient != null) _httpClient.Dispose();
+                if (_httpClient != null)
+                {
+                    _httpClient.Dispose();
+                }
             }
             catch (Exception e)
             {
                 throw new MoneroError(e);
             }
 
-            if (string.IsNullOrEmpty(username)) username = null;
-            if (string.IsNullOrEmpty(password)) password = null;
-
+            if (string.IsNullOrEmpty(username))
+            {
+                username = null;
+            }
+            if (string.IsNullOrEmpty(password))
+            {
+                password = null;
+            }
             if (!string.IsNullOrEmpty(username) || !string.IsNullOrEmpty(password))
             {
                 if (string.IsNullOrEmpty(username))
@@ -323,7 +347,10 @@ namespace Monero.Common
 
         public MoneroJsonRpcResponse SendJsonRequest(MoneroJsonRpcRequest rpcRequest, ulong timeoutMs = 20000)
         {
-            if (_httpClient == null) throw new MoneroError("Http client is null");
+            if (_httpClient == null)
+            {
+                throw new MoneroError("Http client is null");
+            }
 
             try
             {
@@ -388,7 +415,10 @@ namespace Monero.Common
 
         public MoneroJsonRpcStringResponse SendJsonStringRequest(string method, List<ulong> parameters, ulong timeoutMs = 20000)
         {
-            if (_httpClient == null) throw new MoneroError("Http client is null");
+            if (_httpClient == null)
+            {
+                throw new MoneroError("Http client is null");
+            }
 
             try
             {
@@ -429,10 +459,6 @@ namespace Monero.Common
                 
                 return rpcResponse!;
             }
-            catch (MoneroRpcError)
-            {
-                throw;
-            }
             catch (Exception e2)
             {
                 throw new MoneroError(e2);
@@ -471,7 +497,10 @@ namespace Monero.Common
                 if (MoneroUtils.GetLogLevel() >= 3)
                 {
                     string respStr = JsonConvert.SerializeObject(respMap);
-                    if (respStr.Length > 10000) respStr = respStr.Substring(0, 10000);
+                    if (respStr.Length > 10000)
+                    {
+                        respStr = respStr.Substring(0, 10000);
+                    }
                     MoneroUtils.Log(3, $"Received path response from path='{path}', response={respStr}, uri={_uri} ({DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime} ms)");
                 }
 

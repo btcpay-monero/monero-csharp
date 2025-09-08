@@ -34,7 +34,10 @@ namespace Monero.Common
 
         public static MoneroNetworkType Parse(string? networkTypeStr)
         {
-            if (networkTypeStr == null) throw new MoneroError("Cannot parse null network type");
+            if (networkTypeStr == null)
+            {
+                throw new MoneroError("Cannot parse null network type");
+            }
             return networkTypeStr.ToLower() switch
             {
                 "mainnet" => MoneroNetworkType.Mainnet,
@@ -46,10 +49,23 @@ namespace Monero.Common
 
         public static MoneroNetworkType Parse(int? nettype)
         {
-            if (nettype == null) throw new MoneroError("Cannot parse null network type");
-            if (nettype == 0) return MoneroNetworkType.Mainnet;
-            else if (nettype == 1) return MoneroNetworkType.Testnet;
-            else return MoneroNetworkType.Stagenet;
+            if (nettype == null)
+            {
+                throw new MoneroError("Cannot parse null network type");
+            }
+
+            if (nettype == 0)
+            {
+                return MoneroNetworkType.Mainnet;
+            }
+            else if (nettype == 1)
+            {
+                return MoneroNetworkType.Testnet;
+            }
+            else
+            {
+                return MoneroNetworkType.Stagenet;
+            }
         }
 
         public static readonly MoneroNetwork[] Types = [new MoneroNetworkMainnet(), new MoneroNetworkTestnet(), new MoneroNetworkStagenet()];

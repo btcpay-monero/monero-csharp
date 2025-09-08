@@ -17,10 +17,16 @@ namespace Monero.Common
 
         public MoneroOutput(MoneroOutput output)
         {
-            if (output._keyImage != null) _keyImage = output._keyImage.Clone();
+            if (output._keyImage != null)
+            {
+                _keyImage = output._keyImage.Clone();
+            }
             _amount = output._amount;
             _index = output._index;
-            if (output._ringOutputIndices != null) _ringOutputIndices = [..output._ringOutputIndices];
+            if (output._ringOutputIndices != null)
+            {
+                _ringOutputIndices = [..output._ringOutputIndices];
+            }
             _stealthPublicKey = output._stealthPublicKey;
         }
 
@@ -97,17 +103,33 @@ namespace Monero.Common
 
         public MoneroOutput Merge(MoneroOutput? output)
         {
-            if (output == null) throw new MoneroError("Output is null");
-            if (this == output) return this;
+            if (output == null)
+            {
+                throw new MoneroError("Output is null");
+            }
+
+            if (this == output)
+            {
+                return this;
+            }
 
             // merge txs if they're different which comes back to merging outputs
-            if (GetTx() != output.GetTx()) GetTx()!.Merge(output.GetTx()!);
+            if (GetTx() != output.GetTx())
+            {
+                GetTx()!.Merge(output.GetTx()!);
+            }
 
             // otherwise merge output fields
             else
             {
-                if (GetKeyImage() == null) SetKeyImage(output.GetKeyImage());
-                else if (output.GetKeyImage() != null) GetKeyImage()!.Merge(output.GetKeyImage());
+                if (GetKeyImage() == null)
+                {
+                    SetKeyImage(output.GetKeyImage());
+                }
+                else if (output.GetKeyImage() != null)
+                {
+                    GetKeyImage()!.Merge(output.GetKeyImage());
+                }
                 SetAmount(GenUtils.Reconcile(GetAmount(), output.GetAmount()));
                 SetIndex(GenUtils.Reconcile(GetIndex(), output.GetIndex()));
             }
@@ -115,24 +137,68 @@ namespace Monero.Common
             return this;
         }
         
-        public bool Equals(MoneroOutput? other) {
-            if (this == other) return true;
-            if (other == null) return false;
-            if (_amount == null) {
-                if (other._amount != null) return false;
-            } else if (_amount != other._amount) return false;
-            if (_index == null) {
-                if (other._index != null) return false;
-            } else if (_index != other._index) return false;
-            if (_keyImage == null) {
-                if (other._keyImage != null) return false;
-            } else if (!_keyImage.Equals(other._keyImage)) return false;
-            if (_ringOutputIndices == null) {
-                if (other._ringOutputIndices != null) return false;
-            } else if (!_ringOutputIndices.Equals(other._ringOutputIndices)) return false;
-            if (_stealthPublicKey == null) {
-                if (other._stealthPublicKey != null) return false;
-            } else if (!_stealthPublicKey.Equals(other._stealthPublicKey)) return false;
+        public bool Equals(MoneroOutput? other) 
+        {
+            if (this == other)
+            {
+                return true;
+            }
+
+            if (other == null)
+            {
+                return false;
+            }
+            if (_amount == null) 
+            {
+                if (other._amount != null)
+                {
+                    return false;
+                }
+            } else if (_amount != other._amount)
+            {
+                return false;
+            }
+            if (_index == null) 
+            {
+                if (other._index != null)
+                {
+                    return false;
+                }
+            } else if (_index != other._index)
+            {
+                return false;
+            }
+            if (_keyImage == null) 
+            {
+                if (other._keyImage != null)
+                {
+                    return false;
+                }
+            } else if (!_keyImage.Equals(other._keyImage))
+            {
+                return false;
+            }
+            if (_ringOutputIndices == null)
+            {
+                if (other._ringOutputIndices != null)
+                {
+                    return false;
+                }
+            } else if (!_ringOutputIndices.Equals(other._ringOutputIndices))
+            {
+                return false;
+            }
+            if (_stealthPublicKey == null) 
+            {
+                if (other._stealthPublicKey != null)
+                {
+                    return false;
+                }
+            } else if (!_stealthPublicKey.Equals(other._stealthPublicKey))
+            {
+                return false;
+            }
+            
             return true;
         }
     }

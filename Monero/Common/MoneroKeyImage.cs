@@ -32,9 +32,20 @@ namespace Monero.Common
 
         public static SpentStatus ParseStatus(int status)
         {
-            if (status == 1) return SpentStatus.NotSpent;
-            else if (status == 2) return SpentStatus.Confirmed;
-            else if (status == 3) return SpentStatus.TxPool;
+            if (status == 1)
+            {
+                return SpentStatus.NotSpent;
+            }
+
+            if (status == 2)
+            {
+                return SpentStatus.Confirmed;
+            }
+
+            if (status == 3)
+            {
+                return SpentStatus.TxPool;
+            }
 
             throw new MoneroError("Invalid integer value for spent status: " + status);
         }
@@ -63,8 +74,14 @@ namespace Monero.Common
 
         public MoneroKeyImage Merge(MoneroKeyImage? keyImage)
         {
-            if (keyImage == null) throw new MoneroError("Cannot merge: key image is null");
-            if (keyImage == this) return this;
+            if (keyImage == null)
+            {
+                throw new MoneroError("Cannot merge: key image is null");
+            }
+            if (keyImage == this)
+            {
+                return this;
+            }
             SetHex(GenUtils.Reconcile(GetHex(), keyImage.GetHex()));
             SetSignature(GenUtils.Reconcile(GetSignature(), keyImage.GetSignature()));
             return this;
@@ -72,7 +89,10 @@ namespace Monero.Common
 
         public bool Equals(MoneroKeyImage? other)
         {
-            if (other == null) return false;
+            if (other == null)
+            {
+                return false;
+            }
             return _hex == other._hex && _signature == other._signature;
         }
     }
