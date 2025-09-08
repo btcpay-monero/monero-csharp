@@ -5,11 +5,6 @@ namespace Monero.Wallet
 {
     public class MoneroWalletLight : MoneroWalletKeys
     {
-        protected MoneroWalletLight(IntPtr walletHandle, string seedOffset = ""): base(walletHandle, seedOffset)
-        {
-
-        }
-
         #region Override Base Methods
 
         public override int AddAddressBookEntry(string address, string description)
