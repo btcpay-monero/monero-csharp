@@ -10,20 +10,20 @@ namespace Monero.Test.Utils
         public static readonly string MONERO_BINS_DIR = "";
   
         // monero daemon rpc endpoint configuration (change per your configuration)
-        public static readonly string DAEMON_RPC_URI = "localhost:28081";
+        public static readonly string DAEMON_RPC_URI = "http://monerod:18081";
         public static readonly string DAEMON_RPC_USERNAME = "";
         public static readonly string DAEMON_RPC_PASSWORD = "";
         public static readonly string DAEMON_LOCAL_PATH = MONERO_BINS_DIR + "/monerod";
   
         // monero wallet rpc configuration (change per your configuration)
-        public static readonly int WALLET_RPC_PORT_START = 28084; // test wallet executables will bind to consecutive ports after these
+        public static readonly int WALLET_RPC_PORT_START = 18082; // test wallet executables will bind to consecutive ports after these
         public static readonly bool WALLET_RPC_ZMQ_ENABLED = false;
         public static readonly int WALLET_RPC_ZMQ_PORT_START = 58083;
         public static readonly int WALLET_RPC_ZMQ_BIND_PORT_START = 48083;  // TODO: zmq bind port necessary?
-        public static readonly string WALLET_RPC_USERNAME = "rpc_user";
-        public static readonly string WALLET_RPC_PASSWORD = "abc123";
+        public static readonly string WALLET_RPC_USERNAME = "";
+        public static readonly string WALLET_RPC_PASSWORD = "";
         public static readonly string WALLET_RPC_ZMQ_DOMAIN = "127.0.0.1";
-        public static readonly string WALLET_RPC_DOMAIN = "localhost";
+        public static readonly string WALLET_RPC_DOMAIN = "http://xmr_wallet";
         public static readonly string WALLET_RPC_URI = WALLET_RPC_DOMAIN + ":" + WALLET_RPC_PORT_START;
         public static readonly string WALLET_RPC_ZMQ_URI = "tcp://" + WALLET_RPC_ZMQ_DOMAIN + ":" + WALLET_RPC_ZMQ_PORT_START;
         public static readonly string WALLET_RPC_LOCAL_PATH = MONERO_BINS_DIR + "/monero-wallet-rpc";
@@ -38,7 +38,7 @@ namespace Monero.Test.Utils
   
         // test wallet constants
         public static readonly ulong MAX_FEE = 75000000000;
-        public static readonly MoneroNetworkType NETWORK_TYPE = MoneroNetworkType.TESTNET;
+        public static readonly MoneroNetworkType NETWORK_TYPE = MoneroNetworkType.MAINNET;
         public static readonly string LANGUAGE = "English";
         public static readonly string SEED = "silk mocked cucumber lettuce hope adrenalin aching lush roles fuel revamp baptism wrist ulong tender teardrop midst pastry pigment equip frying inbound pinched ravine frying";
         public static readonly string ADDRESS = "A1y9sbVt8nqhZAVm3me1U18rUVXcjeNKuBd1oE2cTs8biA9cozPMeyYLhe77nPv12JA3ejJN3qprmREriit2fi6tJDi99RR";

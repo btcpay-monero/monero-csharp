@@ -8,4 +8,4 @@ RUN dotnet restore
 
 RUN dotnet build --no-restore
 
-CMD ["dotnet", "test", "--filter", "TestMoneroUtils", "--no-build", "--logger:trx"]
+CMD ["dotnet", "test", "--filter", "TestMoneroUtils|TestMoneroRpcConnection", "--no-build", "--logger:trx"]

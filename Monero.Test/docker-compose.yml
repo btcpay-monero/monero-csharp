@@ -19,7 +19,7 @@ services:
   xmr_wallet:
     image: btcpayserver/monero:0.18.4.1
     container_name: xmr_wallet
-    command: monero-wallet-rpc --log-level 2 --allow-mismatched-daemon-version --rpc-bind-ip=0.0.0.0 --disable-rpc-login --confirm-external-bind --rpc-bind-port=28082 --non-interactive --trusted-daemon --daemon-address=monerod:18081 --wallet-dir=/wallet --rpc-access-control-origins=* --tx-notify="/bin/sh ./scripts/notifier.sh -k -X GET https://host.docker.internal:14142/monerolikedaemoncallback/tx?cryptoCode=xmr&hash=%s"
+    command: monero-wallet-rpc --log-level 2 --allow-mismatched-daemon-version --rpc-bind-ip=0.0.0.0 --disable-rpc-login --confirm-external-bind --rpc-bind-port=18082 --non-interactive --trusted-daemon --daemon-address=monerod:18081 --wallet-dir=/wallet --rpc-access-control-origins=* --tx-notify="/bin/sh ./scripts/notifier.sh -k -X GET https://host.docker.internal:14142/monerolikedaemoncallback/tx?cryptoCode=xmr&hash=%s"
     ports:
       - "18082:18082"
     volumes:

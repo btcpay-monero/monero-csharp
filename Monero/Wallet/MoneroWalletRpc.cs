@@ -53,11 +53,10 @@ namespace Monero.Wallet
             // TODO: ensure other fields are uninitialized?
 
             // open wallet on rpc server
-            Dictionary<string, object> parameters = [];
+            Dictionary<string, object?> parameters = [];
             parameters.Add("filename", config.GetPath());
             parameters.Add("password", config.GetPassword() == null ? "" : config.GetPassword());
-            MoneroJsonRpcRequest request = new MoneroJsonRpcRequest("open_wallet", parameters);
-            rpc.SendJsonRequest(request);
+            rpc.SendJsonRequest("open_wallet", parameters);
             Clear();
             path = config.GetPath();
 
@@ -128,12 +127,11 @@ namespace Monero.Wallet
             if (config.GetLanguage() == null || config.GetLanguage().Length == 0) config.SetLanguage(MoneroWallet.DEFAULT_LANGUAGE);
 
             // send request
-            Dictionary<string, object> parameters = [];
+            Dictionary<string, object?> parameters = [];
             parameters.Add("filename", config.GetPath());
             parameters.Add("password", config.GetPassword());
             parameters.Add("language", config.GetLanguage());
-            MoneroJsonRpcRequest request = new MoneroJsonRpcRequest("create_wallet", parameters);
-            try { rpc.SendJsonRequest(request); }
+            try { rpc.SendJsonRequest("create_wallet", parameters); }
             catch (MoneroRpcError e) { HandleCreateWalletError(config.GetPath(), e); }
             Clear();
             path = config.GetPath();
@@ -144,7 +142,7 @@ namespace Monero.Wallet
         {
             config = config.Clone();
             if (config.GetLanguage() == null || config.GetLanguage().Length == 0) config.SetLanguage(MoneroWallet.DEFAULT_LANGUAGE);
-            Dictionary<string, object> parameters = [];
+            Dictionary<string, object?> parameters = [];
             parameters.Add("filename", config.GetPath());
             parameters.Add("password", config.GetPassword());
             parameters.Add("seed", config.GetSeed());
@@ -154,8 +152,7 @@ namespace Monero.Wallet
             parameters.Add("autosave_current", config.GetSaveCurrent());
             parameters.Add("enable_multisig_experimental", config.IsMultisig());
 
-            MoneroJsonRpcRequest request = new MoneroJsonRpcRequest("restore_deterministic_wallet", parameters);
-            try { rpc.SendJsonRequest(request); }
+            try { rpc.SendJsonRequest("restore_deterministic_wallet", parameters); }
             catch (MoneroRpcError e) { HandleCreateWalletError(config.GetPath(), e); }
             Clear();
             path = config.GetPath();
@@ -167,7 +164,7 @@ namespace Monero.Wallet
             config = config.Clone();
             if (config.GetSeedOffset() != null) throw new MoneroError("Cannot specify seed offset when creating wallet from keys");
             if (config.GetRestoreHeight() == null) config.SetRestoreHeight(0);
-            Dictionary<string, object> parameters = [];
+            Dictionary<string, object?> parameters = [];
 
             parameters.Add("filename", config.GetPath());
             parameters.Add("password", config.GetPassword());
@@ -177,8 +174,7 @@ namespace Monero.Wallet
             parameters.Add("restore_height", config.GetRestoreHeight());
             parameters.Add("autosave_current", config.GetSaveCurrent());
 
-            MoneroJsonRpcRequest request = new MoneroJsonRpcRequest("generate_from_keys", parameters);
-            try { rpc.SendJsonRequest(request); }
+            try { rpc.SendJsonRequest("generate_from_keys", parameters); }
             catch (MoneroRpcError e) { HandleCreateWalletError(config.GetPath(), e); }
             Clear();
             path = config.GetPath();
@@ -1643,7 +1639,7 @@ namespace Monero.Wallet
 
         public override string ExportMultisigHex()
         {
-            MoneroJsonRpcResponse resp = rpc.SendJsonRequest("export_multisig_info");
+            var resp = rpc.SendJsonRequest("export_multisig_info");
             var result = resp.Result;
             return (string)result["info"];
         }
@@ -1678,7 +1674,7 @@ namespace Monero.Wallet
         {
             MoneroJsonRpcParams parameters = [];
             parameters.Add("tx_data_hex", signedMultisigTxHex);
-            MoneroJsonRpcResponse resp = rpc.SendJsonRequest("submit_multisig", parameters);
+            var resp = rpc.SendJsonRequest("submit_multisig", parameters);
             if (resp.Result == null || !resp.Result.ContainsKey("tx_hash_list"))
             {
                 throw new MoneroError("Invalid response from submit_multisig: " + resp.ToString());

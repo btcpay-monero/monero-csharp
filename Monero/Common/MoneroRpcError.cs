@@ -1,25 +1,29 @@
 ﻿
-using MoneroJsonRpcParams = System.Collections.Generic.Dictionary<string, object>;
-
 namespace Monero.Common
 {
     public class MoneroRpcError : MoneroError
     {
-        private readonly string _rpcMethod;
-        private readonly MoneroJsonRpcParams? _params;
+        private readonly string? _rpcMethod;
+        private readonly object? _params;
 
-        public MoneroRpcError(string message, int? code, string rpcMethod, MoneroJsonRpcParams? parameters = null) : base(message, code)
+        public MoneroRpcError(string message, int? code = null, string? rpcMethod = null, object? parameters = null) : base(message, code)
         {
             _rpcMethod = rpcMethod;
             _params = parameters;
         }
 
-        public string GetRpcMethod()
+        public MoneroRpcError(MoneroRpcError e): base(e)
         {
-            return _rpcMethod;
+            _rpcMethod = e._rpcMethod;
+            _params = e._params;
         }
 
-        public MoneroJsonRpcParams? GetRpcParams() {
+        public string GetRpcMethod()
+        {
+            return _rpcMethod ?? "";
+        }
+
+        public object? GetRpcParams() {
             return _params;
         }
     }
