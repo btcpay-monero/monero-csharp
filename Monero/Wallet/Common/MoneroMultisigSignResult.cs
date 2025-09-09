@@ -1,50 +1,49 @@
 ﻿
-namespace Monero.Wallet.Common
+namespace Monero.Wallet.Common;
+
+public class MoneroMultisigSignResult
 {
-    public class MoneroMultisigSignResult
+    private string? _signedMultisigHex;
+    private List<string> _txHashes = [];
+
+    public MoneroMultisigSignResult() { }
+
+    public MoneroMultisigSignResult(string signedMultisigHex, List<string> txHashes)
     {
-        private string? _signedMultisigHex;
-        private List<string> _txHashes = [];
+        _signedMultisigHex = signedMultisigHex;
+        _txHashes = txHashes;
+    }
 
-        public MoneroMultisigSignResult() { }
+    public MoneroMultisigSignResult(MoneroMultisigSignResult signResult)
+    {
+        _signedMultisigHex = signResult._signedMultisigHex;
+        _txHashes = [.. signResult._txHashes];
+    }
 
-        public MoneroMultisigSignResult(string signedMultisigHex, List<string> txHashes)
-        {
-            _signedMultisigHex = signedMultisigHex;
-            _txHashes = txHashes;
-        }
+    public string? GetSignedMultisigTxHex()
+    {
+        return _signedMultisigHex;
+    }
 
-        public MoneroMultisigSignResult(MoneroMultisigSignResult signResult)
-        {
-            _signedMultisigHex = signResult._signedMultisigHex;
-            _txHashes = [.. signResult._txHashes];
-        }
+    public MoneroMultisigSignResult SetSignedMultisigTxHex(string signedMultisigHex)
+    {
+        _signedMultisigHex = signedMultisigHex;
+        return this;
+    }
 
-        public string? GetSignedMultisigTxHex()
-        {
-            return _signedMultisigHex;
-        }
+    public List<string> GetTxHashes()
+    {
+        return _txHashes;
+    }
 
-        public MoneroMultisigSignResult SetSignedMultisigTxHex(string signedMultisigHex)
-        {
-            _signedMultisigHex = signedMultisigHex;
-            return this;
-        }
+    public MoneroMultisigSignResult SetTxHashes(List<string> txHashes)
+    {
+        _txHashes = [.. txHashes];
+        return this;
+    }
 
-        public List<string> GetTxHashes()
-        {
-            return _txHashes;
-        }
-
-        public MoneroMultisigSignResult SetTxHashes(List<string> txHashes)
-        {
-            _txHashes = [.. txHashes];
-            return this;
-        }
-
-        public MoneroMultisigSignResult Clone()
-        {
-            return new MoneroMultisigSignResult(this);
-        }
+    public MoneroMultisigSignResult Clone()
+    {
+        return new MoneroMultisigSignResult(this);
     }
 }

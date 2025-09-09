@@ -1,48 +1,47 @@
 ﻿
-namespace Monero.Wallet.Common
+namespace Monero.Wallet.Common;
+
+public class MoneroSyncResult
 {
-    public class MoneroSyncResult
+    private ulong _numBlocksFetched;
+    private bool _receivedMoney;
+
+    public MoneroSyncResult(ulong numBlocksFetched, bool receivedMoney)
     {
-        private ulong _numBlocksFetched;
-        private bool _receivedMoney;
+        _numBlocksFetched = numBlocksFetched;
+        _receivedMoney = receivedMoney;
+    }
 
-        public MoneroSyncResult(ulong numBlocksFetched, bool receivedMoney)
-        {
-            _numBlocksFetched = numBlocksFetched;
-            _receivedMoney = receivedMoney;
-        }
+    public MoneroSyncResult(MoneroSyncResult syncResult)
+    {
+        _numBlocksFetched = syncResult._numBlocksFetched;
+        _receivedMoney = syncResult._receivedMoney;
+    }
 
-        public MoneroSyncResult(MoneroSyncResult syncResult)
-        {
-            _numBlocksFetched = syncResult._numBlocksFetched;
-            _receivedMoney = syncResult._receivedMoney;
-        }
+    public ulong GetNumBlocksFetched()
+    {
+        return _numBlocksFetched;
+    }
 
-        public ulong GetNumBlocksFetched()
-        {
-            return _numBlocksFetched;
-        }
+    public MoneroSyncResult SetNumBlocksFetched(ulong numBlocksFetched)
+    {
+        _numBlocksFetched = numBlocksFetched;
+        return this;
+    }
 
-        public MoneroSyncResult SetNumBlocksFetched(ulong numBlocksFetched)
-        {
-            _numBlocksFetched = numBlocksFetched;
-            return this;
-        }
+    public bool IsReceivedMoney()
+    {
+        return _receivedMoney;
+    }
 
-        public bool IsReceivedMoney()
-        {
-            return _receivedMoney;
-        }
+    public MoneroSyncResult SetReceivedMoney(bool receivedMoney)
+    {
+        _receivedMoney = receivedMoney;
+        return this;
+    }
 
-        public MoneroSyncResult SetReceivedMoney(bool receivedMoney)
-        {
-            _receivedMoney = receivedMoney;
-            return this;
-        }
-
-        public MoneroSyncResult Clone()
-        {
-            return new MoneroSyncResult(this);
-        }
+    public MoneroSyncResult Clone()
+    {
+        return new MoneroSyncResult(this);
     }
 }

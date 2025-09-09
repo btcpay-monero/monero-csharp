@@ -1,11 +1,10 @@
 ﻿
-namespace Monero.Wallet.Common
+namespace Monero.Wallet.Common;
+
+public enum MoneroTxPriority
 {
-    public enum MoneroTxPriority
-    {
-        DEFAULT,
-        UNIMPORTANT,
-        NORMAL,
-        ELEVATED
-    }
+    DEFAULT,
+    UNIMPORTANT,
+    NORMAL,
+    ELEVATED
 }

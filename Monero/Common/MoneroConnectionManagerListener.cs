@@ -1,8 +1,7 @@
 ﻿
-namespace Monero.Common
+namespace Monero.Common;
+
+public interface MoneroConnectionManagerListener
 {
-    public interface MoneroConnectionManagerListener
-    {
-        void OnConnectionChanged(MoneroRpcConnection? connection);
-    }
+    void OnConnectionChanged(MoneroRpcConnection? connection);
 }

@@ -1,13 +1,12 @@
 ﻿
-namespace Monero.Common
-{
-    public class MoneroLwsRequest : MoneroHttpRequest
-    {
-        public readonly string Method;
+namespace Monero.Common;
 
-        public MoneroLwsRequest(string method)
-        {
-            Method = method;
-        }
+public class MoneroLwsRequest : MoneroHttpRequest
+{
+    public readonly string Method;
+
+    public MoneroLwsRequest(string method)
+    {
+        Method = method;
     }
 }

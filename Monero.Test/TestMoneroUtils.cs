@@ -5,10 +5,6 @@ namespace Monero.Test;
 
 public class TestMoneroUtils
 {
-    public TestMoneroUtils() {
-        
-    }
-
     // Can get integrated addresses
     [Fact(Skip = "MoneroUtils.GetIntegratedAddress(): not implemented")]
     public void TestGetIntegratedAddresses()

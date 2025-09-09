@@ -1,10 +1,10 @@
 ﻿
-namespace Monero.Test.Utils
+namespace Monero.Test.Utils;
+
+public static class StopMining
 {
-    public static class StopMining
+    public static void Stop()
     {
-        public static void Stop() {
-            TestUtils.GetDaemonRpc().StopMining();
-        }
+        TestUtils.GetDaemonRpc().StopMining();
     }
 }

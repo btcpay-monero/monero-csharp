@@ -1,117 +1,116 @@
 ﻿
-namespace Monero.Daemon.Common
+namespace Monero.Daemon.Common;
+
+public class MoneroBlockTemplate
 {
-    public class MoneroBlockTemplate
+    private string? blockTemplateBlob;
+    private string? blockHashingBlob;
+    private ulong? difficulty;
+    private ulong? expectedReward;
+    private ulong? height;
+    private string? prevHash;
+    private ulong? reservedOffset;
+    private ulong? seedHeight;
+    private string? seedHash;
+    private string? nextSeedHash;
+
+    public string? GetBlockTemplateBlob()
     {
-        private string? blockTemplateBlob;
-        private string? blockHashingBlob;
-        private ulong? difficulty;
-        private ulong? expectedReward;
-        private ulong? height;
-        private string? prevHash;
-        private ulong? reservedOffset;
-        private ulong? seedHeight;
-        private string? seedHash;
-        private string? nextSeedHash;
+        return blockTemplateBlob;
+    }
 
-        public string? GetBlockTemplateBlob()
-        {
-            return blockTemplateBlob;
-        }
+    public void SetBlockTemplateBlob(string? blockTemplateBlob)
+    {
+        this.blockTemplateBlob = blockTemplateBlob;
+    }
 
-        public void SetBlockTemplateBlob(string? blockTemplateBlob)
-        {
-            this.blockTemplateBlob = blockTemplateBlob;
-        }
+    public string? GetBlockHashingBlob()
+    {
+        return blockHashingBlob;
+    }
 
-        public string? GetBlockHashingBlob()
-        {
-            return blockHashingBlob;
-        }
+    public void SetBlockHashingBlob(string? blockHashingBlob)
+    {
+        this.blockHashingBlob = blockHashingBlob;
+    }
 
-        public void SetBlockHashingBlob(string? blockHashingBlob)
-        {
-            this.blockHashingBlob = blockHashingBlob;
-        }
+    public ulong? GetDifficulty()
+    {
+        return difficulty;
+    }
 
-        public ulong? GetDifficulty()
-        {
-            return difficulty;
-        }
+    public void SetDifficulty(ulong? difficulty)
+    {
+        this.difficulty = difficulty;
+    }
 
-        public void SetDifficulty(ulong? difficulty)
-        {
-            this.difficulty = difficulty;
-        }
+    public ulong? GetExpectedReward()
+    {
+        return expectedReward;
+    }
 
-        public ulong? GetExpectedReward()
-        {
-            return expectedReward;
-        }
+    public void SetExpectedReward(ulong? expectedReward)
+    {
+        this.expectedReward = expectedReward;
+    }
 
-        public void SetExpectedReward(ulong? expectedReward)
-        {
-            this.expectedReward = expectedReward;
-        }
+    public ulong? GetHeight()
+    {
+        return height;
+    }
 
-        public ulong? GetHeight()
-        {
-            return height;
-        }
+    public void SetHeight(ulong? height)
+    {
+        this.height = height;
+    }
 
-        public void SetHeight(ulong? height)
-        {
-            this.height = height;
-        }
+    public string? GetPrevHash()
+    {
+        return prevHash;
+    }
 
-        public string? GetPrevHash()
-        {
-            return prevHash;
-        }
+    public void SetPrevHash(string? prevHash)
+    {
+        this.prevHash = prevHash;
+    }
 
-        public void SetPrevHash(string? prevHash)
-        {
-            this.prevHash = prevHash;
-        }
+    public ulong? GetReservedOffset()
+    {
+        return reservedOffset;
+    }
 
-        public ulong? GetReservedOffset()
-        {
-            return reservedOffset;
-        }
+    public void SetReservedOffset(ulong? reservedOffset)
+    {
+        this.reservedOffset = reservedOffset;
+    }
 
-        public void SetReservedOffset(ulong? reservedOffset)
-        {
-            this.reservedOffset = reservedOffset;
-        }
+    public ulong? GetSeedHeight()
+    {
+        return seedHeight;
+    }
 
-        public ulong? GetSeedHeight()
-        {
-            return seedHeight;
-        }
+    public void SetSeedHeight(ulong? seedHeight)
+    {
+        this.seedHeight = seedHeight;
+    }
 
-        public void SetSeedHeight(ulong? seedHeight)
-        {
-            this.seedHeight = seedHeight;
-        }
+    public string? GetSeedHash()
+    {
+        return seedHash;
+    }
 
-        public string? GetSeedHash()
-        {
-            return seedHash;
-        }
+    public void SetSeedHash(string? seedHash)
+    {
+        this.seedHash = seedHash;
+    }
 
-        public void SetSeedHash(string? seedHash)
-        {
-            this.seedHash = seedHash;
-        }
+    public string? GetNextSeedHash()
+    {
+        return nextSeedHash;
+    }
 
-        public string? GetNextSeedHash()
-        {
-            return nextSeedHash;
-        }
-
-        public void SetNextSeedHash(string? nextSeedHash)
-        {
-            this.nextSeedHash = nextSeedHash;
-        }
+    public void SetNextSeedHash(string? nextSeedHash)
+    {
+        this.nextSeedHash = nextSeedHash;
     }
 }

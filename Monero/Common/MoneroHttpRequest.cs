@@ -1,8 +1,7 @@
 ﻿
-namespace Monero.Common
-{
-    public abstract class MoneroHttpRequest
-    {
+namespace Monero.Common;
 
-    }
+public abstract class MoneroHttpRequest
+{
+
 }

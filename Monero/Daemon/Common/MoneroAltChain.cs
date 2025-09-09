@@ -1,69 +1,68 @@
 ﻿
-namespace Monero.Daemon.Common
+namespace Monero.Daemon.Common;
+
+public class MoneroAltChain
 {
-    public class MoneroAltChain
+    private List<string> blockHashes = [];
+    private ulong? difficulty;
+    private ulong? height;
+    private ulong? length;
+    private string? mainChainParentBlockHash;
+
+    public MoneroAltChain() { }
+
+    public List<string> GetBlockHashes()
     {
-        private List<string> blockHashes = [];
-        private ulong? difficulty;
-        private ulong? height;
-        private ulong? length;
-        private string? mainChainParentBlockHash;
+        return blockHashes;
+    }
 
-        public MoneroAltChain() { }
+    public MoneroAltChain SetBlockHashes(List<string> blockHashes)
+    {
+        this.blockHashes = blockHashes;
+        return this;
+    }
 
-        public List<string> GetBlockHashes()
-        {
-            return blockHashes;
-        }
+    public ulong? GetDifficulty()
+    {
+        return difficulty;
+    }
 
-        public MoneroAltChain SetBlockHashes(List<string> blockHashes)
-        {
-            this.blockHashes = blockHashes;
-            return this;
-        }
+    public MoneroAltChain SetDifficulty(ulong difficulty)
+    {
+        this.difficulty = difficulty;
+        return this;
+    }
 
-        public ulong? GetDifficulty()
-        {
-            return difficulty;
-        }
+    public ulong? GetHeight()
+    {
+        return height;
+    }
 
-        public MoneroAltChain SetDifficulty(ulong difficulty)
-        {
-            this.difficulty = difficulty;
-            return this;
-        }
+    public MoneroAltChain SetHeight(ulong height)
+    {
+        this.height = height;
+        return this;
+    }
 
-        public ulong? GetHeight()
-        {
-            return height;
-        }
+    public ulong? GetLength()
+    {
+        return length;
+    }
 
-        public MoneroAltChain SetHeight(ulong height)
-        {
-            this.height = height;
-            return this;
-        }
+    public MoneroAltChain SetLength(ulong length)
+    {
+        this.length = length;
+        return this;
+    }
 
-        public ulong? GetLength()
-        {
-            return length;
-        }
+    public string? GetMainChainParentBlockHash()
+    {
+        return mainChainParentBlockHash;
+    }
 
-        public MoneroAltChain SetLength(ulong length)
-        {
-            this.length = length;
-            return this;
-        }
-
-        public string? GetMainChainParentBlockHash()
-        {
-            return mainChainParentBlockHash;
-        }
-
-        public MoneroAltChain SetMainChainParentBlockHash(string mainChainParentBlockHash)
-        {
-            this.mainChainParentBlockHash = mainChainParentBlockHash;
-            return this;
-        }
+    public MoneroAltChain SetMainChainParentBlockHash(string mainChainParentBlockHash)
+    {
+        this.mainChainParentBlockHash = mainChainParentBlockHash;
+        return this;
     }
 }

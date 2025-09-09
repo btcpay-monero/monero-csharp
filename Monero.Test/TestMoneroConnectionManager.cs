@@ -6,10 +6,6 @@ namespace Monero.Test;
 
 public class TestMoneroConnectionManager
 {
-
-
-    public TestMoneroConnectionManager() { }
-
     [Fact]
     public void TestConnectionManager()
     {
@@ -51,7 +47,7 @@ public class TestMoneroConnectionManager
             // test unknown connection
             int numExpectedChanges = 0;
             connectionManager.SetConnection(orderedConnections[0]);
-            Assert.Null( connectionManager.IsConnected());
+            Assert.Null(connectionManager.IsConnected());
             Assert.True(++numExpectedChanges == listener.ChangedConnections.Count);
 
             // auto connect to best available connection
@@ -206,7 +202,7 @@ public class TestMoneroConnectionManager
 
             // set connection to empty string
             connectionManager.SetConnection("");
-            Assert.Null( connectionManager.GetConnection());
+            Assert.Null(connectionManager.GetConnection());
             Assert.True(++numExpectedChanges == listener.ChangedConnections.Count);
 
             // check all connections and test auto switch
@@ -250,7 +246,7 @@ public class TestMoneroConnectionManager
             // reset
             connectionManager.Reset();
             Assert.True(0 == connectionManager.GetConnections().Count);
-            Assert.Null( connectionManager.GetConnection());
+            Assert.Null(connectionManager.GetConnection());
         }
         catch (Exception ex)
         {

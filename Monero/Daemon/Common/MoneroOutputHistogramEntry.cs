@@ -1,51 +1,50 @@
 ﻿
-namespace Monero.Daemon.Common
+namespace Monero.Daemon.Common;
+
+public class MoneroOutputHistogramEntry
 {
-    public class MoneroOutputHistogramEntry
+    private ulong? amount;
+    private ulong? numInstances;
+    private ulong? numUnlockedInstances;
+    private ulong? numRecentInstances;
+
+    public ulong? GetAmount()
     {
-        private ulong? amount;
-        private ulong? numInstances;
-        private ulong? numUnlockedInstances;
-        private ulong? numRecentInstances;
+        return amount;
+    }
 
-        public ulong? GetAmount()
-        {
-            return amount;
-        }
+    public void SetAmount(ulong? amount)
+    {
+        this.amount = amount;
+    }
 
-        public void SetAmount(ulong? amount)
-        {
-            this.amount = amount;
-        }
+    public ulong? GetNumInstances()
+    {
+        return numInstances;
+    }
 
-        public ulong? GetNumInstances()
-        {
-            return numInstances;
-        }
+    public void SetNumInstances(ulong? numInstances)
+    {
+        this.numInstances = numInstances;
+    }
 
-        public void SetNumInstances(ulong? numInstances)
-        {
-            this.numInstances = numInstances;
-        }
+    public ulong? GetNumUnlockedInstances()
+    {
+        return numUnlockedInstances;
+    }
 
-        public ulong? GetNumUnlockedInstances()
-        {
-            return numUnlockedInstances;
-        }
+    public void SetNumUnlockedInstances(ulong? numUnlockedInstances)
+    {
+        this.numUnlockedInstances = numUnlockedInstances;
+    }
 
-        public void SetNumUnlockedInstances(ulong? numUnlockedInstances)
-        {
-            this.numUnlockedInstances = numUnlockedInstances;
-        }
+    public ulong? GetNumRecentInstances()
+    {
+        return numRecentInstances;
+    }
 
-        public ulong? GetNumRecentInstances()
-        {
-            return numRecentInstances;
-        }
-
-        public void SetNumRecentInstances(ulong? numRecentInstances)
-        {
-            this.numRecentInstances = numRecentInstances;
-        }
+    public void SetNumRecentInstances(ulong? numRecentInstances)
+    {
+        this.numRecentInstances = numRecentInstances;
     }
 }

@@ -1,76 +1,75 @@
 ﻿
-namespace Monero.Wallet.Common
+namespace Monero.Wallet.Common;
+
+public class MoneroOutputQuery : MoneroOutputWallet
 {
-    public class MoneroOutputQuery : MoneroOutputWallet
+    protected MoneroTxQuery? txQuery;
+    private List<uint> subaddressIndices = [];
+    private ulong? minAmount;
+    private ulong? maxAmount;
+
+    public MoneroOutputQuery() { }
+
+    public MoneroOutputQuery(MoneroOutputQuery query) : base(query)
     {
-        protected MoneroTxQuery? txQuery;
-        private List<uint> subaddressIndices = [];
-        private ulong? minAmount;
-        private ulong? maxAmount;
+        if (query.GetMinAmount() != null) this.minAmount = query.GetMinAmount();
+        if (query.GetMaxAmount() != null) this.maxAmount = query.GetMaxAmount();
+        if (query.subaddressIndices != null) this.subaddressIndices = new List<uint>(query.subaddressIndices);
+        this.txQuery = query.txQuery;  // reference original by default, MoneroTxQuery's deep copy will Set this to itself
+    }
 
-        public MoneroOutputQuery() { }
+    public override MoneroOutputQuery Clone()
+    {
+        return new MoneroOutputQuery(this);
+    }
 
-        public MoneroOutputQuery(MoneroOutputQuery query) : base(query)
-        {
-            if (query.GetMinAmount() != null) this.minAmount = query.GetMinAmount();
-            if (query.GetMaxAmount() != null) this.maxAmount = query.GetMaxAmount();
-            if (query.subaddressIndices != null) this.subaddressIndices = new List<uint>(query.subaddressIndices);
-            this.txQuery = query.txQuery;  // reference original by default, MoneroTxQuery's deep copy will Set this to itself
-        }
+    public ulong? GetMinAmount()
+    {
+        return minAmount;
+    }
 
-        public override MoneroOutputQuery Clone()
-        {
-            return new MoneroOutputQuery(this);
-        }
+    public MoneroOutputQuery SetMinAmount(ulong minAmount)
+    {
+        this.minAmount = minAmount;
+        return this;
+    }
 
-        public ulong? GetMinAmount()
-        {
-            return minAmount;
-        }
+    public ulong? GetMaxAmount()
+    {
+        return maxAmount;
+    }
 
-        public MoneroOutputQuery SetMinAmount(ulong minAmount)
-        {
-            this.minAmount = minAmount;
-            return this;
-        }
+    public MoneroOutputQuery SetMaxAmount(ulong maxAmount)
+    {
+        this.maxAmount = maxAmount;
+        return this;
+    }
 
-        public ulong? GetMaxAmount()
-        {
-            return maxAmount;
-        }
+    public MoneroTxQuery? GetTxQuery()
+    {
+        return txQuery;
+    }
 
-        public MoneroOutputQuery SetMaxAmount(ulong maxAmount)
-        {
-            this.maxAmount = maxAmount;
-            return this;
-        }
+    public MoneroOutputQuery SetTxQuery(MoneroTxQuery? txQuery)
+    {
+        this.txQuery = txQuery;
+        if (txQuery != null) txQuery.SetOutputQuery(this);
+        return this;
+    }
 
-        public MoneroTxQuery? GetTxQuery()
-        {
-            return txQuery;
-        }
+    public List<uint> GetSubaddressIndices()
+    {
+        return subaddressIndices;
+    }
 
-        public MoneroOutputQuery SetTxQuery(MoneroTxQuery? txQuery)
-        {
-            this.txQuery = txQuery;
-            if (txQuery != null) txQuery.SetOutputQuery(this);
-            return this;
-        }
+    public MoneroOutputQuery? SetSubaddressIndices(List<uint> subaddressIndices)
+    {
+        this.subaddressIndices = subaddressIndices;
+        return this;
+    }
 
-        public List<uint> GetSubaddressIndices()
-        {
-            return subaddressIndices;
-        }
-
-        public MoneroOutputQuery? SetSubaddressIndices(List<uint> subaddressIndices)
-        {
-            this.subaddressIndices = subaddressIndices;
-            return this;
-        }
-
-        public bool MeetsCriteria(MoneroOutputWallet output)
-        {
-            throw new NotImplementedException();
-        }
+    public bool MeetsCriteria(MoneroOutputWallet output)
+    {
+        throw new NotImplementedException();
     }
 }

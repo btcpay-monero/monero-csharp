@@ -1,84 +1,83 @@
 ﻿
-namespace Monero.Daemon.Common
+namespace Monero.Daemon.Common;
+
+public class MoneroConnectionSpan
 {
-    public class MoneroConnectionSpan
+    private string? connectionId;
+    private ulong? numBlocks;
+    private string? remoteAddress;
+    private ulong? rate;
+    private ulong? speed;
+    private ulong? size;
+    private ulong? startHeight;
+
+    public string? GetConnectionId()
     {
-        private string? connectionId;
-        private ulong? numBlocks;
-        private string? remoteAddress;
-        private ulong? rate;
-        private ulong? speed;
-        private ulong? size;
-        private ulong? startHeight;
+        return connectionId;
+    }
 
-        public string? GetConnectionId()
-        {
-            return connectionId;
-        }
+    public void SetConnectionId(string? connectionId)
+    {
+        this.connectionId = connectionId;
+    }
 
-        public void SetConnectionId(string? connectionId)
-        {
-            this.connectionId = connectionId;
-        }
+    public ulong? GetNumBlocks()
+    {
+        return numBlocks;
+    }
 
-        public ulong? GetNumBlocks()
-        {
-            return numBlocks;
-        }
+    public void SetNumBlocks(ulong? numBlocks)
+    {
+        this.numBlocks = numBlocks;
+    }
 
-        public void SetNumBlocks(ulong? numBlocks)
-        {
-            this.numBlocks = numBlocks;
-        }
+    public string? GetRemoteAddress()
+    {
+        return remoteAddress;
+    }
 
-        public string? GetRemoteAddress()
-        {
-            return remoteAddress;
-        }
+    public void SetRemoteAddress(string? remoteAddress)
+    {
+        this.remoteAddress = remoteAddress;
+    }
 
-        public void SetRemoteAddress(string? remoteAddress)
-        {
-            this.remoteAddress = remoteAddress;
-        }
+    public ulong? GetRate()
+    {
+        return rate;
+    }
 
-        public ulong? GetRate()
-        {
-            return rate;
-        }
+    public void SetRate(ulong? rate)
+    {
+        this.rate = rate;
+    }
 
-        public void SetRate(ulong? rate)
-        {
-            this.rate = rate;
-        }
+    public ulong? GetSpeed()
+    {
+        return speed;
+    }
 
-        public ulong? GetSpeed()
-        {
-            return speed;
-        }
+    public void SetSpeed(ulong? speed)
+    {
+        this.speed = speed;
+    }
 
-        public void SetSpeed(ulong? speed)
-        {
-            this.speed = speed;
-        }
+    public ulong? GetSize()
+    {
+        return size;
+    }
 
-        public ulong? GetSize()
-        {
-            return size;
-        }
+    public void SetSize(ulong? size)
+    {
+        this.size = size;
+    }
 
-        public void SetSize(ulong? size)
-        {
-            this.size = size;
-        }
+    public ulong? GetStartHeight()
+    {
+        return startHeight;
+    }
 
-        public ulong? GetStartHeight()
-        {
-            return startHeight;
-        }
-
-        public void SetStartHeight(ulong? startHeight)
-        {
-            this.startHeight = startHeight;
-        }
+    public void SetStartHeight(ulong? startHeight)
+    {
+        this.startHeight = startHeight;
     }
 }

@@ -1,55 +1,53 @@
-﻿
-namespace Monero.Wallet.Common
+﻿namespace Monero.Wallet.Common;
+
+public class MoneroTxSet
 {
-    public class MoneroTxSet
+    private List<MoneroTxWallet> _txs = [];
+    private string? _multisigTxHex;
+    private string? _unsignedTxHex;
+    private string? _signedTxHex;
+
+    public List<MoneroTxWallet> GetTxs()
     {
-        private List<MoneroTxWallet> _txs = [];
-        private string? _multisigTxHex;
-        private string? _unsignedTxHex;
-        private string? _signedTxHex;
+        return _txs;
+    }
 
-        public List<MoneroTxWallet> GetTxs()
-        {
-            return _txs;
-        }
+    public MoneroTxSet SetTxs(List<MoneroTxWallet> txs)
+    {
+        _txs = txs ?? [];
+        return this;
+    }
 
-        public MoneroTxSet SetTxs(List<MoneroTxWallet> txs)
-        {
-            _txs = txs ?? [];
-            return this;
-        }
+    public string? GetMultisigTxHex()
+    {
+        return _multisigTxHex;
+    }
 
-        public string? GetMultisigTxHex()
-        {
-            return _multisigTxHex;
-        }
+    public MoneroTxSet SetMultisigTxHex(string? multisigTxHex)
+    {
+        _multisigTxHex = multisigTxHex;
+        return this;
+    }
 
-        public MoneroTxSet SetMultisigTxHex(string? multisigTxHex)
-        {
-            _multisigTxHex = multisigTxHex;
-            return this;
-        }
+    public string? GetUnsignedTxHex()
+    {
+        return _unsignedTxHex;
+    }
 
-        public string? GetUnsignedTxHex()
-        {
-            return _unsignedTxHex;
-        }
+    public MoneroTxSet SetUnsignedTxHex(string? unsignedTxHex)
+    {
+        _unsignedTxHex = unsignedTxHex;
+        return this;
+    }
 
-        public MoneroTxSet SetUnsignedTxHex(string? unsignedTxHex)
-        {
-            _unsignedTxHex = unsignedTxHex;
-            return this;
-        }
+    public string? GetSignedTxHex()
+    {
+        return _signedTxHex;
+    }
 
-        public string? GetSignedTxHex()
-        {
-            return _signedTxHex;
-        }
-
-        public MoneroTxSet SetSignedTxHex(string? signedTxHex)
-        {
-            _signedTxHex = signedTxHex;
-            return this;
-        }
+    public MoneroTxSet SetSignedTxHex(string? signedTxHex)
+    {
+        _signedTxHex = signedTxHex;
+        return this;
     }
 }

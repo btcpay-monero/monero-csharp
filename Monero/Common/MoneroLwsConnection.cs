@@ -1,26 +1,25 @@
 ﻿
-namespace Monero.Common
+namespace Monero.Common;
+
+public class MoneroLwsConnection : MoneroConnection
 {
-    public class MoneroLwsConnection : MoneroConnection
+    public override bool CheckConnection(ulong timeoutMs)
     {
-        public override bool CheckConnection(ulong timeoutMs)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
+    }
 
-        public override MoneroConnection Clone()
-        {
-            throw new NotImplementedException();
-        }
+    public override MoneroConnection Clone()
+    {
+        throw new NotImplementedException();
+    }
 
-        public override bool? IsAuthenticated()
-        {
-            throw new NotImplementedException();
-        }
+    public override bool? IsAuthenticated()
+    {
+        throw new NotImplementedException();
+    }
 
-        public override bool? IsConnected()
-        {
-            throw new NotImplementedException();
-        }
+    public override bool? IsConnected()
+    {
+        throw new NotImplementedException();
     }
 }

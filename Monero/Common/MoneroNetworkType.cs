@@ -1,11 +1,9 @@
 ﻿
-namespace Monero.Common
-{
-    public enum MoneroNetworkType
-    {
-        MAINNET,
-        TESTNET,
-        STAGENET
-    }
+namespace Monero.Common;
 
+public enum MoneroNetworkType
+{
+    MAINNET,
+    TESTNET,
+    STAGENET
 }

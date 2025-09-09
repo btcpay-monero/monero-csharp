@@ -1,29 +1,28 @@
 ﻿
-namespace Monero.Daemon.Common
+namespace Monero.Daemon.Common;
+
+public class MoneroMinerTxSum
 {
-    public class MoneroMinerTxSum
+    private ulong? emissionSum;
+    private ulong? feeSum;
+
+    public ulong? GetEmissionSum()
     {
-        private ulong? emissionSum;
-        private ulong? feeSum;
+        return emissionSum;
+    }
 
-        public ulong? GetEmissionSum()
-        {
-            return emissionSum;
-        }
+    public void SetEmissionSum(ulong? emissionSum)
+    {
+        this.emissionSum = emissionSum;
+    }
 
-        public void SetEmissionSum(ulong? emissionSum)
-        {
-            this.emissionSum = emissionSum;
-        }
+    public ulong? GetFeeSum()
+    {
+        return feeSum;
+    }
 
-        public ulong? GetFeeSum()
-        {
-            return feeSum;
-        }
-
-        public void SetFeeSum(ulong? feeSum)
-        {
-            this.feeSum = feeSum;
-        }
+    public void SetFeeSum(ulong? feeSum)
+    {
+        this.feeSum = feeSum;
     }
 }

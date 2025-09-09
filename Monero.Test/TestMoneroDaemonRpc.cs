@@ -1,10 +1,11 @@
-﻿using Monero.Common;
+﻿using System.Collections.ObjectModel;
+
+using Monero.Common;
 using Monero.Daemon;
 using Monero.Daemon.Common;
 using Monero.Test.Utils;
 using Monero.Wallet;
 using Monero.Wallet.Common;
-using System.Collections.ObjectModel;
 
 namespace Monero.Test;
 
@@ -1103,7 +1104,7 @@ public class TestMoneroDaemonRpc
         }
         catch (MoneroError e)
         {
-            throw e;
+            throw;
         }
         finally
         {
@@ -1333,7 +1334,7 @@ public class TestMoneroDaemonRpc
         }
         catch (MoneroError e)
         {
-            throw e;
+            throw;
         }
         finally
         {
@@ -1541,9 +1542,9 @@ public class TestMoneroDaemonRpc
         if (tx.IsConfirmed() == true)
         {
             Assert.NotNull(tx.GetBlock());
-            Assert.True(tx.GetBlock().GetTxs().Contains(tx));
+            Assert.Contains(tx, tx.GetBlock().GetTxs());
             Assert.True(tx.GetBlock().GetHeight() > 0);
-            Assert.True(tx.GetBlock().GetTxs().Contains(tx));
+            Assert.Contains(tx, tx.GetBlock().GetTxs());
             Assert.True(tx.GetBlock().GetHeight() > 0);
             Assert.True(tx.GetBlock().GetTimestamp() > 0);
             Assert.True(tx.GetRelay());
@@ -1656,7 +1657,7 @@ public class TestMoneroDaemonRpc
             if (ctx.fromBinaryBlock == true) Assert.Null(tx.GetFullHex());         // TODO: GetBlocksByHeight() has inconsistent client-side pruning
             else Assert.True(tx.GetFullHex().Length > 0);
             if (ctx.fromBinaryBlock == true) Assert.Null(tx.GetRctSigPrunable());  // TODO: GetBlocksByHeight() has inconsistent client-side pruning
-                                                                                           //else Assert.NotNull((tx.GetRctSigPrunable()); // TODO: define and test this
+                                                                                   //else Assert.NotNull((tx.GetRctSigPrunable()); // TODO: define and test this
             Assert.False(tx.IsDoubleSpendSeen());
             if (tx.IsConfirmed() == true)
             {
@@ -1966,8 +1967,6 @@ public class TestMoneroDaemonRpc
         Assert.True(peer.GetCurrentUpload() >= 0);
         Assert.True(peer.GetHeight() >= 0);
         Assert.True(peer.GetLiveTime() >= 0);
-        Assert.NotNull(peer.IsLocalIp());
-        Assert.NotNull(peer.IsLocalHost());
         Assert.True(peer.GetNumReceives() >= 0);
         Assert.True(peer.GetReceiveIdleTime() >= 0);
         Assert.True(peer.GetNumSends() >= 0);
@@ -1984,7 +1983,6 @@ public class TestMoneroDaemonRpc
         Assert.True(peer.GetHost().Length > 0);
         Assert.True(peer.GetPort() > 0);
         Assert.True(peer.GetRpcPort() == null || peer.GetRpcPort() >= 0);
-        Assert.NotNull(peer.IsOnline());
         //if (peer.GetRpcCreditsPerHash() != null) TestUtils.testUnsignedBigInteger(peer.GetRpcCreditsPerHash());
         if (fromConnection) Assert.Null(peer.GetLastSeenTimestamp());
         else
@@ -2053,7 +2051,7 @@ public class TestMoneroDaemonRpc
         catch (Exception e)
         {
             MoneroUtils.Log(0, "Submit result is not good");
-            throw e;
+            throw;
         }
     }
 
@@ -2132,7 +2130,7 @@ public class TestMoneroDaemonRpc
         catch (Exception e)
         {
             daemon.FlushTxPool(txHashes); // flush txs when relay fails to prevent double spends in other tests
-            throw e;
+            throw;
         }
 
         // wait for txs to be relayed // TODO (monero-project): all txs should be relayed: https://github.com/monero-project/monero/issues/8523
