@@ -82,12 +82,12 @@ public class MoneroDaemonLws : MoneroDaemonDefault
         throw new NotImplementedException("Not supported by monero-lws");
     }
 
-    public override List<MoneroBlock> GetBlocksByRange(ulong startHeight, ulong endHeight)
+    public override List<MoneroBlock> GetBlocksByRange(ulong? startHeight, ulong? endHeight)
     {
         throw new NotImplementedException("Not supported by monero-lws");
     }
 
-    public override List<MoneroBlock> GetBlocksByRangeChunked(ulong startHeight, ulong endHeight, ulong? maxChunkSize = null)
+    public override List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight, ulong? maxChunkSize = null)
     {
         throw new NotImplementedException("Not supported by monero-lws");
     }
@@ -272,7 +272,7 @@ public class MoneroDaemonLws : MoneroDaemonDefault
         throw new NotImplementedException("Not supported by monero-lws");
     }
 
-    public override void StartMining(string address, ulong numThreads, bool isBackground, bool ignoreBattery)
+    public override void StartMining(string? address, ulong? numThreads, bool? isBackground, bool? ignoreBattery)
     {
         throw new NotImplementedException("Not supported by monero-lws");
     }

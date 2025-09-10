@@ -7,7 +7,7 @@ public class MoneroOutput
     private MoneroKeyImage? keyImage;
     private ulong? amount;
     private ulong? index;
-    private List<ulong> ringOutputIndices = [];
+    private List<ulong>? ringOutputIndices;
     private string? stealthPublicKey;
 
     public MoneroOutput()
@@ -73,12 +73,12 @@ public class MoneroOutput
         return this;
     }
 
-    public List<ulong> GetRingOutputIndices()
+    public List<ulong>? GetRingOutputIndices()
     {
         return ringOutputIndices;
     }
 
-    public virtual MoneroOutput SetRingOutputIndices(List<ulong> ringOutputIndices)
+    public virtual MoneroOutput SetRingOutputIndices(List<ulong>? ringOutputIndices)
     {
         this.ringOutputIndices = ringOutputIndices;
         return this;

@@ -28,9 +28,9 @@ public class MoneroTx
     private string? prunableHash;
     private ulong? size;
     private ulong? weight;
-    private List<MoneroOutput> inputs = [];
-    private List<MoneroOutput> outputs = [];
-    private List<ulong> outputIndices = [];
+    private List<MoneroOutput>? inputs;
+    private List<MoneroOutput>? outputs;
+    private List<ulong>? outputIndices;
     private string? metadata;
     private byte[]? extra; // TODO: switch to string for consistency with MoneroTxWallet?
     private object? rctSignatures; // TODO: implement
@@ -41,7 +41,7 @@ public class MoneroTx
     private string? lastFailedHash;
     private ulong? maxUsedBlockHeight;
     private string? maxUsedBlockHash;
-    private List<string> signatures = [];
+    private List<string>? signatures;
 
     public MoneroTx()
     {
@@ -364,29 +364,29 @@ public class MoneroTx
         return inputs;
     }
 
-    public virtual MoneroTx SetInputs(List<MoneroOutput> inputs)
+    public virtual MoneroTx SetInputs(List<MoneroOutput>? inputs)
     {
         this.inputs = inputs;
         return this;
     }
 
-    public List<MoneroOutput> GetOutputs()
+    public List<MoneroOutput>? GetOutputs()
     {
         return outputs;
     }
 
-    public virtual MoneroTx SetOutputs(List<MoneroOutput> outputs)
+    public virtual MoneroTx SetOutputs(List<MoneroOutput>? outputs)
     {
         this.outputs = outputs;
         return this;
     }
 
-    public List<ulong> GetOutputIndices()
+    public List<ulong>? GetOutputIndices()
     {
         return outputIndices;
     }
 
-    public virtual MoneroTx SetOutputIndices(List<ulong> outputIndices)
+    public virtual MoneroTx SetOutputIndices(List<ulong>? outputIndices)
     {
         this.outputIndices = outputIndices;
         return this;
@@ -408,7 +408,7 @@ public class MoneroTx
         return extra;
     }
 
-    public virtual MoneroTx SetExtra(byte[] extra)
+    public virtual MoneroTx SetExtra(byte[]? extra)
     {
         this.extra = extra;
         return this;
@@ -419,7 +419,7 @@ public class MoneroTx
         return rctSignatures;
     }
 
-    public virtual MoneroTx SetRctSignatures(object rctSignatures)
+    public virtual MoneroTx SetRctSignatures(object? rctSignatures)
     {
         this.rctSignatures = rctSignatures;
         return this;
@@ -430,7 +430,7 @@ public class MoneroTx
         return rctSigPrunable;
     }
 
-    public virtual MoneroTx SetRctSigPrunable(object rctSigPrunable)
+    public virtual MoneroTx SetRctSigPrunable(object? rctSigPrunable)
     {
         this.rctSigPrunable = rctSigPrunable;
         return this;
@@ -502,19 +502,23 @@ public class MoneroTx
         return this;
     }
 
-    public List<string> GetSignatures()
+    public List<string>? GetSignatures()
     {
         return signatures;
     }
 
-    public virtual MoneroTx SetSignatures(List<string> signatures)
+    public virtual MoneroTx SetSignatures(List<string>? signatures)
     {
         this.signatures = signatures;
         return this;
     }
 
-    public MoneroTx Merge(MoneroTx tx)
+    public MoneroTx Merge(MoneroTx? tx)
     {
+        if (tx == null)
+        {
+            throw new MoneroError("Cannot merge null tx");
+        }
         if (this == tx) return this;
 
         // merge blocks if they're different

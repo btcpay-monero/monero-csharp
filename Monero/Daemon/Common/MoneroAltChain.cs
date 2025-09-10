@@ -3,7 +3,7 @@ namespace Monero.Daemon.Common;
 
 public class MoneroAltChain
 {
-    private List<string> blockHashes = [];
+    private List<string>? blockHashes;
     private ulong? difficulty;
     private ulong? height;
     private ulong? length;
@@ -11,12 +11,12 @@ public class MoneroAltChain
 
     public MoneroAltChain() { }
 
-    public List<string> GetBlockHashes()
+    public List<string>? GetBlockHashes()
     {
         return blockHashes;
     }
 
-    public MoneroAltChain SetBlockHashes(List<string> blockHashes)
+    public MoneroAltChain SetBlockHashes(List<string>? blockHashes)
     {
         this.blockHashes = blockHashes;
         return this;
@@ -27,7 +27,7 @@ public class MoneroAltChain
         return difficulty;
     }
 
-    public MoneroAltChain SetDifficulty(ulong difficulty)
+    public MoneroAltChain SetDifficulty(ulong? difficulty)
     {
         this.difficulty = difficulty;
         return this;
@@ -38,7 +38,7 @@ public class MoneroAltChain
         return height;
     }
 
-    public MoneroAltChain SetHeight(ulong height)
+    public MoneroAltChain SetHeight(ulong? height)
     {
         this.height = height;
         return this;
@@ -49,7 +49,7 @@ public class MoneroAltChain
         return length;
     }
 
-    public MoneroAltChain SetLength(ulong length)
+    public MoneroAltChain SetLength(ulong? length)
     {
         this.length = length;
         return this;
@@ -60,7 +60,7 @@ public class MoneroAltChain
         return mainChainParentBlockHash;
     }
 
-    public MoneroAltChain SetMainChainParentBlockHash(string mainChainParentBlockHash)
+    public MoneroAltChain SetMainChainParentBlockHash(string? mainChainParentBlockHash)
     {
         this.mainChainParentBlockHash = mainChainParentBlockHash;
         return this;

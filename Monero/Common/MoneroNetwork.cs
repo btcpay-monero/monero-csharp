@@ -38,6 +38,7 @@ public abstract class MoneroNetwork
         return networkTypeStr.ToLower() switch
         {
             "mainnet" => MoneroNetworkType.MAINNET,
+            "fakechain" => MoneroNetworkType.MAINNET,
             "testnet" => MoneroNetworkType.TESTNET,
             "stagenet" => MoneroNetworkType.STAGENET,
             _ => throw new MoneroError("Invalid network type to parse: " + networkTypeStr),

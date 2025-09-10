@@ -4,8 +4,8 @@ namespace Monero.Daemon.Common;
 public class MoneroDaemonSyncInfo
 {
     private ulong? height;
-    private List<MoneroPeer> peers = [];
-    private List<MoneroConnectionSpan> spans = [];
+    private List<MoneroPeer>? peers;
+    private List<MoneroConnectionSpan>? spans;
     private ulong? targetHeight;
     private uint? nextNeededPruningSeed;
     private string? overview;
@@ -22,22 +22,22 @@ public class MoneroDaemonSyncInfo
         this.height = height;
     }
 
-    public List<MoneroPeer> GetPeers()
+    public List<MoneroPeer>? GetPeers()
     {
         return peers;
     }
 
-    public void SetPeers(List<MoneroPeer> peers)
+    public void SetPeers(List<MoneroPeer>? peers)
     {
         this.peers = peers;
     }
 
-    public List<MoneroConnectionSpan> GetSpans()
+    public List<MoneroConnectionSpan>? GetSpans()
     {
         return spans;
     }
 
-    public void SetSpans(List<MoneroConnectionSpan> spans)
+    public void SetSpans(List<MoneroConnectionSpan>? spans)
     {
         this.spans = spans;
     }

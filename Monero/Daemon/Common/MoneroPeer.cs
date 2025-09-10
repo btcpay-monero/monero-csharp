@@ -290,12 +290,12 @@ public class MoneroPeer
         this.numSupportFlags = numSupportFlags;
     }
 
-    public MoneroConnectionType? GetType()
+    public MoneroConnectionType? GetConnectionType()
     {
         return type;
     }
 
-    public void SetType(MoneroConnectionType? type)
+    public void SetConnectionType(MoneroConnectionType? type)
     {
         this.type = type;
     }

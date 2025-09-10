@@ -5,8 +5,8 @@ public class MoneroBlock : MoneroBlockHeader
 {
     private string? hex;
     private MoneroTx? minerTx;
-    private List<MoneroTx> txs = [];
-    private List<string> txHashes = [];
+    private List<MoneroTx>? txs;
+    private List<string>? txHashes;
 
     public MoneroBlock() : base() { }
 
@@ -164,17 +164,20 @@ public class MoneroBlock : MoneroBlockHeader
         return this;
     }
 
-    public List<MoneroTx> GetTxs()
+    public List<MoneroTx>? GetTxs()
     {
         return txs;
     }
 
-    public MoneroBlock SetTxs(List<MoneroTx> txs)
+    public MoneroBlock SetTxs(List<MoneroTx>? txs)
     {
         this.txs = txs;
-        foreach (MoneroTx tx in txs)
+        if (txs != null)
         {
-            tx.SetBlock(this);
+            foreach (MoneroTx tx in txs)
+            {
+                tx.SetBlock(this);
+            }
         }
         return this;
     }
@@ -197,7 +200,7 @@ public class MoneroBlock : MoneroBlockHeader
         return txHashes;
     }
 
-    public MoneroBlock SetTxHashes(List<string> txHashes)
+    public MoneroBlock SetTxHashes(List<string>? txHashes)
     {
         this.txHashes = txHashes;
         return this;

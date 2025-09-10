@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
-
+using Monero.Wallet.Common;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Utilities.Encoders;
 
@@ -236,12 +236,38 @@ public static class MoneroUtils
             throw new MoneroError("Invalid hex: " + str);
     }
 
+    public static bool IsValidHex(string str)
+    {
+        try
+        {
+            ValidateHex(str);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public static void ValidateBase58(string standardAddress)
     {
         foreach (char c in standardAddress)
         {
             if (!CHARS.Contains(c))
                 throw new MoneroError("Invalid Base58 " + standardAddress);
+        }
+    }
+
+    public static bool IsValidBase58(string standardAddress)
+    {
+        try
+        {
+            ValidateBase58(standardAddress);
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 
@@ -261,18 +287,15 @@ public static class MoneroUtils
 
     public static ulong XmrToAtomicUnits(double amountXmr)
     {
-        // Usa decimal per precisione e converte a BigInteger con arrotondamento
         decimal precise = Math.Round((decimal)amountXmr * XMR_AU_MULTIPLIER, 0, MidpointRounding.AwayFromZero);
         return ((ulong)new BigInteger(precise));
     }
 
     public static double AtomicUnitsToXmr(ulong amountAtomicUnits)
     {
-        // Converti BigInteger in decimal per la divisione
         decimal atomicDecimal = (decimal)amountAtomicUnits;
         decimal result = atomicDecimal / XMR_AU_MULTIPLIER;
 
-        // Arrotonda a 12 cifre decimali come in Java
         return Math.Round((double)result, 12, MidpointRounding.AwayFromZero);
     }
 
@@ -340,7 +363,24 @@ public static class MoneroUtils
 
     public static MoneroIntegratedAddress GetIntegratedAddress(MoneroNetworkType networkType, string standardAddress, string? paymentId = null)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException("MoneroUtils.GetIntegratedAddress(): not implemented.");
+    }
+
+    public static Uri ParseUri(string uri)
+    {
+        if (!string.IsNullOrEmpty(uri) && !Regex.IsMatch(uri.ToLower(), @"^\w+://.+"))
+        {
+            uri = "http://" + uri; // assume http if protocol not given
+        }
+
+        try
+        {
+            return new Uri(uri);
+        }
+        catch (Exception e)
+        {
+            throw new MoneroError(e);
+        }
     }
 
     private static bool IsValidAddressHash(string decodedAddrStr)
@@ -464,23 +504,6 @@ public static class MoneroUtils
         return res;
     }
 
-    private static byte[]? HexToBin(string? hexStr)
-    {
-        if (string.IsNullOrEmpty(hexStr) || hexStr.Length % 2 != 0)
-        {
-            return null;
-        }
-
-        byte[] res = new byte[hexStr.Length / 2];
-        for (int i = 0; i < res.Length; ++i)
-        {
-            res[i] = Convert.ToByte(hexStr.Substring(i * 2, 2), 16);
-        }
-
-        return res;
-    }
-
-
     private static string BinToHex(int[] data)
     {
         var builder = new StringBuilder();
@@ -493,6 +516,32 @@ public static class MoneroUtils
 
     public static Dictionary<string, object> BinaryBlocksToMap(byte[] blocks)
     {
-        throw new NotImplementedException("");
+        throw new NotImplementedException("MoneroUtils.BinaryBlocksToMap(): not implemented");
+    }
+
+    public static void MergeTx(List<MoneroTx> txs, MoneroTx tx)
+    {
+        foreach (MoneroTx aTx in txs)
+        {
+            if (aTx.GetHash()!.Equals(tx.GetHash()))
+            {
+                aTx.Merge(tx);
+                return;
+            }
+        }
+        txs.Add(tx);
+    }
+
+    public static void MergeTx(List<MoneroTxWallet> txs, MoneroTxWallet tx)
+    {
+        foreach (MoneroTx aTx in txs)
+        {
+            if (aTx.GetHash()!.Equals(tx.GetHash()))
+            {
+                aTx.Merge(tx);
+                return;
+            }
+        }
+        txs.Add(tx);
     }
 }

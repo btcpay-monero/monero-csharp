@@ -18,9 +18,12 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract MoneroDaemonUpdateCheckResult CheckForUpdate();
 
-    public abstract MoneroDaemonUpdateDownloadResult DownloadUpdate();
+    public virtual MoneroDaemonUpdateDownloadResult DownloadUpdate()
+    {
+        return DownloadUpdate(null);
+    }
 
-    public abstract MoneroDaemonUpdateDownloadResult DownloadUpdate(string path);
+    public abstract MoneroDaemonUpdateDownloadResult DownloadUpdate(string? path);
 
     public virtual void FlushTxPool()
     {
@@ -56,9 +59,9 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract List<MoneroBlock> GetBlocksByHeight(List<ulong> blockHeights);
 
-    public abstract List<MoneroBlock> GetBlocksByRange(ulong startHeight, ulong endHeight);
+    public abstract List<MoneroBlock> GetBlocksByRange(ulong? startHeight, ulong? endHeight);
 
-    public abstract List<MoneroBlock> GetBlocksByRangeChunked(ulong startHeight, ulong endHeight, ulong? maxChunkSize = null);
+    public abstract List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight, ulong? maxChunkSize = null);
 
     public abstract MoneroBlockTemplate GetBlockTemplate(string walletAddress, int? reserveSize = null);
 
@@ -104,9 +107,19 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract MoneroDaemonSyncInfo GetSyncInfo();
 
-    public abstract MoneroTx GetTx(string txHash, bool prune = false);
+    public virtual MoneroTx? GetTx(string txHash, bool prune = false)
+    {
+        var txs = GetTxs([txHash], prune);
 
-    public abstract string GetTxHex(string txHash, bool prune = false);
+        return txs.FirstOrDefault();
+    }
+
+    public virtual string? GetTxHex(string txHash, bool prune = false)
+    {
+        var hexes = GetTxHexes([txHash], prune);
+
+        return hexes.FirstOrDefault();
+    }
 
     public abstract List<string> GetTxHexes(List<string> txHashes, bool prune = false);
 
@@ -160,7 +173,7 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract int SetUploadLimit(int limit);
 
-    public abstract void StartMining(string address, ulong numThreads, bool isBackground, bool ignoreBattery);
+    public abstract void StartMining(string? address, ulong? numThreads, bool? isBackground, bool? ignoreBattery);
 
     public abstract void Stop();
 

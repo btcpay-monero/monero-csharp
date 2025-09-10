@@ -266,4 +266,28 @@ public class MoneroBlockHeader
         this.SetPowHash(GenUtils.Reconcile(this.GetPowHash(), header.GetPowHash()));
         return this;
     }
+
+    public virtual bool Equals(MoneroBlockHeader? other)
+    {
+        if (other == null) return false;
+        if (other == this) return true;
+        return hash == other.hash &&
+               height == other.height &&
+               timestamp == other.timestamp &&
+               size == other.size &&
+               weight == other.weight &&
+               longTermWeight == other.longTermWeight &&
+               depth == other.depth &&
+               difficulty == other.difficulty &&
+               cumulativeDifficulty == other.cumulativeDifficulty &&
+               majorVersion == other.majorVersion &&
+               minorVersion == other.minorVersion &&
+               nonce == other.nonce &&
+               minerTxHash == other.minerTxHash &&
+               numTxs == other.numTxs &&
+               orphanStatus == other.orphanStatus &&
+               prevHash == other.prevHash &&
+               reward == other.reward &&
+               powHash == other.powHash;
+    }
 }
