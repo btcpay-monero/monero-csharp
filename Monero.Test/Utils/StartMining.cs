@@ -1,8 +1,7 @@
-﻿namespace Monero.Test.Utils;
+namespace Monero.Test.Utils;
 
 public static class StartMining
 {
-
     public static void Start()
     {
         Start(1);

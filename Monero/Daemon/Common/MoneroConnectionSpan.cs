@@ -1,14 +1,13 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroConnectionSpan
 {
     private string? connectionId;
     private ulong? numBlocks;
-    private string? remoteAddress;
     private ulong? rate;
-    private ulong? speed;
+    private string? remoteAddress;
     private ulong? size;
+    private ulong? speed;
     private ulong? startHeight;
 
     public string? GetConnectionId()

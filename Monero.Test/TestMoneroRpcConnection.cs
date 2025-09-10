@@ -9,9 +9,9 @@ public class TestMoneroRpcConnection
     [Fact]
     public void TestClone()
     {
-        var connection = new MoneroRpcConnection("test", "user", "pass123", "test_zmq", 2);
+        MoneroRpcConnection connection = new("test", "user", "pass123", "test_zmq", 2);
 
-        var copy = connection.Clone();
+        MoneroRpcConnection copy = connection.Clone();
 
         Assert.True(connection.Equals(copy));
 
@@ -28,7 +28,7 @@ public class TestMoneroRpcConnection
     [Fact]
     public void TestNodeRpcConnection()
     {
-        var connection = new MoneroRpcConnection(TestUtils.DAEMON_RPC_URI);
+        MoneroRpcConnection connection = new(TestUtils.DAEMON_RPC_URI);
 
         TestConnection(connection, TestUtils.DAEMON_RPC_URI, true);
     }
@@ -37,7 +37,7 @@ public class TestMoneroRpcConnection
     [Fact]
     public void TestWalletRpcConnection()
     {
-        var connection = new MoneroRpcConnection(TestUtils.WALLET_RPC_URI);
+        MoneroRpcConnection connection = new(TestUtils.WALLET_RPC_URI);
 
         TestConnection(connection, TestUtils.WALLET_RPC_URI, true);
     }
@@ -46,7 +46,7 @@ public class TestMoneroRpcConnection
     [Fact]
     public void TestInvalidConnection()
     {
-        var connection = new MoneroRpcConnection("");
+        MoneroRpcConnection connection = new("");
 
         TestConnection(connection, "", false);
     }
@@ -57,13 +57,13 @@ public class TestMoneroRpcConnection
     {
         // Setup connection
 
-        var connection = new MoneroRpcConnection(TestUtils.DAEMON_RPC_URI);
+        MoneroRpcConnection connection = new(TestUtils.DAEMON_RPC_URI);
 
         TestConnection(connection, TestUtils.DAEMON_RPC_URI, true);
 
         // Test monerod JSON request
 
-        var jsonResponse = connection.SendJsonRequest("get_info");
+        MoneroJsonRpcResponse<Dictionary<string, object>> jsonResponse = connection.SendJsonRequest("get_info");
 
         Assert.NotNull(jsonResponse);
         Assert.Null(jsonResponse.Error);
@@ -71,10 +71,10 @@ public class TestMoneroRpcConnection
 
         // Test monerod PATH request
 
-        var pathResponse = connection.SendPathRequest("get_info");
+        Dictionary<string, object> pathResponse = connection.SendPathRequest("get_info");
 
         Assert.NotNull(pathResponse);
-        Assert.Null(pathResponse.GetValueOrDefault("error"));
+        Assert.False(pathResponse.TryGetValue("error", out object _));
 
         // Test monerod BINARY request
 
@@ -113,5 +113,4 @@ public class TestMoneroRpcConnection
             Assert.False(connection.IsConnected());
         }
     }
-
 }

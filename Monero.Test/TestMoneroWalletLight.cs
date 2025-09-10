@@ -1,11 +1,10 @@
-﻿using Monero.Wallet;
+using Monero.Wallet;
 using Monero.Wallet.Common;
 
 namespace Monero.Test;
 
 public class TestMoneroWalletLight : TestMoneroWalletCommon
 {
-
     protected override void CloseWallet(MoneroWallet wallet, bool save)
     {
         throw new NotImplementedException();

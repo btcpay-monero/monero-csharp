@@ -1,14 +1,13 @@
-﻿
 namespace Monero.Common;
 
 public class MoneroOutput
 {
-    private MoneroTx? tx;
-    private MoneroKeyImage? keyImage;
     private ulong? amount;
     private ulong? index;
+    private MoneroKeyImage? keyImage;
     private List<ulong>? ringOutputIndices;
     private string? stealthPublicKey;
+    private MoneroTx? tx;
 
     public MoneroOutput()
     {
@@ -17,10 +16,18 @@ public class MoneroOutput
 
     public MoneroOutput(MoneroOutput output)
     {
-        if (output.keyImage != null) this.keyImage = output.keyImage.Clone();
+        if (output.keyImage != null)
+        {
+            keyImage = output.keyImage.Clone();
+        }
+
         amount = output.amount;
         index = output.index;
-        if (output.ringOutputIndices != null) ringOutputIndices = new List<ulong>(output.ringOutputIndices);
+        if (output.ringOutputIndices != null)
+        {
+            ringOutputIndices = new List<ulong>(output.ringOutputIndices);
+        }
+
         stealthPublicKey = output.stealthPublicKey;
     }
 
@@ -97,19 +104,36 @@ public class MoneroOutput
 
     public MoneroOutput Merge(MoneroOutput output)
     {
-        if (!(output is MoneroOutput)) throw new MoneroError("Cannot merge outputs of different types");
-        if (this == output) return this;
+        if (!(output is MoneroOutput))
+        {
+            throw new MoneroError("Cannot merge outputs of different types");
+        }
+
+        if (this == output)
+        {
+            return this;
+        }
 
         // merge txs if they're different which comes back to merging outputs
-        if (this.GetTx() != output.GetTx()) this.GetTx().Merge(output.GetTx());
+        if (GetTx() != output.GetTx())
+        {
+            GetTx().Merge(output.GetTx());
+        }
 
         // otherwise merge output fields
         else
         {
-            if (this.GetKeyImage() == null) this.SetKeyImage(output.GetKeyImage());
-            else if (output.GetKeyImage() != null) this.GetKeyImage().Merge(output.GetKeyImage());
-            this.SetAmount(GenUtils.Reconcile(this.GetAmount(), output.GetAmount()));
-            this.SetIndex(GenUtils.Reconcile(this.GetIndex(), output.GetIndex()));
+            if (GetKeyImage() == null)
+            {
+                SetKeyImage(output.GetKeyImage());
+            }
+            else if (output.GetKeyImage() != null)
+            {
+                GetKeyImage().Merge(output.GetKeyImage());
+            }
+
+            SetAmount(GenUtils.Reconcile(GetAmount(), output.GetAmount()));
+            SetIndex(GenUtils.Reconcile(GetIndex(), output.GetIndex()));
         }
 
         return this;

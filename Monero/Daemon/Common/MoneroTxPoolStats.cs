@@ -1,20 +1,19 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroTxPoolStats
 {
-    private int? numTxs;
-    private int? numNotRelayed;
-    private int? numFailing;
-    private int? numDoubleSpends;
-    private int? num10m;
-    private ulong? feeTotal;
     private ulong? bytesMax;
     private ulong? bytesMed;
     private ulong? bytesMin;
     private ulong? bytesTotal;
+    private ulong? feeTotal;
     private Dictionary<ulong, int>? histo;
     private ulong? histo98pc;
+    private int? num10m;
+    private int? numDoubleSpends;
+    private int? numFailing;
+    private int? numNotRelayed;
+    private int? numTxs;
     private ulong? oldestTimestamp;
 
     public int? GetNumTxs()

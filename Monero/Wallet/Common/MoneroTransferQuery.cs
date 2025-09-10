@@ -1,45 +1,71 @@
-﻿using Monero.Common;
+using Monero.Common;
 
 namespace Monero.Wallet.Common;
 
 public class MoneroTransferQuery : MoneroTransfer
 {
-    protected MoneroTxQuery? txQuery;
-    private bool? isIncoming;
     private string? address;
     private List<string> addresses = [];
-    private uint? subaddressIndex;
-    private List<uint> subaddressIndices = [];
     private List<MoneroDestination> destinations = [];
     private bool? hasDestinations;
+    private bool? isIncoming;
+    private uint? subaddressIndex;
+    private List<uint> subaddressIndices = [];
+    protected MoneroTxQuery? txQuery;
 
     public MoneroTransferQuery()
     {
-
     }
 
     public MoneroTransferQuery(MoneroTransferQuery query) : base(query)
     {
-        this.isIncoming = query.isIncoming;
-        this.address = query.address;
-        if (query.addresses != null) this.addresses = new List<string>(query.addresses);
-        this.subaddressIndex = query.subaddressIndex;
-        if (query.subaddressIndices != null) this.subaddressIndices = new List<uint>(query.subaddressIndices);
+        isIncoming = query.isIncoming;
+        address = query.address;
+        if (query.addresses != null)
+        {
+            addresses = new List<string>(query.addresses);
+        }
+
+        subaddressIndex = query.subaddressIndex;
+        if (query.subaddressIndices != null)
+        {
+            subaddressIndices = new List<uint>(query.subaddressIndices);
+        }
+
         if (query.destinations != null)
         {
-            this.destinations = new List<MoneroDestination>();
-            foreach (MoneroDestination destination in query.GetDestinations()) this.destinations.Add(destination.Clone());
+            destinations = [];
+            foreach (MoneroDestination destination in query.GetDestinations())
+            {
+                destinations.Add(destination.Clone());
+            }
         }
-        this.hasDestinations = query.hasDestinations;
-        this.txQuery = query.txQuery; // reference original by default, MoneroTxQuery's deep copy will Set this to itself
+
+        hasDestinations = query.hasDestinations;
+        txQuery =
+            query.txQuery; // reference original by default, MoneroTxQuery's deep copy will Set this to itself
         Validate();
     }
 
     private void Validate()
     {
-        if (subaddressIndex != null && subaddressIndex < 0) throw new MoneroError("Subaddress index must be >= 0");
-        if (subaddressIndices != null) foreach (uint subaddressIdx in subaddressIndices) if (subaddressIdx < 0) throw new MoneroError("Subaddress indices must be >= 0");
+        if (subaddressIndex != null && subaddressIndex < 0)
+        {
+            throw new MoneroError("Subaddress index must be >= 0");
+        }
+
+        if (subaddressIndices != null)
+        {
+            foreach (uint subaddressIdx in subaddressIndices)
+            {
+                if (subaddressIdx < 0)
+                {
+                    throw new MoneroError("Subaddress indices must be >= 0");
+                }
+            }
+        }
     }
+
     public override MoneroTransferQuery Clone()
     {
         return new MoneroTransferQuery(this);
@@ -53,7 +79,11 @@ public class MoneroTransferQuery : MoneroTransfer
     public MoneroTransferQuery SetTxQuery(MoneroTxQuery txQuery)
     {
         this.txQuery = txQuery;
-        if (txQuery != null) txQuery.SetTransferQuery(this);
+        if (txQuery != null)
+        {
+            txQuery.SetTransferQuery(this);
+        }
+
         return this;
     }
 

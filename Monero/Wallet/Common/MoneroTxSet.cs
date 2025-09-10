@@ -1,11 +1,11 @@
-﻿namespace Monero.Wallet.Common;
+namespace Monero.Wallet.Common;
 
 public class MoneroTxSet
 {
-    private List<MoneroTxWallet> _txs = [];
     private string? _multisigTxHex;
-    private string? _unsignedTxHex;
     private string? _signedTxHex;
+    private List<MoneroTxWallet> _txs = [];
+    private string? _unsignedTxHex;
 
     public List<MoneroTxWallet> GetTxs()
     {

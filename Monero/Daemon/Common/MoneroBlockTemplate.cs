@@ -1,18 +1,17 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroBlockTemplate
 {
-    private string? blockTemplateBlob;
     private string? blockHashingBlob;
+    private string? blockTemplateBlob;
     private ulong? difficulty;
     private ulong? expectedReward;
     private ulong? height;
+    private string? nextSeedHash;
     private string? prevHash;
     private ulong? reservedOffset;
-    private ulong? seedHeight;
     private string? seedHash;
-    private string? nextSeedHash;
+    private ulong? seedHeight;
 
     public string? GetBlockTemplateBlob()
     {

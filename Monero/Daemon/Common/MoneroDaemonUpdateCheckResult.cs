@@ -1,13 +1,12 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroDaemonUpdateCheckResult
 {
-    private bool? isUpdateAvailable;
-    private string? version;
-    private string? hash;
     private string? autoUri;
+    private string? hash;
+    private bool? isUpdateAvailable;
     private string? userUri;
+    private string? version;
 
     public MoneroDaemonUpdateCheckResult()
     {

@@ -1,17 +1,16 @@
-﻿
 namespace Monero.Wallet.Common;
 
 public class MoneroAccountTag
 {
-    private string? _tag;
-    private string? _label;
     private List<uint> _accountIndices = [];
+    private string? _label;
+    private string? _tag;
 
     public MoneroAccountTag(string? tag = null, string? label = null, List<uint>? accountIndices = null)
     {
         _tag = tag;
         _label = label;
-        _accountIndices = accountIndices ?? new List<uint>();
+        _accountIndices = accountIndices ?? [];
     }
 
     public string? GetTag()

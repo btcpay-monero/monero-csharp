@@ -1,12 +1,12 @@
-﻿
 namespace Monero.Common;
 
 public class MoneroRpcError : MoneroError
 {
-    private readonly string? _rpcMethod;
     private readonly object? _params;
+    private readonly string? _rpcMethod;
 
-    public MoneroRpcError(string message, int? code = null, string? rpcMethod = null, object? parameters = null) : base(message, code)
+    public MoneroRpcError(string message, int? code = null, string? rpcMethod = null, object? parameters = null) :
+        base(message, code)
     {
         _rpcMethod = rpcMethod;
         _params = parameters;

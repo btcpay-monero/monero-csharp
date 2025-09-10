@@ -1,14 +1,14 @@
-﻿
 namespace Monero.Wallet.Common;
 
 public class MoneroAddressBookEntry
 {
-    private uint? index;
     private string? address;
-    private string? paymentId;
     private string? description;
+    private uint? index;
+    private string? paymentId;
 
-    public MoneroAddressBookEntry(uint? index = null, string? address = null, string? description = null, string? paymentId = null)
+    public MoneroAddressBookEntry(uint? index = null, string? address = null, string? description = null,
+        string? paymentId = null)
     {
         this.index = index;
         this.address = address;
@@ -60,5 +60,4 @@ public class MoneroAddressBookEntry
         this.description = description;
         return this;
     }
-
 }

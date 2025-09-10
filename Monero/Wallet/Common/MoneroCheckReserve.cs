@@ -1,4 +1,4 @@
-﻿using Monero.Common;
+using Monero.Common;
 
 namespace Monero.Wallet.Common;
 

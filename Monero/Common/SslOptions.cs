@@ -1,14 +1,14 @@
-﻿namespace Monero.Common;
+namespace Monero.Common;
 
 public class SslOptions
 {
-    private string privateKeyPath;
-    private string certificatePath;
-    private string certificateAuthorityFile;
-    private List<string> allowedFingerprints;
     private bool allowAnyCert;
+    private List<string>? allowedFingerprints;
+    private string? certificateAuthorityFile;
+    private string? certificatePath;
+    private string? privateKeyPath;
 
-    public string GetPrivateKeyPath()
+    public string? GetPrivateKeyPath()
     {
         return privateKeyPath;
     }
@@ -18,7 +18,7 @@ public class SslOptions
         this.privateKeyPath = privateKeyPath;
     }
 
-    public string GetCertificatePath()
+    public string? GetCertificatePath()
     {
         return certificatePath;
     }
@@ -28,7 +28,7 @@ public class SslOptions
         this.certificatePath = certificatePath;
     }
 
-    public string GetCertificateAuthorityFile()
+    public string? GetCertificateAuthorityFile()
     {
         return certificateAuthorityFile;
     }
@@ -38,7 +38,7 @@ public class SslOptions
         this.certificateAuthorityFile = certificateAuthorityFile;
     }
 
-    public List<string> GetAllowedFingerprints()
+    public List<string>? GetAllowedFingerprints()
     {
         return allowedFingerprints;
     }

@@ -1,4 +1,4 @@
-﻿namespace Monero.Common;
+namespace Monero.Common;
 
 public enum MoneroAddressType
 {

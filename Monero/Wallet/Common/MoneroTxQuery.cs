@@ -1,42 +1,59 @@
-﻿
 using Monero.Common;
 
 namespace Monero.Wallet.Common;
 
 public class MoneroTxQuery : MoneroTxWallet
 {
-    private bool? isOutgoing;
-    private bool? isIncoming;
     private List<string> hashes = [];
     private bool? hasPaymentId;
-    private List<string> paymentIds = [];
     private ulong? height;
-    private ulong? minHeight;
-    private ulong? maxHeight;
     private bool? includeOutputs;
-    protected MoneroTransferQuery? transferQuery;
     protected MoneroOutputQuery? inputQuery;
+    private bool? isIncoming;
+    private bool? isOutgoing;
+    private ulong? maxHeight;
+    private ulong? minHeight;
     protected MoneroOutputQuery? outputQuery;
+    private List<string> paymentIds = [];
+    protected MoneroTransferQuery? transferQuery;
 
     public MoneroTxQuery()
     {
-
     }
 
     public MoneroTxQuery(MoneroTxQuery query) : base(query)
     {
-        this.isOutgoing = query.isOutgoing;
-        this.isIncoming = query.isIncoming;
-        if (query.hashes != null) this.hashes = new List<string>(query.hashes);
-        this.hasPaymentId = query.hasPaymentId;
-        if (query.paymentIds != null) this.paymentIds = new List<string>(query.paymentIds);
-        this.height = query.height;
-        this.minHeight = query.minHeight;
-        this.maxHeight = query.maxHeight;
-        this.includeOutputs = query.includeOutputs;
-        if (query.transferQuery != null) this.SetTransferQuery(new MoneroTransferQuery(query.transferQuery));
-        if (query.inputQuery != null) this.SetInputQuery(new MoneroOutputQuery(query.inputQuery));
-        if (query.outputQuery != null) this.SetOutputQuery(new MoneroOutputQuery(query.outputQuery));
+        isOutgoing = query.isOutgoing;
+        isIncoming = query.isIncoming;
+        if (query.hashes != null)
+        {
+            hashes = new List<string>(query.hashes);
+        }
+
+        hasPaymentId = query.hasPaymentId;
+        if (query.paymentIds != null)
+        {
+            paymentIds = new List<string>(query.paymentIds);
+        }
+
+        height = query.height;
+        minHeight = query.minHeight;
+        maxHeight = query.maxHeight;
+        includeOutputs = query.includeOutputs;
+        if (query.transferQuery != null)
+        {
+            SetTransferQuery(new MoneroTransferQuery(query.transferQuery));
+        }
+
+        if (query.inputQuery != null)
+        {
+            SetInputQuery(new MoneroOutputQuery(query.inputQuery));
+        }
+
+        if (query.outputQuery != null)
+        {
+            SetOutputQuery(new MoneroOutputQuery(query.outputQuery));
+        }
     }
 
     public override MoneroTxQuery Clone()
@@ -171,10 +188,14 @@ public class MoneroTxQuery : MoneroTxWallet
         return transferQuery;
     }
 
-    public MoneroTxQuery SetTransferQuery(MoneroTransferQuery transferQuery)
+    public MoneroTxQuery SetTransferQuery(MoneroTransferQuery? transferQuery)
     {
         this.transferQuery = transferQuery;
-        if (transferQuery != null) transferQuery.SetTxQuery(this);
+        if (transferQuery != null)
+        {
+            transferQuery.SetTxQuery(this);
+        }
+
         return this;
     }
 
@@ -183,10 +204,14 @@ public class MoneroTxQuery : MoneroTxWallet
         return inputQuery;
     }
 
-    public MoneroTxQuery SetInputQuery(MoneroOutputQuery inputQuery)
+    public MoneroTxQuery SetInputQuery(MoneroOutputQuery? inputQuery)
     {
         this.inputQuery = inputQuery;
-        if (inputQuery != null) inputQuery.SetTxQuery(this);
+        if (inputQuery != null)
+        {
+            inputQuery.SetTxQuery(this);
+        }
+
         return this;
     }
 
@@ -195,20 +220,26 @@ public class MoneroTxQuery : MoneroTxWallet
         return outputQuery;
     }
 
-    public MoneroTxQuery SetOutputQuery(MoneroOutputQuery outputQuery)
+    public MoneroTxQuery SetOutputQuery(MoneroOutputQuery? outputQuery)
     {
         this.outputQuery = outputQuery;
-        if (outputQuery != null) outputQuery.SetTxQuery(this);
+        if (outputQuery != null)
+        {
+            outputQuery.SetTxQuery(this);
+        }
+
         return this;
     }
 
     public bool MeetsCriteria(MoneroTx tx)
     {
-        throw new NotImplementedException("MoneroTxQuery.MeetsCriteria(MoneroTx tx) is not implemented yet. Please implement this method to filter transactions based on the query criteria.");
+        throw new NotImplementedException(
+            "MoneroTxQuery.MeetsCriteria(MoneroTx tx) is not implemented yet. Please implement this method to filter transactions based on the query criteria.");
     }
 
     public bool MeetsCriteria(MoneroTxWallet tx)
     {
-        throw new NotImplementedException("MoneroTxQuery.MeetsCriteria(MoneroTxWallet tx) is not implemented yet. Please implement this method to filter transactions based on the query criteria.");
+        throw new NotImplementedException(
+            "MoneroTxQuery.MeetsCriteria(MoneroTxWallet tx) is not implemented yet. Please implement this method to filter transactions based on the query criteria.");
     }
 }

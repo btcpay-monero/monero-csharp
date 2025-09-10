@@ -1,9 +1,111 @@
-﻿using Monero.Common;
+using Monero.Common;
 
 namespace Monero.Daemon.Common;
 
 public class MoneroDaemonConfig
 {
+    private readonly string? path;
+    private bool? allowLocalIp;
+    private string? banList;
+    private int? blockSyncSize;
+    private string? booststrapDaemonLogin;
+    private string? bootstrapDaemonAddress;
+    private bool? confirmExternalBind;
+
+    // Server
+    private string? dataDir;
+    private string? dbSyncMode;
+    private bool? detach;
+    private bool? disableDnsCheckpoints;
+    private bool? disableRpcBan;
+
+    private bool? enableDnsBlocklist;
+    private bool? enforceDnsCheckpointing;
+    private List<string> exclusiveNodes = [];
+    private bool? fastBlockSync;
+    private bool? hideMyPort;
+    private string? i2pAnonymousInbound;
+    private string? i2pTxProxy;
+    private string? igd;
+    private List<string> inPeers = [];
+    private int? limitRate;
+    private int? limitRateDown;
+    private int? limitRateUp;
+
+    // Log
+    private string? logFile;
+    private int? logLevel;
+    private int? maxConcurrency;
+
+    private int? maxConnectionsPerIp;
+
+    private int? maxLogFiles;
+    private int? maxLogFileSize;
+    private ulong? maxTxPoolWeight;
+
+    // Network type
+    private MoneroNetworkType networkType = MoneroNetworkType.MAINNET;
+    private bool? noIgd;
+    private bool? nonInteractive;
+    private bool? noSync;
+    private bool? noZmq;
+    private bool? offline;
+    private List<string> outPeers = [];
+
+    // P2P Netwrork
+    private string? p2pBindIp;
+    private string? p2pBindIpv6Address;
+    private int? p2pBindPort;
+    private int? p2pBindPortIpv6;
+    private int? p2pExternalPort;
+    private bool? p2pIgnoreIpv4;
+    private bool? p2pUseIpv6;
+    private bool? padTransactions;
+    private List<string> peers = [];
+    private string? pidFile;
+    private int? prepBlocksThreads;
+    private List<string> priorityNodes = [];
+
+    private string? proxy;
+
+    // Performance
+    private bool? pruneBlockchain;
+
+    // Node RPC API
+    private bool? publicNode;
+
+    private bool? restrictedRpc;
+    private string? rpcAccessControlOrigins;
+    private string? rpcBindIp;
+    private string? rpcBindIpv6Address;
+    private int? rpcBindPort;
+    private bool? rpcIgnoreIpv4;
+    private string? rpcLogin;
+    private int? rpcMacConnectionsPerPrivateIp;
+    private int? rpcMaxConnections;
+    private int? rpcMaxConnectionsPerPublicIp;
+    private int? rpcMaxResponseSoftLimit;
+    private string? rpcRestrictedBindIp;
+    private string? rpcRestrictedBindIpv6Address;
+    private int? rpcRestrictedBindPort;
+    private string? rpcSsl;
+    private bool? rpcSslAllowAnyCert;
+    private bool? rpcSslAllowChained;
+    private List<string> rpcSslAllowedFingerprints = [];
+    private string? rpcSslCaCertificates;
+    private string? rpcSslCertificate;
+    private string? rpcSslPrivateKey;
+    private bool? rpcUseIpv6;
+    private string? seedNode;
+    private bool? syncPrunedBlocks;
+    private string? torAnonymousInbound;
+
+    // Tor/I2P and proxies
+    private string? torTxProxy;
+    private string? zmqPub;
+    private string? zmqRpcBindIp;
+    private int? zmqRpcBindPort;
+
     public MoneroDaemonConfig SetNetworkType(MoneroNetworkType networkType)
     {
         this.networkType = networkType;
@@ -149,7 +251,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetEnabledDnsBlocklist(bool? enabledDnsBlocklist)
     {
-        this.enableDnsBlocklist = enabledDnsBlocklist;
+        enableDnsBlocklist = enabledDnsBlocklist;
         return this;
     }
 
@@ -661,7 +763,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcMaxConnectionsPerPrivateIp(int? rpcMaxConnectionsPerPrivateIp)
     {
-        this.rpcMacConnectionsPerPrivateIp = rpcMaxConnectionsPerPrivateIp;
+        rpcMacConnectionsPerPrivateIp = rpcMaxConnectionsPerPrivateIp;
         return this;
     }
 
@@ -971,96 +1073,157 @@ public class MoneroDaemonConfig
     {
         List<string> cmd = [];
 
-        if (!string.IsNullOrEmpty(path)) cmd.Add(path);
+        if (!string.IsNullOrEmpty(path))
+        {
+            cmd.Add(path);
+        }
 
         MoneroNetworkType networkType = GetNetworkType();
 
-        if (networkType == MoneroNetworkType.TESTNET) cmd.Add("--testnet");
-        else if (networkType == MoneroNetworkType.STAGENET) cmd.Add("--stagenet");
+        if (networkType == MoneroNetworkType.TESTNET)
+        {
+            cmd.Add("--testnet");
+        }
+        else if (networkType == MoneroNetworkType.STAGENET)
+        {
+            cmd.Add("--stagenet");
+        }
+
         if (!string.IsNullOrEmpty(logFile))
         {
             cmd.Add("--log-file");
             cmd.Add(logFile);
         }
+
         if (logLevel != null)
         {
             cmd.Add("--log-level");
             cmd.Add(((int)logLevel).ToString());
         }
+
         if (maxLogFileSize != null)
         {
             cmd.Add("--max-log-file-size");
             cmd.Add(((int)maxLogFileSize).ToString());
         }
+
         if (maxLogFiles != null)
         {
             cmd.Add("--max-log-files");
             cmd.Add(((int)maxLogFiles).ToString());
         }
+
         if (!string.IsNullOrEmpty(dataDir))
         {
             cmd.Add("--data-dir");
             cmd.Add(dataDir);
         }
+
         if (!string.IsNullOrEmpty(pidFile))
         {
             cmd.Add("--pid-file");
             cmd.Add(pidFile);
         }
-        if (detach == true) cmd.Add("--detach");
-        if (nonInteractive == true) cmd.Add("--non-interactive");
+
+        if (detach == true)
+        {
+            cmd.Add("--detach");
+        }
+
+        if (nonInteractive == true)
+        {
+            cmd.Add("--non-interactive");
+        }
+
         if (maxTxPoolWeight != null)
         {
             cmd.Add("--max-txpool-weight");
             cmd.Add(((int)maxTxPoolWeight).ToString());
         }
-        if (enforceDnsCheckpointing == true) cmd.Add("--enforce-dns-checkpointing");
-        if (disableDnsCheckpoints == true) cmd.Add("--disable-dns-checkpoints");
+
+        if (enforceDnsCheckpointing == true)
+        {
+            cmd.Add("--enforce-dns-checkpointing");
+        }
+
+        if (disableDnsCheckpoints == true)
+        {
+            cmd.Add("--disable-dns-checkpoints");
+        }
+
         if (!string.IsNullOrEmpty(banList))
         {
             cmd.Add("--ban-list");
             cmd.Add(banList);
         }
-        if (enableDnsBlocklist == true) cmd.Add("--enable-dns-blocklist");
+
+        if (enableDnsBlocklist == true)
+        {
+            cmd.Add("--enable-dns-blocklist");
+        }
+
         if (!string.IsNullOrEmpty(p2pBindIp))
         {
             cmd.Add("--p2p-bind-ip");
             cmd.Add(p2pBindIp);
         }
+
         if (p2pBindPort != null && p2pBindPort >= 0)
         {
             cmd.Add("--p2p-bind-port");
             cmd.Add(((int)p2pBindPort).ToString());
         }
+
         if (p2pExternalPort != null && p2pExternalPort >= 0)
         {
             cmd.Add("--p2p-external-port");
             cmd.Add(((int)p2pExternalPort).ToString());
         }
-        if (p2pUseIpv6 == true) cmd.Add("--p2p-use-ipv6");
+
+        if (p2pUseIpv6 == true)
+        {
+            cmd.Add("--p2p-use-ipv6");
+        }
+
         if (!string.IsNullOrEmpty(p2pBindIpv6Address))
         {
             cmd.Add("--p2p-bind-ipv6-address");
             cmd.Add(p2pBindIpv6Address);
         }
+
         if (p2pBindPortIpv6 != null && p2pBindPortIpv6 >= 0)
         {
             cmd.Add("--p2p-bind-port-ipv6");
             cmd.Add(((int)p2pBindPortIpv6).ToString());
         }
-        if (p2pIgnoreIpv4 == true) cmd.Add("--p2p-ignore-ipv4");
-        if (noIgd == true) cmd.Add("--no-igd");
+
+        if (p2pIgnoreIpv4 == true)
+        {
+            cmd.Add("--p2p-ignore-ipv4");
+        }
+
+        if (noIgd == true)
+        {
+            cmd.Add("--no-igd");
+        }
+
         if (!string.IsNullOrEmpty(igd))
         {
             cmd.Add("--igd");
             cmd.Add(igd);
         }
-        if (hideMyPort == true) cmd.Add("--hide-my-port");
+
+        if (hideMyPort == true)
+        {
+            cmd.Add("--hide-my-port");
+        }
+
         if (!string.IsNullOrEmpty(seedNode))
         {
             cmd.Add("--seed-node");
             cmd.Add(seedNode);
         }
+
         if (peers.Count > 0)
         {
             foreach (string peer in peers)
@@ -1069,6 +1232,7 @@ public class MoneroDaemonConfig
                 cmd.Add(peer);
             }
         }
+
         if (priorityNodes.Count > 0)
         {
             foreach (string priorityNode in priorityNodes)
@@ -1077,6 +1241,7 @@ public class MoneroDaemonConfig
                 cmd.Add(priorityNode);
             }
         }
+
         if (exclusiveNodes.Count > 0)
         {
             foreach (string exclusiveNode in exclusiveNodes)
@@ -1085,6 +1250,7 @@ public class MoneroDaemonConfig
                 cmd.Add(exclusiveNode);
             }
         }
+
         if (outPeers.Count > 0)
         {
             foreach (string outPeer in outPeers)
@@ -1093,6 +1259,7 @@ public class MoneroDaemonConfig
                 cmd.Add(outPeer);
             }
         }
+
         if (inPeers.Count > 0)
         {
             foreach (string inPeer in inPeers)
@@ -1101,122 +1268,169 @@ public class MoneroDaemonConfig
                 cmd.Add(inPeer);
             }
         }
+
         if (limitRateUp != null && limitRateUp >= 0)
         {
             cmd.Add("--limit-rate-up");
             cmd.Add(((int)limitRateUp).ToString());
         }
+
         if (limitRateDown != null && limitRateDown >= 0)
         {
             cmd.Add("--limit-rate-down");
             cmd.Add(((int)limitRateDown).ToString());
         }
+
         if (limitRate != null && limitRate >= 0)
         {
             cmd.Add("--limit-rate");
             cmd.Add(((int)limitRate).ToString());
         }
-        if (offline == true) cmd.Add("--offline");
-        if (allowLocalIp == true) cmd.Add("--allow-local-ip");
+
+        if (offline == true)
+        {
+            cmd.Add("--offline");
+        }
+
+        if (allowLocalIp == true)
+        {
+            cmd.Add("--allow-local-ip");
+        }
+
         if (maxConnectionsPerIp != null && maxConnectionsPerIp >= 0)
         {
             cmd.Add("--max-connections-per-ip");
             cmd.Add(((int)maxConnectionsPerIp).ToString());
         }
+
         if (!string.IsNullOrEmpty(torTxProxy))
         {
             cmd.Add("--tx-proxy");
             cmd.Add(torTxProxy);
         }
+
         if (!string.IsNullOrEmpty(torAnonymousInbound))
         {
             cmd.Add("--anonymous-inbound");
             cmd.Add(torAnonymousInbound);
         }
+
         if (!string.IsNullOrEmpty(i2pTxProxy))
         {
             cmd.Add("--tx-proxy");
             cmd.Add(i2pTxProxy);
         }
+
         if (!string.IsNullOrEmpty(i2pAnonymousInbound))
         {
             cmd.Add("--anonymous-inbound");
             cmd.Add(i2pAnonymousInbound);
         }
-        if (padTransactions == true) cmd.Add("--pad-transactions");
+
+        if (padTransactions == true)
+        {
+            cmd.Add("--pad-transactions");
+        }
+
         if (!string.IsNullOrEmpty(proxy))
         {
             cmd.Add("--proxy");
             cmd.Add(proxy);
         }
-        if (publicNode == true) cmd.Add("--public-node");
+
+        if (publicNode == true)
+        {
+            cmd.Add("--public-node");
+        }
+
         if (!string.IsNullOrEmpty(rpcBindIp))
         {
             cmd.Add("--rpc-bind-ip");
             cmd.Add(rpcBindIp);
         }
+
         if (rpcBindPort != null && rpcBindPort >= 0)
         {
             cmd.Add("--rpc-bind-port");
             cmd.Add(((int)rpcBindPort).ToString());
         }
+
         if (!string.IsNullOrEmpty(rpcBindIpv6Address))
         {
             cmd.Add("--rpc-bind-ipv6-address");
             cmd.Add(rpcBindIpv6Address);
         }
-        if (rpcUseIpv6 == true) cmd.Add("--rpc-use-ipv6");
-        if (rpcIgnoreIpv4 == true) cmd.Add("--rpc-ignore-ipv4");
+
+        if (rpcUseIpv6 == true)
+        {
+            cmd.Add("--rpc-use-ipv6");
+        }
+
+        if (rpcIgnoreIpv4 == true)
+        {
+            cmd.Add("--rpc-ignore-ipv4");
+        }
+
         if (!string.IsNullOrEmpty(rpcRestrictedBindIp))
         {
             cmd.Add("--rpc-restricted-bind-ip");
             cmd.Add(rpcRestrictedBindIp);
         }
+
         if (rpcRestrictedBindPort != null && rpcRestrictedBindPort >= 0)
         {
             cmd.Add("--rpc-restricted-bind-port");
             cmd.Add(((int)rpcRestrictedBindPort).ToString());
         }
+
         if (!string.IsNullOrEmpty(rpcRestrictedBindIpv6Address))
         {
             cmd.Add("--rpc-restricted-bind-ipv6-address");
             cmd.Add(rpcRestrictedBindIpv6Address);
         }
+
         if (rpcMaxConnections != null && rpcMaxConnections >= 0)
         {
             cmd.Add("--rpc-max-connections");
             cmd.Add(((int)rpcMaxConnections).ToString());
         }
+
         if (rpcMaxConnectionsPerPublicIp != null && rpcMaxConnectionsPerPublicIp >= 0)
         {
             cmd.Add("--rpc-max-connections-per-public-ip");
             cmd.Add(((int)rpcMaxConnectionsPerPublicIp).ToString());
         }
+
         if (rpcMacConnectionsPerPrivateIp != null && rpcMacConnectionsPerPrivateIp >= 0)
         {
             cmd.Add("--rpc-max-connections-per-private-ip");
             cmd.Add(((int)rpcMacConnectionsPerPrivateIp).ToString());
         }
+
         if (rpcMaxResponseSoftLimit != null && rpcMaxResponseSoftLimit >= 0)
         {
             cmd.Add("--rpc-max-response-soft-limit");
             cmd.Add(((int)rpcMaxResponseSoftLimit).ToString());
         }
+
         if (!string.IsNullOrEmpty(rpcSsl))
         {
             cmd.Add("--rpc-ssl");
             cmd.Add(rpcSsl);
         }
+
         if (!string.IsNullOrEmpty(rpcSslPrivateKey))
         {
             cmd.Add("--rpc-ssl-private-key");
             cmd.Add(rpcSslPrivateKey);
         }
+
         if (!string.IsNullOrEmpty(rpcSslCertificate))
         {
             cmd.Add("--rpc-ssl-certificate");
             cmd.Add(rpcSslCertificate);
         }
+
         if (rpcSslAllowedFingerprints.Count > 0)
         {
             foreach (string fingerprint in rpcSslAllowedFingerprints)
@@ -1225,168 +1439,129 @@ public class MoneroDaemonConfig
                 cmd.Add(fingerprint);
             }
         }
-        if (rpcSslAllowAnyCert == true) cmd.Add("--rpc-ssl-allow-any-cert");
+
+        if (rpcSslAllowAnyCert == true)
+        {
+            cmd.Add("--rpc-ssl-allow-any-cert");
+        }
+
         if (!string.IsNullOrEmpty(rpcSslCaCertificates))
         {
             cmd.Add("--rpc-ssl-ca-certificates");
             cmd.Add(rpcSslCaCertificates);
         }
-        if (rpcSslAllowChained == true) cmd.Add("--rpc-ssl-allow-chained");
+
+        if (rpcSslAllowChained == true)
+        {
+            cmd.Add("--rpc-ssl-allow-chained");
+        }
+
         if (!string.IsNullOrEmpty(rpcLogin))
         {
             cmd.Add("--rpc-login");
             cmd.Add(rpcLogin);
         }
+
         if (!string.IsNullOrEmpty(rpcAccessControlOrigins))
         {
             cmd.Add("--rpc-access-control-origins");
             cmd.Add(rpcAccessControlOrigins);
         }
-        if (disableRpcBan == true) cmd.Add("--disable-rpc-ban");
+
+        if (disableRpcBan == true)
+        {
+            cmd.Add("--disable-rpc-ban");
+        }
+
         if (!string.IsNullOrEmpty(zmqRpcBindIp))
         {
             cmd.Add("--zmq-rpc-bind-ip");
             cmd.Add(zmqRpcBindIp);
         }
+
         if (zmqRpcBindPort != null && zmqRpcBindPort >= 0)
         {
             cmd.Add("--zmq-rpc-bind-port");
             cmd.Add(((int)zmqRpcBindPort).ToString());
         }
+
         if (!string.IsNullOrEmpty(zmqPub))
         {
             cmd.Add("--zmq-pub");
             cmd.Add(zmqPub);
         }
-        if (noZmq == true) cmd.Add("--no-zmq");
-        if (confirmExternalBind == true) cmd.Add("--confirm-external-bind");
-        if (restrictedRpc == true) cmd.Add("--restricted-rpc");
-        if (pruneBlockchain == true) cmd.Add("--prune-blockchain");
-        if (syncPrunedBlocks == true) cmd.Add("--sync-pruned-blocks");
+
+        if (noZmq == true)
+        {
+            cmd.Add("--no-zmq");
+        }
+
+        if (confirmExternalBind == true)
+        {
+            cmd.Add("--confirm-external-bind");
+        }
+
+        if (restrictedRpc == true)
+        {
+            cmd.Add("--restricted-rpc");
+        }
+
+        if (pruneBlockchain == true)
+        {
+            cmd.Add("--prune-blockchain");
+        }
+
+        if (syncPrunedBlocks == true)
+        {
+            cmd.Add("--sync-pruned-blocks");
+        }
+
         if (!string.IsNullOrEmpty(dbSyncMode))
         {
             cmd.Add("--db-sync-mode");
             cmd.Add(dbSyncMode);
         }
+
         if (maxConcurrency != null && maxConcurrency >= 0)
         {
             cmd.Add("--max-concurrency");
             cmd.Add(((int)maxConcurrency).ToString());
         }
+
         if (prepBlocksThreads != null && prepBlocksThreads >= 0)
         {
             cmd.Add("--prep-blocks-threads");
             cmd.Add(((int)prepBlocksThreads).ToString());
         }
-        if (fastBlockSync == true) cmd.Add("--fast-block-sync");
+
+        if (fastBlockSync == true)
+        {
+            cmd.Add("--fast-block-sync");
+        }
+
         if (blockSyncSize != null && blockSyncSize >= 0)
         {
             cmd.Add("--block-sync-size");
             cmd.Add(((int)blockSyncSize).ToString());
         }
+
         if (!string.IsNullOrEmpty(bootstrapDaemonAddress))
         {
             cmd.Add("--bootstrap-daemon-address");
             cmd.Add(bootstrapDaemonAddress);
         }
+
         if (!string.IsNullOrEmpty(booststrapDaemonLogin))
         {
             cmd.Add("--bootstrap-daemon-login");
             cmd.Add(booststrapDaemonLogin);
         }
-        if (noSync == true) cmd.Add("--no-sync");
+
+        if (noSync == true)
+        {
+            cmd.Add("--no-sync");
+        }
 
         return cmd;
     }
-
-    private readonly string? path;
-    // Network type
-    private MoneroNetworkType networkType = MoneroNetworkType.MAINNET;
-    // Log
-    private string? logFile;
-    private int? logLevel;
-    private int? maxLogFileSize;
-    private int? maxLogFiles;
-    // Server
-    private string? dataDir;
-    private string? pidFile;
-    private bool? detach;
-    private bool? nonInteractive;
-    private ulong? maxTxPoolWeight;
-    private bool? enforceDnsCheckpointing;
-    private bool? disableDnsCheckpoints;
-    private string? banList;
-    private bool? enableDnsBlocklist;
-    // P2P Netwrork
-    private string? p2pBindIp;
-    private int? p2pBindPort;
-    private int? p2pExternalPort;
-    private bool? p2pUseIpv6;
-    private string? p2pBindIpv6Address;
-    private int? p2pBindPortIpv6;
-    private bool? p2pIgnoreIpv4;
-    private bool? noIgd;
-    private string? igd;
-    private bool? hideMyPort;
-    private string? seedNode;
-    private List<string> peers = [];
-    private List<string> priorityNodes = [];
-    private List<string> exclusiveNodes = [];
-    private List<string> outPeers = [];
-    private List<string> inPeers = [];
-    private int? limitRateUp;
-    private int? limitRateDown;
-    private int? limitRate;
-    private bool? offline;
-    private bool? allowLocalIp;
-    private int? maxConnectionsPerIp;
-    // Tor/I2P and proxies
-    private string? torTxProxy;
-    private string? torAnonymousInbound;
-    private string? i2pTxProxy;
-    private string? i2pAnonymousInbound;
-    private bool? padTransactions;
-    private string? proxy;
-    // Node RPC API
-    private bool? publicNode;
-    private string? rpcBindIp;
-    private int? rpcBindPort;
-    private string? rpcBindIpv6Address;
-    private bool? rpcUseIpv6;
-    private bool? rpcIgnoreIpv4;
-    private string? rpcRestrictedBindIp;
-    private int? rpcRestrictedBindPort;
-    private string? rpcRestrictedBindIpv6Address;
-    private int? rpcMaxConnections;
-    private int? rpcMaxConnectionsPerPublicIp;
-    private int? rpcMacConnectionsPerPrivateIp;
-    private int? rpcMaxResponseSoftLimit;
-    private string? rpcSsl;
-    private string? rpcSslPrivateKey;
-    private string? rpcSslCertificate;
-    private List<string> rpcSslAllowedFingerprints = [];
-    private bool? rpcSslAllowAnyCert;
-    private string? rpcSslCaCertificates;
-    private bool? rpcSslAllowChained;
-    private string? rpcLogin;
-    private string? rpcAccessControlOrigins;
-    private bool? disableRpcBan;
-    private string? zmqRpcBindIp;
-    private int? zmqRpcBindPort;
-    private string? zmqPub;
-    private bool? noZmq;
-    private bool? confirmExternalBind;
-    private bool? restrictedRpc;
-    // Performance
-    private bool? pruneBlockchain;
-    private bool? syncPrunedBlocks;
-    private string? dbSyncMode;
-    private int? maxConcurrency;
-    private int? prepBlocksThreads;
-    private bool? fastBlockSync;
-    private int? blockSyncSize;
-    private string? bootstrapDaemonAddress;
-    private string? booststrapDaemonLogin;
-    private bool? noSync;
-
 }

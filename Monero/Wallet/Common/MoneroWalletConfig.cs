@@ -1,30 +1,29 @@
-﻿
 using Monero.Common;
 
 namespace Monero.Wallet.Common;
 
 public class MoneroWalletConfig
 {
-    private string? _path;
-    private string? _password;
+    private bool? _isMultisig;
     private MoneroNetworkType? _networkType;
+    private string? _password;
+    private string? _path;
     private MoneroRpcConnection? _server;
-    private string? serverUsername;
-    private string? serverPassword;
+    private int? accountLookahead; // number of accounts to scan
+    private byte[]? cacheData;
     private MoneroConnectionManager? connectionManager;
+    private byte[]? keysData;
+    private string? language;
+    private string? primaryAddress;
+    private string? privateSpendKey;
+    private string? privateViewKey;
+    private ulong? restoreHeight;
+    private bool? saveCurrent;
     private string? seed;
     private string? seedOffset;
-    private string? primaryAddress;
-    private string? privateViewKey;
-    private string? privateSpendKey;
-    private ulong? restoreHeight;
-    private string? language;
-    private bool? saveCurrent;
-    private int? accountLookahead;     // number of accounts to scan
-    private int? subaddressLookahead;  // number of subaddresses to scan per account
-    private byte[]? keysData;
-    private byte[]? cacheData;
-    private bool? _isMultisig;
+    private string? serverPassword;
+    private string? serverUsername;
+    private int? subaddressLookahead; // number of subaddresses to scan per account
 
     public MoneroWalletConfig() { }
 
@@ -62,7 +61,7 @@ public class MoneroWalletConfig
 
     public MoneroWalletConfig SetPath(string? path)
     {
-        this._path = path;
+        _path = path;
         return this;
     }
 
@@ -73,7 +72,7 @@ public class MoneroWalletConfig
 
     public MoneroWalletConfig SetPassword(string? password)
     {
-        this._password = password;
+        _password = password;
         return this;
     }
 
@@ -84,7 +83,7 @@ public class MoneroWalletConfig
 
     public MoneroWalletConfig SetNetworkType(MoneroNetworkType networkType)
     {
-        this._networkType = networkType;
+        _networkType = networkType;
         return this;
     }
 
@@ -93,16 +92,16 @@ public class MoneroWalletConfig
         return SetNetworkType(MoneroNetwork.Parse(networkTypeStr));
     }
 
-    public MoneroRpcConnection GetServer()
+    public MoneroRpcConnection? GetServer()
     {
         return _server;
     }
 
     public MoneroWalletConfig SetServer(MoneroRpcConnection server)
     {
-        this._server = server;
-        this.serverUsername = server == null ? null : server.GetUsername();
-        this.serverPassword = server == null ? null : server.GetPassword();
+        _server = server;
+        serverUsername = server == null ? null : server.GetUsername();
+        serverPassword = server == null ? null : server.GetPassword();
         return this;
     }
 
@@ -118,9 +117,21 @@ public class MoneroWalletConfig
             _server = null;
             return this;
         }
-        if (_server == null) _server = new MoneroRpcConnection(serverUri);
-        else _server.SetUri(serverUri);
-        if (serverUsername != null && serverPassword != null) _server.SetCredentials(serverUsername, serverPassword);
+
+        if (_server == null)
+        {
+            _server = new MoneroRpcConnection(serverUri);
+        }
+        else
+        {
+            _server.SetUri(serverUri);
+        }
+
+        if (serverUsername != null && serverPassword != null)
+        {
+            _server.SetCredentials(serverUsername, serverPassword);
+        }
+
         return this;
     }
 
@@ -132,7 +143,11 @@ public class MoneroWalletConfig
     public MoneroWalletConfig SetServerUsername(string? serverUsername)
     {
         this.serverUsername = serverUsername;
-        if (_server != null && serverUsername != null && serverPassword != null) _server.SetCredentials(serverUsername, serverPassword);
+        if (_server != null && serverUsername != null && serverPassword != null)
+        {
+            _server.SetCredentials(serverUsername, serverPassword);
+        }
+
         return this;
     }
 
@@ -144,11 +159,15 @@ public class MoneroWalletConfig
     public MoneroWalletConfig SetServerPassword(string? serverPassword)
     {
         this.serverPassword = serverPassword;
-        if (_server != null && serverUsername != null && serverPassword != null) _server.SetCredentials(serverUsername, serverPassword);
+        if (_server != null && serverUsername != null && serverPassword != null)
+        {
+            _server.SetCredentials(serverUsername, serverPassword);
+        }
+
         return this;
     }
 
-    public MoneroConnectionManager GetConnectionManager()
+    public MoneroConnectionManager? GetConnectionManager()
     {
         return connectionManager;
     }
@@ -257,6 +276,7 @@ public class MoneroWalletConfig
     {
         return accountLookahead;
     }
+
     public MoneroWalletConfig SetSubaddressLookahead(int? subaddressLookahead)
     {
         this.subaddressLookahead = subaddressLookahead;

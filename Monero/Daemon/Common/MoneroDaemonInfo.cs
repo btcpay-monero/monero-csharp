@@ -1,42 +1,42 @@
-﻿using Monero.Common;
+using Monero.Common;
 
 namespace Monero.Daemon.Common;
 
 public class MoneroDaemonInfo
 {
-    private string? version;
-    private ulong? numAltBlocks;
+    private ulong? adjustedTimestamp;
     private ulong? blockSizeLimit;
     private ulong? blockSizeMedian;
     private ulong? blockWeightLimit;
     private ulong? blockWeightMedian;
     private string? bootstrapDaemonAddress;
-    private ulong? difficulty;
+    private ulong? credits;
     private ulong? cumulativeDifficulty;
+    private ulong? databaseSize;
+    private ulong? difficulty;
     private ulong? freeSpace;
-    private uint? numOfflinePeers;
-    private uint? numOnlinePeers;
     private ulong? height;
     private ulong? heightWithoutBootstrap;
-    private MoneroNetworkType? networkType;
+    private bool? isBusySyncing;
     private bool? isOffline;
+    private bool? isRestricted;
+    private bool? isSynchronized;
+    private MoneroNetworkType? networkType;
+    private ulong? numAltBlocks;
     private uint? numIncomingConnections;
+    private uint? numOfflinePeers;
+    private uint? numOnlinePeers;
     private uint? numOutgoingConnections;
     private uint? numRpcConnections;
+    private uint? numTxs;
+    private uint? numTxsPool;
     private ulong? startTimestamp;
-    private ulong? adjustedTimestamp;
     private ulong? target;
     private ulong? targetHeight;
     private string? topBlockHash;
-    private uint? numTxs;
-    private uint? numTxsPool;
-    private bool? wasBootstrapEverUsed;
-    private ulong? databaseSize;
     private bool? updateAvailable;
-    private ulong? credits;
-    private bool? isBusySyncing;
-    private bool? isSynchronized;
-    private bool? isRestricted;
+    private string? version;
+    private bool? wasBootstrapEverUsed;
 
     public string? GetVersion()
     {

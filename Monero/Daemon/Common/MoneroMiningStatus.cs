@@ -1,13 +1,12 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroMiningStatus
 {
+    private string? address;
     private bool? isActive;
     private bool? isBackground;
-    private string? address;
-    private ulong? speed;
     private uint? numThreads;
+    private ulong? speed;
 
     public bool? IsActive()
     {

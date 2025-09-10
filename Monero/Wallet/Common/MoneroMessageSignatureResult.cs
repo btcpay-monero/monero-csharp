@@ -1,4 +1,3 @@
-﻿
 namespace Monero.Wallet.Common;
 
 public class MoneroMessageSignatureResult
@@ -8,7 +7,8 @@ public class MoneroMessageSignatureResult
     private MoneroMessageSignatureType? _signatureType;
     private int? _version;
 
-    public MoneroMessageSignatureResult(bool isGood = false, bool? isOld = null, MoneroMessageSignatureType? signatureType = null, int? version = null)
+    public MoneroMessageSignatureResult(bool isGood = false, bool? isOld = null,
+        MoneroMessageSignatureType? signatureType = null, int? version = null)
     {
         _isGood = isGood;
         _isOld = isOld;

@@ -1,24 +1,23 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroSubmitTxResult
 {
-    private bool? isGood;
-    private bool? isRelayed;
-    private bool? isDoubleSpend;
-    private bool? isFeeTooLow;
-    private bool? isMixinTooLow;
+    private ulong? credits;
     private bool? hasInvalidInput;
     private bool? hasInvalidOutput;
     private bool? hasTooFewOutputs;
-    private bool? isOverspend;
-    private bool? isTooBig;
-    private bool? sanityCheckFailed;
-    private string? reason;
-    private ulong? credits;
-    private string? topBlockHash;
-    private bool? isTxExtraTooBig;
+    private bool? isDoubleSpend;
+    private bool? isFeeTooLow;
+    private bool? isGood;
+    private bool? isMixinTooLow;
     private bool? isNonzeroUnlockTime;
+    private bool? isOverspend;
+    private bool? isRelayed;
+    private bool? isTooBig;
+    private bool? isTxExtraTooBig;
+    private string? reason;
+    private bool? sanityCheckFailed;
+    private string? topBlockHash;
 
     public bool? IsGood()
     {

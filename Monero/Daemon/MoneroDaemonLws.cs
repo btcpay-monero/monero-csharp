@@ -1,4 +1,4 @@
-﻿using Monero.Common;
+using Monero.Common;
 using Monero.Daemon.Common;
 
 namespace Monero.Daemon;
@@ -87,7 +87,8 @@ public class MoneroDaemonLws : MoneroDaemonDefault
         throw new NotImplementedException("Not supported by monero-lws");
     }
 
-    public override List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight, ulong? maxChunkSize = null)
+    public override List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight,
+        ulong? maxChunkSize = null)
     {
         throw new NotImplementedException("Not supported by monero-lws");
     }
@@ -147,12 +148,14 @@ public class MoneroDaemonLws : MoneroDaemonDefault
         throw new NotImplementedException("Not supported by monero-lws");
     }
 
-    public override List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative = null, ulong? startHeight = null, ulong? endHeight = null)
+    public override List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts,
+        bool? isCumulative = null, ulong? startHeight = null, ulong? endHeight = null)
     {
         throw new NotImplementedException("Not supported by monero-lws");
     }
 
-    public override List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts = null, int? minCount = null, int? maxCount = null, bool? isUnlocked = null, int? recentCutoff = null)
+    public override List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts = null,
+        int? minCount = null, int? maxCount = null, bool? isUnlocked = null, int? recentCutoff = null)
     {
         throw new NotImplementedException("Not supported by monero-lws");
     }
@@ -387,5 +390,4 @@ public class MoneroDaemonLws : MoneroDaemonDefault
     }
 
     #endregion
-
 }

@@ -1,12 +1,11 @@
-﻿
 namespace Monero.Wallet.Common;
 
 public class MoneroMultisigInfo
 {
     private bool _isMultisig;
     private bool _isReady;
-    private int _threshold;
     private int _numParticipants;
+    private int _threshold;
 
     public MoneroMultisigInfo(bool isMultisig = false, bool isReady = false, int threshold = 0, int numParticipants = 0)
     {

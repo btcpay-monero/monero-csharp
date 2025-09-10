@@ -1,10 +1,9 @@
-﻿
 namespace Monero.Common;
 
 public class MoneroVersion
 {
-    private int? _number;
     private bool? _isRelease;
+    private int? _number;
 
     public MoneroVersion(int? number = null, bool? isRelease = null)
     {
@@ -26,5 +25,4 @@ public class MoneroVersion
         _isRelease = isRelease;
         return this;
     }
-
 }

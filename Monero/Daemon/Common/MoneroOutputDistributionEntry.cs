@@ -1,11 +1,10 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroOutputDistributionEntry
 {
-    private ulong? amount;
     private uint? _base;
-    private List<uint> distribution;
+    private ulong? amount;
+    private List<uint>? distribution;
     private ulong? startHeight;
 
     public ulong? GetAmount()
@@ -28,7 +27,7 @@ public class MoneroOutputDistributionEntry
         this._base = _base;
     }
 
-    public List<uint> GetDistribution()
+    public List<uint>? GetDistribution()
     {
         return distribution;
     }

@@ -1,4 +1,3 @@
-﻿
 namespace Monero.Common;
 
 public class MoneroInvalidPaymentIdError : MoneroError
@@ -11,5 +10,4 @@ public class MoneroInvalidPaymentIdError : MoneroError
     }
 
     public string GetPaymentId() { return paymentId; }
-
 }

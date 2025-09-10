@@ -1,4 +1,3 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroMinerTxSum

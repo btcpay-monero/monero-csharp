@@ -1,13 +1,13 @@
-﻿
 namespace Monero.Common;
 
 public class MoneroIntegratedAddress
 {
-    private string? _standardAddress;
-    private string? _paymentId;
     private string? _integratedAddress;
+    private string? _paymentId;
+    private string? _standardAddress;
 
-    public MoneroIntegratedAddress(string? standardAddress = null, string? paymentId = null, string? integratedAddress = null)
+    public MoneroIntegratedAddress(string? standardAddress = null, string? paymentId = null,
+        string? integratedAddress = null)
     {
         _standardAddress = standardAddress;
         _paymentId = paymentId;

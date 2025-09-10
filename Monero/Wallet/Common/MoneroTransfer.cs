@@ -1,13 +1,12 @@
-﻿
 using Monero.Common;
 
 namespace Monero.Wallet.Common;
 
 public abstract class MoneroTransfer
 {
-    protected MoneroTxWallet _tx;
-    protected ulong? _amount;
     protected uint? _accountIndex;
+    protected ulong? _amount;
+    protected MoneroTxWallet? _tx;
 
     public MoneroTransfer() { }
 
@@ -20,7 +19,7 @@ public abstract class MoneroTransfer
 
     public abstract MoneroTransfer Clone();
 
-    public MoneroTxWallet GetTx()
+    public MoneroTxWallet? GetTx()
     {
         return _tx;
     }
@@ -62,29 +61,32 @@ public abstract class MoneroTransfer
 
     public MoneroTransfer Merge(MoneroTransfer transfer)
     {
-        if (this == transfer) return this;
+        if (this == transfer)
+        {
+            return this;
+        }
 
         // merge txs if they're different which comes back to merging transfers
-        if (this.GetTx() != transfer.GetTx())
+        if (GetTx() != transfer.GetTx())
         {
-            this.GetTx().Merge(transfer.GetTx());
+            GetTx().Merge(transfer.GetTx());
             return this;
         }
 
         // otherwise merge transfer fields
-        this.SetAccountIndex(GenUtils.Reconcile(this.GetAccountIndex(), transfer.GetAccountIndex()));
+        SetAccountIndex(GenUtils.Reconcile(GetAccountIndex(), transfer.GetAccountIndex()));
 
         // TODO monero-project: failed tx in pool (after testUpdateLockedDifferentAccounts()) causes non-originating saved wallets to return duplicate incoming transfers but one has amount of 0
-        if (this.GetAmount() != null && transfer.GetAmount() != null && !this.GetAmount().Equals(transfer.GetAmount()) && (0 == this.GetAmount()) || 0 == transfer.GetAmount())
+        if ((GetAmount() != null && transfer.GetAmount() != null &&
+             !GetAmount().Equals(transfer.GetAmount()) && 0 == GetAmount()) || 0 == transfer.GetAmount())
         {
             MoneroUtils.Log(0, "WARNING: monero-project returning transfers with 0 amount/numSuggestedConfirmations");
         }
         else
         {
-            this.SetAmount(GenUtils.Reconcile(this.GetAmount(), transfer.GetAmount()));
+            SetAmount(GenUtils.Reconcile(GetAmount(), transfer.GetAmount()));
         }
 
         return this;
     }
-
 }

@@ -1,17 +1,16 @@
-﻿
 namespace Monero.Common;
 
 public class MoneroKeyImage
 {
-    private string? _hex;
-    private string? _signature;
-
     public enum SpentStatus
     {
         NOT_SPENT,
         CONFIRMED,
         TX_POOL
     }
+
+    private string? _hex;
+    private string? _signature;
 
     public MoneroKeyImage(string? hex = null, string? signature = null)
     {
@@ -32,9 +31,20 @@ public class MoneroKeyImage
 
     public static SpentStatus ParseStatus(int status)
     {
-        if (status == 1) return SpentStatus.NOT_SPENT;
-        else if (status == 2) return SpentStatus.CONFIRMED;
-        else if (status == 3) return SpentStatus.TX_POOL;
+        if (status == 1)
+        {
+            return SpentStatus.NOT_SPENT;
+        }
+
+        if (status == 2)
+        {
+            return SpentStatus.CONFIRMED;
+        }
+
+        if (status == 3)
+        {
+            return SpentStatus.TX_POOL;
+        }
 
         throw new MoneroError("Invalid integer value for spent status: " + status);
     }
@@ -63,7 +73,10 @@ public class MoneroKeyImage
 
     public MoneroKeyImage Merge(MoneroKeyImage? keyImage)
     {
-        if (keyImage == this) return this;
+        if (keyImage == this)
+        {
+            return this;
+        }
 
         return this;
     }

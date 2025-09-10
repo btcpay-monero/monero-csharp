@@ -1,13 +1,13 @@
-﻿using Monero.Common;
+using Monero.Common;
 
 namespace Monero.Wallet.Common;
 
 public class MoneroOutputWallet : MoneroOutput
 {
     private uint? accountIndex;
-    private uint? subaddressIndex;
-    private bool isSpent;
     private bool isFrozen;
+    private bool isSpent;
+    private uint? subaddressIndex;
 
     public MoneroOutputWallet()
     {
@@ -15,10 +15,10 @@ public class MoneroOutputWallet : MoneroOutput
 
     public MoneroOutputWallet(MoneroOutputWallet output) : base(output)
     {
-        this.accountIndex = output.accountIndex;
-        this.subaddressIndex = output.subaddressIndex;
-        this.isSpent = output.isSpent;
-        this.isFrozen = output.isFrozen;
+        accountIndex = output.accountIndex;
+        subaddressIndex = output.subaddressIndex;
+        isSpent = output.isSpent;
+        isFrozen = output.isFrozen;
     }
 
     public override MoneroOutputWallet Clone()
@@ -26,9 +26,9 @@ public class MoneroOutputWallet : MoneroOutput
         return new MoneroOutputWallet(this);
     }
 
-    public override MoneroTxWallet GetTx()
+    public override MoneroTxWallet? GetTx()
     {
-        return (MoneroTxWallet)base.GetTx();
+        return base.GetTx() as MoneroTxWallet;
     }
 
 
@@ -98,7 +98,11 @@ public class MoneroOutputWallet : MoneroOutput
 
     public bool? IsLocked()
     {
-        if (GetTx() == null) return null;
+        if (GetTx() == null)
+        {
+            return null;
+        }
+
         return GetTx().IsLocked();
     }
 }

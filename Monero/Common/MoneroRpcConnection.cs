@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -7,16 +7,16 @@ namespace Monero.Common;
 
 public class MoneroRpcConnection : MoneroConnection
 {
-    private string? _username;
-    private string? _password;
-    private string? _zmqUri;
+    private HttpClient? _httpClient;
     private bool? _isAuthenticated;
+    private string? _password;
 
     private bool _printStackTrace;
+    private string? _username;
+    private string? _zmqUri;
 
-    private HttpClient? _httpClient;
-
-    public MoneroRpcConnection(string? uri = null, string? username = null, string? password = null, string? zmqUri = null, int priority = 0) : base(uri, null, priority)
+    public MoneroRpcConnection(string? uri = null, string? username = null, string? password = null,
+        string? zmqUri = null, int priority = 0) : base(uri, null, priority)
     {
         _zmqUri = zmqUri;
         SetCredentials(username, password);
@@ -36,7 +36,7 @@ public class MoneroRpcConnection : MoneroConnection
     {
         try
         {
-            var uriObj = new Uri(_uri ?? "");
+            Uri uriObj = new(_uri ?? "");
             return uriObj.Host.EndsWith(".onion", StringComparison.OrdinalIgnoreCase);
         }
         catch
@@ -49,7 +49,7 @@ public class MoneroRpcConnection : MoneroConnection
     {
         try
         {
-            var uriObj = new Uri(_uri ?? "");
+            Uri uriObj = new(_uri ?? "");
             return uriObj.Host.EndsWith(".b32.i2p", StringComparison.OrdinalIgnoreCase);
         }
         catch
@@ -64,6 +64,7 @@ public class MoneroRpcConnection : MoneroConnection
         {
             return false;
         }
+
         return !IsOnion() && !IsI2P();
     }
 
@@ -73,10 +74,12 @@ public class MoneroRpcConnection : MoneroConnection
         {
             return false;
         }
+
         if (ReferenceEquals(this, other))
         {
             return true;
         }
+
         return _username == other._username &&
                _password == other._password &&
                _uri == other._uri &&
@@ -113,7 +116,7 @@ public class MoneroRpcConnection : MoneroConnection
     {
         if (error != null)
         {
-            var message = error.ContainsKey("message") ? error["message"].ToString() : "";
+            string? message = error.ContainsKey("message") ? error["message"].ToString() : "";
             int code = error.ContainsKey("code") ? Convert.ToInt32(error["code"]) : -1;
 
             if (string.IsNullOrEmpty(message))
@@ -142,7 +145,7 @@ public class MoneroRpcConnection : MoneroConnection
             throw new MoneroRpcInvalidResponseError(method, _uri, parameters);
         }
 
-        var error = (Dictionary<string, object>?)rpcResponse.GetValueOrDefault("error");
+        Dictionary<string, object>? error = (Dictionary<string, object>?)rpcResponse.GetValueOrDefault("error");
 
         HandleRpcError(error, method, parameters);
     }
@@ -154,7 +157,11 @@ public class MoneroRpcConnection : MoneroConnection
 
     public override bool? IsConnected()
     {
-        if (_isAuthenticated != null) return _isOnline == true && _isAuthenticated == true;
+        if (_isAuthenticated != null)
+        {
+            return _isOnline == true && _isAuthenticated == true;
+        }
+
         return _isOnline;
     }
 
@@ -177,12 +184,14 @@ public class MoneroRpcConnection : MoneroConnection
             ulong startTime = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             try
             {
-                var request = new MoneroJsonRpcRequest("get_version");
-                var response = SendJsonRequest<Dictionary<string, object>>(request, timeoutMs);
+                MoneroJsonRpcRequest request = new("get_version");
+                MoneroJsonRpcResponse<Dictionary<string, object>>? response =
+                    SendJsonRequest<Dictionary<string, object>>(request, timeoutMs);
                 if (response == null)
                 {
                     throw new Exception("Invalid response");
                 }
+
                 _isOnline = true;
                 _isAuthenticated = true;
             }
@@ -200,14 +209,20 @@ public class MoneroRpcConnection : MoneroConnection
                         _isAuthenticated = false;
                     }
                     else if (((MoneroRpcError)e).GetCode() == 404)
-                    { // fallback to latency check
+                    {
+                        // fallback to latency check
                         _isOnline = true;
                         _isAuthenticated = true;
                     }
                 }
             }
-            var now = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            if (_isOnline == true) _responseTime = now - startTime;
+
+            ulong now = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            if (_isOnline == true)
+            {
+                _responseTime = now - startTime;
+            }
+
             return isOnlineBefore != _isOnline || isAuthenticatedBefore != _isAuthenticated;
         }
     }
@@ -282,26 +297,26 @@ public class MoneroRpcConnection : MoneroConnection
             {
                 throw new MoneroError("password cannot be empty because username is not empty");
             }
-            var handler = new HttpClientHandler()
-            {
-                Credentials = new NetworkCredential(username, password)
-            };
+
+            HttpClientHandler handler = new() { Credentials = new NetworkCredential(username, password) };
 
             if (!string.IsNullOrEmpty(_proxyUri))
             {
                 handler.Proxy = new WebProxy(_proxyUri, true);
                 handler.UseProxy = true;
             }
+
             _httpClient = new HttpClient(handler);
         }
         else
         {
-            var handler = new HttpClientHandler();
+            HttpClientHandler handler = new();
             if (!string.IsNullOrEmpty(_proxyUri))
             {
                 handler.Proxy = new WebProxy(_proxyUri, true);
                 handler.UseProxy = true;
             }
+
             _httpClient = new HttpClient(handler);
         }
 
@@ -310,6 +325,7 @@ public class MoneroRpcConnection : MoneroConnection
             _isOnline = null;
             _isAuthenticated = null;
         }
+
         _username = username;
         _password = password;
         return this;
@@ -331,12 +347,14 @@ public class MoneroRpcConnection : MoneroConnection
         _printStackTrace = printStackTrace;
     }
 
-    public MoneroJsonRpcResponse<Dictionary<string, object>> SendJsonRequest(string method, Dictionary<string, object?>? parameters = null, ulong timeoutMs = 20000)
+    public MoneroJsonRpcResponse<Dictionary<string, object>> SendJsonRequest(string method,
+        Dictionary<string, object?>? parameters = null, ulong timeoutMs = 20000)
     {
         return SendJsonRequest<Dictionary<string, object>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
     }
 
-    public MoneroJsonRpcResponse<Dictionary<string, object>> SendJsonRequest(string method, List<string> parameters, ulong timeoutMs = 20000)
+    public MoneroJsonRpcResponse<Dictionary<string, object>> SendJsonRequest(string method, List<string> parameters,
+        ulong timeoutMs = 20000)
     {
         return SendJsonRequest<Dictionary<string, object>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
     }
@@ -355,7 +373,8 @@ public class MoneroRpcConnection : MoneroConnection
 
         try
         {
-            var rpcResponse = SendRequest<MoneroJsonRpcResponse<T>>("json_rpc", rpcRequest, timeoutMs);
+            MoneroJsonRpcResponse<T>? rpcResponse =
+                SendRequest<MoneroJsonRpcResponse<T>>("json_rpc", rpcRequest, timeoutMs);
 
             ValidateRpcResponse(rpcResponse, rpcRequest.Method, rpcRequest.Params);
 
@@ -367,7 +386,8 @@ public class MoneroRpcConnection : MoneroConnection
         }
     }
 
-    public Dictionary<string, object> SendPathRequest(string path, Dictionary<string, object?>? parameters = null, ulong? timeoutMs = null)
+    public Dictionary<string, object> SendPathRequest(string path, Dictionary<string, object?>? parameters = null,
+        ulong? timeoutMs = null)
     {
         if (_httpClient == null)
         {
@@ -376,7 +396,7 @@ public class MoneroRpcConnection : MoneroConnection
 
         try
         {
-            var respMap = SendRequest<Dictionary<string, object>>(path, parameters, timeoutMs);
+            Dictionary<string, object>? respMap = SendRequest<Dictionary<string, object>>(path, parameters, timeoutMs);
 
             ValidateRpcResponse(respMap, path, parameters);
             return respMap!;
@@ -387,7 +407,8 @@ public class MoneroRpcConnection : MoneroConnection
         }
     }
 
-    public byte[] SendBinaryRequest(string method, Dictionary<string, object?>? parameters = null, ulong timeoutMs = 20000)
+    public byte[] SendBinaryRequest(string method, Dictionary<string, object?>? parameters = null,
+        ulong timeoutMs = 20000)
     {
         throw new NotImplementedException("MoneroRpcConnection.SendBinaryRequest(): not implemented");
     }
@@ -420,11 +441,13 @@ public class MoneroRpcConnection : MoneroConnection
                 }
             }
 
-            var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+            StringContent content = new(jsonBody, Encoding.UTF8, "application/json");
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(timeoutMs ?? _timeoutMs));
+            using CancellationTokenSource cts = new(TimeSpan.FromMilliseconds(timeoutMs ?? _timeoutMs));
 
-            var httpResponse = _httpClient.PostAsync(new Uri($"{_uri}/{path}"), content, cts.Token).GetAwaiter().GetResult();
+            HttpResponseMessage httpResponse = _httpClient.PostAsync(new Uri($"{_uri}/{path}"), content, cts.Token)
+                .GetAwaiter()
+                .GetResult();
 
             ValidateHttpResponse(httpResponse);
 
@@ -437,5 +460,4 @@ public class MoneroRpcConnection : MoneroConnection
             throw new MoneroError(e2);
         }
     }
-
 }

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Web;
 
 using Monero.Common;
@@ -7,20 +7,20 @@ namespace Monero.Wallet.Common;
 
 public class MoneroTxConfig
 {
-    private List<MoneroDestination> destinations;
-    private List<uint> subtractFeeFrom;
-    private string paymentId;
-    private MoneroTxPriority priority;
-    private ulong fee;
     private uint accountIndex;
-    private List<uint> subaddressIndices;
-    private bool canSplit;
-    private bool relay;
-    private string note;
-    private string recipientName;
     private ulong belowAmount;
+    private bool canSplit;
+    private List<MoneroDestination>? destinations;
+    private ulong fee;
+    private string? keyImage;
+    private string? note;
+    private string? paymentId;
+    private MoneroTxPriority? priority;
+    private string? recipientName;
+    private bool relay;
+    private List<uint>? subaddressIndices;
+    private List<uint>? subtractFeeFrom;
     private bool sweepEachSubaddress;
-    private string keyImage;
 
     public MoneroTxConfig() { }
 
@@ -50,31 +50,43 @@ public class MoneroTxConfig
     public static string GetPaymentUri(MoneroTxConfig config)
     {
         if (config.GetAddress() == null)
+        {
             throw new ArgumentException("Payment URI requires an address");
+        }
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.Append("monero:");
         sb.Append(config.GetAddress());
 
-        var paramSb = new StringBuilder();
+        StringBuilder paramSb = new();
 
         if (config.GetAmount() != null)
+        {
             paramSb.Append("&tx_amount=").Append(MoneroUtils.AtomicUnitsToXmr((ulong)config.GetAmount()));
+        }
 
         if (!string.IsNullOrEmpty(config.GetRecipientName()))
+        {
             paramSb.Append("&recipient_name=").Append(HttpUtility.UrlEncode(config.GetRecipientName()));
+        }
 
         if (!string.IsNullOrEmpty(config.GetNote()))
+        {
             paramSb.Append("&tx_description=").Append(HttpUtility.UrlEncode(config.GetNote()));
+        }
 
         if (!string.IsNullOrEmpty(config.GetPaymentId()))
+        {
             throw new ArgumentException("Standalone payment id deprecated, use integrated address instead");
+        }
 
         string paramStr = paramSb.ToString();
         if (paramStr.Length > 0)
+        {
             paramStr = "?" + paramStr.Substring(1); // Replace first '&' with '?'
+        }
 
-        return sb.ToString() + paramStr;
+        return sb + paramStr;
     }
 
 
@@ -85,23 +97,42 @@ public class MoneroTxConfig
 
     public MoneroTxConfig SetAddress(string address)
     {
-        if (destinations.Count > 1) throw new MoneroError("Cannot Set address when multiple destinations are specified.");
+        if (destinations.Count > 1)
+        {
+            throw new MoneroError("Cannot Set address when multiple destinations are specified.");
+        }
+
         destinations.Clear();
         destinations.Add(new MoneroDestination(address, 0));
         return this;
     }
 
-    public string GetAddress()
+    public string? GetAddress()
     {
-        if (destinations.Count != 1) throw new MoneroError("Cannot Get address because MoneroTxConfig does not have exactly one destination");
+        if (destinations.Count != 1)
+        {
+            throw new MoneroError("Cannot Get address because MoneroTxConfig does not have exactly one destination");
+        }
+
         return destinations[0].GetAddress();
     }
 
     public MoneroTxConfig SetAmount(ulong amount)
     {
-        if (this.destinations != null && this.destinations.Count > 1) throw new MoneroError("Cannot Set amount because MoneroTxConfig already has multiple destinations");
-        if (this.destinations == null || this.destinations.Count == 0) AddDestination(new MoneroDestination(null, amount));
-        else this.destinations[0].SetAmount(amount);
+        if (destinations != null && destinations.Count > 1)
+        {
+            throw new MoneroError("Cannot Set amount because MoneroTxConfig already has multiple destinations");
+        }
+
+        if (destinations == null || destinations.Count == 0)
+        {
+            AddDestination(new MoneroDestination(null, amount));
+        }
+        else
+        {
+            destinations[0].SetAmount(amount);
+        }
+
         return this;
     }
 
@@ -113,7 +144,11 @@ public class MoneroTxConfig
 
     public ulong? GetAmount()
     {
-        if (destinations == null || destinations.Count != 1) throw new MoneroError("Cannot Get amount because MoneroTxConfig does not have exactly one destination");
+        if (destinations == null || destinations.Count != 1)
+        {
+            throw new MoneroError("Cannot Get amount because MoneroTxConfig does not have exactly one destination");
+        }
+
         return destinations[0].GetAmount();
     }
 
@@ -124,12 +159,16 @@ public class MoneroTxConfig
 
     public MoneroTxConfig AddDestination(MoneroDestination destination)
     {
-        if (this.destinations == null) this.destinations = new List<MoneroDestination>();
-        this.destinations.Add(destination);
+        if (destinations == null)
+        {
+            destinations = [];
+        }
+
+        destinations.Add(destination);
         return this;
     }
 
-    public List<MoneroDestination> GetDestinations()
+    public List<MoneroDestination>? GetDestinations()
     {
         return destinations;
     }
@@ -140,29 +179,29 @@ public class MoneroTxConfig
         return this;
     }
 
-    public List<uint> GetSubtractFeeFrom()
+    public List<uint>? GetSubtractFeeFrom()
     {
         return subtractFeeFrom;
     }
 
     public MoneroTxConfig SetSubtractFeeFrom(List<uint> destinationIndices)
     {
-        this.subtractFeeFrom = destinationIndices;
+        subtractFeeFrom = destinationIndices;
         return this;
     }
 
-    public string GetPaymentId()
+    public string? GetPaymentId()
     {
         return paymentId;
     }
 
-    public MoneroTxConfig SetPaymentId(string paymentId)
+    public MoneroTxConfig SetPaymentId(string? paymentId)
     {
         this.paymentId = paymentId;
         return this;
     }
 
-    public MoneroTxPriority GetPriority()
+    public MoneroTxPriority? GetPriority()
     {
         return priority;
     }
@@ -195,7 +234,7 @@ public class MoneroTxConfig
         return this;
     }
 
-    public List<uint> GetSubaddressIndices()
+    public List<uint>? GetSubaddressIndices()
     {
         return subaddressIndices;
     }
@@ -206,15 +245,15 @@ public class MoneroTxConfig
         return this;
     }
 
-    public MoneroTxConfig SetSubaddressIndices(List<uint> subaddressIndices)
+    public MoneroTxConfig SetSubaddressIndices(List<uint>? subaddressIndicesList)
     {
-        this.subaddressIndices = subaddressIndices;
+        this.subaddressIndices = subaddressIndicesList;
         return this;
     }
 
     public MoneroTxConfig SetSubaddressIndices(uint subaddressIndex)
     {
-        this.subaddressIndices = [subaddressIndex];
+        subaddressIndices = [subaddressIndex];
         return this;
     }
 
@@ -240,23 +279,23 @@ public class MoneroTxConfig
         return this;
     }
 
-    public string GetNote()
+    public string? GetNote()
     {
         return note;
     }
 
-    public MoneroTxConfig SetNote(string note)
+    public MoneroTxConfig SetNote(string? note)
     {
         this.note = note;
         return this;
     }
 
-    public string GetRecipientName()
+    public string? GetRecipientName()
     {
         return recipientName;
     }
 
-    public MoneroTxConfig SetRecipientName(string recipientName)
+    public MoneroTxConfig SetRecipientName(string? recipientName)
     {
         this.recipientName = recipientName;
         return this;
@@ -284,7 +323,7 @@ public class MoneroTxConfig
         return this;
     }
 
-    public string GetKeyImage()
+    public string? GetKeyImage()
     {
         return keyImage;
     }

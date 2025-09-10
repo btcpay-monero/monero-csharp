@@ -1,4 +1,3 @@
-﻿
 namespace Monero.Common;
 
 public class MoneroLwsConnection : MoneroConnection

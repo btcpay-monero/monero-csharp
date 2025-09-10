@@ -1,18 +1,17 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroHardForkInfo
 {
+    private ulong? credits;
     private ulong? earliestHeight;
     private bool? isEnabled;
+    private uint? numVotes;
     private uint? state;
     private uint? threshold;
-    private uint? version;
-    private uint? numVotes;
-    private uint? window;
-    private uint? voting;
-    private ulong? credits;
     private string? topBlockHash;
+    private uint? version;
+    private uint? voting;
+    private uint? window;
 
     public ulong? GetEarliestHeight()
     {

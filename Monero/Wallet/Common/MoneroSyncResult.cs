@@ -1,4 +1,3 @@
-﻿
 namespace Monero.Wallet.Common;
 
 public class MoneroSyncResult

@@ -1,4 +1,3 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroAltChain
@@ -8,8 +7,6 @@ public class MoneroAltChain
     private ulong? height;
     private ulong? length;
     private string? mainChainParentBlockHash;
-
-    public MoneroAltChain() { }
 
     public List<string>? GetBlockHashes()
     {

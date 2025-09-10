@@ -1,11 +1,10 @@
-﻿
 namespace Monero.Wallet.Common;
 
 public class MoneroIncomingTransfer : MoneroTransfer
 {
-    private uint subaddressIndex;
-    private string address;
-    private ulong numSuggestedConfirmations;
+    private string? address;
+    private ulong? numSuggestedConfirmations;
+    private uint? subaddressIndex;
 
     public MoneroIncomingTransfer()
     {
@@ -35,7 +34,7 @@ public class MoneroIncomingTransfer : MoneroTransfer
         return true;
     }
 
-    public uint GetSubaddressIndex()
+    public uint? GetSubaddressIndex()
     {
         return subaddressIndex;
     }
@@ -46,7 +45,7 @@ public class MoneroIncomingTransfer : MoneroTransfer
         return this;
     }
 
-    public string GetAddress()
+    public string? GetAddress()
     {
         return address;
     }
@@ -57,7 +56,7 @@ public class MoneroIncomingTransfer : MoneroTransfer
         return this;
     }
 
-    public ulong GetNumSuggestedConfirmations()
+    public ulong? GetNumSuggestedConfirmations()
     {
         return numSuggestedConfirmations;
     }

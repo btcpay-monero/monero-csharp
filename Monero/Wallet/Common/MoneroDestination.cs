@@ -1,4 +1,3 @@
-﻿
 namespace Monero.Wallet.Common;
 
 public class MoneroDestination
@@ -20,7 +19,7 @@ public class MoneroDestination
 
     public MoneroDestination Clone() { return new MoneroDestination(this); }
 
-    public string GetAddress()
+    public string? GetAddress()
     {
         return _address;
     }

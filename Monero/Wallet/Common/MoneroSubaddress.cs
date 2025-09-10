@@ -1,17 +1,16 @@
-﻿
 namespace Monero.Wallet.Common;
 
 public class MoneroSubaddress
 {
     private uint? accountIndex;
-    private uint? index;
     private string? address;
-    private string? label;
     private ulong? balance;
-    private ulong? unlockedBalance;
-    private ulong? numUnspentOutputs;
+    private uint? index;
     private bool? isUsed;
+    private string? label;
     private ulong? numBlocksToUnlock;
+    private ulong? numUnspentOutputs;
+    private ulong? unlockedBalance;
 
     public MoneroSubaddress() { }
 

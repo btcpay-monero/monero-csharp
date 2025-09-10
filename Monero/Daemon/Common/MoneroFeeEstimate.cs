@@ -1,4 +1,3 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroFeeEstimate
@@ -9,7 +8,7 @@ public class MoneroFeeEstimate
 
     public MoneroFeeEstimate()
     {
-        // nothing to construct
+        fees = [];
     }
 
     public MoneroFeeEstimate(ulong? fee, List<ulong> fees, ulong? quantizationMask)

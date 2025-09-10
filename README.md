@@ -5,3 +5,11 @@
 </div>
 
 # Monero C# Bindings
+
+## Code formatting
+
+We use the **unmodified** standardized `.editorconfig` from .NET SDK. Run `dotnet new editorconfig --force` to apply the latest version.
+
+To enforce formatting for the whole project, run `dotnet format monero-csharp.sln --verbosity diagnostic`
+
+To enforce custom analyzer configuration options, we do use global _AnalyzerConfig_ `.globalconfig` file.

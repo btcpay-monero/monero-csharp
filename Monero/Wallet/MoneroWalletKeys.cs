@@ -1,4 +1,4 @@
-﻿using Monero.Common;
+using Monero.Common;
 using Monero.Wallet.Common;
 
 namespace Monero.Wallet;
@@ -82,7 +82,8 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void EditAddressBookEntry(uint index, bool setAddress, string address, bool setDescription, string description)
+    public override void EditAddressBookEntry(uint index, bool setAddress, string address, bool setDescription,
+        string description)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -177,7 +178,8 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress = null, string? paymentId = null)
+    public override MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress = null,
+        string? paymentId = null)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -407,7 +409,9 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string SignMessage(string message, MoneroMessageSignatureType signatureType = MoneroMessageSignatureType.SIGN_WITH_SPEND_KEY, uint accountIdx = 0, uint subaddressIdx = 0)
+    public override string SignMessage(string message,
+        MoneroMessageSignatureType signatureType = MoneroMessageSignatureType.SIGN_WITH_SPEND_KEY, uint accountIdx = 0,
+        uint subaddressIdx = 0)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -493,5 +497,4 @@ public class MoneroWalletKeys : MoneroWalletDefault
     }
 
     #endregion
-
 }

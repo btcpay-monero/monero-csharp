@@ -1,33 +1,123 @@
-﻿
 namespace Monero.Common;
 
 public class MoneroBlock : MoneroBlockHeader
 {
     private string? hex;
     private MoneroTx? minerTx;
-    private List<MoneroTx>? txs;
     private List<string>? txHashes;
+    private List<MoneroTx>? txs;
 
-    public MoneroBlock() : base() { }
+    public MoneroBlock()
+    {
+    }
 
     public MoneroBlock(MoneroBlockHeader header) : base(header)
     {
-        this.hex = null;
-        this.minerTx = null;
-        this.txs = [];
-        this.txHashes = [];
+        hex = null;
+        minerTx = null;
+        txs = [];
+        txHashes = [];
     }
 
     public MoneroBlock(MoneroBlock block) : base(block)
     {
-        this.hex = block.GetHex();
-        if (block.minerTx != null) this.minerTx = block.minerTx.Clone().SetBlock(this);
+        hex = block.GetHex();
+        if (block.minerTx != null)
+        {
+            minerTx = block.minerTx.Clone().SetBlock(this);
+        }
+
         if (block.txs != null)
         {
-            this.txs = new List<MoneroTx>();
-            foreach (MoneroTx tx in block.txs) txs.Add(tx.Clone().SetBlock(this));
+            txs = [];
+            foreach (MoneroTx tx in block.txs)
+            {
+                txs.Add(tx.Clone().SetBlock(this));
+            }
         }
-        if (block.GetTxHashes() != null) this.txHashes = new List<String>(block.GetTxHashes());
+
+        if (block.GetTxHashes() != null)
+        {
+            txHashes = new List<string>(block.GetTxHashes());
+        }
+    }
+
+    public string? GetHex()
+    {
+        return hex;
+    }
+
+    public MoneroBlock SetHex(string? hex)
+    {
+        this.hex = hex;
+        return this;
+    }
+
+    public MoneroTx? GetMinerTx()
+    {
+        return minerTx;
+    }
+
+    public MoneroBlock SetMinerTx(MoneroTx? minerTx)
+    {
+        this.minerTx = minerTx;
+        return this;
+    }
+
+    public List<MoneroTx>? GetTxs()
+    {
+        return txs;
+    }
+
+    public MoneroBlock SetTxs(List<MoneroTx>? txs)
+    {
+        this.txs = txs;
+        if (txs != null)
+        {
+            foreach (MoneroTx tx in txs)
+            {
+                tx.SetBlock(this);
+            }
+        }
+
+        return this;
+    }
+
+    public MoneroBlock SetTxs(MoneroTx? tx)
+    {
+        if (tx == null)
+        {
+            throw new ArgumentNullException(nameof(tx), "Transaction cannot be null");
+        }
+
+        return SetTxs([tx]);
+    }
+
+    public MoneroBlock AddTx(MoneroTx? tx)
+    {
+        if (tx == null)
+        {
+            throw new ArgumentNullException(nameof(tx), "Transaction cannot be null");
+        }
+
+        txs.Add(tx.SetBlock(this));
+        return this;
+    }
+
+    public List<string>? GetTxHashes()
+    {
+        return txHashes;
+    }
+
+    public MoneroBlock SetTxHashes(List<string>? txHashes)
+    {
+        this.txHashes = txHashes;
+        return this;
+    }
+
+    public MoneroBlock Clone()
+    {
+        return new MoneroBlock(this);
     }
 
     #region Override Base Methods
@@ -141,73 +231,4 @@ public class MoneroBlock : MoneroBlockHeader
     }
 
     #endregion
-
-    public string? GetHex()
-    {
-        return hex;
-    }
-
-    public MoneroBlock SetHex(string? hex)
-    {
-        this.hex = hex;
-        return this;
-    }
-
-    public MoneroTx? GetMinerTx()
-    {
-        return minerTx;
-    }
-
-    public MoneroBlock SetMinerTx(MoneroTx? minerTx)
-    {
-        this.minerTx = minerTx;
-        return this;
-    }
-
-    public List<MoneroTx>? GetTxs()
-    {
-        return txs;
-    }
-
-    public MoneroBlock SetTxs(List<MoneroTx>? txs)
-    {
-        this.txs = txs;
-        if (txs != null)
-        {
-            foreach (MoneroTx tx in txs)
-            {
-                tx.SetBlock(this);
-            }
-        }
-        return this;
-    }
-
-    public MoneroBlock SetTxs(MoneroTx? tx)
-    {
-        if (tx == null) throw new ArgumentNullException(nameof(tx), "Transaction cannot be null");
-        return SetTxs([tx]);
-    }
-
-    public MoneroBlock AddTx(MoneroTx? tx)
-    {
-        if (tx == null) throw new ArgumentNullException(nameof(tx), "Transaction cannot be null");
-        txs.Add(tx.SetBlock(this));
-        return this;
-    }
-
-    public List<string> GetTxHashes()
-    {
-        return txHashes;
-    }
-
-    public MoneroBlock SetTxHashes(List<string>? txHashes)
-    {
-        this.txHashes = txHashes;
-        return this;
-    }
-
-    public MoneroBlock Clone()
-    {
-        return new MoneroBlock(this);
-    }
 }

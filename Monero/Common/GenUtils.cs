@@ -1,19 +1,17 @@
-﻿using System.Collections;
-using Org.BouncyCastle.Utilities;
+using System.Collections;
 
 namespace Monero.Common;
 
 public class GenUtils
 {
-    public static string GetGuid()
-    {
-        return Guid.NewGuid().ToString();
-    }
-
-    public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined = null, bool? resolveTrue = null, bool? resolveMax = null)
+    public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined = null, bool? resolveTrue = null,
+        bool? resolveMax = null)
     {
         // check for the same reference
-        if (object.ReferenceEquals(val1, val2)) return val1;
+        if (ReferenceEquals(val1, val2))
+        {
+            return val1;
+        }
 
         int? comparison = null;
 
@@ -21,18 +19,28 @@ public class GenUtils
         if (val1 is ulong b1 && val2 is ulong b2)
         {
             comparison = b1.CompareTo(b2);
-            if (comparison == 0) return val1;
+            if (comparison == 0)
+            {
+                return val1;
+            }
         }
 
         if (val1 is bool bool1 && val2 is bool bool2)
         {
-            if (bool1 == bool2) return val1;
+            if (bool1 == bool2)
+            {
+                return val1;
+            }
         }
 
         // resolve one value null
         if (val1 == null || val2 == null)
         {
-            if (resolveDefined == false) return default!;
+            if (resolveDefined == false)
+            {
+                return default!;
+            }
+
             return val1 == null ? val2 : val1!;
         }
 
@@ -44,9 +52,12 @@ public class GenUtils
 
         if (val1 is IEnumerable e1 && val2 is IEnumerable e2)
         {
-            var list1 = e1.Cast<object>().ToList();
-            var list2 = e2.Cast<object>().ToList();
-            if (list1.SequenceEqual(list2)) return val1;
+            List<object> list1 = e1.Cast<object>().ToList();
+            List<object> list2 = e2.Cast<object>().ToList();
+            if (list1.SequenceEqual(list2))
+            {
+                return val1;
+            }
         }
 
         // resolve different numbers
@@ -55,8 +66,10 @@ public class GenUtils
             if (val1 is ulong b1Num && val2 is ulong b2Num)
             {
                 return (T)(object)(resolveMax.Value
-                    ? (comparison < 0 ? b2Num : b1Num)
-                    : (comparison < 0 ? b1Num : b2Num));
+                    ? comparison < 0 ? b2Num : b1Num
+                    : comparison < 0
+                        ? b1Num
+                        : b2Num);
             }
 
             if (val1 is int i1 && val2 is int i2)
@@ -75,7 +88,8 @@ public class GenUtils
         // assert deep equality
         if (!Equals(val1, val2))
         {
-            throw new Exception($"Cannot Reconcile values {val1} and {val2} with config: [{resolveDefined}, {resolveTrue}, {resolveMax}]");
+            throw new Exception(
+                $"Cannot Reconcile values {val1} and {val2} with config: [{resolveDefined}, {resolveTrue}, {resolveMax}]");
         }
 
         return val1;
@@ -83,9 +97,11 @@ public class GenUtils
 
     public static byte[]? ReconcileByteArrays(byte[]? arr1, byte[]? arr2)
     {
-
         // check for the same reference or null
-        if (arr1 == arr2) return arr1;
+        if (arr1 == arr2)
+        {
+            return arr1;
+        }
 
         // resolve one value defined
         if (arr1 == null || arr2 == null)
@@ -94,26 +110,52 @@ public class GenUtils
         }
 
         // assert deep equality
-        if (!Arrays.Equals(arr1, arr2)) throw new MoneroError("Cannot Reconcile arrays");
+        if (!Equals(arr1, arr2))
+        {
+            throw new MoneroError("Cannot Reconcile arrays");
+        }
+
         return arr1;
     }
 
     public static byte[]? ListToByteArray(List<byte>? list)
     {
-        if (list == null) return null;
+        if (list == null)
+        {
+            return null;
+        }
+
         byte[] bytes = new byte[list.Count];
-        for (int i = 0; i < list.Count; i++) bytes[i] = list[i];
+        for (int i = 0; i < list.Count; i++)
+        {
+            bytes[i] = list[i];
+        }
+
         return bytes;
     }
 
     public static int[]? Subarray(int[]? array, int startIndexInclusive, int endIndexExclusive)
     {
-        if (array == null) return null;
-        if (startIndexInclusive < 0) startIndexInclusive = 0;
-        if (endIndexExclusive > array.Length) endIndexExclusive = array.Length;
+        if (array == null)
+        {
+            return null;
+        }
+
+        if (startIndexInclusive < 0)
+        {
+            startIndexInclusive = 0;
+        }
+
+        if (endIndexExclusive > array.Length)
+        {
+            endIndexExclusive = array.Length;
+        }
 
         int newSize = endIndexExclusive - startIndexInclusive;
-        if (newSize <= 0) return [];
+        if (newSize <= 0)
+        {
+            return [];
+        }
 
         int[] subarray = new int[newSize];
         Array.Copy(array, startIndexInclusive, subarray, 0, newSize);
@@ -138,16 +180,25 @@ public class GenUtils
         }
     }
 
-    public static string KvLine(object? key, object? value, int indent, bool newline = true, bool ignoreUndefined = true)
+    public static string KvLine(object? key, object? value, int indent, bool newline = true,
+        bool ignoreUndefined = true)
     {
-        if (value == null && ignoreUndefined) return "";
+        if (value == null && ignoreUndefined)
+        {
+            return "";
+        }
+
         return GetIndent(indent) + key + ": " + value + (newline ? '\n' : "");
     }
 
     public static string GetIndent(int length)
     {
         string str = "";
-        for (int i = 0; i < length; i++) str += "  "; // two spaces
+        for (int i = 0; i < length; i++)
+        {
+            str += "  "; // two spaces
+        }
+
         return str;
     }
 }

@@ -1,12 +1,11 @@
-﻿namespace Monero.Common;
+namespace Monero.Common;
 
 public class TaskLooper
 {
-    private readonly Action _task;
-    private ulong _periodInMs;
-    private CancellationTokenSource _cts;
-    private Task _loopTask;
     private readonly object _lock = new();
+    private readonly Action _task;
+    private CancellationTokenSource? _cts;
+    private ulong _periodInMs;
 
     public TaskLooper(Action task)
     {
@@ -24,23 +23,28 @@ public class TaskLooper
         }
     }
 
-    public TaskLooper Start(ulong periodInMs, bool targetFixedPeriod = false)
+    public void Start(ulong periodInMs, bool targetFixedPeriod = false)
     {
         if (periodInMs <= 0)
+        {
             throw new ArgumentException("Period must be greater than 0 ms", nameof(periodInMs));
+        }
 
         lock (_lock)
         {
-            if (IsStarted) return this;
+            if (IsStarted)
+            {
+                return;
+            }
 
             _periodInMs = periodInMs;
             _cts = new CancellationTokenSource();
 
-            _loopTask = Task.Run(async () =>
+            Task.Run(async () =>
             {
                 while (!_cts.Token.IsCancellationRequested)
                 {
-                    var startTime = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    ulong startTime = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
                     try
                     {
@@ -51,12 +55,15 @@ public class TaskLooper
                         Console.Error.WriteLine($"Task execution error: {ex}");
                     }
 
-                    if (_cts.Token.IsCancellationRequested) break;
+                    if (_cts.Token.IsCancellationRequested)
+                    {
+                        break;
+                    }
 
                     ulong delay = _periodInMs;
                     if (targetFixedPeriod)
                     {
-                        var elapsed = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
+                        ulong elapsed = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
                         delay = Math.Max(0, _periodInMs - elapsed);
                     }
 
@@ -71,8 +78,6 @@ public class TaskLooper
                 }
             }, _cts.Token);
         }
-
-        return this;
     }
 
     public void Stop()
@@ -91,7 +96,9 @@ public class TaskLooper
     public void SetPeriodInMs(ulong periodInMs)
     {
         if (periodInMs <= 0)
+        {
             throw new ArgumentException("Period must be greater than 0 ms");
+        }
 
         lock (_lock)
         {

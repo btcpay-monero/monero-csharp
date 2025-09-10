@@ -1,12 +1,12 @@
-﻿using Monero.Common;
+using Monero.Common;
 using Monero.Daemon.Common;
 
 namespace Monero.Daemon;
 
 public abstract class MoneroDaemonDefault : MoneroDaemon
 {
-    protected List<MoneroDaemonListener> _listeners = [];
     protected Dictionary<ulong, MoneroBlockHeader> _cachedHeaders = [];
+    protected List<MoneroDaemonListener> _listeners = [];
 
     public virtual void AddListener(MoneroDaemonListener listener)
     {
@@ -27,7 +27,8 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public virtual void FlushTxPool()
     {
-        FlushTxPool(new List<string>());
+        List<string> emptyList = [];
+        FlushTxPool(emptyList);
     }
 
     public virtual void FlushTxPool(string txHash)
@@ -61,7 +62,8 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract List<MoneroBlock> GetBlocksByRange(ulong? startHeight, ulong? endHeight);
 
-    public abstract List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight, ulong? maxChunkSize = null);
+    public abstract List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight,
+        ulong? maxChunkSize = null);
 
     public abstract MoneroBlockTemplate GetBlockTemplate(string walletAddress, int? reserveSize = null);
 
@@ -95,9 +97,11 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract MoneroMiningStatus GetMiningStatus();
 
-    public abstract List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative = null, ulong? startHeight = null, ulong? endHeight = null);
+    public abstract List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts,
+        bool? isCumulative = null, ulong? startHeight = null, ulong? endHeight = null);
 
-    public abstract List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts = null, int? minCount = null, int? maxCount = null, bool? isUnlocked = null, int? recentCutoff = null);
+    public abstract List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts = null,
+        int? minCount = null, int? maxCount = null, bool? isUnlocked = null, int? recentCutoff = null);
 
     public abstract List<MoneroOutput> GetOutputs(List<MoneroOutput> outputs);
 
@@ -109,14 +113,14 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public virtual MoneroTx? GetTx(string txHash, bool prune = false)
     {
-        var txs = GetTxs([txHash], prune);
+        List<MoneroTx> txs = GetTxs([txHash], prune);
 
         return txs.FirstOrDefault();
     }
 
     public virtual string? GetTxHex(string txHash, bool prune = false)
     {
-        var hexes = GetTxHexes([txHash], prune);
+        List<string> hexes = GetTxHexes([txHash], prune);
 
         return hexes.FirstOrDefault();
     }

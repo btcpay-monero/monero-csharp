@@ -1,34 +1,34 @@
-﻿using Monero.Common;
+using Monero.Common;
 
 namespace Monero.Daemon.Common;
 
 public class MoneroPeer
 {
-    private string? id;
     private string? address;
-    private string? host;
-    private int? port;
-    private bool isOnline;
-    private ulong? lastSeenTimestamp;
-    private int? pruningSeed;
-    private int? rpcPort;
-    private ulong? rpcCreditsPerHash;
-    private string? hash;
     private ulong? avgDownload;
     private ulong? avgUpload;
     private ulong? currentDownload;
     private ulong? currentUpload;
+    private string? hash;
     private ulong? height;
+    private string? host;
+    private string? id;
     private bool isIncoming;
-    private ulong? liveTime;
-    private bool isLocalIp;
     private bool isLocalHost;
+    private bool isLocalIp;
+    private bool isOnline;
+    private ulong? lastSeenTimestamp;
+    private ulong? liveTime;
     private int? numReceives;
     private int? numSends;
+    private int? numSupportFlags;
+    private int? port;
+    private int? pruningSeed;
     private ulong? receiveIdleTime;
+    private ulong? rpcCreditsPerHash;
+    private int? rpcPort;
     private ulong? sendIdleTime;
     private string? state;
-    private int? numSupportFlags;
     private MoneroConnectionType? type;
 
     public string? GetId()
@@ -121,7 +121,7 @@ public class MoneroPeer
 
     public ulong? GetRpcCreditsPerHash()
     {
-        return this.rpcCreditsPerHash;
+        return rpcCreditsPerHash;
     }
 
     public MoneroPeer SetRpcCreditsPerHash(ulong? rpcCreditsPerHash)

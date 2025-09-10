@@ -1,15 +1,14 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroDaemonSyncInfo
 {
+    private ulong? credits;
     private ulong? height;
+    private uint? nextNeededPruningSeed;
+    private string? overview;
     private List<MoneroPeer>? peers;
     private List<MoneroConnectionSpan>? spans;
     private ulong? targetHeight;
-    private uint? nextNeededPruningSeed;
-    private string? overview;
-    private ulong? credits;
     private string? topBlockHash;
 
     public ulong? GetHeight()

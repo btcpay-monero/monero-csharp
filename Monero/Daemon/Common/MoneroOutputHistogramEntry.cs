@@ -1,12 +1,11 @@
-﻿
 namespace Monero.Daemon.Common;
 
 public class MoneroOutputHistogramEntry
 {
     private ulong? amount;
     private ulong? numInstances;
-    private ulong? numUnlockedInstances;
     private ulong? numRecentInstances;
+    private ulong? numUnlockedInstances;
 
     public ulong? GetAmount()
     {
