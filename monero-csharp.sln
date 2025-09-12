@@ -5,7 +5,9 @@ VisualStudioVersion = 17.14.36202.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monero", "Monero\Monero.csproj", "{DA177BA4-AA4F-48DB-8F0A-F15D04B84A5F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monero.Test", "Monero.Test\Monero.Test.csproj", "{68899F01-BA02-4FAA-879D-93EAD566E0D1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monero.IntegrationTests", "Monero.IntegrationTests\Monero.IntegrationTests.csproj", "{68899F01-BA02-4FAA-879D-93EAD566E0D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monero.UnitTests", "Monero.UnitTests\Monero.UnitTests.csproj", "{E97E4D14-6039-4C80-A9EA-C1818B873F5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{68899F01-BA02-4FAA-879D-93EAD566E0D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68899F01-BA02-4FAA-879D-93EAD566E0D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68899F01-BA02-4FAA-879D-93EAD566E0D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E97E4D14-6039-4C80-A9EA-C1818B873F5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E97E4D14-6039-4C80-A9EA-C1818B873F5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E97E4D14-6039-4C80-A9EA-C1818B873F5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E97E4D14-6039-4C80-A9EA-C1818B873F5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

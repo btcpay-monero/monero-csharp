@@ -1,9 +1,9 @@
 using Monero.Common;
-using Monero.Test.Utils;
+using Monero.IntegrationTests.Utils;
 using Monero.Wallet;
 using Monero.Wallet.Common;
 
-namespace Monero.Test;
+namespace Monero.IntegrationTests;
 
 public class TestMoneroWalletRpc : TestMoneroWalletCommon
 {

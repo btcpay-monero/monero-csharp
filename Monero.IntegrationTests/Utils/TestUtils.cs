@@ -6,7 +6,7 @@ using Monero.Daemon.Common;
 using Monero.Wallet;
 using Monero.Wallet.Common;
 
-namespace Monero.Test.Utils;
+namespace Monero.IntegrationTests.Utils;
 
 internal abstract class TestUtils
 {

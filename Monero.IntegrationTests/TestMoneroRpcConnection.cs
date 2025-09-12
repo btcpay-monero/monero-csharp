@@ -1,7 +1,7 @@
 using Monero.Common;
-using Monero.Test.Utils;
+using Monero.IntegrationTests.Utils;
 
-namespace Monero.Test;
+namespace Monero.IntegrationTests;
 
 public class TestMoneroRpcConnection
 {

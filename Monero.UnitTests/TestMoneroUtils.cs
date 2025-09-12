@@ -1,7 +1,7 @@
 using Monero.Common;
 using Monero.Wallet.Common;
 
-namespace Monero.Test;
+namespace Monero.UnitTests;
 
 public class TestMoneroUtils
 {

@@ -3,7 +3,7 @@ services:
   tests:
     build:
       context: ..
-      dockerfile: Monero.Test/Dockerfile
+      dockerfile: Monero.IntegrationTests/Dockerfile
     depends_on:
       - xmr_wallet
 

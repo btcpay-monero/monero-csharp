@@ -1,4 +1,4 @@
-namespace Monero.Test.Utils;
+namespace Monero.IntegrationTests.Utils;
 
 public static class StopMining
 {
