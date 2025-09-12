@@ -52,7 +52,7 @@ internal abstract class TestUtils
 
     // test wallet constants
     public static readonly ulong MAX_FEE = 75000000000;
-    public static readonly MoneroNetworkType NETWORK_TYPE = MoneroNetworkType.MAINNET;
+    public static readonly MoneroNetworkType NETWORK_TYPE = MoneroNetworkType.Mainnet;
     public static readonly string LANGUAGE = "English";
 
     public static readonly string SEED =
@@ -166,12 +166,12 @@ internal abstract class TestUtils
 
     public static string GetMiningAddress()
     {
-        if (NETWORK_TYPE == MoneroNetworkType.MAINNET)
+        if (NETWORK_TYPE == MoneroNetworkType.Mainnet)
         {
             return "42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L";
         }
 
-        if (NETWORK_TYPE == MoneroNetworkType.TESTNET)
+        if (NETWORK_TYPE == MoneroNetworkType.Testnet)
         {
             return "9tUBnNCkC3UKGygHCwYvAB1FscpjUuq5e9MYJd2rXuiiTjjfVeSVjnbSG5VTnJgBgy9Y7GTLfxpZNMUwNZjGfdFr1z79eV1";
         }
@@ -192,13 +192,13 @@ internal abstract class TestUtils
 
         switch (networkType)
         {
-            case MoneroNetworkType.STAGENET:
+            case MoneroNetworkType.Stagenet:
                 return
                     "78Zq71rS1qK4CnGt8utvMdWhVNMJexGVEDM2XsSkBaGV9bDSnRFFhWrQTbmCACqzevE8vth9qhWfQ9SUENXXbLnmMVnBwgW"; // subaddress
-            case MoneroNetworkType.TESTNET:
+            case MoneroNetworkType.Testnet:
                 return
                     "BhsbVvqW4Wajf4a76QW3hA2B3easR5QdNE5L8NwkY7RWXCrfSuaUwj1DDUsk3XiRGHBqqsK3NPvsATwcmNNPUQQ4SRR2b3V"; // subaddress
-            case MoneroNetworkType.MAINNET:
+            case MoneroNetworkType.Mainnet:
                 return
                     "87a1Yf47UqyQFCrMqqtxfvhJN9se3PgbmU7KUFWqhSu5aih6YsZYoxfjgyxAM1DztNNSdoYTZYn9xa3vHeJjoZqdAybnLzN"; // subaddress
             default:

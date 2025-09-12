@@ -2,12 +2,12 @@ namespace Monero.Common;
 
 public class MoneroOutput
 {
-    private ulong? amount;
-    private ulong? index;
-    private MoneroKeyImage? keyImage;
-    private List<ulong>? ringOutputIndices;
-    private string? stealthPublicKey;
-    private MoneroTx? tx;
+    private ulong? _amount;
+    private ulong? _index;
+    private MoneroKeyImage? _keyImage;
+    private List<ulong>? _ringOutputIndices;
+    private string? _stealthPublicKey;
+    private MoneroTx? _tx;
 
     public MoneroOutput()
     {
@@ -16,19 +16,19 @@ public class MoneroOutput
 
     public MoneroOutput(MoneroOutput output)
     {
-        if (output.keyImage != null)
+        if (output._keyImage != null)
         {
-            keyImage = output.keyImage.Clone();
+            _keyImage = output._keyImage.Clone();
         }
 
-        amount = output.amount;
-        index = output.index;
-        if (output.ringOutputIndices != null)
+        _amount = output._amount;
+        _index = output._index;
+        if (output._ringOutputIndices != null)
         {
-            ringOutputIndices = new List<ulong>(output.ringOutputIndices);
+            _ringOutputIndices = new List<ulong>(output._ringOutputIndices);
         }
 
-        stealthPublicKey = output.stealthPublicKey;
+        _stealthPublicKey = output._stealthPublicKey;
     }
 
     public virtual MoneroOutput Clone()
@@ -38,67 +38,67 @@ public class MoneroOutput
 
     public virtual MoneroTx? GetTx()
     {
-        return tx;
+        return _tx;
     }
 
     public virtual MoneroOutput SetTx(MoneroTx? tx)
     {
-        this.tx = tx;
+        this._tx = tx;
         return this;
     }
 
     public MoneroKeyImage? GetKeyImage()
     {
-        return keyImage;
+        return _keyImage;
     }
 
     public MoneroOutput SetKeyImage(MoneroKeyImage? keyImage)
     {
-        this.keyImage = keyImage;
+        this._keyImage = keyImage;
         return this;
     }
 
     public ulong? GetAmount()
     {
-        return amount;
+        return _amount;
     }
 
     public virtual MoneroOutput SetAmount(ulong? amount)
     {
-        this.amount = amount;
+        this._amount = amount;
         return this;
     }
 
     public ulong? GetIndex()
     {
-        return index;
+        return _index;
     }
 
     public virtual MoneroOutput SetIndex(ulong? index)
     {
-        this.index = index;
+        this._index = index;
         return this;
     }
 
     public List<ulong>? GetRingOutputIndices()
     {
-        return ringOutputIndices;
+        return _ringOutputIndices;
     }
 
     public virtual MoneroOutput SetRingOutputIndices(List<ulong>? ringOutputIndices)
     {
-        this.ringOutputIndices = ringOutputIndices;
+        this._ringOutputIndices = ringOutputIndices;
         return this;
     }
 
     public string? GetStealthPublicKey()
     {
-        return stealthPublicKey;
+        return _stealthPublicKey;
     }
 
     public virtual MoneroOutput SetStealthPublicKey(string? stealthPublicKey)
     {
-        this.stealthPublicKey = stealthPublicKey;
+        this._stealthPublicKey = stealthPublicKey;
         return this;
     }
 

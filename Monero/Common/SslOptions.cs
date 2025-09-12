@@ -2,59 +2,59 @@ namespace Monero.Common;
 
 public class SslOptions
 {
-    private bool allowAnyCert;
-    private List<string>? allowedFingerprints;
-    private string? certificateAuthorityFile;
-    private string? certificatePath;
-    private string? privateKeyPath;
+    private bool _allowAnyCert;
+    private List<string>? _allowedFingerprints;
+    private string? _certificateAuthorityFile;
+    private string? _certificatePath;
+    private string? _privateKeyPath;
 
     public string? GetPrivateKeyPath()
     {
-        return privateKeyPath;
+        return _privateKeyPath;
     }
 
     public void SetPrivateKeyPath(string privateKeyPath)
     {
-        this.privateKeyPath = privateKeyPath;
+        this._privateKeyPath = privateKeyPath;
     }
 
     public string? GetCertificatePath()
     {
-        return certificatePath;
+        return _certificatePath;
     }
 
     public void SetCertificatePath(string certificatePath)
     {
-        this.certificatePath = certificatePath;
+        this._certificatePath = certificatePath;
     }
 
     public string? GetCertificateAuthorityFile()
     {
-        return certificateAuthorityFile;
+        return _certificateAuthorityFile;
     }
 
     public void SetCertificateAuthorityFile(string certificateAuthorityFile)
     {
-        this.certificateAuthorityFile = certificateAuthorityFile;
+        this._certificateAuthorityFile = certificateAuthorityFile;
     }
 
     public List<string>? GetAllowedFingerprints()
     {
-        return allowedFingerprints;
+        return _allowedFingerprints;
     }
 
     public void SetAllowedFingerprints(List<string> allowedFingerprints)
     {
-        this.allowedFingerprints = allowedFingerprints;
+        this._allowedFingerprints = allowedFingerprints;
     }
 
     public bool GetAllowAnyCert()
     {
-        return allowAnyCert;
+        return _allowAnyCert;
     }
 
     public void SetAllowAnyCert(bool allowAnyCert)
     {
-        this.allowAnyCert = allowAnyCert;
+        this._allowAnyCert = allowAnyCert;
     }
 }

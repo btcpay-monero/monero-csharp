@@ -2,9 +2,9 @@ namespace Monero.Common;
 
 public enum MoneroConnectionType
 {
-    INVALID,
-    IPV4,
-    IPV6,
-    TOR,
+    Invalid,
+    Ipv4,
+    Ipv6,
+    Tor,
     I2P
 }

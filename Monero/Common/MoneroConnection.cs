@@ -2,7 +2,7 @@ namespace Monero.Common;
 
 public abstract class MoneroConnection
 {
-    public static readonly ulong DEFAULT_TIMEOUT = 2000;
+    public static readonly ulong DefaultTimeout = 2000;
     protected Dictionary<string, string?> _attributes = [];
     protected bool? _isOnline;
     protected int _priority;

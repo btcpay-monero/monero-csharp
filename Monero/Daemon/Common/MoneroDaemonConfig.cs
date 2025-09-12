@@ -44,7 +44,7 @@ public class MoneroDaemonConfig
     private ulong? maxTxPoolWeight;
 
     // Network type
-    private MoneroNetworkType networkType = MoneroNetworkType.MAINNET;
+    private MoneroNetworkType networkType = MoneroNetworkType.Mainnet;
     private bool? noIgd;
     private bool? nonInteractive;
     private bool? noSync;
@@ -1080,11 +1080,11 @@ public class MoneroDaemonConfig
 
         MoneroNetworkType networkType = GetNetworkType();
 
-        if (networkType == MoneroNetworkType.TESTNET)
+        if (networkType == MoneroNetworkType.Testnet)
         {
             cmd.Add("--testnet");
         }
-        else if (networkType == MoneroNetworkType.STAGENET)
+        else if (networkType == MoneroNetworkType.Stagenet)
         {
             cmd.Add("--stagenet");
         }

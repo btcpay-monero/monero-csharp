@@ -2782,7 +2782,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
             tx.SetIsRelayed(relay);
             tx.SetIsMinerTx(false);
             tx.SetIsFailed(false);
-            tx.SetRingSize(MoneroUtils.RING_SIZE);
+            tx.SetRingSize(MoneroUtils.RingSize);
             MoneroOutgoingTransfer? transfer = tx.GetOutgoingTransfer();
             transfer.SetAccountIndex(config.GetAccountIndex());
             if (config.GetSubaddressIndices().Count == 1)
@@ -3002,7 +3002,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         tx.SetIsMinerTx(false);
         tx.SetIsFailed(false);
         tx.SetIsLocked(true);
-        tx.SetRingSize(MoneroUtils.RING_SIZE);
+        tx.SetRingSize(MoneroUtils.RingSize);
         MoneroOutgoingTransfer transfer = new MoneroOutgoingTransfer().SetTx(tx);
         if (config.GetSubaddressIndices() != null && config.GetSubaddressIndices().Count == 1)
         {
@@ -3394,7 +3394,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
             }
             else if (key.Equals("payment_id"))
             {
-                if (!"".Equals(val) && !MoneroTxWallet.DEFAULT_PAYMENT_ID.Equals(val))
+                if (!"".Equals(val) && !MoneroTxWallet.DefaultPaymentId.Equals(val))
                 {
                     tx.SetPaymentId((string)val); // default is undefined
                 }

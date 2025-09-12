@@ -257,7 +257,7 @@ public class TestMoneroConnectionManager
             Assert.False(connectionManager.IsConnected());
             Assert.True(++numExpectedChanges == listener.ChangedConnections.Count);
             connectionManager.StartPolling((ulong)TestUtils.SYNC_PERIOD_IN_MS, null, null,
-                MoneroConnectionManager.PollType.CURRENT);
+                MoneroConnectionManager.PollType.Current);
             Thread.Sleep(TestUtils.AUTO_CONNECT_TIMEOUT_MS);
             Assert.True(connectionManager.IsConnected());
             Assert.True(++numExpectedChanges == listener.ChangedConnections.Count);
@@ -266,7 +266,7 @@ public class TestMoneroConnectionManager
             connectionManager.SetConnection(null);
             Assert.True(++numExpectedChanges == listener.ChangedConnections.Count);
             connectionManager.StartPolling((ulong)TestUtils.SYNC_PERIOD_IN_MS, null, null,
-                MoneroConnectionManager.PollType.ALL);
+                MoneroConnectionManager.PollType.All);
             Thread.Sleep(TestUtils.AUTO_CONNECT_TIMEOUT_MS);
             Assert.True(connectionManager.IsConnected());
             Assert.True(++numExpectedChanges == listener.ChangedConnections.Count);

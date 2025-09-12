@@ -14,7 +14,7 @@ public class TestMoneroUtils
         string subaddress =
             "7B9w2xieXjhDumgPX39h1CAYELpsZ7Pe8Wqtr3pVL9jJ5gGDqgxjWt55gTYUCAuhahhM85ajEp6VbQfLDPETt4oT2ZRXa6n";
         string paymentId = "03284e41c342f036";
-        MoneroNetworkType networkType = MoneroNetworkType.STAGENET;
+        MoneroNetworkType networkType = MoneroNetworkType.Stagenet;
 
         // get integrated address with randomly generated payment id
         MoneroIntegratedAddress integratedAddress = MoneroUtils.GetIntegratedAddress(networkType, primaryAddress);

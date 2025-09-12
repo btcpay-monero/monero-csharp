@@ -4,9 +4,9 @@ public class MoneroKeyImage
 {
     public enum SpentStatus
     {
-        NOT_SPENT,
-        CONFIRMED,
-        TX_POOL
+        NotSpent,
+        Confirmed,
+        TxPool
     }
 
     private string? _hex;
@@ -33,17 +33,17 @@ public class MoneroKeyImage
     {
         if (status == 1)
         {
-            return SpentStatus.NOT_SPENT;
+            return SpentStatus.NotSpent;
         }
 
         if (status == 2)
         {
-            return SpentStatus.CONFIRMED;
+            return SpentStatus.Confirmed;
         }
 
         if (status == 3)
         {
-            return SpentStatus.TX_POOL;
+            return SpentStatus.TxPool;
         }
 
         throw new MoneroError("Invalid integer value for spent status: " + status);

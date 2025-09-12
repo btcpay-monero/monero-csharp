@@ -11,20 +11,20 @@ namespace Monero.Common;
 
 public static class MoneroUtils
 {
-    private const int FULL_BLOCK_SIZE = 8;
-    private const int FULL_ENCODED_BLOCK_SIZE = 11;
-    private static readonly ulong XMR_AU_MULTIPLIER = 1000000000000;
+    private const int FullBlockSize = 8;
+    private const int FullEncodedBlockSize = 11;
+    private static readonly ulong XmrAuMultiplier = 1000000000000;
 
-    public static readonly uint RING_SIZE = 16;
-    private static int LOG_LEVEL;
-    private static readonly ulong AU_PER_XMR = 1000000000000;
-    private static readonly int NUM_MNEMONIC_WORDS = 25;
-    private static readonly int VIEW_KEY_LENGTH = 64;
-    private static readonly string ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-    private static readonly char[] CHARS = ALPHABET.ToCharArray();
-    private static readonly int ALPHABET_SIZE = ALPHABET.Length;
+    public static readonly uint RingSize = 16;
+    private static int s_logLevel;
+    private static readonly ulong AuPerXmr = 1000000000000;
+    private static readonly int NumMnemonicWords = 25;
+    private static readonly int ViewKeyLength = 64;
+    private static readonly string Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    private static readonly char[] Chars = Alphabet.ToCharArray();
+    private static readonly int AlphabetSize = Alphabet.Length;
 
-    private static readonly Dictionary<int, int> ENCODED_BLOCK_SIZE = new()
+    private static readonly Dictionary<int, int> EncodedBlockSize = new()
     {
         { 0, 0 },
         { 2, 1 },
@@ -37,10 +37,10 @@ public static class MoneroUtils
         { 11, 8 }
     };
 
-    private static readonly ulong UINT64_MAX = ulong.MaxValue;
+    private static readonly ulong Uint64Max = ulong.MaxValue;
 
-    private static readonly Regex STANDARD_ADDRESS_PATTERN = new("^[" + ALPHABET + "]{95}$", RegexOptions.Compiled);
-    private static readonly Regex INTEGRATED_ADDRESS_PATTERN = new("^[" + ALPHABET + "]{106}$", RegexOptions.Compiled);
+    private static readonly Regex StandardAddressPattern = new("^[" + Alphabet + "]{95}$", RegexOptions.Compiled);
+    private static readonly Regex IntegratedAddressPattern = new("^[" + Alphabet + "]{106}$", RegexOptions.Compiled);
 
     public static string GetVersion()
     {
@@ -90,9 +90,9 @@ public static class MoneroUtils
         }
 
         string[] words = mnemonic.Split(" ");
-        if (words.Length != NUM_MNEMONIC_WORDS)
+        if (words.Length != NumMnemonicWords)
         {
-            throw new MoneroError("Mnemonic phrase is " + words.Length + " words but must be " + NUM_MNEMONIC_WORDS);
+            throw new MoneroError("Mnemonic phrase is " + words.Length + " words but must be " + NumMnemonicWords);
         }
     }
 
@@ -103,9 +103,9 @@ public static class MoneroUtils
             throw new MoneroError("View key is null");
         }
 
-        if (viewKey.Length != VIEW_KEY_LENGTH)
+        if (viewKey.Length != ViewKeyLength)
         {
-            throw new MoneroError("View key is " + viewKey.Length + " characters but must be " + VIEW_KEY_LENGTH);
+            throw new MoneroError("View key is " + viewKey.Length + " characters but must be " + ViewKeyLength);
         }
     }
 
@@ -290,7 +290,7 @@ public static class MoneroUtils
     {
         foreach (char c in standardAddress)
         {
-            if (!CHARS.Contains(c))
+            if (!Chars.Contains(c))
             {
                 throw new MoneroError("Invalid Base58 " + standardAddress);
             }
@@ -317,13 +317,13 @@ public static class MoneroUtils
             throw new MoneroError("Log level must be an integer >= 0");
         }
 
-        if (LOG_LEVEL >= level)
+        if (s_logLevel >= level)
         {
             Console.WriteLine(message);
         }
     }
 
-    public static int GetLogLevel() { return LOG_LEVEL; }
+    public static int GetLogLevel() { return s_logLevel; }
 
     public static void SetLogLevel(int level)
     {
@@ -332,19 +332,19 @@ public static class MoneroUtils
             throw new MoneroError("Log level must be an integer >= 0");
         }
 
-        LOG_LEVEL = level;
+        s_logLevel = level;
     }
 
     public static ulong XmrToAtomicUnits(double amountXmr)
     {
-        decimal precise = Math.Round((decimal)amountXmr * XMR_AU_MULTIPLIER, 0, MidpointRounding.AwayFromZero);
+        decimal precise = Math.Round((decimal)amountXmr * XmrAuMultiplier, 0, MidpointRounding.AwayFromZero);
         return (ulong)new BigInteger(precise);
     }
 
     public static double AtomicUnitsToXmr(ulong amountAtomicUnits)
     {
         decimal atomicDecimal = amountAtomicUnits;
-        decimal result = atomicDecimal / XMR_AU_MULTIPLIER;
+        decimal result = atomicDecimal / XmrAuMultiplier;
 
         return Math.Round((double)result, 12, MidpointRounding.AwayFromZero);
     }
@@ -358,9 +358,9 @@ public static class MoneroUtils
 
         // determine if address has integrated address pattern
         bool isIntegrated = false;
-        if (!STANDARD_ADDRESS_PATTERN.IsMatch(address))
+        if (!StandardAddressPattern.IsMatch(address))
         {
-            if (INTEGRATED_ADDRESS_PATTERN.IsMatch(address))
+            if (IntegratedAddressPattern.IsMatch(address))
             {
                 isIntegrated = true;
             }
@@ -394,7 +394,7 @@ public static class MoneroUtils
                     throw new MoneroError("Address has primary address code but integrated address pattern");
                 }
 
-                addressType = MoneroAddressType.PRIMARY_ADDRESS;
+                addressType = MoneroAddressType.PrimaryAddress;
                 networkType = aNetworkType;
                 break;
             }
@@ -406,7 +406,7 @@ public static class MoneroUtils
                     throw new MoneroError("Address has integrated address code but non-integrated address pattern");
                 }
 
-                addressType = MoneroAddressType.INTEGRATED_ADDRESS;
+                addressType = MoneroAddressType.IntegratedAddress;
                 networkType = aNetworkType;
                 break;
             }
@@ -418,7 +418,7 @@ public static class MoneroUtils
                     throw new MoneroError("Address has subaddress code but integrated address pattern");
                 }
 
-                addressType = MoneroAddressType.SUBADDRESS;
+                addressType = MoneroAddressType.Subaddress;
                 networkType = aNetworkType;
                 break;
             }
@@ -496,28 +496,28 @@ public static class MoneroUtils
             bin[i] = address[i];
         }
 
-        int fullBlockCount = (int)Math.Floor((float)bin.Length / FULL_ENCODED_BLOCK_SIZE);
-        int lastBlockSize = bin.Length % FULL_ENCODED_BLOCK_SIZE;
-        int lastBlockDecodedSize = ENCODED_BLOCK_SIZE[lastBlockSize];
+        int fullBlockCount = (int)Math.Floor((float)bin.Length / FullEncodedBlockSize);
+        int lastBlockSize = bin.Length % FullEncodedBlockSize;
+        int lastBlockDecodedSize = EncodedBlockSize[lastBlockSize];
         if (lastBlockDecodedSize < 0)
         {
             throw new ArgumentException("Invalid encoded length");
         }
 
-        int dataSize = (fullBlockCount * FULL_BLOCK_SIZE) + lastBlockDecodedSize;
+        int dataSize = (fullBlockCount * FullBlockSize) + lastBlockDecodedSize;
         int[] data = new int[dataSize];
         for (int i = 0; i < fullBlockCount; i++)
         {
             data = DecodeBlock(
-                GenUtils.Subarray(bin, i * FULL_ENCODED_BLOCK_SIZE,
-                    (i * FULL_ENCODED_BLOCK_SIZE) + FULL_ENCODED_BLOCK_SIZE), data, i * FULL_BLOCK_SIZE);
+                GenUtils.Subarray(bin, i * FullEncodedBlockSize,
+                    (i * FullEncodedBlockSize) + FullEncodedBlockSize), data, i * FullBlockSize);
         }
 
         if (lastBlockSize > 0)
         {
-            int[]? subarray = GenUtils.Subarray(bin, fullBlockCount * FULL_ENCODED_BLOCK_SIZE,
-                (fullBlockCount * FULL_ENCODED_BLOCK_SIZE) + FULL_BLOCK_SIZE);
-            data = DecodeBlock(subarray, data, fullBlockCount * FULL_BLOCK_SIZE);
+            int[]? subarray = GenUtils.Subarray(bin, fullBlockCount * FullEncodedBlockSize,
+                (fullBlockCount * FullEncodedBlockSize) + FullBlockSize);
+            data = DecodeBlock(subarray, data, fullBlockCount * FullBlockSize);
         }
 
         return BinToHex(data);
@@ -525,12 +525,12 @@ public static class MoneroUtils
 
     private static int[] DecodeBlock(int[] data, int[] buf, int index)
     {
-        if (data.Length < 1 || data.Length > FULL_ENCODED_BLOCK_SIZE)
+        if (data.Length < 1 || data.Length > FullEncodedBlockSize)
         {
             throw new MoneroError("Invalid block length: " + data.Length);
         }
 
-        int resSize = ENCODED_BLOCK_SIZE[data.Length];
+        int resSize = EncodedBlockSize[data.Length];
         if (resSize <= 0)
         {
             throw new MoneroError("Invalid block size");
@@ -540,7 +540,7 @@ public static class MoneroUtils
         BigInteger order = 1;
         for (int i = data.Length - 1; i >= 0; i--)
         {
-            int digit = ALPHABET.IndexOf((char)data[i]);
+            int digit = Alphabet.IndexOf((char)data[i]);
             if (digit < 0)
             {
                 throw new MoneroError("Invalid symbol");
@@ -548,21 +548,21 @@ public static class MoneroUtils
 
             BigInteger product = (order * digit) + resNum;
             // if product > UINT64_MAX
-            if (product.CompareTo(UINT64_MAX) > 0)
+            if (product.CompareTo(Uint64Max) > 0)
             {
                 throw new MoneroError("Overflow");
             }
 
             resNum = product;
-            order = order * ALPHABET_SIZE;
+            order = order * AlphabetSize;
         }
 
-        if (resSize < FULL_BLOCK_SIZE && BigInteger.Pow(2, 8 * resSize).CompareTo(resNum) <= 0)
+        if (resSize < FullBlockSize && BigInteger.Pow(2, 8 * resSize).CompareTo(resNum) <= 0)
         {
             throw new MoneroError("Overflow 2");
         }
 
-        int[] tmpBuf = Uint64To8be(resNum, resSize);
+        int[] tmpBuf = Uint64To8Be(resNum, resSize);
         for (int j = 0; j < tmpBuf.Length; j++)
         {
             buf[j + index] = tmpBuf[j];
@@ -571,7 +571,7 @@ public static class MoneroUtils
         return buf;
     }
 
-    private static int[] Uint64To8be(BigInteger num, int size)
+    private static int[] Uint64To8Be(BigInteger num, int size)
     {
         int[] res = new int[size];
         if (size < 1 || size > 8)

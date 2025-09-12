@@ -2226,19 +2226,19 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
                 int rpcType = Convert.ToInt32(val);
                 if (rpcType == 0)
                 {
-                    peer.SetConnectionType(MoneroConnectionType.INVALID);
+                    peer.SetConnectionType(MoneroConnectionType.Invalid);
                 }
                 else if (rpcType == 1)
                 {
-                    peer.SetConnectionType(MoneroConnectionType.IPV4);
+                    peer.SetConnectionType(MoneroConnectionType.Ipv4);
                 }
                 else if (rpcType == 2)
                 {
-                    peer.SetConnectionType(MoneroConnectionType.IPV6);
+                    peer.SetConnectionType(MoneroConnectionType.Ipv6);
                 }
                 else if (rpcType == 3)
                 {
-                    peer.SetConnectionType(MoneroConnectionType.TOR);
+                    peer.SetConnectionType(MoneroConnectionType.Tor);
                 }
                 else if (rpcType == 4)
                 {
@@ -2431,21 +2431,21 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 if ((bool)val)
                 {
-                    info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.MAINNET));
+                    info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.Mainnet));
                 }
             }
             else if (key.Equals("testnet"))
             {
                 if ((bool)val)
                 {
-                    info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.TESTNET));
+                    info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.Testnet));
                 }
             }
             else if (key.Equals("stagenet"))
             {
                 if ((bool)val)
                 {
-                    info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.STAGENET));
+                    info.SetNetworkType(GenUtils.Reconcile(info.GetNetworkType(), MoneroNetworkType.Stagenet));
                 }
             }
             else if (key.Equals("credits"))

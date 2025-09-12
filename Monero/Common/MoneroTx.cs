@@ -2,45 +2,45 @@ namespace Monero.Common;
 
 public class MoneroTx
 {
-    public static readonly string DEFAULT_PAYMENT_ID = "0000000000000000";
+    public static readonly string DefaultPaymentId = "0000000000000000";
 
-    private MoneroBlock? block;
-    private byte[]? extra; // TODO: switch to string for consistency with MoneroTxWallet?
-    private ulong? fee;
-    private string? fullHex;
-    private string? hash;
-    private List<MoneroOutput>? inputs;
-    private bool? inTxPool;
-    private bool? isConfirmed;
-    private bool? isDoubleSpendSeen;
-    private bool? isFailed;
-    private bool? isKeptByBlock;
-    private bool? isMinerTx;
-    private bool? isRelayed;
-    private string? key;
-    private string? lastFailedHash;
-    private ulong? lastFailedHeight;
-    private ulong? lastRelayedTimestamp;
-    private string? maxUsedBlockHash;
-    private ulong? maxUsedBlockHeight;
-    private string? metadata;
-    private ulong? numConfirmations;
-    private List<ulong>? outputIndices;
-    private List<MoneroOutput>? outputs;
-    private string? paymentId;
-    private string? prunableHash;
-    private string? prunableHex;
-    private string? prunedHex;
-    private object? rctSignatures; // TODO: implement
-    private object? rctSigPrunable; // TODO: implement
-    private ulong? receivedTimestamp;
-    private bool? relay;
-    private uint? ringSize;
-    private List<string>? signatures;
-    private ulong? size;
-    private ulong? unlockTime;
-    private uint? version;
-    private ulong? weight;
+    private MoneroBlock? _block;
+    private byte[]? _extra; // TODO: switch to string for consistency with MoneroTxWallet?
+    private ulong? _fee;
+    private string? _fullHex;
+    private string? _hash;
+    private List<MoneroOutput>? _inputs;
+    private bool? _inTxPool;
+    private bool? _isConfirmed;
+    private bool? _isDoubleSpendSeen;
+    private bool? _isFailed;
+    private bool? _isKeptByBlock;
+    private bool? _isMinerTx;
+    private bool? _isRelayed;
+    private string? _key;
+    private string? _lastFailedHash;
+    private ulong? _lastFailedHeight;
+    private ulong? _lastRelayedTimestamp;
+    private string? _maxUsedBlockHash;
+    private ulong? _maxUsedBlockHeight;
+    private string? _metadata;
+    private ulong? _numConfirmations;
+    private List<ulong>? _outputIndices;
+    private List<MoneroOutput>? _outputs;
+    private string? _paymentId;
+    private string? _prunableHash;
+    private string? _prunableHex;
+    private string? _prunedHex;
+    private object? _rctSignatures; // TODO: implement
+    private object? _rctSigPrunable; // TODO: implement
+    private ulong? _receivedTimestamp;
+    private bool? _relay;
+    private uint? _ringSize;
+    private List<string>? _signatures;
+    private ulong? _size;
+    private ulong? _unlockTime;
+    private uint? _version;
+    private ulong? _weight;
 
     public MoneroTx()
     {
@@ -49,68 +49,68 @@ public class MoneroTx
 
     public MoneroTx(MoneroTx tx)
     {
-        hash = tx.hash;
-        version = tx.version;
-        isMinerTx = tx.isMinerTx;
-        paymentId = tx.paymentId;
-        fee = tx.fee;
-        ringSize = tx.ringSize;
-        relay = tx.relay;
-        isRelayed = tx.isRelayed;
-        isConfirmed = tx.isConfirmed;
-        inTxPool = tx.inTxPool;
-        numConfirmations = tx.numConfirmations;
-        unlockTime = tx.unlockTime;
-        lastRelayedTimestamp = tx.lastRelayedTimestamp;
-        receivedTimestamp = tx.receivedTimestamp;
-        isDoubleSpendSeen = tx.isDoubleSpendSeen;
-        key = tx.key;
-        fullHex = tx.fullHex;
-        prunedHex = tx.prunedHex;
-        prunableHex = tx.prunableHex;
-        prunableHash = tx.prunableHash;
-        size = tx.size;
-        weight = tx.weight;
-        if (tx.inputs != null)
+        _hash = tx._hash;
+        _version = tx._version;
+        _isMinerTx = tx._isMinerTx;
+        _paymentId = tx._paymentId;
+        _fee = tx._fee;
+        _ringSize = tx._ringSize;
+        _relay = tx._relay;
+        _isRelayed = tx._isRelayed;
+        _isConfirmed = tx._isConfirmed;
+        _inTxPool = tx._inTxPool;
+        _numConfirmations = tx._numConfirmations;
+        _unlockTime = tx._unlockTime;
+        _lastRelayedTimestamp = tx._lastRelayedTimestamp;
+        _receivedTimestamp = tx._receivedTimestamp;
+        _isDoubleSpendSeen = tx._isDoubleSpendSeen;
+        _key = tx._key;
+        _fullHex = tx._fullHex;
+        _prunedHex = tx._prunedHex;
+        _prunableHex = tx._prunableHex;
+        _prunableHash = tx._prunableHash;
+        _size = tx._size;
+        _weight = tx._weight;
+        if (tx._inputs != null)
         {
-            inputs = [];
-            foreach (MoneroOutput input in tx.inputs)
+            _inputs = [];
+            foreach (MoneroOutput input in tx._inputs)
             {
-                inputs.Add(input.Clone().SetTx(this));
+                _inputs.Add(input.Clone().SetTx(this));
             }
         }
 
-        if (tx.outputs != null)
+        if (tx._outputs != null)
         {
-            outputs = [];
-            foreach (MoneroOutput output in tx.outputs)
+            _outputs = [];
+            foreach (MoneroOutput output in tx._outputs)
             {
-                outputs.Add(output.Clone().SetTx(this));
+                _outputs.Add(output.Clone().SetTx(this));
             }
         }
 
-        if (tx.outputIndices != null)
+        if (tx._outputIndices != null)
         {
-            outputIndices = new List<ulong>(tx.outputIndices);
+            _outputIndices = new List<ulong>(tx._outputIndices);
         }
 
-        metadata = tx.metadata;
-        if (tx.extra != null)
+        _metadata = tx._metadata;
+        if (tx._extra != null)
         {
-            extra = tx.extra;
+            _extra = tx._extra;
         }
 
-        rctSignatures = tx.rctSignatures;
-        rctSigPrunable = tx.rctSigPrunable;
-        isKeptByBlock = tx.isKeptByBlock;
-        isFailed = tx.isFailed;
-        lastFailedHeight = tx.lastFailedHeight;
-        lastFailedHash = tx.lastFailedHash;
-        maxUsedBlockHeight = tx.maxUsedBlockHeight;
-        maxUsedBlockHash = tx.maxUsedBlockHash;
-        if (tx.signatures != null)
+        _rctSignatures = tx._rctSignatures;
+        _rctSigPrunable = tx._rctSigPrunable;
+        _isKeptByBlock = tx._isKeptByBlock;
+        _isFailed = tx._isFailed;
+        _lastFailedHeight = tx._lastFailedHeight;
+        _lastFailedHash = tx._lastFailedHash;
+        _maxUsedBlockHeight = tx._maxUsedBlockHeight;
+        _maxUsedBlockHash = tx._maxUsedBlockHash;
+        if (tx._signatures != null)
         {
-            signatures = new List<string>(tx.signatures);
+            _signatures = new List<string>(tx._signatures);
         }
     }
 
@@ -121,12 +121,12 @@ public class MoneroTx
 
     public MoneroBlock? GetBlock()
     {
-        return block;
+        return _block;
     }
 
     public virtual MoneroTx SetBlock(MoneroBlock? block)
     {
-        this.block = block;
+        this._block = block;
         return this;
     }
 
@@ -137,397 +137,397 @@ public class MoneroTx
 
     public virtual string? GetHash()
     {
-        return hash;
+        return _hash;
     }
 
     public virtual MoneroTx SetHash(string? hash)
     {
-        this.hash = hash;
+        this._hash = hash;
         return this;
     }
 
     public virtual uint? GetVersion()
     {
-        return version;
+        return _version;
     }
 
     public virtual MoneroTx SetVersion(uint? version)
     {
-        this.version = version;
+        this._version = version;
         return this;
     }
 
     public bool? IsMinerTx()
     {
-        return isMinerTx;
+        return _isMinerTx;
     }
 
-    public virtual MoneroTx SetIsMinerTx(bool? IsMinerTx)
+    public virtual MoneroTx SetIsMinerTx(bool? isMinerTx)
     {
-        isMinerTx = IsMinerTx;
+        _isMinerTx = isMinerTx;
         return this;
     }
 
     public string? GetPaymentId()
     {
-        return paymentId;
+        return _paymentId;
     }
 
     public virtual MoneroTx SetPaymentId(string? paymentId)
     {
-        this.paymentId = paymentId;
+        this._paymentId = paymentId;
         return this;
     }
 
     public ulong? GetFee()
     {
-        return fee;
+        return _fee;
     }
 
     public virtual MoneroTx SetFee(ulong? fee)
     {
-        this.fee = fee;
+        this._fee = fee;
         return this;
     }
 
     public uint? GetRingSize()
     {
-        return ringSize;
+        return _ringSize;
     }
 
     public virtual MoneroTx SetRingSize(uint? ringSize)
     {
-        this.ringSize = ringSize;
+        this._ringSize = ringSize;
         return this;
     }
 
     public bool? GetRelay()
     {
-        return relay;
+        return _relay;
     }
 
     public virtual MoneroTx SetRelay(bool? relay)
     {
-        this.relay = relay;
+        this._relay = relay;
         return this;
     }
 
     public bool? IsRelayed()
     {
-        return isRelayed;
+        return _isRelayed;
     }
 
-    public virtual MoneroTx SetIsRelayed(bool? IsRelayed)
+    public virtual MoneroTx SetIsRelayed(bool? isRelayed)
     {
-        isRelayed = IsRelayed;
+        _isRelayed = isRelayed;
         return this;
     }
 
     public bool? IsConfirmed()
     {
-        return isConfirmed;
+        return _isConfirmed;
     }
 
-    public virtual MoneroTx SetIsConfirmed(bool? IsConfirmed)
+    public virtual MoneroTx SetIsConfirmed(bool? isConfirmed)
     {
-        isConfirmed = IsConfirmed;
+        _isConfirmed = isConfirmed;
         return this;
     }
 
     public bool? InTxPool()
     {
-        return inTxPool;
+        return _inTxPool;
     }
 
     public virtual MoneroTx SetInTxPool(bool? inTxPool)
     {
-        this.inTxPool = inTxPool;
+        this._inTxPool = inTxPool;
         return this;
     }
 
     public ulong? GetNumConfirmations()
     {
-        return numConfirmations;
+        return _numConfirmations;
     }
 
     public virtual MoneroTx SetNumConfirmations(ulong? numConfirmations)
     {
-        this.numConfirmations = numConfirmations;
+        this._numConfirmations = numConfirmations;
         return this;
     }
 
     public ulong? GetUnlockTime()
     {
-        return unlockTime;
+        return _unlockTime;
     }
 
     public virtual MoneroTx SetUnlockTime(ulong? unlockTime)
     {
-        this.unlockTime = unlockTime;
+        this._unlockTime = unlockTime;
         return this;
     }
 
     public ulong? GetLastRelayedTimestamp()
     {
-        return lastRelayedTimestamp;
+        return _lastRelayedTimestamp;
     }
 
     public virtual MoneroTx SetLastRelayedTimestamp(ulong? lastRelayedTimestamp)
     {
-        this.lastRelayedTimestamp = lastRelayedTimestamp;
+        this._lastRelayedTimestamp = lastRelayedTimestamp;
         return this;
     }
 
     public ulong? GetReceivedTimestamp()
     {
-        return receivedTimestamp;
+        return _receivedTimestamp;
     }
 
     public virtual MoneroTx SetReceivedTimestamp(ulong? receivedTimestamp)
     {
-        this.receivedTimestamp = receivedTimestamp;
+        this._receivedTimestamp = receivedTimestamp;
         return this;
     }
 
     public bool? IsDoubleSpendSeen()
     {
-        return isDoubleSpendSeen;
+        return _isDoubleSpendSeen;
     }
 
-    public virtual MoneroTx SetIsDoubleSpendSeen(bool? IsDoubleSpend)
+    public virtual MoneroTx SetIsDoubleSpendSeen(bool? isDoubleSpend)
     {
-        isDoubleSpendSeen = IsDoubleSpend;
+        _isDoubleSpendSeen = isDoubleSpend;
         return this;
     }
 
     public string? GetKey()
     {
-        return key;
+        return _key;
     }
 
     public virtual MoneroTx SetKey(string? key)
     {
-        this.key = key;
+        this._key = key;
         return this;
     }
 
     public string? GetFullHex()
     {
-        return fullHex;
+        return _fullHex;
     }
 
     public virtual MoneroTx SetFullHex(string? fullHex)
     {
-        this.fullHex = fullHex;
+        this._fullHex = fullHex;
         return this;
     }
 
     public string? GetPrunedHex()
     {
-        return prunedHex;
+        return _prunedHex;
     }
 
     public virtual MoneroTx SetPrunedHex(string? prunedHex)
     {
-        this.prunedHex = prunedHex;
+        this._prunedHex = prunedHex;
         return this;
     }
 
     public string? GetPrunableHex()
     {
-        return prunableHex;
+        return _prunableHex;
     }
 
     public virtual MoneroTx SetPrunableHex(string? prunableHex)
     {
-        this.prunableHex = prunableHex;
+        this._prunableHex = prunableHex;
         return this;
     }
 
     public string? GetPrunableHash()
     {
-        return prunableHash;
+        return _prunableHash;
     }
 
     public virtual MoneroTx SetPrunableHash(string? prunableHash)
     {
-        this.prunableHash = prunableHash;
+        this._prunableHash = prunableHash;
         return this;
     }
 
     public ulong? GetSize()
     {
-        return size;
+        return _size;
     }
 
     public virtual MoneroTx SetSize(ulong? size)
     {
-        this.size = size;
+        this._size = size;
         return this;
     }
 
     public ulong? GetWeight()
     {
-        return weight;
+        return _weight;
     }
 
     public virtual MoneroTx SetWeight(ulong? weight)
     {
-        this.weight = weight;
+        this._weight = weight;
         return this;
     }
 
     public List<MoneroOutput>? GetInputs()
     {
-        return inputs;
+        return _inputs;
     }
 
     public virtual MoneroTx SetInputs(List<MoneroOutput>? inputs)
     {
-        this.inputs = inputs;
+        this._inputs = inputs;
         return this;
     }
 
     public List<MoneroOutput>? GetOutputs()
     {
-        return outputs;
+        return _outputs;
     }
 
     public virtual MoneroTx SetOutputs(List<MoneroOutput>? outputs)
     {
-        this.outputs = outputs;
+        this._outputs = outputs;
         return this;
     }
 
     public List<ulong>? GetOutputIndices()
     {
-        return outputIndices;
+        return _outputIndices;
     }
 
     public virtual MoneroTx SetOutputIndices(List<ulong>? outputIndices)
     {
-        this.outputIndices = outputIndices;
+        this._outputIndices = outputIndices;
         return this;
     }
 
     public string? GetMetadata()
     {
-        return metadata;
+        return _metadata;
     }
 
     public virtual MoneroTx SetMetadata(string? metadata)
     {
-        this.metadata = metadata;
+        this._metadata = metadata;
         return this;
     }
 
     public byte[]? GetExtra()
     {
-        return extra;
+        return _extra;
     }
 
     public virtual MoneroTx SetExtra(byte[]? extra)
     {
-        this.extra = extra;
+        this._extra = extra;
         return this;
     }
 
     public object? GetRctSignatures()
     {
-        return rctSignatures;
+        return _rctSignatures;
     }
 
     public virtual MoneroTx SetRctSignatures(object? rctSignatures)
     {
-        this.rctSignatures = rctSignatures;
+        this._rctSignatures = rctSignatures;
         return this;
     }
 
     public object? GetRctSigPrunable()
     {
-        return rctSigPrunable;
+        return _rctSigPrunable;
     }
 
     public virtual MoneroTx SetRctSigPrunable(object? rctSigPrunable)
     {
-        this.rctSigPrunable = rctSigPrunable;
+        this._rctSigPrunable = rctSigPrunable;
         return this;
     }
 
     public bool? IsKeptByBlock()
     {
-        return isKeptByBlock;
+        return _isKeptByBlock;
     }
 
-    public virtual MoneroTx SetIsKeptByBlock(bool? IsKeptByBlock)
+    public virtual MoneroTx SetIsKeptByBlock(bool? isKeptByBlock)
     {
-        isKeptByBlock = IsKeptByBlock;
+        _isKeptByBlock = isKeptByBlock;
         return this;
     }
 
     public bool? IsFailed()
     {
-        return isFailed;
+        return _isFailed;
     }
 
-    public virtual MoneroTx SetIsFailed(bool? IsFailed)
+    public virtual MoneroTx SetIsFailed(bool? isFailed)
     {
-        isFailed = IsFailed;
+        _isFailed = isFailed;
         return this;
     }
 
     public ulong? GetLastFailedHeight()
     {
-        return lastFailedHeight;
+        return _lastFailedHeight;
     }
 
     public virtual MoneroTx SetLastFailedHeight(ulong? lastFailedHeight)
     {
-        this.lastFailedHeight = lastFailedHeight;
+        this._lastFailedHeight = lastFailedHeight;
         return this;
     }
 
     public string? GetLastFailedHash()
     {
-        return lastFailedHash;
+        return _lastFailedHash;
     }
 
     public virtual MoneroTx SetLastFailedHash(string? lastFailedHash)
     {
-        this.lastFailedHash = lastFailedHash;
+        this._lastFailedHash = lastFailedHash;
         return this;
     }
 
     public ulong? GetMaxUsedBlockHeight()
     {
-        return maxUsedBlockHeight;
+        return _maxUsedBlockHeight;
     }
 
     public virtual MoneroTx SetMaxUsedBlockHeight(ulong? maxUsedBlockHeight)
     {
-        this.maxUsedBlockHeight = maxUsedBlockHeight;
+        this._maxUsedBlockHeight = maxUsedBlockHeight;
         return this;
     }
 
     public string? GetMaxUsedBlockHash()
     {
-        return maxUsedBlockHash;
+        return _maxUsedBlockHash;
     }
 
     public virtual MoneroTx SetMaxUsedBlockHash(string? maxUsedBlockHash)
     {
-        this.maxUsedBlockHash = maxUsedBlockHash;
+        this._maxUsedBlockHash = maxUsedBlockHash;
         return this;
     }
 
     public List<string>? GetSignatures()
     {
-        return signatures;
+        return _signatures;
     }
 
     public virtual MoneroTx SetSignatures(List<string>? signatures)
     {
-        this.signatures = signatures;
+        this._signatures = signatures;
         return this;
     }
 
