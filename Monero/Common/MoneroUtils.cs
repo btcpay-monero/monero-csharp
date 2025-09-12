@@ -604,7 +604,7 @@ public static class MoneroUtils
         return builder.ToString();
     }
 
-    public static Dictionary<string, object> BinaryBlocksToMap(byte[] blocks)
+    public static Dictionary<string, object?> BinaryBlocksToMap(byte[] blocks)
     {
         throw new NotImplementedException("MoneroUtils.BinaryBlocksToMap(): not implemented");
     }

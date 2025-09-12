@@ -17,7 +17,7 @@ public class MoneroDaemonLws : MoneroDaemonDefault
         throw new NotImplementedException("Not supported by monero-lws");
     }
 
-    public override MoneroDaemonUpdateDownloadResult DownloadUpdate(string path)
+    public override MoneroDaemonUpdateDownloadResult DownloadUpdate(string? path)
     {
         throw new NotImplementedException("Not supported by monero-lws");
     }

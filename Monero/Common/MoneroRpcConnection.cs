@@ -138,7 +138,7 @@ public class MoneroRpcConnection : MoneroConnection
         HandleRpcError(rpcResponse.Error, method, parameters);
     }
 
-    private void ValidateRpcResponse(Dictionary<string, object>? rpcResponse, string method, object? parameters)
+    private void ValidateRpcResponse(Dictionary<string, object?>? rpcResponse, string method, object? parameters)
     {
         if (rpcResponse == null)
         {
@@ -347,16 +347,16 @@ public class MoneroRpcConnection : MoneroConnection
         _printStackTrace = printStackTrace;
     }
 
-    public MoneroJsonRpcResponse<Dictionary<string, object>> SendJsonRequest(string method,
+    public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method,
         Dictionary<string, object?>? parameters = null, ulong timeoutMs = 20000)
     {
-        return SendJsonRequest<Dictionary<string, object>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
+        return SendJsonRequest<Dictionary<string, object?>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
     }
 
-    public MoneroJsonRpcResponse<Dictionary<string, object>> SendJsonRequest(string method, List<string> parameters,
+    public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method, List<string> parameters,
         ulong timeoutMs = 20000)
     {
-        return SendJsonRequest<Dictionary<string, object>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
+        return SendJsonRequest<Dictionary<string, object?>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
     }
 
     public MoneroJsonRpcResponse<string> SendJsonRequest(string method, List<ulong> parameters, ulong timeoutMs = 20000)
@@ -386,7 +386,7 @@ public class MoneroRpcConnection : MoneroConnection
         }
     }
 
-    public Dictionary<string, object> SendPathRequest(string path, Dictionary<string, object?>? parameters = null,
+    public Dictionary<string, object?> SendPathRequest(string path, Dictionary<string, object?>? parameters = null,
         ulong? timeoutMs = null)
     {
         if (_httpClient == null)
@@ -396,7 +396,7 @@ public class MoneroRpcConnection : MoneroConnection
 
         try
         {
-            Dictionary<string, object>? respMap = SendRequest<Dictionary<string, object>>(path, parameters, timeoutMs);
+            Dictionary<string, object?>? respMap = SendRequest<Dictionary<string, object?>>(path, parameters, timeoutMs);
 
             ValidateRpcResponse(respMap, path, parameters);
             return respMap!;

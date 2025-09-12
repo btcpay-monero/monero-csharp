@@ -4,7 +4,7 @@ namespace Monero.Daemon.Common;
 
 public class MoneroDaemonConfig
 {
-    private readonly string? path;
+    private string? path;
     private bool? allowLocalIp;
     private string? banList;
     private int? blockSyncSize;
@@ -105,6 +105,17 @@ public class MoneroDaemonConfig
     private string? zmqPub;
     private string? zmqRpcBindIp;
     private int? zmqRpcBindPort;
+
+    public MoneroDaemonConfig SetPath(string? path)
+    {
+        this.path = path;
+        return this;
+    }
+
+    public string? GetPath()
+    {
+        return path;
+    }
 
     public MoneroDaemonConfig SetNetworkType(MoneroNetworkType networkType)
     {
@@ -381,7 +392,7 @@ public class MoneroDaemonConfig
         return seedNode;
     }
 
-    public MoneroDaemonConfig SetPeers(List<string>? peers)
+    public MoneroDaemonConfig SetPeers(List<string> peers)
     {
         this.peers = peers;
         return this;
@@ -410,7 +421,7 @@ public class MoneroDaemonConfig
         return this;
     }
 
-    public MoneroDaemonConfig SetPriorityNodes(List<string>? priorityNodes)
+    public MoneroDaemonConfig SetPriorityNodes(List<string> priorityNodes)
     {
         this.priorityNodes = priorityNodes;
         return this;
@@ -439,7 +450,7 @@ public class MoneroDaemonConfig
         return this;
     }
 
-    public MoneroDaemonConfig SetExclusiveNodes(List<string>? exclusiveNodes)
+    public MoneroDaemonConfig SetExclusiveNodes(List<string> exclusiveNodes)
     {
         this.exclusiveNodes = exclusiveNodes;
         return this;
