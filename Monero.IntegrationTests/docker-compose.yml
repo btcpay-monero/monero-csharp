@@ -6,9 +6,13 @@ services:
       dockerfile: Monero.IntegrationTests/Dockerfile
     depends_on:
       - xmr_wallet
+    extra_hosts:
+      - "tests:127.0.0.1"
+    volumes:
+      - ../coverage:/coverage
 
   node1:
-    image: btcpayserver/monero:0.18.4.1
+    image: btcpayserver/monero:0.18.4.2
     container_name: node1
     command: [
       "monerod",
@@ -38,7 +42,7 @@ services:
       - "18089:18089"
 
   node2:
-    image: btcpayserver/monero:0.18.4.1
+    image: btcpayserver/monero:0.18.4.2
     container_name: node2
     command: [
       "monerod",
@@ -68,7 +72,7 @@ services:
       - node1
 
   xmr_wallet:
-    image: btcpayserver/monero:0.18.4.1
+    image: btcpayserver/monero:0.18.4.2
     container_name: xmr_wallet
     command: monero-wallet-rpc --log-level 2 --allow-mismatched-daemon-version --rpc-bind-ip=0.0.0.0 --disable-rpc-login --confirm-external-bind --rpc-bind-port=18082 --non-interactive --trusted-daemon --daemon-address=node2:18081 --wallet-dir=/wallet --rpc-access-control-origins=* --tx-notify="/bin/sh ./scripts/notifier.sh -k -X GET https://host.docker.internal:14142/monerolikedaemoncallback/tx?cryptoCode=xmr&hash=%s"
     ports:

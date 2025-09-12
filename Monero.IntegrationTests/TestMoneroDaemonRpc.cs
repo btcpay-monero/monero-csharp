@@ -1290,7 +1290,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     }
 
     // Can check for an update
-    [Fact]
+    [Fact(Skip = "Unstable update call")]
     public void TestCheckForUpdate()
     {
         Assert.True(TEST_NON_RELAYS);

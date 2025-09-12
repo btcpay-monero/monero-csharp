@@ -1,4 +1,4 @@
-name: Build
+name: Build and test
 
 on:
   push:
@@ -27,10 +27,12 @@ jobs:
         run: dotnet clean
 
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build -c Release --no-restore
 
       - name: Run unit tests
-        run: dotnet test Monero.UnitTests/Monero.UnitTests.csproj --no-build --logger:trx
+        run: |
+          dotnet tool install --global JetBrains.dotCover.CommandLineTools --version 2025.1.6
+          dotCover cover-dotnet --TargetArguments="test Monero.UnitTests/Monero.UnitTests.csproj -c Release --no-build" --output=coverage/dotCover.UnitTests.output.dcvr
 
       - name: Run integration tests
         run: docker compose -f Monero.IntegrationTests/docker-compose.yml run tests
@@ -38,3 +40,9 @@ jobs:
       - name: Cleanup Docker containers
         if: always()
         run: docker compose -f Monero.IntegrationTests/docker-compose.yml down -v
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/dotcover.xml
