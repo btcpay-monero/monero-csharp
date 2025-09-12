@@ -102,11 +102,11 @@ public class MoneroOutput
         return this;
     }
 
-    public MoneroOutput Merge(MoneroOutput output)
+    public MoneroOutput Merge(MoneroOutput? output)
     {
-        if (!(output is MoneroOutput))
+        if (output == null)
         {
-            throw new MoneroError("Cannot merge outputs of different types");
+            throw new MoneroError("Cannot merge null output");
         }
 
         if (this == output)
@@ -117,7 +117,12 @@ public class MoneroOutput
         // merge txs if they're different which comes back to merging outputs
         if (GetTx() != output.GetTx())
         {
-            GetTx().Merge(output.GetTx());
+            if (GetTx() == null)
+            {
+                throw new MoneroError("Cannot merge from null tx");
+            }
+
+            GetTx()!.Merge(output.GetTx());
         }
 
         // otherwise merge output fields
@@ -129,7 +134,7 @@ public class MoneroOutput
             }
             else if (output.GetKeyImage() != null)
             {
-                GetKeyImage().Merge(output.GetKeyImage());
+                GetKeyImage()!.Merge(output.GetKeyImage());
             }
 
             SetAmount(GenUtils.Reconcile(GetAmount(), output.GetAmount()));

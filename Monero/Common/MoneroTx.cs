@@ -553,7 +553,7 @@ public class MoneroTx
             }
             else if (tx.GetBlock() != null)
             {
-                GetBlock().Merge(tx.GetBlock()); // comes back to merging txs
+                GetBlock()!.Merge(tx.GetBlock()); // comes back to merging txs
                 return this;
             }
         }
@@ -597,7 +597,7 @@ public class MoneroTx
         // merge inputs
         if (tx.GetInputs() != null)
         {
-            foreach (MoneroOutput merger in tx.GetInputs())
+            foreach (MoneroOutput merger in tx.GetInputs()!)
             {
                 bool merged = false;
                 merger.SetTx(this);
@@ -606,9 +606,17 @@ public class MoneroTx
                     SetInputs([]);
                 }
 
-                foreach (MoneroOutput mergee in GetInputs())
+                foreach (MoneroOutput mergee in GetInputs()!)
                 {
-                    if (mergee.GetKeyImage().GetHex().Equals(merger.GetKeyImage().GetHex()))
+                    MoneroKeyImage? mergeeKeyImage = mergee.GetKeyImage();
+                    MoneroKeyImage? mergerKeyImage = merger.GetKeyImage();
+
+                    if (mergerKeyImage == null || mergeeKeyImage == null)
+                    {
+                        continue;
+                    }
+
+                    if (mergeeKeyImage.GetHex() == mergerKeyImage.GetHex())
                     {
                         mergee.Merge(merger);
                         merged = true;
@@ -618,7 +626,7 @@ public class MoneroTx
 
                 if (!merged)
                 {
-                    GetInputs().Add(merger);
+                    GetInputs()!.Add(merger);
                 }
             }
         }
@@ -626,7 +634,7 @@ public class MoneroTx
         // merge outputs
         if (tx.GetOutputs() != null)
         {
-            foreach (MoneroOutput output in tx.GetOutputs())
+            foreach (MoneroOutput output in tx.GetOutputs()!)
             {
                 output.SetTx(this);
             }
@@ -638,16 +646,19 @@ public class MoneroTx
             else
             {
                 // merge outputs if key image or stealth public key present, otherwise append
-                foreach (MoneroOutput merger in tx.GetOutputs())
+                foreach (MoneroOutput merger in tx.GetOutputs()!)
                 {
                     bool merged = false;
                     merger.SetTx(this);
-                    foreach (MoneroOutput mergee in GetOutputs())
+                    foreach (MoneroOutput mergee in GetOutputs()!)
                     {
-                        if ((merger.GetKeyImage() != null &&
-                             mergee.GetKeyImage().GetHex().Equals(merger.GetKeyImage().GetHex())) ||
-                            (merger.GetStealthPublicKey() != null &&
-                             mergee.GetStealthPublicKey().Equals(merger.GetStealthPublicKey())))
+                        MoneroKeyImage? mergeeKeyImage = mergee.GetKeyImage();
+                        MoneroKeyImage? mergerKeyImage = merger.GetKeyImage();
+
+                        if ((mergerKeyImage != null && mergeeKeyImage != null &&
+                             mergeeKeyImage.GetHex() == mergerKeyImage.GetHex()) ||
+                            (merger.GetStealthPublicKey() != null && mergee.GetStealthPublicKey() != null &&
+                             mergee.GetStealthPublicKey() == merger.GetStealthPublicKey()))
                         {
                             mergee.Merge(merger);
                             merged = true;
@@ -657,7 +668,7 @@ public class MoneroTx
 
                     if (!merged)
                     {
-                        GetOutputs().Add(merger); // append output
+                        GetOutputs()!.Add(merger); // append output
                     }
                 }
             }

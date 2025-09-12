@@ -17,7 +17,6 @@ public static class MoneroUtils
 
     public static readonly uint RingSize = 16;
     private static int s_logLevel;
-    private static readonly ulong AuPerXmr = 1000000000000;
     private static readonly int NumMnemonicWords = 25;
     private static readonly int ViewKeyLength = 64;
     private static readonly string Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -142,7 +141,7 @@ public static class MoneroUtils
             ValidatePrivateViewKey(privateViewKey);
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return false;
         }
@@ -155,7 +154,7 @@ public static class MoneroUtils
             ValidatePublicViewKey(publicViewKey);
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return false;
         }
@@ -168,7 +167,7 @@ public static class MoneroUtils
             ValidatePrivateSpendKey(privateSpendKey);
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return false;
         }
@@ -181,7 +180,7 @@ public static class MoneroUtils
             ValidatePublicSpendKey(publicSpendKey);
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return false;
         }
@@ -226,7 +225,7 @@ public static class MoneroUtils
             ValidateAddress(address);
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return false;
         }
@@ -523,8 +522,13 @@ public static class MoneroUtils
         return BinToHex(data);
     }
 
-    private static int[] DecodeBlock(int[] data, int[] buf, int index)
+    private static int[] DecodeBlock(int[]? data, int[] buf, int index)
     {
+        if (data == null)
+        {
+            throw new MoneroError("Cannot decode null data");
+        }
+
         if (data.Length < 1 || data.Length > FullEncodedBlockSize)
         {
             throw new MoneroError("Invalid block length: " + data.Length);

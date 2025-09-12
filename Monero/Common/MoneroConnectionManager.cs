@@ -46,6 +46,10 @@ public class MoneroConnectionManager
 
     private MoneroRpcConnection? GetBestConnectionFromPrioritizedResponses(List<MoneroRpcConnection>? responses)
     {
+        if (responses == null)
+        {
+            return null;
+        }
         // get best response
         MoneroRpcConnection? bestResponse = null;
 
@@ -573,7 +577,8 @@ public class MoneroConnectionManager
 
         if (_autoSwitch && IsConnected() == false)
         {
-            MoneroRpcConnection bestConnection = GetBestAvailableConnection([connection]);
+            List<MoneroRpcConnection> excludedConnections = connection == null ? [] : [connection];
+            MoneroRpcConnection? bestConnection = GetBestAvailableConnection(excludedConnections);
             if (bestConnection != null)
             {
                 SetConnection(bestConnection);
@@ -594,7 +599,7 @@ public class MoneroConnectionManager
         return CheckConnections(_connections, null);
     }
 
-    public MoneroRpcConnection GetBestAvailableConnection(List<MoneroRpcConnection>? excludedConnections = null)
+    public MoneroRpcConnection? GetBestAvailableConnection(List<MoneroRpcConnection>? excludedConnections = null)
     {
         throw new NotImplementedException(
             "This method is not implemented yet. Please implement the logic to get the best available connection excluding the specified connections.");
@@ -654,7 +659,7 @@ public class MoneroConnectionManager
     private class ConnectionComparator : Comparer<MoneroRpcConnection>
     {
         public readonly ConnectionPriorityComparator PriorityComparator = new();
-        public MoneroRpcConnection? CurrentConnection;
+        public MoneroRpcConnection? CurrentConnection = null;
 
         public override int Compare(MoneroRpcConnection? c1, MoneroRpcConnection? c2)
         {
@@ -689,7 +694,9 @@ public class MoneroConnectionManager
             {
                 if (c1.GetPriority() == c2.GetPriority())
                 {
-                    return c1.GetUri().CompareTo(c2.GetUri());
+                    string c1Uri = c1.GetUri() ?? "";
+                    string c2Uri = c2.GetUri() ?? "";
+                    return String.Compare(c1Uri, c2Uri, StringComparison.Ordinal);
                 }
 
                 return PriorityComparator.Compare(c1.GetPriority(), c2.GetPriority()) *

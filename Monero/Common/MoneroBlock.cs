@@ -38,7 +38,7 @@ public class MoneroBlock : MoneroBlockHeader
 
         if (block.GetTxHashes() != null)
         {
-            _txHashes = new List<string>(block.GetTxHashes());
+            _txHashes = new List<string>(block.GetTxHashes()!);
         }
     }
 
@@ -98,6 +98,11 @@ public class MoneroBlock : MoneroBlockHeader
         if (tx == null)
         {
             throw new ArgumentNullException(nameof(tx), "Transaction cannot be null");
+        }
+
+        if (_txs == null)
+        {
+            _txs = [];
         }
 
         _txs.Add(tx.SetBlock(this));
