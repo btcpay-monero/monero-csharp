@@ -7,7 +7,7 @@ namespace Monero.IntegrationTests;
 
 public class TestMoneroWalletRpc : TestMoneroWalletCommon
 {
-    protected override void CloseWallet(MoneroWallet wallet, bool save)
+    protected override void CloseWallet(MoneroWallet walletInstance, bool save)
     {
         throw new NotImplementedException();
     }
@@ -45,25 +45,25 @@ public class TestMoneroWalletRpc : TestMoneroWalletCommon
             config.SetServer(daemon.GetRpcConnection());
         }
 
-        // create client connected to internal monero-wallet-rpc process
+        // create a client connected to an internal monero-wallet-rpc process
         bool offline = TestUtils.OFFLINE_SERVER_URI.Equals(config.GetServerUri());
-        MoneroWalletRpc wallet = TestUtils.StartWalletRpcProcess(offline);
+        MoneroWalletRpc moneroWalletRpc = TestUtils.StartWalletRpcProcess(offline);
 
         // open wallet
         try
         {
-            wallet.OpenWallet(config);
-            wallet.SetDaemonConnection(wallet.GetDaemonConnection(), true, null); // set daemon as trusted
-            if (wallet.IsConnectedToDaemon())
+            moneroWalletRpc.OpenWallet(config);
+            moneroWalletRpc.SetDaemonConnection(moneroWalletRpc.GetDaemonConnection(), true, null); // set daemon as trusted
+            if (moneroWalletRpc.IsConnectedToDaemon())
             {
-                wallet.StartSyncing((ulong)TestUtils.SYNC_PERIOD_IN_MS);
+                moneroWalletRpc.StartSyncing((ulong)TestUtils.SYNC_PERIOD_IN_MS);
             }
 
-            return wallet;
+            return moneroWalletRpc;
         }
         catch (MoneroError e)
         {
-            try { TestUtils.StopWalletRpcProcess(wallet); }
+            try { TestUtils.StopWalletRpcProcess(moneroWalletRpc); }
             catch (Exception e2) { throw new Exception(e2.Message); }
 
             throw;

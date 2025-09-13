@@ -11,7 +11,7 @@ public abstract class MoneroNetwork
 
     public readonly MoneroNetworkType Type;
 
-    public MoneroNetwork(int primaryAddressCode, int integratedAddressCode, int subaddressCode, MoneroNetworkType type)
+    protected MoneroNetwork(int primaryAddressCode, int integratedAddressCode, int subaddressCode, MoneroNetworkType type)
     {
         this._primaryAddressCode = primaryAddressCode;
         this._integratedAddressCode = integratedAddressCode;

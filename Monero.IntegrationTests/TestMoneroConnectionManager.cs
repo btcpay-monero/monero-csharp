@@ -305,7 +305,10 @@ public class TestMoneroConnectionManager
                 {
                     TestUtils.StopWalletRpcProcess(wallet);
                 }
-                catch { }
+                catch
+                {
+                    // ignore
+                }
             }
         }
     }

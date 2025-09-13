@@ -2921,7 +2921,10 @@ public class MoneroWalletRpc : MoneroWalletDefault
             {
                 account.SetTag((string)val);
             }
-            else if (key.Equals("label")) { } // label belongs to first subaddress
+            else if (key.Equals("label"))
+            {
+                // label belongs to the first subaddress
+            }
             //else LOGGER.warning("ignoring unexpected account field: " + key + ": " + val);
         }
 
@@ -2978,7 +2981,10 @@ public class MoneroWalletRpc : MoneroWalletDefault
             {
                 subaddress.SetNumBlocksToUnlock((ulong)val);
             }
-            else if (key.Equals("time_to_unlock")) { } // ignoring
+            else if (key.Equals("time_to_unlock"))
+            {
+                // ignoring
+            }
             //else LOGGER.warning("ignoring unexpected subaddress field: " + key + ": " + val);
         }
 
@@ -3298,7 +3304,10 @@ public class MoneroWalletRpc : MoneroWalletDefault
             {
                 tx.SetKey((string)val);
             }
-            else if (key.Equals("type")) { } // type already handled
+            else if (key.Equals("type"))
+            {
+                // type already handled
+            }
             else if (key.Equals("tx_size"))
             {
                 tx.SetSize((ulong)val);
@@ -3379,7 +3388,10 @@ public class MoneroWalletRpc : MoneroWalletDefault
 
                 transfer.SetAmount((ulong)val);
             }
-            else if (key.Equals("amounts")) { } // ignoring, amounts sum to amount
+            else if (key.Equals("amounts"))
+            {
+                // ignoring, amounts sum to amount
+            }
             else if (key.Equals("address"))
             {
                 if (isOutgoing != true)
@@ -3475,10 +3487,12 @@ public class MoneroWalletRpc : MoneroWalletDefault
             }
             else if (key.Equals("multisig_txset") && val != null)
             {
-            } // handled elsewhere; this method only builds a tx wallet
+                // handled elsewhere; this method only builds a tx wallet
+            }
             else if (key.Equals("unsigned_txset") && val != null)
             {
-            } // handled elsewhere; this method only builds a tx wallet
+                // handled elsewhere; this method only builds a tx wallet
+            }
             else if (key.Equals("amount_in"))
             {
                 tx.SetInputSum((ulong)val);
@@ -3715,7 +3729,10 @@ public class MoneroWalletRpc : MoneroWalletDefault
                     txSet.GetTxs().Add(tx);
                 }
             }
-            else if (key.Equals("summary")) { } // TODO: support tx set summary fields?
+            else if (key.Equals("summary"))
+            {
+                // TODO: support tx set summary fields?
+            }
             else
             {
                 MoneroUtils.Log(0, "ignoring unexpected describe transfer field: " + key + ": " + val);

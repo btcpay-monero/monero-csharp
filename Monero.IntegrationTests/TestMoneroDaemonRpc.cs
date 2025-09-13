@@ -1244,7 +1244,10 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         {
             // stop mining at end of test
             try { daemon.StopMining(); }
-            catch (MoneroError e) { }
+            catch (MoneroError e)
+            {
+                // ignore
+            }
         }
     }
 

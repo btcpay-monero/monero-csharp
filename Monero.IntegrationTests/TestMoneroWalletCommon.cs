@@ -36,8 +36,8 @@ public abstract class TestMoneroWalletCommon
 
     protected abstract MoneroWallet OpenWallet(MoneroWalletConfig config);
     protected abstract MoneroWallet CreateWallet(MoneroWalletConfig config);
-    protected void CloseWallet(MoneroWallet wallet) { CloseWallet(wallet, false); }
-    protected abstract void CloseWallet(MoneroWallet wallet, bool save);
+    private void CloseWallet(MoneroWallet walletInstance) { CloseWallet(walletInstance, false); }
+    protected abstract void CloseWallet(MoneroWallet walletInstance, bool save);
     protected abstract List<string> GetSeedLanguages();
 
     // Can create a random wallet
@@ -49,19 +49,19 @@ public abstract class TestMoneroWalletCommon
         try
         {
             // create random wallet
-            MoneroWallet wallet = CreateWallet(new MoneroWalletConfig());
-            string path = wallet.GetPath();
+            MoneroWallet moneroWallet = CreateWallet(new MoneroWalletConfig());
+            string path = moneroWallet.GetPath();
             Exception? e2 = null;
             try
             {
-                MoneroUtils.ValidateAddress(wallet.GetPrimaryAddress());
-                MoneroUtils.ValidatePrivateViewKey(wallet.GetPrivateViewKey());
-                MoneroUtils.ValidatePrivateSpendKey(wallet.GetPrivateSpendKey());
-                MoneroUtils.ValidateMnemonic(wallet.GetSeed());
-                if (wallet.GetWalletType() != MoneroWalletType.RPC)
+                MoneroUtils.ValidateAddress(moneroWallet.GetPrimaryAddress());
+                MoneroUtils.ValidatePrivateViewKey(moneroWallet.GetPrivateViewKey());
+                MoneroUtils.ValidatePrivateSpendKey(moneroWallet.GetPrivateSpendKey());
+                MoneroUtils.ValidateMnemonic(moneroWallet.GetSeed());
+                if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
                 {
                     Assert.True(MoneroWallet.DEFAULT_LANGUAGE ==
-                                wallet.GetSeedLanguage()); // TODO monero-wallet-rpc: get seed language
+                                moneroWallet.GetSeedLanguage()); // TODO monero-wallet-rpc: get seed language
                 }
             }
             catch (Exception e)
@@ -69,7 +69,7 @@ public abstract class TestMoneroWalletCommon
                 e2 = e;
             }
 
-            CloseWallet(wallet);
+            CloseWallet(moneroWallet);
             if (e2 != null)
             {
                 throw e2;
@@ -121,20 +121,20 @@ public abstract class TestMoneroWalletCommon
             string privateViewKey = this.wallet.GetPrivateViewKey();
             string privateSpendKey = this.wallet.GetPrivateSpendKey();
 
-            // recreate test wallet from seed
-            MoneroWallet wallet = CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.SEED)
+            // recreate the test wallet from seed
+            MoneroWallet moneroWallet = CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.SEED)
                 .SetRestoreHeight(TestUtils.FIRST_RECEIVE_HEIGHT));
-            string path = wallet.GetPath();
+            string path = moneroWallet.GetPath();
             Exception? e2 = null;
             try
             {
-                Assert.True(primaryAddress == wallet.GetPrimaryAddress());
-                Assert.True(privateViewKey == wallet.GetPrivateViewKey());
-                Assert.True(privateSpendKey == wallet.GetPrivateSpendKey());
-                Assert.True(TestUtils.SEED == wallet.GetSeed());
-                if (wallet.GetWalletType() != MoneroWalletType.RPC)
+                Assert.True(primaryAddress == moneroWallet.GetPrimaryAddress());
+                Assert.True(privateViewKey == moneroWallet.GetPrivateViewKey());
+                Assert.True(privateSpendKey == moneroWallet.GetPrivateSpendKey());
+                Assert.True(TestUtils.SEED == moneroWallet.GetSeed());
+                if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
                 {
-                    Assert.True(MoneroWallet.DEFAULT_LANGUAGE == wallet.GetSeedLanguage());
+                    Assert.True(MoneroWallet.DEFAULT_LANGUAGE == moneroWallet.GetSeedLanguage());
                 }
             }
             catch (Exception e)
@@ -142,18 +142,18 @@ public abstract class TestMoneroWalletCommon
                 e2 = e;
             }
 
-            CloseWallet(wallet);
+            CloseWallet(moneroWallet);
             if (e2 != null)
             {
                 throw e2;
             }
 
-            // attempt to create wallet with two missing words
+            // attempt to create a wallet with two missing words
             try
             {
                 string invalidMnemonic =
                     "memoir desk algebra inbound innocent unplugs fully okay five inflamed giant factual ritual toyed topic snake unhappy guarded tweezers haunted inundate giant";
-                wallet = CreateWallet(new MoneroWalletConfig().SetSeed(invalidMnemonic)
+                moneroWallet = CreateWallet(new MoneroWalletConfig().SetSeed(invalidMnemonic)
                     .SetRestoreHeight(TestUtils.FIRST_RECEIVE_HEIGHT));
             }
             catch (Exception e)
@@ -161,7 +161,7 @@ public abstract class TestMoneroWalletCommon
                 Assert.True("Invalid mnemonic" == e.Message);
             }
 
-            // attempt to create wallet at same path
+            // attempt to create a wallet at the same path
             try
             {
                 CreateWallet(new MoneroWalletConfig().SetPath(path));
@@ -191,20 +191,20 @@ public abstract class TestMoneroWalletCommon
         Exception? e1 = null; // emulating Java "finally" but compatible with other languages
         try
         {
-            // create test wallet with offset
-            MoneroWallet wallet = CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.SEED)
+            // create a test wallet with offset
+            MoneroWallet moneroWallet = CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.SEED)
                 .SetRestoreHeight(TestUtils.FIRST_RECEIVE_HEIGHT).SetSeedOffset("my secret offset!"));
             Exception? e2 = null;
             try
             {
-                MoneroUtils.ValidateMnemonic(wallet.GetSeed());
-                Assert.True(TestUtils.SEED == wallet.GetSeed());
-                MoneroUtils.ValidateAddress(wallet.GetPrimaryAddress());
-                Assert.True(TestUtils.ADDRESS != wallet.GetPrimaryAddress());
-                if (wallet.GetWalletType() != MoneroWalletType.RPC)
+                MoneroUtils.ValidateMnemonic(moneroWallet.GetSeed());
+                Assert.True(TestUtils.SEED == moneroWallet.GetSeed());
+                MoneroUtils.ValidateAddress(moneroWallet.GetPrimaryAddress());
+                Assert.True(TestUtils.ADDRESS != moneroWallet.GetPrimaryAddress());
+                if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
                 {
                     Assert.True(MoneroWallet.DEFAULT_LANGUAGE ==
-                                wallet.GetSeedLanguage()); // TODO monero-wallet-rpc: support
+                                moneroWallet.GetSeedLanguage()); // TODO monero-wallet-rpc: support
                 }
             }
             catch (Exception e)
@@ -212,7 +212,7 @@ public abstract class TestMoneroWalletCommon
                 e2 = e;
             }
 
-            CloseWallet(wallet);
+            CloseWallet(moneroWallet);
             if (e2 != null)
             {
                 throw e2;
@@ -242,30 +242,30 @@ public abstract class TestMoneroWalletCommon
             string privateViewKey = this.wallet.GetPrivateViewKey();
             string privateSpendKey = this.wallet.GetPrivateSpendKey();
 
-            // recreate test wallet from keys
-            MoneroWallet wallet = CreateWallet(new MoneroWalletConfig().SetPrimaryAddress(primaryAddress)
+            // recreate the test wallet from keys
+            MoneroWallet moneroWallet = CreateWallet(new MoneroWalletConfig().SetPrimaryAddress(primaryAddress)
                 .SetPrivateViewKey(privateViewKey).SetPrivateSpendKey(privateSpendKey)
                 .SetRestoreHeight(daemon.GetHeight()));
-            string path = wallet.GetPath();
+            string path = moneroWallet.GetPath();
             Exception? e2 = null;
             try
             {
-                Assert.True(primaryAddress == wallet.GetPrimaryAddress());
-                Assert.True(privateViewKey == wallet.GetPrivateViewKey());
-                Assert.True(privateSpendKey == wallet.GetPrivateSpendKey());
-                if (!wallet.IsConnectedToDaemon())
+                Assert.True(primaryAddress == moneroWallet.GetPrimaryAddress());
+                Assert.True(privateViewKey == moneroWallet.GetPrivateViewKey());
+                Assert.True(privateSpendKey == moneroWallet.GetPrivateSpendKey());
+                if (!moneroWallet.IsConnectedToDaemon())
                 {
                     MoneroUtils.Log(0,
                         "WARNING: wallet created from keys is not connected to authenticated daemon"); // TODO monero-project: keys wallets not connected
                 }
 
-                Assert.True(wallet.IsConnectedToDaemon(),
+                Assert.True(moneroWallet.IsConnectedToDaemon(),
                     "Wallet created from keys is not connected to authenticated daemon");
-                if (wallet.GetWalletType() != MoneroWalletType.RPC)
+                if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
                 {
-                    MoneroUtils.ValidateMnemonic(wallet
+                    MoneroUtils.ValidateMnemonic(moneroWallet
                         .GetSeed()); // TODO monero-wallet-rpc: cannot get seed from wallet created from keys?
-                    Assert.True(MoneroWallet.DEFAULT_LANGUAGE == wallet.GetSeedLanguage());
+                    Assert.True(MoneroWallet.DEFAULT_LANGUAGE == moneroWallet.GetSeedLanguage());
                 }
             }
             catch (Exception e)
@@ -273,37 +273,37 @@ public abstract class TestMoneroWalletCommon
                 e2 = e;
             }
 
-            CloseWallet(wallet);
+            CloseWallet(moneroWallet);
             if (e2 != null)
             {
                 throw e2;
             }
 
             // recreate test wallet from spend key
-            if (wallet.GetWalletType() != MoneroWalletType.RPC)
+            if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
             {
                 // TODO monero-wallet-rpc: cannot create wallet from spend key?
-                wallet = CreateWallet(new MoneroWalletConfig().SetPrivateSpendKey(privateSpendKey)
+                moneroWallet = CreateWallet(new MoneroWalletConfig().SetPrivateSpendKey(privateSpendKey)
                     .SetRestoreHeight(daemon.GetHeight()));
                 e2 = null;
                 try
                 {
-                    Assert.True(primaryAddress == wallet.GetPrimaryAddress());
-                    Assert.True(privateViewKey == wallet.GetPrivateViewKey());
-                    Assert.True(privateSpendKey == wallet.GetPrivateSpendKey());
-                    if (!wallet.IsConnectedToDaemon())
+                    Assert.True(primaryAddress == moneroWallet.GetPrimaryAddress());
+                    Assert.True(privateViewKey == moneroWallet.GetPrivateViewKey());
+                    Assert.True(privateSpendKey == moneroWallet.GetPrivateSpendKey());
+                    if (!moneroWallet.IsConnectedToDaemon())
                     {
                         MoneroUtils.Log(0,
                             "WARNING: wallet created from keys is not connected to authenticated daemon"); // TODO monero-project: keys wallets not connected
                     }
 
-                    Assert.True(wallet.IsConnectedToDaemon(),
+                    Assert.True(moneroWallet.IsConnectedToDaemon(),
                         "Wallet created from keys is not connected to authenticated daemon");
-                    if (wallet.GetWalletType() != MoneroWalletType.RPC)
+                    if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
                     {
-                        MoneroUtils.ValidateMnemonic(wallet
+                        MoneroUtils.ValidateMnemonic(moneroWallet
                             .GetSeed()); // TODO monero-wallet-rpc: cannot get seed from wallet created from keys?
-                        Assert.True(MoneroWallet.DEFAULT_LANGUAGE == wallet.GetSeedLanguage());
+                        Assert.True(MoneroWallet.DEFAULT_LANGUAGE == moneroWallet.GetSeedLanguage());
                     }
                 }
                 catch (Exception e)
@@ -311,7 +311,7 @@ public abstract class TestMoneroWalletCommon
                     e2 = e;
                 }
 
-                CloseWallet(wallet);
+                CloseWallet(moneroWallet);
                 if (e2 != null)
                 {
                     throw e2;
@@ -396,23 +396,23 @@ public abstract class TestMoneroWalletCommon
     {
         Assert.True(TEST_NON_RELAYS);
 
-        // create random wallet
-        MoneroWallet wallet = CreateWallet(new MoneroWalletConfig());
+        // create a random wallet
+        MoneroWallet moneroWallet = CreateWallet(new MoneroWalletConfig());
 
         // set a random attribute
         string uuid = Guid.NewGuid().ToString();
-        wallet.SetAttribute("uuid", uuid);
+        moneroWallet.SetAttribute("uuid", uuid);
 
-        // record the wallet's path then save and close
-        string path = wallet.GetPath();
-        CloseWallet(wallet, true);
+        // record the wallet's path, then save and close
+        string path = moneroWallet.GetPath();
+        CloseWallet(moneroWallet, true);
 
         // re-open the wallet using its path
-        wallet = OpenWallet(path, null);
+        moneroWallet = OpenWallet(path, null);
 
         // test the attribute
-        Assert.True(uuid == wallet.GetAttribute("uuid"));
-        CloseWallet(wallet);
+        Assert.True(uuid == moneroWallet.GetAttribute("uuid"));
+        CloseWallet(moneroWallet);
     }
 
     // Can set the daemon connection
@@ -420,66 +420,66 @@ public abstract class TestMoneroWalletCommon
     public void TestSetDaemonConnection()
     {
         // create random wallet with default daemon connection
-        MoneroWallet wallet = CreateWallet(new MoneroWalletConfig());
+        MoneroWallet moneroWallet = CreateWallet(new MoneroWalletConfig());
         Assert.True(
             new MoneroRpcConnection(TestUtils.DAEMON_RPC_URI, TestUtils.DAEMON_RPC_USERNAME,
-                TestUtils.DAEMON_RPC_PASSWORD).Equals(wallet.GetDaemonConnection()));
-        Assert.True(wallet.IsConnectedToDaemon()); // uses default localhost connection
+                TestUtils.DAEMON_RPC_PASSWORD).Equals(moneroWallet.GetDaemonConnection()));
+        Assert.True(moneroWallet.IsConnectedToDaemon()); // uses default localhost connection
 
         // set empty server uri
-        wallet.SetDaemonConnection("");
-        Assert.Null(wallet.GetDaemonConnection());
-        Assert.False(wallet.IsConnectedToDaemon());
+        moneroWallet.SetDaemonConnection("");
+        Assert.Null(moneroWallet.GetDaemonConnection());
+        Assert.False(moneroWallet.IsConnectedToDaemon());
 
         // set offline server uri
-        wallet.SetDaemonConnection(TestUtils.OFFLINE_SERVER_URI);
-        Assert.True(new MoneroRpcConnection(TestUtils.OFFLINE_SERVER_URI, "", "").Equals(wallet.GetDaemonConnection()));
-        Assert.False(wallet.IsConnectedToDaemon());
+        moneroWallet.SetDaemonConnection(TestUtils.OFFLINE_SERVER_URI);
+        Assert.True(new MoneroRpcConnection(TestUtils.OFFLINE_SERVER_URI, "", "").Equals(moneroWallet.GetDaemonConnection()));
+        Assert.False(moneroWallet.IsConnectedToDaemon());
 
         // set daemon with wrong credentials
-        wallet.SetDaemonConnection(TestUtils.DAEMON_RPC_URI, "wronguser", "wrongpass");
+        moneroWallet.SetDaemonConnection(TestUtils.DAEMON_RPC_URI, "wronguser", "wrongpass");
         Assert.True(
             new MoneroRpcConnection(TestUtils.DAEMON_RPC_URI, "wronguser", "wrongpass").Equals(
-                wallet.GetDaemonConnection()));
+                moneroWallet.GetDaemonConnection()));
         if ("".Equals(TestUtils.DAEMON_RPC_USERNAME) || TestUtils.DAEMON_RPC_USERNAME == null)
         {
-            Assert.True(wallet
+            Assert.True(moneroWallet
                 .IsConnectedToDaemon()); // TODO: monerod without authentication works with bad credentials?
         }
         else
         {
-            Assert.False(wallet.IsConnectedToDaemon());
+            Assert.False(moneroWallet.IsConnectedToDaemon());
         }
 
         // set daemon with authentication
-        wallet.SetDaemonConnection(TestUtils.DAEMON_RPC_URI, TestUtils.DAEMON_RPC_USERNAME,
+        moneroWallet.SetDaemonConnection(TestUtils.DAEMON_RPC_URI, TestUtils.DAEMON_RPC_USERNAME,
             TestUtils.DAEMON_RPC_PASSWORD);
         Assert.True(
             new MoneroRpcConnection(TestUtils.DAEMON_RPC_URI, TestUtils.DAEMON_RPC_USERNAME,
-                TestUtils.DAEMON_RPC_PASSWORD).Equals(wallet.GetDaemonConnection()));
-        Assert.True(wallet.IsConnectedToDaemon());
+                TestUtils.DAEMON_RPC_PASSWORD).Equals(moneroWallet.GetDaemonConnection()));
+        Assert.True(moneroWallet.IsConnectedToDaemon());
 
         // nullify daemon connection
-        wallet.SetDaemonConnection(null);
-        Assert.Null(wallet.GetDaemonConnection());
-        wallet.SetDaemonConnection(TestUtils.DAEMON_RPC_URI);
-        Assert.True(new MoneroRpcConnection(TestUtils.DAEMON_RPC_URI).Equals(wallet.GetDaemonConnection()));
-        wallet.SetDaemonConnection(null);
-        Assert.Null(wallet.GetDaemonConnection());
+        moneroWallet.SetDaemonConnection(null);
+        Assert.Null(moneroWallet.GetDaemonConnection());
+        moneroWallet.SetDaemonConnection(TestUtils.DAEMON_RPC_URI);
+        Assert.True(new MoneroRpcConnection(TestUtils.DAEMON_RPC_URI).Equals(moneroWallet.GetDaemonConnection()));
+        moneroWallet.SetDaemonConnection(null);
+        Assert.Null(moneroWallet.GetDaemonConnection());
 
         // set daemon uri to non-daemon
-        wallet.SetDaemonConnection("www.Getmonero.org");
-        Assert.True(new MoneroRpcConnection("www.Getmonero.org").Equals(wallet.GetDaemonConnection()));
-        Assert.False(wallet.IsConnectedToDaemon());
+        moneroWallet.SetDaemonConnection("www.Getmonero.org");
+        Assert.True(new MoneroRpcConnection("www.Getmonero.org").Equals(moneroWallet.GetDaemonConnection()));
+        Assert.False(moneroWallet.IsConnectedToDaemon());
 
         // set daemon to invalid uri
-        wallet.SetDaemonConnection("abc123");
-        Assert.False(wallet.IsConnectedToDaemon());
+        moneroWallet.SetDaemonConnection("abc123");
+        Assert.False(moneroWallet.IsConnectedToDaemon());
 
         // attempt to sync
         try
         {
-            wallet.Sync();
+            moneroWallet.Sync();
             throw new Exception("Exception expected");
         }
         catch (MoneroError e)
@@ -488,7 +488,7 @@ public abstract class TestMoneroWalletCommon
         }
         finally
         {
-            CloseWallet(wallet);
+            CloseWallet(moneroWallet);
         }
     }
 
@@ -505,59 +505,59 @@ public abstract class TestMoneroWalletCommon
         connectionManager.AddConnection(connection2);
 
         // create wallet with connection manager
-        MoneroWallet wallet =
+        MoneroWallet moneroWallet =
             CreateWallet(new MoneroWalletConfig().SetServerUri("").SetConnectionManager(connectionManager));
-        Assert.True(TestUtils.GetDaemonRpc().GetRpcConnection() == wallet.GetDaemonConnection());
-        Assert.True(wallet.IsConnectedToDaemon());
+        Assert.True(TestUtils.GetDaemonRpc().GetRpcConnection() == moneroWallet.GetDaemonConnection());
+        Assert.True(moneroWallet.IsConnectedToDaemon());
 
         // set manager's connection
         connectionManager.SetConnection(connection2);
         Thread.Sleep(TestUtils.AUTO_CONNECT_TIMEOUT_MS);
-        Assert.True(connection2 == wallet.GetDaemonConnection());
+        Assert.True(connection2 == moneroWallet.GetDaemonConnection());
 
         // reopen wallet with connection manager
-        string path = wallet.GetPath();
-        CloseWallet(wallet);
-        wallet = OpenWallet(new MoneroWalletConfig().SetServerUri("").SetConnectionManager(connectionManager)
+        string path = moneroWallet.GetPath();
+        CloseWallet(moneroWallet);
+        moneroWallet = OpenWallet(new MoneroWalletConfig().SetServerUri("").SetConnectionManager(connectionManager)
             .SetPath(path));
-        Assert.True(connection2 == wallet.GetDaemonConnection());
+        Assert.True(connection2 == moneroWallet.GetDaemonConnection());
 
         // disconnect
         connectionManager.SetConnection(null);
-        Assert.Null(wallet.GetDaemonConnection());
-        Assert.False(wallet.IsConnectedToDaemon());
+        Assert.Null(moneroWallet.GetDaemonConnection());
+        Assert.False(moneroWallet.IsConnectedToDaemon());
 
         // start polling connections
         connectionManager.StartPolling((ulong)TestUtils.SYNC_PERIOD_IN_MS);
 
         // test that wallet auto connects
         Thread.Sleep(TestUtils.AUTO_CONNECT_TIMEOUT_MS);
-        Assert.True(connection1.Equals(wallet.GetDaemonConnection()));
-        Assert.True(wallet.IsConnectedToDaemon());
+        Assert.True(connection1.Equals(moneroWallet.GetDaemonConnection()));
+        Assert.True(moneroWallet.IsConnectedToDaemon());
 
         // test override with bad connection
-        wallet.AddListener(new MoneroWalletListener());
+        moneroWallet.AddListener(new MoneroWalletListener());
         connectionManager.SetAutoSwitch(false);
         connectionManager.SetConnection("http://foo.bar.xyz");
-        Assert.True("http://foo.bar.xyz" == wallet.GetDaemonConnection().GetUri());
-        Assert.False(wallet.IsConnectedToDaemon());
+        Assert.True("http://foo.bar.xyz" == moneroWallet.GetDaemonConnection().GetUri());
+        Assert.False(moneroWallet.IsConnectedToDaemon());
         Thread.Sleep(5000);
-        Assert.False(wallet.IsConnectedToDaemon());
+        Assert.False(moneroWallet.IsConnectedToDaemon());
 
         // set to another connection manager
         MoneroConnectionManager connectionManager2 = new();
         connectionManager2.SetConnection(connection2);
-        wallet.SetConnectionManager(connectionManager2);
-        Assert.True(connection2 == wallet.GetDaemonConnection());
+        moneroWallet.SetConnectionManager(connectionManager2);
+        Assert.True(connection2 == moneroWallet.GetDaemonConnection());
 
         // unset connection manager
-        wallet.SetConnectionManager(null);
-        Assert.Null(wallet.GetConnectionManager());
-        Assert.True(connection2 == wallet.GetDaemonConnection());
+        moneroWallet.SetConnectionManager(null);
+        Assert.Null(moneroWallet.GetConnectionManager());
+        Assert.True(connection2 == moneroWallet.GetDaemonConnection());
 
         // stop polling and close
         connectionManager.StopPolling();
-        CloseWallet(wallet);
+        CloseWallet(moneroWallet);
     }
 
     // Can get the seed

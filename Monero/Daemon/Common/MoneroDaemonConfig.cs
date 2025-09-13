@@ -1078,13 +1078,13 @@ public class MoneroDaemonConfig
             cmd.Add(path);
         }
 
-        MoneroNetworkType networkType = GetNetworkType();
+        MoneroNetworkType moneroNetworkType = GetNetworkType();
 
-        if (networkType == MoneroNetworkType.Testnet)
+        if (moneroNetworkType == MoneroNetworkType.Testnet)
         {
             cmd.Add("--testnet");
         }
-        else if (networkType == MoneroNetworkType.Stagenet)
+        else if (moneroNetworkType == MoneroNetworkType.Stagenet)
         {
             cmd.Add("--stagenet");
         }

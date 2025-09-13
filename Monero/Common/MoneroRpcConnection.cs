@@ -201,14 +201,14 @@ public class MoneroRpcConnection : MoneroConnection
                 _isAuthenticated = null;
                 _responseTime = null;
 
-                if (e is MoneroRpcError)
+                if (e is MoneroRpcError error)
                 {
-                    if (((MoneroRpcError)e).GetCode() == 401)
+                    if (error.GetCode() == 401)
                     {
                         _isOnline = true;
                         _isAuthenticated = false;
                     }
-                    else if (((MoneroRpcError)e).GetCode() == 404)
+                    else if (error.GetCode() == 404)
                     {
                         // fallback to latency check
                         _isOnline = true;

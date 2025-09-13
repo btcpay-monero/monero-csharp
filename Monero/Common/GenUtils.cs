@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Monero.Common;
 
-public class GenUtils
+public static class GenUtils
 {
     public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined = null, bool? resolveTrue = null,
         bool? resolveMax = null)

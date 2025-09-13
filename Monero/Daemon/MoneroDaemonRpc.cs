@@ -101,7 +101,10 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
                             Console.WriteLine("[monerod] " + bgLine);
                         }
                     }
-                    catch (Exception) { }
+                    catch (Exception)
+                    {
+                        // ignore
+                    }
                 });
                 outputThread.Start();
 
@@ -1338,7 +1341,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             }
             else if (key.Equals("as_json") || key.Equals("tx_json"))
             {
-            } // handled last so tx is as initialized as possible
+                // handled last so tx is as initialized as possible
+            }
             else if (key.Equals("as_hex") || key.Equals("tx_blob"))
             {
                 tx.SetFullHex(GenUtils.Reconcile(tx.GetFullHex(), "".Equals(val) ? null : (string)val));
@@ -1514,8 +1518,14 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 template.SetExpectedReward(Convert.ToUInt64(val));
             }
-            else if (key.Equals("difficulty")) { } // handled by wide_difficulty
-            else if (key.Equals("difficulty_top64")) { } // handled by wide_difficulty
+            else if (key.Equals("difficulty"))
+            {
+                // handled by wide_difficulty
+            }
+            else if (key.Equals("difficulty_top64"))
+            {
+                // handled by wide_difficulty
+            }
             else if (key.Equals("wide_difficulty"))
             {
                 template.SetDifficulty(GenUtils.Reconcile(template.GetDifficulty(), PrefixedHexToUulong((string)val)));
@@ -1532,8 +1542,14 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 template.SetReservedOffset(Convert.ToUInt64(val));
             }
-            else if (key.Equals("status")) { } // handled elsewhere
-            else if (key.Equals("untrusted")) { } // handled elsewhere
+            else if (key.Equals("status"))
+            {
+                // handled elsewhere
+            }
+            else if (key.Equals("untrusted"))
+            {
+                // handled elsewhere
+            }
             else if (key.Equals("seed_height"))
             {
                 template.SetSeedHeight(Convert.ToUInt64(val));
@@ -1584,10 +1600,22 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 header.SetDepth(GenUtils.Reconcile(header.GetDepth(), Convert.ToUInt64(val)));
             }
-            else if (key.Equals("difficulty")) { } // handled by wide_difficulty
-            else if (key.Equals("cumulative_difficulty")) { } // handled by wide_cumulative_difficulty
-            else if (key.Equals("difficulty_top64")) { } // handled by wide_difficulty
-            else if (key.Equals("cumulative_difficulty_top64")) { } // handled by wide_cumulative_difficulty
+            else if (key.Equals("difficulty"))
+            {
+                // handled by wide_difficulty
+            }
+            else if (key.Equals("cumulative_difficulty"))
+            {
+                // handled by wide_cumulative_difficulty
+            }
+            else if (key.Equals("difficulty_top64"))
+            {
+                // handled by wide_difficulty
+            }
+            else if (key.Equals("cumulative_difficulty_top64"))
+            {
+                // handled by wide_cumulative_difficulty
+            }
             else if (key.Equals("wide_difficulty"))
             {
                 header.SetDifficulty(GenUtils.Reconcile(header.GetDifficulty(), PrefixedHexToUulong((string)val)));
@@ -1649,8 +1677,14 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 header.SetPowHash(GenUtils.Reconcile(header.GetPowHash(), "".Equals(val) ? null : (string)val));
             }
-            else if (key.Equals("tx_hashes")) { } // used in block model, not header model
-            else if (key.Equals("miner_tx")) { } // used in block model, not header model
+            else if (key.Equals("tx_hashes"))
+            {
+                // used in block model, not header model
+            }
+            else if (key.Equals("miner_tx"))
+            {
+                // used in block model, not header model
+            }
             else if (key.Equals("miner_tx_hash"))
             {
                 header.SetMinerTxHash((string)val);
@@ -1839,8 +1873,14 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 result.SetHash((string)val);
             }
-            else if (key.Equals("path")) { } // handled elsewhere
-            else if (key.Equals("status")) { } // handled elsewhere
+            else if (key.Equals("path"))
+            {
+                // handled elsewhere
+            }
+            else if (key.Equals("status"))
+            {
+                // handled elsewhere
+            }
             else if (key.Equals("update"))
             {
                 result.SetIsUpdateAvailable((bool)val);
@@ -1853,7 +1893,10 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 result.SetVersion((string)val);
             }
-            else if (key.Equals("untrusted")) { } // handled elsewhere
+            else if (key.Equals("untrusted"))
+            {
+                // handled elsewhere
+            }
             else
             {
                 MoneroUtils.Log(0, "ignoring unexpected field in rpc check update result: " + key + ": " + val);
@@ -2005,7 +2048,10 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 peer.SetId("" + val); // TODO monero-wallet-rpc: peer id is big integer but string in `get_connections`
             }
-            else if (key.Equals("ip")) { } // host used instead which is consistently a string
+            else if (key.Equals("ip"))
+            {
+                // host used instead which is consistently a string
+            }
             else if (key.Equals("last_seen"))
             {
                 peer.SetLastSeenTimestamp(Convert.ToUInt64(val));
@@ -2094,7 +2140,10 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 result.SetCredits(Convert.ToUInt64(val));
             }
-            else if (key.Equals("status") || key.Equals("untrusted")) { } // handled elsewhere
+            else if (key.Equals("status") || key.Equals("untrusted"))
+            {
+                // handled elsewhere
+            }
             else if (key.Equals("top_hash"))
             {
                 result.SetTopBlockHash("".Equals(val) ? null : (string)val);
@@ -2160,7 +2209,10 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 peer.SetHost((string)val);
             }
-            else if (key.Equals("ip")) { } // host used instead which is consistently a string
+            else if (key.Equals("ip"))
+            {
+                // host used instead which is consistently a string
+            }
             else if (key.Equals("incoming"))
             {
                 peer.SetIsIncoming((bool)val);
@@ -2336,10 +2388,22 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
                     info.SetBootstrapDaemonAddress((string)val);
                 }
             }
-            else if (key.Equals("difficulty")) { } // handled by wide_difficulty
-            else if (key.Equals("cumulative_difficulty")) { } // handled by wide_cumulative_difficulty
-            else if (key.Equals("difficulty_top64")) { } // handled by wide_difficulty
-            else if (key.Equals("cumulative_difficulty_top64")) { } // handled by wide_cumulative_difficulty
+            else if (key.Equals("difficulty"))
+            {
+                // handled by wide_difficulty
+            }
+            else if (key.Equals("cumulative_difficulty"))
+            {
+                // handled by wide_cumulative_difficulty
+            }
+            else if (key.Equals("difficulty_top64"))
+            {
+                // handled by wide_difficulty
+            }
+            else if (key.Equals("cumulative_difficulty_top64"))
+            {
+                // handled by wide_cumulative_difficulty
+            }
             else if (key.Equals("wide_difficulty"))
             {
                 info.SetDifficulty(GenUtils.Reconcile(info.GetDifficulty(), PrefixedHexToUulong((string)val)));
@@ -2393,7 +2457,10 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 info.SetAdjustedTimestamp(Convert.ToUInt64(val));
             }
-            else if (key.Equals("status")) { } // handled elsewhere
+            else if (key.Equals("status"))
+            {
+                // handled elsewhere
+            }
             else if (key.Equals("target"))
             {
                 info.SetTarget(Convert.ToUInt64(val));
@@ -2410,7 +2477,10 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 info.SetNumTxsPool(Convert.ToUInt32(val));
             }
-            else if (key.Equals("untrusted")) { } // handled elsewhere
+            else if (key.Equals("untrusted"))
+            {
+                // handled elsewhere
+            }
             else if (key.Equals("was_bootstrap_ever_used"))
             {
                 info.SetWasBootstrapEverUsed((bool)val);
@@ -2509,7 +2579,10 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
                     syncInfo.GetSpans()!.Add(ConvertRpcConnectionSpan(rpcSpan));
                 }
             }
-            else if (key.Equals("status")) { } // handled elsewhere
+            else if (key.Equals("status"))
+            {
+                // handled elsewhere
+            }
             else if (key.Equals("target_height"))
             {
                 syncInfo.SetTargetHeight(Convert.ToUInt64(val));
@@ -2548,7 +2621,10 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 syncInfo.SetTopBlockHash("".Equals(val) ? null : (string)val);
             }
-            else if (key.Equals("untrusted")) { } // handled elsewhere
+            else if (key.Equals("untrusted"))
+            {
+                // handled elsewhere
+            }
             else
             {
                 MoneroUtils.Log(0, "ignoring unexpected field in sync info: " + key + ": " + val);
@@ -2576,8 +2652,14 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 info.SetState(Convert.ToUInt32(val));
             }
-            else if (key.Equals("status")) { } // handled elsewhere
-            else if (key.Equals("untrusted")) { } // handled elsewhere
+            else if (key.Equals("status"))
+            {
+                // handled elsewhere
+            }
+            else if (key.Equals("untrusted"))
+            {
+                // handled elsewhere
+            }
             else if (key.Equals("threshold"))
             {
                 info.SetThreshold(Convert.ToUInt32(val));
@@ -2692,9 +2774,18 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         foreach (string key in rpcChain.Keys)
         {
             object val = rpcChain[key];
-            if (key.Equals("block_hash")) { } // using block_hashes instead
-            else if (key.Equals("difficulty")) { } // handled by wide_difficulty
-            else if (key.Equals("difficulty_top64")) { } // handled by wide_difficulty
+            if (key.Equals("block_hash"))
+            {
+                // using block_hashes instead
+            }
+            else if (key.Equals("difficulty"))
+            {
+                // handled by wide_difficulty
+            }
+            else if (key.Equals("difficulty_top64"))
+            {
+                // handled by wide_difficulty
+            }
             else if (key.Equals("wide_difficulty"))
             {
                 chain.SetDifficulty(GenUtils.Reconcile(chain.GetDifficulty(), PrefixedHexToUulong((string)val)));

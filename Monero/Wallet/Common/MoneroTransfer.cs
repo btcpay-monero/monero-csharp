@@ -8,9 +8,9 @@ public abstract class MoneroTransfer
     protected ulong? _amount;
     protected MoneroTxWallet? _tx;
 
-    public MoneroTransfer() { }
+    protected MoneroTransfer() { }
 
-    public MoneroTransfer(MoneroTransfer transfer)
+    protected MoneroTransfer(MoneroTransfer transfer)
     {
         _tx = transfer._tx;
         _amount = transfer._amount;

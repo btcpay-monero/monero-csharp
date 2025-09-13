@@ -11,7 +11,7 @@ public abstract class MoneroConnection
     protected ulong _timeoutMs;
     protected string? _uri;
 
-    public MoneroConnection(string? uri = null, string? proxyUri = null, int priority = 0, ulong timeoutMs = 2000)
+    protected MoneroConnection(string? uri = null, string? proxyUri = null, int priority = 0, ulong timeoutMs = 2000)
     {
         _uri = uri;
         _proxyUri = proxyUri;
@@ -19,7 +19,7 @@ public abstract class MoneroConnection
         _timeoutMs = timeoutMs;
     }
 
-    public MoneroConnection(MoneroConnection other)
+    protected MoneroConnection(MoneroConnection other)
     {
         _uri = other._uri;
         _proxyUri = other._proxyUri;

@@ -17,19 +17,15 @@ public class WalletTxTracker
 
     public void WaitForWalletTxsToClearPool(MoneroWallet wallet)
     {
-        WaitForWalletTxsToClearPool([wallet]);
-    }
-
-    public void WaitForWalletTxsToClearPool(List<MoneroWallet> wallets)
-    {
+        List<MoneroWallet> wallets = [wallet];
         // get wallet tx hashes
         List<string> txHashesWallet = [];
-        foreach (MoneroWallet wallet in wallets)
+        foreach (MoneroWallet moneroWallet in wallets)
         {
-            if (!clearedWallets.Contains(wallet))
+            if (!clearedWallets.Contains(moneroWallet))
             {
-                wallet.Sync();
-                foreach (MoneroTxWallet tx in wallet.GetTxs())
+                moneroWallet.Sync();
+                foreach (MoneroTxWallet tx in moneroWallet.GetTxs())
                 {
                     string? txHash = tx.GetHash();
                     if (txHash == null)
@@ -42,7 +38,7 @@ public class WalletTxTracker
             }
         }
 
-        // loop until all wallet txs clear from pool
+        // loop until all wallet txs clear from the pool
         bool isFirst = true;
         bool miningStarted = false;
         MoneroDaemon daemon = TestUtils.GetDaemonRpc();
@@ -76,7 +72,7 @@ public class WalletTxTracker
                 break;
             }
 
-            // if first time waiting, log message and start mining
+            // if first time waiting, log a message and start mining
             if (isFirst)
             {
                 isFirst = false;
@@ -90,7 +86,10 @@ public class WalletTxTracker
                         StartMining.Start();
                         miningStarted = true;
                     }
-                    catch (Exception e) { } // no problem
+                    catch (Exception e)
+                    {
+                        // no problem
+                    }
                 }
             }
 
@@ -106,10 +105,10 @@ public class WalletTxTracker
         }
 
         // sync wallets with the pool
-        foreach (MoneroWallet wallet in wallets)
+        foreach (MoneroWallet moneroWallet in wallets)
         {
-            wallet.Sync();
-            clearedWallets.Add(wallet);
+            moneroWallet.Sync();
+            clearedWallets.Add(moneroWallet);
         }
     }
 }

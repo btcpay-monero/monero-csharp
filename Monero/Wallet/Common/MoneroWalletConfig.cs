@@ -140,12 +140,12 @@ public class MoneroWalletConfig
         return _server?.GetUsername();
     }
 
-    public MoneroWalletConfig SetServerUsername(string? serverUsername)
+    public MoneroWalletConfig SetServerUsername(string? serverUsernameInput)
     {
-        this.serverUsername = serverUsername;
-        if (_server != null && serverUsername != null && serverPassword != null)
+        this.serverUsername = serverUsernameInput;
+        if (_server != null && serverUsernameInput != null && serverPassword != null)
         {
-            _server.SetCredentials(serverUsername, serverPassword);
+            _server.SetCredentials(serverUsernameInput, serverPassword);
         }
 
         return this;

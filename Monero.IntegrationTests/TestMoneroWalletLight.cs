@@ -5,7 +5,7 @@ namespace Monero.IntegrationTests;
 
 public class TestMoneroWalletLight : TestMoneroWalletCommon
 {
-    protected override void CloseWallet(MoneroWallet wallet, bool save)
+    protected override void CloseWallet(MoneroWallet walletInstance, bool save)
     {
         throw new NotImplementedException();
     }

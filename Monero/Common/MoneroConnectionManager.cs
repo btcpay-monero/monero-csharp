@@ -289,7 +289,6 @@ public class MoneroConnectionManager
             case PollType.All:
                 StartPollingConnections((ulong)periodMs);
                 break;
-            case PollType.Prioritized:
             default:
                 StartPollingPrioritizedConnections((ulong)periodMs, excludedConnections);
                 break;
