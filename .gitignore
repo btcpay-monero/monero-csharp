@@ -3,6 +3,7 @@
 .idea
 .vs/
 coverage
+nuget-packages
 **/.AssemblyAttributes
 monero-csharp.sln.DotSettings.user
 .DS_Store

@@ -1,0 +1,11 @@
+{
+  "Identifier": "Monero.Csharp",
+  "Name": "Monero CSharp bindings library",
+  "Version": "0.0.1",
+  "Description": "This library provides C# bindings for interacting with the Monero, enabling seamless payment integration.",
+  "SystemPlugin": false,
+  "Documentation": null,
+  "Source": null,
+  "Author": null,
+  "AuthorLink": null
+}

@@ -29,6 +29,12 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
 
+      - name: Deterministic build check
+        run: |
+          dotnet tool install --global dotnet-validate --version 0.0.1-preview.537
+          dotnet pack Monero/Monero.csproj -c Release /p:PackageVersion=1 --no-build -o nuget-packages
+          dotnet validate package local nuget-packages/Monero.1.0.0.nupkg
+
       - name: Run unit tests
         run: |
           dotnet tool install --global JetBrains.dotCover.CommandLineTools --version 2025.1.6
@@ -46,3 +52,9 @@ jobs:
         with:
           name: coverage-report
           path: coverage/dotcover.xml
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package-${{ github.sha }}
+          path: nuget-packages/Monero.1.0.0.nupkg
