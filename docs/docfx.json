@@ -1,0 +1,47 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "..",
+          "files": [
+            "Monero/Monero.csproj"
+          ]
+        }
+      ],
+      "dest": "api",
+      "disableDefaultFilter": false
+    }
+  ],
+  "build": {
+    "globalMetadata": {
+      "_appTitle": "Monero C#",
+      "_appName": "Monero C#",
+      "_appLogoPath": "images/small_logo.png",
+      "_appFaviconPath": "images/favicon.ico",
+      "_enableSearch": true
+    },
+    "content": [
+      {
+        "files": [
+          "api/**.yml",
+          "index.md",
+          "LICENSE.md",
+          "toc.yml"
+        ]
+      }
+    ],
+    "dest": "_site",
+    "exportViewModel": true,
+    "globalMetadataFiles": [],
+    "fileMetadataFiles": [],
+    "template": [
+      "default",
+      "modern"
+    ],
+    "disableGitFeatures": true,
+    "postProcessors": [
+      "ExtractSearchIndex"
+    ]
+  }
+}
