@@ -20,6 +20,7 @@ concurrency:
 
 jobs:
   docfx:
+    if: github.repository == 'btcpay-monero/monero-csharp' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
