@@ -7,3 +7,5 @@ nuget-packages
 **/.AssemblyAttributes
 monero-csharp.sln.DotSettings.user
 .DS_Store
+docs/_site/
+docs/api/
