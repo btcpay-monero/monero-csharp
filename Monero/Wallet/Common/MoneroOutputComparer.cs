@@ -4,7 +4,7 @@ namespace Monero.Wallet.Common;
 
 internal class MoneroOutputComparer : Comparer<MoneroOutput>
 {
-    private static readonly MoneroTxHeightComparer TX_HEIGHT_COMPARATOR = new();
+    private static readonly MoneroTxHeightComparer TxHeightComparator = new();
 
     public override int Compare(MoneroOutput? o1, MoneroOutput? o2)
     {
@@ -27,7 +27,7 @@ internal class MoneroOutputComparer : Comparer<MoneroOutput>
         }
 
         // compare by height
-        int heightComparison = TX_HEIGHT_COMPARATOR.Compare(ow1.GetTx(), ow2.GetTx());
+        int heightComparison = TxHeightComparator.Compare(ow1.GetTx(), ow2.GetTx());
         if (heightComparison != 0)
         {
             return heightComparison;
@@ -143,6 +143,6 @@ internal class MoneroOutputComparer : Comparer<MoneroOutput>
             return 1; // output 2 has no key image hex
         }
 
-        return ow1KeyImageHex.CompareTo(ow2KeyImageHex);
+        return String.Compare(ow1KeyImageHex, ow2KeyImageHex, StringComparison.Ordinal);
     }
 }

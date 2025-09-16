@@ -4,10 +4,10 @@ namespace Monero.Wallet.Common;
 
 public class MoneroOutputWallet : MoneroOutput
 {
-    private uint? accountIndex;
-    private bool isFrozen;
-    private bool isSpent;
-    private uint? subaddressIndex;
+    private uint? _accountIndex;
+    private bool? _isFrozen;
+    private bool? _isSpent;
+    private uint? _subaddressIndex;
 
     public MoneroOutputWallet()
     {
@@ -15,10 +15,10 @@ public class MoneroOutputWallet : MoneroOutput
 
     public MoneroOutputWallet(MoneroOutputWallet output) : base(output)
     {
-        accountIndex = output.accountIndex;
-        subaddressIndex = output.subaddressIndex;
-        isSpent = output.isSpent;
-        isFrozen = output.isFrozen;
+        _accountIndex = output._accountIndex;
+        _subaddressIndex = output._subaddressIndex;
+        _isSpent = output._isSpent;
+        _isFrozen = output._isFrozen;
     }
 
     public override MoneroOutputWallet Clone()
@@ -47,23 +47,23 @@ public class MoneroOutputWallet : MoneroOutput
 
     public uint? GetAccountIndex()
     {
-        return accountIndex;
+        return _accountIndex;
     }
 
     public MoneroOutputWallet SetAccountIndex(uint? accountIndex)
     {
-        this.accountIndex = accountIndex;
+        this._accountIndex = accountIndex;
         return this;
     }
 
     public uint? GetSubaddressIndex()
     {
-        return subaddressIndex;
+        return _subaddressIndex;
     }
 
     public MoneroOutputWallet SetSubaddressIndex(uint? subaddressIndex)
     {
-        this.subaddressIndex = subaddressIndex;
+        this._subaddressIndex = subaddressIndex;
         return this;
     }
 
@@ -73,25 +73,25 @@ public class MoneroOutputWallet : MoneroOutput
         return this;
     }
 
-    public bool IsSpent()
+    public bool? IsSpent()
     {
-        return isSpent;
+        return _isSpent;
     }
 
-    public MoneroOutputWallet SetIsSpent(bool isSpent)
+    public MoneroOutputWallet SetIsSpent(bool? isSpent)
     {
-        this.isSpent = isSpent;
+        this._isSpent = isSpent;
         return this;
     }
 
-    public bool IsFrozen()
+    public bool? IsFrozen()
     {
-        return isFrozen;
+        return _isFrozen;
     }
 
-    public MoneroOutputWallet SetIsFrozen(bool isFrozen)
+    public MoneroOutputWallet SetIsFrozen(bool? isFrozen)
     {
-        this.isFrozen = isFrozen;
+        this._isFrozen = isFrozen;
         return this;
     }
 

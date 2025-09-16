@@ -2,26 +2,26 @@ namespace Monero.Daemon.Common;
 
 public class MoneroPruneResult
 {
-    private bool? isPruned;
-    private int? pruningSeed;
+    private bool? _isPruned;
+    private int? _pruningSeed;
 
     public bool? IsPruned()
     {
-        return isPruned;
+        return _isPruned;
     }
 
     public void SetIsPruned(bool? isPruned)
     {
-        this.isPruned = isPruned;
+        this._isPruned = isPruned;
     }
 
     public int? GetPruningSeed()
     {
-        return pruningSeed;
+        return _pruningSeed;
     }
 
     public void SetPruningSeed(int? pruningSeed)
     {
-        this.pruningSeed = pruningSeed;
+        this._pruningSeed = pruningSeed;
     }
 }

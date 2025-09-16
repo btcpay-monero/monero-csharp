@@ -2,52 +2,52 @@ namespace Monero.Daemon.Common;
 
 public class MoneroBan
 {
-    private string? host; // e.g. 192.168.1.100
-    private uint? ip; // integer formatted IP
-    private bool? isBanned;
-    private ulong? seconds;
+    private string? _host; // e.g. 192.168.1.100
+    private uint? _ip; // integer formatted IP
+    private bool? _isBanned;
+    private ulong? _seconds;
 
     public string? GetHost()
     {
-        return host;
+        return _host;
     }
 
     public MoneroBan SetHost(string? host)
     {
-        this.host = host;
+        this._host = host;
         return this;
     }
 
     public uint? GetIp()
     {
-        return ip;
+        return _ip;
     }
 
     public MoneroBan SetIp(uint? ip)
     {
-        this.ip = ip;
+        this._ip = ip;
         return this;
     }
 
     public bool? IsBanned()
     {
-        return isBanned;
+        return _isBanned;
     }
 
     public MoneroBan SetIsBanned(bool? isBanned)
     {
-        this.isBanned = isBanned;
+        this._isBanned = isBanned;
         return this;
     }
 
     public ulong? GetSeconds()
     {
-        return seconds;
+        return _seconds;
     }
 
     public MoneroBan SetSeconds(ulong? seconds)
     {
-        this.seconds = seconds;
+        this._seconds = seconds;
         return this;
     }
 }

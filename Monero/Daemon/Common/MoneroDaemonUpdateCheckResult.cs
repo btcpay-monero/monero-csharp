@@ -2,11 +2,11 @@ namespace Monero.Daemon.Common;
 
 public class MoneroDaemonUpdateCheckResult
 {
-    private string? autoUri;
-    private string? hash;
-    private bool? isUpdateAvailable;
-    private string? userUri;
-    private string? version;
+    private string? _autoUri;
+    private string? _hash;
+    private bool? _isUpdateAvailable;
+    private string? _userUri;
+    private string? _version;
 
     public MoneroDaemonUpdateCheckResult()
     {
@@ -15,11 +15,11 @@ public class MoneroDaemonUpdateCheckResult
 
     public MoneroDaemonUpdateCheckResult(MoneroDaemonUpdateCheckResult checkResult)
     {
-        isUpdateAvailable = checkResult.isUpdateAvailable;
-        version = checkResult.version;
-        hash = checkResult.hash;
-        autoUri = checkResult.autoUri;
-        userUri = checkResult.userUri;
+        _isUpdateAvailable = checkResult._isUpdateAvailable;
+        _version = checkResult._version;
+        _hash = checkResult._hash;
+        _autoUri = checkResult._autoUri;
+        _userUri = checkResult._userUri;
     }
 
     public MoneroDaemonUpdateCheckResult Clone()
@@ -29,51 +29,51 @@ public class MoneroDaemonUpdateCheckResult
 
     public bool? IsUpdateAvailable()
     {
-        return isUpdateAvailable;
+        return _isUpdateAvailable;
     }
 
     public void SetIsUpdateAvailable(bool? isUpdateAvailable)
     {
-        this.isUpdateAvailable = isUpdateAvailable;
+        this._isUpdateAvailable = isUpdateAvailable;
     }
 
     public string? GetVersion()
     {
-        return version;
+        return _version;
     }
 
     public void SetVersion(string? version)
     {
-        this.version = version;
+        this._version = version;
     }
 
     public string? GetHash()
     {
-        return hash;
+        return _hash;
     }
 
     public void SetHash(string? hash)
     {
-        this.hash = hash;
+        this._hash = hash;
     }
 
     public string? GetAutoUri()
     {
-        return autoUri;
+        return _autoUri;
     }
 
     public void SetAutoUri(string? autoUri)
     {
-        this.autoUri = autoUri;
+        this._autoUri = autoUri;
     }
 
     public string? GetUserUri()
     {
-        return userUri;
+        return _userUri;
     }
 
     public void SetUserUri(string? userUri)
     {
-        this.userUri = userUri;
+        this._userUri = userUri;
     }
 }

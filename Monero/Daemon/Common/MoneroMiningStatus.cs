@@ -2,59 +2,59 @@ namespace Monero.Daemon.Common;
 
 public class MoneroMiningStatus
 {
-    private string? address;
-    private bool? isActive;
-    private bool? isBackground;
-    private uint? numThreads;
-    private ulong? speed;
+    private string? _address;
+    private bool? _isActive;
+    private bool? _isBackground;
+    private uint? _numThreads;
+    private ulong? _speed;
 
     public bool? IsActive()
     {
-        return isActive;
+        return _isActive;
     }
 
     public void SetIsActive(bool? isActive)
     {
-        this.isActive = isActive;
+        this._isActive = isActive;
     }
 
     public bool? IsBackground()
     {
-        return isBackground;
+        return _isBackground;
     }
 
     public void SetIsBackground(bool? isBackground)
     {
-        this.isBackground = isBackground;
+        this._isBackground = isBackground;
     }
 
     public string? GetAddress()
     {
-        return address;
+        return _address;
     }
 
     public void SetAddress(string? address)
     {
-        this.address = address;
+        this._address = address;
     }
 
     public ulong? GetSpeed()
     {
-        return speed;
+        return _speed;
     }
 
     public void SetSpeed(ulong? speed)
     {
-        this.speed = speed;
+        this._speed = speed;
     }
 
     public uint? GetNumThreads()
     {
-        return numThreads;
+        return _numThreads;
     }
 
     public void SetNumThreads(uint? numThreads)
     {
-        this.numThreads = numThreads;
+        this._numThreads = numThreads;
     }
 }

@@ -2,147 +2,147 @@ namespace Monero.Daemon.Common;
 
 public class MoneroTxPoolStats
 {
-    private ulong? bytesMax;
-    private ulong? bytesMed;
-    private ulong? bytesMin;
-    private ulong? bytesTotal;
-    private ulong? feeTotal;
-    private Dictionary<ulong, int>? histo;
-    private ulong? histo98pc;
-    private int? num10m;
-    private int? numDoubleSpends;
-    private int? numFailing;
-    private int? numNotRelayed;
-    private int? numTxs;
-    private ulong? oldestTimestamp;
+    private ulong? _bytesMax;
+    private ulong? _bytesMed;
+    private ulong? _bytesMin;
+    private ulong? _bytesTotal;
+    private ulong? _feeTotal;
+    private Dictionary<ulong, int>? _histo;
+    private ulong? _histo98Pc;
+    private int? _num10M;
+    private int? _numDoubleSpends;
+    private int? _numFailing;
+    private int? _numNotRelayed;
+    private int? _numTxs;
+    private ulong? _oldestTimestamp;
 
     public int? GetNumTxs()
     {
-        return numTxs;
+        return _numTxs;
     }
 
     public void SetNumTxs(int? numTxs)
     {
-        this.numTxs = numTxs;
+        this._numTxs = numTxs;
     }
 
     public int? GetNumNotRelayed()
     {
-        return numNotRelayed;
+        return _numNotRelayed;
     }
 
     public void SetNumNotRelayed(int? numNotRelayed)
     {
-        this.numNotRelayed = numNotRelayed;
+        this._numNotRelayed = numNotRelayed;
     }
 
     public int? GetNumFailing()
     {
-        return numFailing;
+        return _numFailing;
     }
 
     public void SetNumFailing(int? numFailing)
     {
-        this.numFailing = numFailing;
+        this._numFailing = numFailing;
     }
 
     public int? GetNumDoubleSpends()
     {
-        return numDoubleSpends;
+        return _numDoubleSpends;
     }
 
     public void SetNumDoubleSpends(int? numDoubleSpends)
     {
-        this.numDoubleSpends = numDoubleSpends;
+        this._numDoubleSpends = numDoubleSpends;
     }
 
-    public int? GetNum10m()
+    public int? GetNum10M()
     {
-        return num10m;
+        return _num10M;
     }
 
-    public void SetNum10m(int? num10m)
+    public void SetNum10M(int? num10M)
     {
-        this.num10m = num10m;
+        this._num10M = num10M;
     }
 
     public ulong? GetFeeTotal()
     {
-        return feeTotal;
+        return _feeTotal;
     }
 
     public void SetFeeTotal(ulong? feeTotal)
     {
-        this.feeTotal = feeTotal;
+        this._feeTotal = feeTotal;
     }
 
     public ulong? GetBytesMax()
     {
-        return bytesMax;
+        return _bytesMax;
     }
 
     public void SetBytesMax(ulong? bytesMax)
     {
-        this.bytesMax = bytesMax;
+        this._bytesMax = bytesMax;
     }
 
     public ulong? GetBytesMed()
     {
-        return bytesMed;
+        return _bytesMed;
     }
 
     public void SetBytesMed(ulong? bytesMed)
     {
-        this.bytesMed = bytesMed;
+        this._bytesMed = bytesMed;
     }
 
     public ulong? GetBytesMin()
     {
-        return bytesMin;
+        return _bytesMin;
     }
 
     public void SetBytesMin(ulong? bytesMin)
     {
-        this.bytesMin = bytesMin;
+        this._bytesMin = bytesMin;
     }
 
     public ulong? GetBytesTotal()
     {
-        return bytesTotal;
+        return _bytesTotal;
     }
 
     public void SetBytesTotal(ulong? bytesTotal)
     {
-        this.bytesTotal = bytesTotal;
+        this._bytesTotal = bytesTotal;
     }
 
     public Dictionary<ulong, int>? GetHisto()
     {
-        return histo;
+        return _histo;
     }
 
     public void SetHisto(Dictionary<ulong, int> histo)
     {
-        this.histo = histo;
+        this._histo = histo;
     }
 
-    public ulong? GetHisto98pc()
+    public ulong? GetHisto98Pc()
     {
-        return histo98pc;
+        return _histo98Pc;
     }
 
-    public void SetHisto98pc(ulong? histo98pc)
+    public void SetHisto98Pc(ulong? histo98Pc)
     {
-        this.histo98pc = histo98pc;
+        this._histo98Pc = histo98Pc;
     }
 
     public ulong? GetOldestTimestamp()
     {
-        return oldestTimestamp;
+        return _oldestTimestamp;
     }
 
     public void SetOldestTimestamp(ulong? oldestTimestamp)
     {
-        this.oldestTimestamp = oldestTimestamp;
+        this._oldestTimestamp = oldestTimestamp;
     }
 }

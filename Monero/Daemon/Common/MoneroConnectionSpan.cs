@@ -2,81 +2,81 @@ namespace Monero.Daemon.Common;
 
 public class MoneroConnectionSpan
 {
-    private string? connectionId;
-    private ulong? numBlocks;
-    private ulong? rate;
-    private string? remoteAddress;
-    private ulong? size;
-    private ulong? speed;
-    private ulong? startHeight;
+    private string? _connectionId;
+    private ulong? _numBlocks;
+    private ulong? _rate;
+    private string? _remoteAddress;
+    private ulong? _size;
+    private ulong? _speed;
+    private ulong? _startHeight;
 
     public string? GetConnectionId()
     {
-        return connectionId;
+        return _connectionId;
     }
 
     public void SetConnectionId(string? connectionId)
     {
-        this.connectionId = connectionId;
+        this._connectionId = connectionId;
     }
 
     public ulong? GetNumBlocks()
     {
-        return numBlocks;
+        return _numBlocks;
     }
 
     public void SetNumBlocks(ulong? numBlocks)
     {
-        this.numBlocks = numBlocks;
+        this._numBlocks = numBlocks;
     }
 
     public string? GetRemoteAddress()
     {
-        return remoteAddress;
+        return _remoteAddress;
     }
 
     public void SetRemoteAddress(string? remoteAddress)
     {
-        this.remoteAddress = remoteAddress;
+        this._remoteAddress = remoteAddress;
     }
 
     public ulong? GetRate()
     {
-        return rate;
+        return _rate;
     }
 
     public void SetRate(ulong? rate)
     {
-        this.rate = rate;
+        this._rate = rate;
     }
 
     public ulong? GetSpeed()
     {
-        return speed;
+        return _speed;
     }
 
     public void SetSpeed(ulong? speed)
     {
-        this.speed = speed;
+        this._speed = speed;
     }
 
     public ulong? GetSize()
     {
-        return size;
+        return _size;
     }
 
     public void SetSize(ulong? size)
     {
-        this.size = size;
+        this._size = size;
     }
 
     public ulong? GetStartHeight()
     {
-        return startHeight;
+        return _startHeight;
     }
 
     public void SetStartHeight(ulong? startHeight)
     {
-        this.startHeight = startHeight;
+        this._startHeight = startHeight;
     }
 }

@@ -2,14 +2,14 @@ namespace Monero.Wallet.Common;
 
 public class MoneroTransferQuery : MoneroTransfer
 {
-    private string? address;
-    private List<string>? addresses;
-    private List<MoneroDestination>? destinations;
-    private bool? hasDestinations;
-    private bool? isIncoming;
-    private uint? subaddressIndex;
-    private List<uint>? subaddressIndices;
-    protected MoneroTxQuery? txQuery;
+    private string? _address;
+    private List<string>? _addresses;
+    private List<MoneroDestination>? _destinations;
+    private bool? _hasDestinations;
+    private bool? _isIncoming;
+    private uint? _subaddressIndex;
+    private List<uint>? _subaddressIndices;
+    protected MoneroTxQuery? _txQuery;
 
     public MoneroTransferQuery()
     {
@@ -17,31 +17,31 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTransferQuery(MoneroTransferQuery query) : base(query)
     {
-        isIncoming = query.isIncoming;
-        address = query.address;
-        if (query.addresses != null)
+        _isIncoming = query._isIncoming;
+        _address = query._address;
+        if (query._addresses != null)
         {
-            addresses = new List<string>(query.addresses);
+            _addresses = new List<string>(query._addresses);
         }
 
-        subaddressIndex = query.subaddressIndex;
-        if (query.subaddressIndices != null)
+        _subaddressIndex = query._subaddressIndex;
+        if (query._subaddressIndices != null)
         {
-            subaddressIndices = new List<uint>(query.subaddressIndices);
+            _subaddressIndices = new List<uint>(query._subaddressIndices);
         }
 
-        if (query.destinations != null)
+        if (query._destinations != null)
         {
-            destinations = [];
-            foreach (MoneroDestination destination in query.destinations)
+            _destinations = [];
+            foreach (MoneroDestination destination in query._destinations)
             {
-                destinations.Add(destination.Clone());
+                _destinations.Add(destination.Clone());
             }
         }
 
-        hasDestinations = query.hasDestinations;
-        txQuery =
-            query.txQuery; // reference original by default, MoneroTxQuery's deep copy will Set this to itself
+        _hasDestinations = query._hasDestinations;
+        _txQuery =
+            query._txQuery; // reference original by default, MoneroTxQuery's deep copy will Set this to itself
     }
 
     public override MoneroTransferQuery Clone()
@@ -51,12 +51,12 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTxQuery? GetTxQuery()
     {
-        return txQuery;
+        return _txQuery;
     }
 
     public MoneroTransferQuery SetTxQuery(MoneroTxQuery? txQuery)
     {
-        this.txQuery = txQuery;
+        this._txQuery = txQuery;
         if (txQuery != null)
         {
             txQuery.SetTransferQuery(this);
@@ -67,45 +67,45 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public override bool? IsIncoming()
     {
-        return isIncoming;
+        return _isIncoming;
     }
 
     public MoneroTransferQuery SetIsIncoming(bool? isIncoming)
     {
-        this.isIncoming = isIncoming;
+        this._isIncoming = isIncoming;
         return this;
     }
 
     public override bool? IsOutgoing()
     {
-        return isIncoming == null ? null : !isIncoming;
+        return _isIncoming == null ? null : !_isIncoming;
     }
 
     public MoneroTransferQuery SetIsOutgoing(bool? isOutgoing)
     {
-        isIncoming = isOutgoing == null ? null : !isOutgoing;
+        _isIncoming = isOutgoing == null ? null : !isOutgoing;
         return this;
     }
 
     public string? GetAddress()
     {
-        return address;
+        return _address;
     }
 
     public MoneroTransferQuery SetAddress(string? address)
     {
-        this.address = address;
+        this._address = address;
         return this;
     }
 
     public List<string>? GetAddresses()
     {
-        return addresses;
+        return _addresses;
     }
 
     public MoneroTransferQuery SetAddresses(List<string>? addresses)
     {
-        this.addresses = addresses;
+        this._addresses = addresses;
         return this;
     }
 
@@ -117,45 +117,45 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public uint? GetSubaddressIndex()
     {
-        return subaddressIndex;
+        return _subaddressIndex;
     }
 
     public MoneroTransferQuery SetSubaddressIndex(uint? subaddressIndex)
     {
-        this.subaddressIndex = subaddressIndex;
+        this._subaddressIndex = subaddressIndex;
         return this;
     }
 
     public List<uint>? GetSubaddressIndices()
     {
-        return subaddressIndices;
+        return _subaddressIndices;
     }
 
     public MoneroTransferQuery SetSubaddressIndices(List<uint>? subaddressIndices)
     {
-        this.subaddressIndices = subaddressIndices;
+        this._subaddressIndices = subaddressIndices;
         return this;
     }
 
     public List<MoneroDestination>? GetDestinations()
     {
-        return destinations;
+        return _destinations;
     }
 
     public MoneroTransferQuery SetDestinations(List<MoneroDestination>? destinations)
     {
-        this.destinations = destinations;
+        this._destinations = destinations;
         return this;
     }
 
     public bool? HasDestinations()
     {
-        return hasDestinations;
+        return _hasDestinations;
     }
 
     public MoneroTransferQuery SetHasDestinations(bool? hasDestinations)
     {
-        this.hasDestinations = hasDestinations;
+        this._hasDestinations = hasDestinations;
         return this;
     }
 

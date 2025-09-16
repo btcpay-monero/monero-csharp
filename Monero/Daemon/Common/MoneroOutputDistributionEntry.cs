@@ -3,18 +3,18 @@ namespace Monero.Daemon.Common;
 public class MoneroOutputDistributionEntry
 {
     private uint? _base;
-    private ulong? amount;
-    private List<uint>? distribution;
-    private ulong? startHeight;
+    private ulong? _amount;
+    private List<uint>? _distribution;
+    private ulong? _startHeight;
 
     public ulong? GetAmount()
     {
-        return amount;
+        return _amount;
     }
 
     public void SetAmount(ulong? amount)
     {
-        this.amount = amount;
+        this._amount = amount;
     }
 
     public uint? GetBase()
@@ -22,28 +22,28 @@ public class MoneroOutputDistributionEntry
         return _base;
     }
 
-    public void SetBase(uint? _base)
+    public void SetBase(uint? entryBase)
     {
-        this._base = _base;
+        this._base = entryBase;
     }
 
     public List<uint>? GetDistribution()
     {
-        return distribution;
+        return _distribution;
     }
 
     public void SetDistribution(List<uint> distribution)
     {
-        this.distribution = distribution;
+        this._distribution = distribution;
     }
 
     public ulong? GetStartHeight()
     {
-        return startHeight;
+        return _startHeight;
     }
 
     public void SetStartHeight(ulong? startHeight)
     {
-        this.startHeight = startHeight;
+        this._startHeight = startHeight;
     }
 }

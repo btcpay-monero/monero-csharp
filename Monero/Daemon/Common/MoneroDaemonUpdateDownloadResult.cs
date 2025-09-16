@@ -2,7 +2,7 @@ namespace Monero.Daemon.Common;
 
 public class MoneroDaemonUpdateDownloadResult : MoneroDaemonUpdateCheckResult
 {
-    private string? downloadPath;
+    private string? _downloadPath;
 
     public MoneroDaemonUpdateDownloadResult(MoneroDaemonUpdateCheckResult checkResult) : base(checkResult)
     {
@@ -10,16 +10,16 @@ public class MoneroDaemonUpdateDownloadResult : MoneroDaemonUpdateCheckResult
 
     public MoneroDaemonUpdateDownloadResult(MoneroDaemonUpdateDownloadResult checkResult) : base(checkResult)
     {
-        downloadPath = checkResult.downloadPath;
+        _downloadPath = checkResult._downloadPath;
     }
 
     public string? GetDownloadPath()
     {
-        return downloadPath;
+        return _downloadPath;
     }
 
     public void SetDownloadPath(string? downloadPath)
     {
-        this.downloadPath = downloadPath;
+        this._downloadPath = downloadPath;
     }
 }

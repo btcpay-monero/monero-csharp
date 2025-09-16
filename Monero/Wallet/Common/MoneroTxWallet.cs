@@ -4,19 +4,19 @@ namespace Monero.Wallet.Common;
 
 public class MoneroTxWallet : MoneroTx
 {
-    private string? changeAddress;
-    private ulong? changeAmount;
-    private string? extraHex; // TODO: refactor MoneroTx to only use extra as hex string
-    private List<MoneroIncomingTransfer>? incomingTransfers;
-    private ulong? inputSum;
-    private bool? isIncoming;
-    private bool? isLocked;
-    private bool? isOutgoing;
-    private string? note;
-    private uint? numDummyOutputs;
-    private MoneroOutgoingTransfer? outgoingTransfer;
-    private ulong? outputSum;
-    private MoneroTxSet? txSet;
+    private string? _changeAddress;
+    private ulong? _changeAmount;
+    private string? _extraHex; // TODO: refactor MoneroTx to only use extra as hex string
+    private List<MoneroIncomingTransfer>? _incomingTransfers;
+    private ulong? _inputSum;
+    private bool? _isIncoming;
+    private bool? _isLocked;
+    private bool? _isOutgoing;
+    private string? _note;
+    private uint? _numDummyOutputs;
+    private MoneroOutgoingTransfer? _outgoingTransfer;
+    private ulong? _outputSum;
+    private MoneroTxSet? _txSet;
 
     public MoneroTxWallet()
     {
@@ -25,31 +25,31 @@ public class MoneroTxWallet : MoneroTx
 
     public MoneroTxWallet(MoneroTxWallet tx) : base(tx)
     {
-        txSet = tx.txSet;
-        isIncoming = tx.isIncoming;
-        isOutgoing = tx.isOutgoing;
-        if (tx.incomingTransfers != null)
+        _txSet = tx._txSet;
+        _isIncoming = tx._isIncoming;
+        _isOutgoing = tx._isOutgoing;
+        if (tx._incomingTransfers != null)
         {
-            incomingTransfers = [];
-            foreach (MoneroIncomingTransfer transfer in tx.incomingTransfers)
+            _incomingTransfers = [];
+            foreach (MoneroIncomingTransfer transfer in tx._incomingTransfers)
             {
-                incomingTransfers.Add(transfer.Clone().SetTx(this));
+                _incomingTransfers.Add(transfer.Clone().SetTx(this));
             }
         }
 
-        if (tx.outgoingTransfer != null)
+        if (tx._outgoingTransfer != null)
         {
-            outgoingTransfer = tx.outgoingTransfer.Clone().SetTx(this);
+            _outgoingTransfer = tx._outgoingTransfer.Clone().SetTx(this);
         }
 
-        note = tx.note;
-        isLocked = tx.isLocked;
-        inputSum = tx.inputSum;
-        outputSum = tx.outputSum;
-        changeAddress = tx.changeAddress;
-        changeAmount = tx.changeAmount;
-        numDummyOutputs = tx.numDummyOutputs;
-        extraHex = tx.extraHex;
+        _note = tx._note;
+        _isLocked = tx._isLocked;
+        _inputSum = tx._inputSum;
+        _outputSum = tx._outputSum;
+        _changeAddress = tx._changeAddress;
+        _changeAmount = tx._changeAmount;
+        _numDummyOutputs = tx._numDummyOutputs;
+        _extraHex = tx._extraHex;
     }
 
     public override MoneroTxWallet Clone()
@@ -59,34 +59,34 @@ public class MoneroTxWallet : MoneroTx
 
     public MoneroTxSet? GetTxSet()
     {
-        return txSet;
+        return _txSet;
     }
 
     public virtual MoneroTxWallet SetTxSet(MoneroTxSet? txSet)
     {
-        this.txSet = txSet;
+        this._txSet = txSet;
         return this;
     }
 
     public virtual bool? IsIncoming()
     {
-        return isIncoming;
+        return _isIncoming;
     }
 
     public virtual MoneroTxWallet SetIsIncoming(bool? isIncoming)
     {
-        this.isIncoming = isIncoming;
+        this._isIncoming = isIncoming;
         return this;
     }
 
     public virtual bool? IsOutgoing()
     {
-        return isOutgoing;
+        return _isOutgoing;
     }
 
     public virtual MoneroTxWallet SetIsOutgoing(bool? isOutgoing)
     {
-        this.isOutgoing = isOutgoing;
+        this._isOutgoing = isOutgoing;
         return this;
     }
 
@@ -193,23 +193,23 @@ public class MoneroTxWallet : MoneroTx
 
     public List<MoneroIncomingTransfer>? GetIncomingTransfers()
     {
-        return incomingTransfers;
+        return _incomingTransfers;
     }
 
     public virtual MoneroTxWallet SetIncomingTransfers(List<MoneroIncomingTransfer>? incomingTransfers)
     {
-        this.incomingTransfers = incomingTransfers;
+        this._incomingTransfers = incomingTransfers;
         return this;
     }
 
     public MoneroOutgoingTransfer? GetOutgoingTransfer()
     {
-        return outgoingTransfer;
+        return _outgoingTransfer;
     }
 
     public virtual MoneroTxWallet SetOutgoingTransfer(MoneroOutgoingTransfer? outgoingTransfer)
     {
-        this.outgoingTransfer = outgoingTransfer;
+        this._outgoingTransfer = outgoingTransfer;
         return this;
     }
 
@@ -343,69 +343,69 @@ public class MoneroTxWallet : MoneroTx
 
     public string? GetNote()
     {
-        return note;
+        return _note;
     }
 
     public virtual MoneroTxWallet SetNote(string? note)
     {
-        this.note = note;
+        this._note = note;
         return this;
     }
 
     public bool? IsLocked()
     {
-        return isLocked;
+        return _isLocked;
     }
 
     public virtual MoneroTxWallet SetIsLocked(bool? isLocked)
     {
-        this.isLocked = isLocked;
+        this._isLocked = isLocked;
         return this;
     }
 
     public virtual MoneroTxWallet SetInputSum(ulong? inputSum)
     {
-        this.inputSum = inputSum;
+        this._inputSum = inputSum;
         return this;
     }
 
     public virtual MoneroTxWallet SetOutputSum(ulong? outputSum)
     {
-        this.outputSum = outputSum;
+        this._outputSum = outputSum;
         return this;
     }
 
     public string? GetChangeAddress()
     {
-        return changeAddress;
+        return _changeAddress;
     }
 
     public virtual MoneroTxWallet SetChangeAddress(string? changeAddress)
     {
-        this.changeAddress = changeAddress;
+        this._changeAddress = changeAddress;
         return this;
     }
 
     public virtual MoneroTxWallet SetChangeAmount(ulong? changeAmount)
     {
-        this.changeAmount = changeAmount;
+        this._changeAmount = changeAmount;
         return this;
     }
 
     public virtual MoneroTxWallet SetNumDummyOutputs(uint? numDummyOutputs)
     {
-        this.numDummyOutputs = numDummyOutputs;
+        this._numDummyOutputs = numDummyOutputs;
         return this;
     }
 
     public string? GetExtraHex()
     {
-        return extraHex;
+        return _extraHex;
     }
 
     public virtual MoneroTxWallet SetExtraHex(string? extraHex)
     {
-        this.extraHex = extraHex;
+        this._extraHex = extraHex;
         return this;
     }
 }

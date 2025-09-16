@@ -2026,9 +2026,9 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             Assert.True(stats.GetBytesMed() > 0);
             Assert.True(stats.GetBytesMin() > 0);
             Assert.True(stats.GetBytesTotal() > 0);
-            Assert.True(stats.GetHisto98pc() == null || stats.GetHisto98pc() > 0);
+            Assert.True(stats.GetHisto98Pc() == null || stats.GetHisto98Pc() > 0);
             Assert.True(stats.GetOldestTimestamp() > 0);
-            Assert.True(stats.GetNum10m() >= 0);
+            Assert.True(stats.GetNum10M() >= 0);
             Assert.True(stats.GetNumDoubleSpends() >= 0);
             Assert.True(stats.GetNumFailing() >= 0);
             Assert.True(stats.GetNumNotRelayed() >= 0);
@@ -2039,9 +2039,9 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             Assert.Null(stats.GetBytesMed());
             Assert.Null(stats.GetBytesMin());
             Assert.True(0 == (long)stats.GetBytesTotal());
-            Assert.Null(stats.GetHisto98pc());
+            Assert.Null(stats.GetHisto98Pc());
             Assert.Null(stats.GetOldestTimestamp());
-            Assert.True(0 == (int)stats.GetNum10m());
+            Assert.True(0 == (int)stats.GetNum10M());
             Assert.True(0 == (int)stats.GetNumDoubleSpends());
             Assert.True(0 == (int)stats.GetNumFailing());
             Assert.True(0 == (int)stats.GetNumNotRelayed());

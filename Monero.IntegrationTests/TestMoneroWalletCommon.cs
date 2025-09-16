@@ -58,9 +58,9 @@ public abstract class TestMoneroWalletCommon
                 MoneroUtils.ValidatePrivateViewKey(moneroWallet.GetPrivateViewKey());
                 MoneroUtils.ValidatePrivateSpendKey(moneroWallet.GetPrivateSpendKey());
                 MoneroUtils.ValidateMnemonic(moneroWallet.GetSeed());
-                if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
+                if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
                 {
-                    Assert.True(MoneroWallet.DEFAULT_LANGUAGE ==
+                    Assert.True(MoneroWallet.DefaultLanguage ==
                                 moneroWallet.GetSeedLanguage()); // TODO monero-wallet-rpc: get seed language
                 }
             }
@@ -132,9 +132,9 @@ public abstract class TestMoneroWalletCommon
                 Assert.True(privateViewKey == moneroWallet.GetPrivateViewKey());
                 Assert.True(privateSpendKey == moneroWallet.GetPrivateSpendKey());
                 Assert.True(TestUtils.SEED == moneroWallet.GetSeed());
-                if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
+                if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
                 {
-                    Assert.True(MoneroWallet.DEFAULT_LANGUAGE == moneroWallet.GetSeedLanguage());
+                    Assert.True(MoneroWallet.DefaultLanguage == moneroWallet.GetSeedLanguage());
                 }
             }
             catch (Exception e)
@@ -201,9 +201,9 @@ public abstract class TestMoneroWalletCommon
                 Assert.True(TestUtils.SEED == moneroWallet.GetSeed());
                 MoneroUtils.ValidateAddress(moneroWallet.GetPrimaryAddress());
                 Assert.True(TestUtils.ADDRESS != moneroWallet.GetPrimaryAddress());
-                if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
+                if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
                 {
-                    Assert.True(MoneroWallet.DEFAULT_LANGUAGE ==
+                    Assert.True(MoneroWallet.DefaultLanguage ==
                                 moneroWallet.GetSeedLanguage()); // TODO monero-wallet-rpc: support
                 }
             }
@@ -261,11 +261,11 @@ public abstract class TestMoneroWalletCommon
 
                 Assert.True(moneroWallet.IsConnectedToDaemon(),
                     "Wallet created from keys is not connected to authenticated daemon");
-                if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
+                if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
                 {
                     MoneroUtils.ValidateMnemonic(moneroWallet
                         .GetSeed()); // TODO monero-wallet-rpc: cannot get seed from wallet created from keys?
-                    Assert.True(MoneroWallet.DEFAULT_LANGUAGE == moneroWallet.GetSeedLanguage());
+                    Assert.True(MoneroWallet.DefaultLanguage == moneroWallet.GetSeedLanguage());
                 }
             }
             catch (Exception e)
@@ -280,7 +280,7 @@ public abstract class TestMoneroWalletCommon
             }
 
             // recreate test wallet from spend key
-            if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
+            if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
             {
                 // TODO monero-wallet-rpc: cannot create wallet from spend key?
                 moneroWallet = CreateWallet(new MoneroWalletConfig().SetPrivateSpendKey(privateSpendKey)
@@ -299,11 +299,11 @@ public abstract class TestMoneroWalletCommon
 
                     Assert.True(moneroWallet.IsConnectedToDaemon(),
                         "Wallet created from keys is not connected to authenticated daemon");
-                    if (moneroWallet.GetWalletType() != MoneroWalletType.RPC)
+                    if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
                     {
                         MoneroUtils.ValidateMnemonic(moneroWallet
                             .GetSeed()); // TODO monero-wallet-rpc: cannot get seed from wallet created from keys?
-                        Assert.True(MoneroWallet.DEFAULT_LANGUAGE == moneroWallet.GetSeedLanguage());
+                        Assert.True(MoneroWallet.DefaultLanguage == moneroWallet.GetSeedLanguage());
                     }
                 }
                 catch (Exception e)
@@ -576,7 +576,7 @@ public abstract class TestMoneroWalletCommon
     {
         Assert.True(TEST_NON_RELAYS);
         string language = wallet.GetSeedLanguage();
-        Assert.True(MoneroWallet.DEFAULT_LANGUAGE == language);
+        Assert.True(MoneroWallet.DefaultLanguage == language);
     }
 
     // Can get a list of supported languages for the seed

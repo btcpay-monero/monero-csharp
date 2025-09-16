@@ -1950,11 +1950,11 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             }
             else if (key.Equals("histo_98pc"))
             {
-                stats.SetHisto98pc(Convert.ToUInt64(val));
+                stats.SetHisto98Pc(Convert.ToUInt64(val));
             }
             else if (key.Equals("num_10m"))
             {
-                stats.SetNum10m(Convert.ToInt32(val));
+                stats.SetNum10M(Convert.ToInt32(val));
             }
             else if (key.Equals("num_double_spends"))
             {
@@ -1995,9 +1995,9 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         }
 
         // uninitialize some stats if not applicable
-        if (stats.GetHisto98pc() == 0)
+        if (stats.GetHisto98Pc() == 0)
         {
-            stats.SetHisto98pc(null);
+            stats.SetHisto98Pc(null);
         }
 
         if (stats.GetNumTxs() == 0)
@@ -2005,7 +2005,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             stats.SetBytesMin(null);
             stats.SetBytesMed(null);
             stats.SetBytesMax(null);
-            stats.SetHisto98pc(null);
+            stats.SetHisto98Pc(null);
             stats.SetOldestTimestamp(null);
         }
 

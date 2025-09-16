@@ -2,7 +2,7 @@ namespace Monero.Wallet.Common;
 
 internal class MoneroIncomingTransferComparer : Comparer<MoneroIncomingTransfer>
 {
-    private static readonly MoneroTxHeightComparer TX_HEIGHT_COMPARATOR = new();
+    private static readonly MoneroTxHeightComparer TxHeightComparator = new();
 
     public override int Compare(MoneroIncomingTransfer? t1, MoneroIncomingTransfer? t2)
     {
@@ -22,7 +22,7 @@ internal class MoneroIncomingTransferComparer : Comparer<MoneroIncomingTransfer>
             return -1;
         }
 
-        int heightComparison = TX_HEIGHT_COMPARATOR.Compare(t1.GetTx(), t2.GetTx());
+        int heightComparison = TxHeightComparator.Compare(t1.GetTx(), t2.GetTx());
         if (heightComparison != 0)
         {
             return heightComparison;

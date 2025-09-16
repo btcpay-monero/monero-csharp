@@ -9,21 +9,21 @@ public class MoneroWalletConfig
     private string? _password;
     private string? _path;
     private MoneroRpcConnection? _server;
-    private int? accountLookahead; // number of accounts to scan
-    private byte[]? cacheData;
-    private MoneroConnectionManager? connectionManager;
-    private byte[]? keysData;
-    private string? language;
-    private string? primaryAddress;
-    private string? privateSpendKey;
-    private string? privateViewKey;
-    private ulong? restoreHeight;
-    private bool? saveCurrent;
-    private string? seed;
-    private string? seedOffset;
-    private string? serverPassword;
-    private string? serverUsername;
-    private int? subaddressLookahead; // number of subaddresses to scan per account
+    private int? _accountLookahead; // number of accounts to scan
+    private byte[]? _cacheData;
+    private MoneroConnectionManager? _connectionManager;
+    private byte[]? _keysData;
+    private string? _language;
+    private string? _primaryAddress;
+    private string? _privateSpendKey;
+    private string? _privateViewKey;
+    private ulong? _restoreHeight;
+    private bool? _saveCurrent;
+    private string? _seed;
+    private string? _seedOffset;
+    private string? _serverPassword;
+    private string? _serverUsername;
+    private int? _subaddressLookahead; // number of subaddresses to scan per account
 
     public MoneroWalletConfig() { }
 
@@ -33,19 +33,19 @@ public class MoneroWalletConfig
         _password = config.GetPassword();
         _networkType = config.GetNetworkType();
         _server = config.GetServer();
-        connectionManager = config.GetConnectionManager();
-        seed = config.GetSeed();
-        seedOffset = config.GetSeedOffset();
-        primaryAddress = config.GetPrimaryAddress();
-        privateViewKey = config.GetPrivateViewKey();
-        privateSpendKey = config.GetPrivateSpendKey();
-        restoreHeight = config.GetRestoreHeight();
-        language = config.GetLanguage();
-        saveCurrent = config.GetSaveCurrent();
-        accountLookahead = config.GetAccountLookahead();
-        subaddressLookahead = config.GetSubaddressLookahead();
-        keysData = config.GetKeysData();
-        cacheData = config.GetCacheData();
+        _connectionManager = config.GetConnectionManager();
+        _seed = config.GetSeed();
+        _seedOffset = config.GetSeedOffset();
+        _primaryAddress = config.GetPrimaryAddress();
+        _privateViewKey = config.GetPrivateViewKey();
+        _privateSpendKey = config.GetPrivateSpendKey();
+        _restoreHeight = config.GetRestoreHeight();
+        _language = config.GetLanguage();
+        _saveCurrent = config.GetSaveCurrent();
+        _accountLookahead = config.GetAccountLookahead();
+        _subaddressLookahead = config.GetSubaddressLookahead();
+        _keysData = config.GetKeysData();
+        _cacheData = config.GetCacheData();
         _isMultisig = config.IsMultisig();
     }
 
@@ -97,11 +97,11 @@ public class MoneroWalletConfig
         return _server;
     }
 
-    public MoneroWalletConfig SetServer(MoneroRpcConnection server)
+    public MoneroWalletConfig SetServer(MoneroRpcConnection? server)
     {
         _server = server;
-        serverUsername = server == null ? null : server.GetUsername();
-        serverPassword = server == null ? null : server.GetPassword();
+        _serverUsername = server == null ? null : server.GetUsername();
+        _serverPassword = server == null ? null : server.GetPassword();
         return this;
     }
 
@@ -112,7 +112,7 @@ public class MoneroWalletConfig
 
     public MoneroWalletConfig SetServerUri(string? serverUri)
     {
-        if (serverUri == null || serverUri == "")
+        if (string.IsNullOrEmpty(serverUri))
         {
             _server = null;
             return this;
@@ -127,9 +127,9 @@ public class MoneroWalletConfig
             _server.SetUri(serverUri);
         }
 
-        if (serverUsername != null && serverPassword != null)
+        if (_serverUsername != null && _serverPassword != null)
         {
-            _server.SetCredentials(serverUsername, serverPassword);
+            _server.SetCredentials(_serverUsername, _serverPassword);
         }
 
         return this;
@@ -142,10 +142,10 @@ public class MoneroWalletConfig
 
     public MoneroWalletConfig SetServerUsername(string? serverUsernameInput)
     {
-        this.serverUsername = serverUsernameInput;
-        if (_server != null && serverUsernameInput != null && serverPassword != null)
+        this._serverUsername = serverUsernameInput;
+        if (_server != null && serverUsernameInput != null && _serverPassword != null)
         {
-            _server.SetCredentials(serverUsernameInput, serverPassword);
+            _server.SetCredentials(serverUsernameInput, _serverPassword);
         }
 
         return this;
@@ -158,10 +158,10 @@ public class MoneroWalletConfig
 
     public MoneroWalletConfig SetServerPassword(string? serverPassword)
     {
-        this.serverPassword = serverPassword;
-        if (_server != null && serverUsername != null && serverPassword != null)
+        this._serverPassword = serverPassword;
+        if (_server != null && _serverUsername != null && serverPassword != null)
         {
-            _server.SetCredentials(serverUsername, serverPassword);
+            _server.SetCredentials(_serverUsername, serverPassword);
         }
 
         return this;
@@ -169,144 +169,144 @@ public class MoneroWalletConfig
 
     public MoneroConnectionManager? GetConnectionManager()
     {
-        return connectionManager;
+        return _connectionManager;
     }
 
     public MoneroWalletConfig SetConnectionManager(MoneroConnectionManager connectionManager)
     {
-        this.connectionManager = connectionManager;
+        this._connectionManager = connectionManager;
         return this;
     }
 
     public string? GetSeed()
     {
-        return seed;
+        return _seed;
     }
 
     public MoneroWalletConfig SetSeed(string? seed)
     {
-        this.seed = seed;
+        this._seed = seed;
         return this;
     }
 
     public string? GetSeedOffset()
     {
-        return seedOffset;
+        return _seedOffset;
     }
 
     public MoneroWalletConfig SetSeedOffset(string? seedOffset)
     {
-        this.seedOffset = seedOffset;
+        this._seedOffset = seedOffset;
         return this;
     }
 
     public string? GetPrimaryAddress()
     {
-        return primaryAddress;
+        return _primaryAddress;
     }
 
     public MoneroWalletConfig SetPrimaryAddress(string? primaryAddress)
     {
-        this.primaryAddress = primaryAddress;
+        this._primaryAddress = primaryAddress;
         return this;
     }
 
     public string? GetPrivateViewKey()
     {
-        return privateViewKey;
+        return _privateViewKey;
     }
 
     public MoneroWalletConfig SetPrivateViewKey(string? privateViewKey)
     {
-        this.privateViewKey = privateViewKey;
+        this._privateViewKey = privateViewKey;
         return this;
     }
 
     public string? GetPrivateSpendKey()
     {
-        return privateSpendKey;
+        return _privateSpendKey;
     }
 
     public MoneroWalletConfig SetPrivateSpendKey(string? privateSpendKey)
     {
-        this.privateSpendKey = privateSpendKey;
+        this._privateSpendKey = privateSpendKey;
         return this;
     }
 
     public ulong? GetRestoreHeight()
     {
-        return restoreHeight;
+        return _restoreHeight;
     }
 
     public MoneroWalletConfig SetRestoreHeight(ulong? restoreHeight)
     {
-        this.restoreHeight = restoreHeight;
+        this._restoreHeight = restoreHeight;
         return this;
     }
 
     public string? GetLanguage()
     {
-        return language;
+        return _language;
     }
 
     public MoneroWalletConfig SetLanguage(string? language)
     {
-        this.language = language;
+        this._language = language;
         return this;
     }
 
     public bool? GetSaveCurrent()
     {
-        return saveCurrent;
+        return _saveCurrent;
     }
 
     public MoneroWalletConfig SetSaveCurrent(bool? saveCurrent)
     {
-        this.saveCurrent = saveCurrent;
+        this._saveCurrent = saveCurrent;
         return this;
     }
 
     public MoneroWalletConfig SetAccountLookahead(int? accountLookahead)
     {
-        this.accountLookahead = accountLookahead;
+        this._accountLookahead = accountLookahead;
         return this;
     }
 
     public int? GetAccountLookahead()
     {
-        return accountLookahead;
+        return _accountLookahead;
     }
 
     public MoneroWalletConfig SetSubaddressLookahead(int? subaddressLookahead)
     {
-        this.subaddressLookahead = subaddressLookahead;
+        this._subaddressLookahead = subaddressLookahead;
         return this;
     }
 
     public int? GetSubaddressLookahead()
     {
-        return subaddressLookahead;
+        return _subaddressLookahead;
     }
 
     public byte[]? GetKeysData()
     {
-        return keysData;
+        return _keysData;
     }
 
     public MoneroWalletConfig SetKeysData(byte[]? keysData)
     {
-        this.keysData = keysData;
+        this._keysData = keysData;
         return this;
     }
 
     public byte[]? GetCacheData()
     {
-        return cacheData;
+        return _cacheData;
     }
 
     public MoneroWalletConfig SetCacheData(byte[]? cacheData)
     {
-        this.cacheData = cacheData;
+        this._cacheData = cacheData;
         return this;
     }
 

@@ -2,6 +2,6 @@ namespace Monero.Wallet;
 
 public enum MoneroWalletType
 {
-    FULL = 0, // full wallet
-    RPC = 1 // rpc wallet
+    Full = 0, // full wallet
+    Rpc = 1 // rpc wallet
 }

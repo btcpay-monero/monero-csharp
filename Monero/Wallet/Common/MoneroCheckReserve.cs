@@ -4,8 +4,8 @@ namespace Monero.Wallet.Common;
 
 public class MoneroCheckReserve : MoneroCheck
 {
-    private ulong? totalAmount;
-    private ulong? unconfirmedSpentAmount;
+    private ulong? _totalAmount;
+    private ulong? _unconfirmedSpentAmount;
 
     public MoneroCheckReserve()
         : base(false)
@@ -16,29 +16,29 @@ public class MoneroCheckReserve : MoneroCheck
     public MoneroCheckReserve(bool isGood, ulong? totalAmount, ulong? unconfirmedSpentAmount)
         : base(isGood)
     {
-        this.totalAmount = totalAmount;
-        this.unconfirmedSpentAmount = unconfirmedSpentAmount;
+        this._totalAmount = totalAmount;
+        this._unconfirmedSpentAmount = unconfirmedSpentAmount;
     }
 
     public ulong? GetTotalAmount()
     {
-        return totalAmount;
+        return _totalAmount;
     }
 
     public MoneroCheckReserve SetTotalAmount(ulong? totalAmount)
     {
-        this.totalAmount = totalAmount;
+        this._totalAmount = totalAmount;
         return this;
     }
 
     public ulong? GetUnconfirmedSpentAmount()
     {
-        return unconfirmedSpentAmount;
+        return _unconfirmedSpentAmount;
     }
 
     public MoneroCheckReserve SetUnconfirmedSpentAmount(ulong? unconfirmedSpentAmount)
     {
-        this.unconfirmedSpentAmount = unconfirmedSpentAmount;
+        this._unconfirmedSpentAmount = unconfirmedSpentAmount;
         return this;
     }
 }

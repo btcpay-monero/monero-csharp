@@ -2,112 +2,112 @@ namespace Monero.Wallet.Common;
 
 public class MoneroAccount
 {
-    private ulong balance;
-    private uint? index;
-    private string? primaryAddress;
-    private List<MoneroSubaddress>? subaddresses;
-    private string? tag;
-    private ulong unlockedBalance;
+    private ulong _balance;
+    private uint? _index;
+    private string? _primaryAddress;
+    private List<MoneroSubaddress>? _subaddresses;
+    private string? _tag;
+    private ulong _unlockedBalance;
 
     public MoneroAccount()
     {
-        balance = 0;
-        unlockedBalance = 0;
+        _balance = 0;
+        _unlockedBalance = 0;
     }
 
     public MoneroAccount(uint? index)
     {
-        this.index = index;
-        balance = 0;
-        unlockedBalance = 0;
+        this._index = index;
+        _balance = 0;
+        _unlockedBalance = 0;
     }
 
     public MoneroAccount(uint? index, string? primaryAddress)
     {
-        this.index = index;
-        this.primaryAddress = primaryAddress;
-        balance = 0;
-        unlockedBalance = 0;
+        this._index = index;
+        this._primaryAddress = primaryAddress;
+        _balance = 0;
+        _unlockedBalance = 0;
     }
 
     public MoneroAccount(uint? index, string? primaryAddress, ulong? balance, ulong? unlockedBalance,
         List<MoneroSubaddress>? subaddresses)
     {
-        this.index = index;
-        this.primaryAddress = primaryAddress;
-        this.balance = balance ?? 0;
-        this.unlockedBalance = unlockedBalance ?? 0;
-        this.subaddresses = subaddresses;
+        this._index = index;
+        this._primaryAddress = primaryAddress;
+        this._balance = balance ?? 0;
+        this._unlockedBalance = unlockedBalance ?? 0;
+        this._subaddresses = subaddresses;
     }
 
     public uint? GetIndex()
     {
-        return index;
+        return _index;
     }
 
     public MoneroAccount SetIndex(uint? index)
     {
-        this.index = index;
+        this._index = index;
         return this;
     }
 
     public string? GetPrimaryAddress()
     {
-        return primaryAddress;
+        return _primaryAddress;
     }
 
     public MoneroAccount SetPrimaryAddress(string? primaryAddress)
     {
-        this.primaryAddress = primaryAddress;
+        this._primaryAddress = primaryAddress;
         return this;
     }
 
     public ulong GetBalance()
     {
-        return balance;
+        return _balance;
     }
 
     public MoneroAccount SetBalance(ulong balance)
     {
-        this.balance = balance;
+        this._balance = balance;
         return this;
     }
 
     public ulong GetUnlockedBalance()
     {
-        return unlockedBalance;
+        return _unlockedBalance;
     }
 
     public MoneroAccount SetUnlockedBalance(ulong unlockedBalance)
     {
-        this.unlockedBalance = unlockedBalance;
+        this._unlockedBalance = unlockedBalance;
         return this;
     }
 
     public string? GetTag()
     {
-        return tag;
+        return _tag;
     }
 
     public MoneroAccount SetTag(string? tag)
     {
-        this.tag = tag;
+        this._tag = tag;
         return this;
     }
 
     public List<MoneroSubaddress>? GetSubaddresses()
     {
-        return subaddresses;
+        return _subaddresses;
     }
 
     public MoneroAccount SetSubaddresses(List<MoneroSubaddress>? subaddresses)
     {
-        this.subaddresses = subaddresses;
+        this._subaddresses = subaddresses;
         if (subaddresses != null)
         {
             foreach (MoneroSubaddress subaddress in subaddresses)
             {
-                subaddress.SetAccountIndex(index);
+                subaddress.SetAccountIndex(_index);
             }
         }
 

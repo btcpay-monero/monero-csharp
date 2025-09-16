@@ -2,196 +2,196 @@ namespace Monero.Daemon.Common;
 
 public class MoneroSubmitTxResult
 {
-    private ulong? credits;
-    private bool? hasInvalidInput;
-    private bool? hasInvalidOutput;
-    private bool? hasTooFewOutputs;
-    private bool? isDoubleSpend;
-    private bool? isFeeTooLow;
-    private bool? isGood;
-    private bool? isMixinTooLow;
-    private bool? isNonzeroUnlockTime;
-    private bool? isOverspend;
-    private bool? isRelayed;
-    private bool? isTooBig;
-    private bool? isTxExtraTooBig;
-    private string? reason;
-    private bool? sanityCheckFailed;
-    private string? topBlockHash;
+    private ulong? _credits;
+    private bool? _hasInvalidInput;
+    private bool? _hasInvalidOutput;
+    private bool? _hasTooFewOutputs;
+    private bool? _isDoubleSpend;
+    private bool? _isFeeTooLow;
+    private bool? _isGood;
+    private bool? _isMixinTooLow;
+    private bool? _isNonzeroUnlockTime;
+    private bool? _isOverspend;
+    private bool? _isRelayed;
+    private bool? _isTooBig;
+    private bool? _isTxExtraTooBig;
+    private string? _reason;
+    private bool? _sanityCheckFailed;
+    private string? _topBlockHash;
 
     public bool? IsGood()
     {
-        return isGood;
+        return _isGood;
     }
 
     public MoneroSubmitTxResult SetIsGood(bool? isGood)
     {
-        this.isGood = isGood;
+        this._isGood = isGood;
         return this;
     }
 
     public bool? IsRelayed()
     {
-        return isRelayed;
+        return _isRelayed;
     }
 
     public MoneroSubmitTxResult SetIsRelayed(bool? isRelayed)
     {
-        this.isRelayed = isRelayed;
+        this._isRelayed = isRelayed;
         return this;
     }
 
     public bool? IsDoubleSpend()
     {
-        return isDoubleSpend;
+        return _isDoubleSpend;
     }
 
     public MoneroSubmitTxResult SetIsDoubleSpend(bool? isDoubleSpend)
     {
-        this.isDoubleSpend = isDoubleSpend;
+        this._isDoubleSpend = isDoubleSpend;
         return this;
     }
 
     public bool? IsFeeTooLow()
     {
-        return isFeeTooLow;
+        return _isFeeTooLow;
     }
 
     public MoneroSubmitTxResult SetIsFeeTooLow(bool? isFeeTooLow)
     {
-        this.isFeeTooLow = isFeeTooLow;
+        this._isFeeTooLow = isFeeTooLow;
         return this;
     }
 
     public bool? IsMixinTooLow()
     {
-        return isMixinTooLow;
+        return _isMixinTooLow;
     }
 
     public MoneroSubmitTxResult SetIsMixinTooLow(bool? isMixinTooLow)
     {
-        this.isMixinTooLow = isMixinTooLow;
+        this._isMixinTooLow = isMixinTooLow;
         return this;
     }
 
     public bool? HasInvalidInput()
     {
-        return hasInvalidInput;
+        return _hasInvalidInput;
     }
 
     public MoneroSubmitTxResult SetHasInvalidInput(bool? hasInvalidInput)
     {
-        this.hasInvalidInput = hasInvalidInput;
+        this._hasInvalidInput = hasInvalidInput;
         return this;
     }
 
     public bool? HasInvalidOutput()
     {
-        return hasInvalidOutput;
+        return _hasInvalidOutput;
     }
 
     public MoneroSubmitTxResult SetHasInvalidOutput(bool? hasInvalidOutput)
     {
-        this.hasInvalidOutput = hasInvalidOutput;
+        this._hasInvalidOutput = hasInvalidOutput;
         return this;
     }
 
     public bool? HasTooFewOutputs()
     {
-        return hasTooFewOutputs;
+        return _hasTooFewOutputs;
     }
 
     public MoneroSubmitTxResult SetHasTooFewOutputs(bool? hasTooFewOutputs)
     {
-        this.hasTooFewOutputs = hasTooFewOutputs;
+        this._hasTooFewOutputs = hasTooFewOutputs;
         return this;
     }
 
     public bool? IsOverspend()
     {
-        return isOverspend;
+        return _isOverspend;
     }
 
     public MoneroSubmitTxResult SetIsOverspend(bool? isOverspend)
     {
-        this.isOverspend = isOverspend;
+        this._isOverspend = isOverspend;
         return this;
     }
 
     public bool? IsTooBig()
     {
-        return isTooBig;
+        return _isTooBig;
     }
 
     public MoneroSubmitTxResult SetIsTooBig(bool? isTooBig)
     {
-        this.isTooBig = isTooBig;
+        this._isTooBig = isTooBig;
         return this;
     }
 
     public bool? GetSanityCheckFailed()
     {
-        return sanityCheckFailed;
+        return _sanityCheckFailed;
     }
 
     public MoneroSubmitTxResult SetSanityCheckFailed(bool? sanityCheckFailed)
     {
-        this.sanityCheckFailed = sanityCheckFailed;
+        this._sanityCheckFailed = sanityCheckFailed;
         return this;
     }
 
     public string? GetReason()
     {
-        return reason;
+        return _reason;
     }
 
     public MoneroSubmitTxResult SetReason(string? reason)
     {
-        this.reason = reason;
+        this._reason = reason;
         return this;
     }
 
     public ulong? GetCredits()
     {
-        return credits;
+        return _credits;
     }
 
     public MoneroSubmitTxResult SetCredits(ulong? credits)
     {
-        this.credits = credits;
+        this._credits = credits;
         return this;
     }
 
     public string? GetTopBlockHash()
     {
-        return topBlockHash;
+        return _topBlockHash;
     }
 
     public MoneroSubmitTxResult SetTopBlockHash(string? topBlockHash)
     {
-        this.topBlockHash = topBlockHash;
+        this._topBlockHash = topBlockHash;
         return this;
     }
 
     public bool? IsTxExtraTooBig()
     {
-        return isTxExtraTooBig;
+        return _isTxExtraTooBig;
     }
 
     public MoneroSubmitTxResult SetIsTxExtraTooBig(bool? isTxExtraTooBig)
     {
-        this.isTxExtraTooBig = isTxExtraTooBig;
+        this._isTxExtraTooBig = isTxExtraTooBig;
         return this;
     }
 
     public bool? IsNonzeroUnlockTime()
     {
-        return isNonzeroUnlockTime;
+        return _isNonzeroUnlockTime;
     }
 
     public MoneroSubmitTxResult SetIsNonzeroUnlockTime(bool? isNonzeroUnlockTime)
     {
-        this.isNonzeroUnlockTime = isNonzeroUnlockTime;
+        this._isNonzeroUnlockTime = isNonzeroUnlockTime;
         return this;
     }
 }

@@ -2,59 +2,59 @@ namespace Monero.Daemon.Common;
 
 public class MoneroFeeEstimate
 {
-    private ulong? fee;
-    private List<ulong> fees;
-    private ulong? quantizationMask;
+    private ulong? _fee;
+    private List<ulong> _fees;
+    private ulong? _quantizationMask;
 
     public MoneroFeeEstimate()
     {
-        fees = [];
+        _fees = [];
     }
 
     public MoneroFeeEstimate(ulong? fee, List<ulong> fees, ulong? quantizationMask)
     {
-        this.fee = fee;
-        this.fees = fees;
-        this.quantizationMask = quantizationMask;
+        this._fee = fee;
+        this._fees = fees;
+        this._quantizationMask = quantizationMask;
     }
 
     public MoneroFeeEstimate(MoneroFeeEstimate feeEstimate)
     {
-        fee = feeEstimate.fee;
-        fees = new List<ulong>(feeEstimate.fees);
-        quantizationMask = feeEstimate.quantizationMask;
+        _fee = feeEstimate._fee;
+        _fees = new List<ulong>(feeEstimate._fees);
+        _quantizationMask = feeEstimate._quantizationMask;
     }
 
     public ulong? GetFee()
     {
-        return fee;
+        return _fee;
     }
 
     public MoneroFeeEstimate SetFee(ulong? fee)
     {
-        this.fee = fee;
+        this._fee = fee;
         return this;
     }
 
     public List<ulong> GetFees()
     {
-        return fees;
+        return _fees;
     }
 
     public MoneroFeeEstimate SetFees(List<ulong> fees)
     {
-        this.fees = fees;
+        this._fees = fees;
         return this;
     }
 
     public ulong? GetQuantizationMask()
     {
-        return quantizationMask;
+        return _quantizationMask;
     }
 
     public MoneroFeeEstimate SetQuantizationMask(ulong? quantizationMask)
     {
-        this.quantizationMask = quantizationMask;
+        this._quantizationMask = quantizationMask;
         return this;
     }
 

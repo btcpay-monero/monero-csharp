@@ -2,114 +2,114 @@ namespace Monero.Daemon.Common;
 
 public class MoneroHardForkInfo
 {
-    private ulong? credits;
-    private ulong? earliestHeight;
-    private bool? isEnabled;
-    private uint? numVotes;
-    private uint? state;
-    private uint? threshold;
-    private string? topBlockHash;
-    private uint? version;
-    private uint? voting;
-    private uint? window;
+    private ulong? _credits;
+    private ulong? _earliestHeight;
+    private bool? _isEnabled;
+    private uint? _numVotes;
+    private uint? _state;
+    private uint? _threshold;
+    private string? _topBlockHash;
+    private uint? _version;
+    private uint? _voting;
+    private uint? _window;
 
     public ulong? GetEarliestHeight()
     {
-        return earliestHeight;
+        return _earliestHeight;
     }
 
     public void SetEarliestHeight(ulong? earliestHeight)
     {
-        this.earliestHeight = earliestHeight;
+        this._earliestHeight = earliestHeight;
     }
 
     public bool? IsEnabled()
     {
-        return isEnabled;
+        return _isEnabled;
     }
 
     public void SetIsEnabled(bool? isEnabled)
     {
-        this.isEnabled = isEnabled;
+        this._isEnabled = isEnabled;
     }
 
     public uint? GetState()
     {
-        return state;
+        return _state;
     }
 
     public void SetState(uint? state)
     {
-        this.state = state;
+        this._state = state;
     }
 
     public uint? GetThreshold()
     {
-        return threshold;
+        return _threshold;
     }
 
     public void SetThreshold(uint? threshold)
     {
-        this.threshold = threshold;
+        this._threshold = threshold;
     }
 
     public uint? GetVersion()
     {
-        return version;
+        return _version;
     }
 
     public void SetVersion(uint? version)
     {
-        this.version = version;
+        this._version = version;
     }
 
     public uint? GetNumVotes()
     {
-        return numVotes;
+        return _numVotes;
     }
 
     public void SetNumVotes(uint? numVotes)
     {
-        this.numVotes = numVotes;
+        this._numVotes = numVotes;
     }
 
     public uint? GetWindow()
     {
-        return window;
+        return _window;
     }
 
     public void SetWindow(uint? window)
     {
-        this.window = window;
+        this._window = window;
     }
 
     public uint? GetVoting()
     {
-        return voting;
+        return _voting;
     }
 
     public void SetVoting(uint? voting)
     {
-        this.voting = voting;
+        this._voting = voting;
     }
 
     public ulong? GetCredits()
     {
-        return credits;
+        return _credits;
     }
 
     public void SetCredits(ulong? credits)
     {
-        this.credits = credits;
+        this._credits = credits;
     }
 
     public string? GetTopBlockHash()
     {
-        return topBlockHash;
+        return _topBlockHash;
     }
 
     public void SetTopBlockHash(string? topBlockHash)
     {
-        this.topBlockHash = topBlockHash;
+        this._topBlockHash = topBlockHash;
     }
 }

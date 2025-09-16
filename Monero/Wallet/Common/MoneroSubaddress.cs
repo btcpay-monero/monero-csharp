@@ -2,125 +2,125 @@ namespace Monero.Wallet.Common;
 
 public class MoneroSubaddress
 {
-    private uint? accountIndex;
-    private string? address;
-    private ulong? balance;
-    private uint? index;
-    private bool? isUsed;
-    private string? label;
-    private ulong? numBlocksToUnlock;
-    private ulong? numUnspentOutputs;
-    private ulong? unlockedBalance;
+    private uint? _accountIndex;
+    private string? _address;
+    private ulong? _balance;
+    private uint? _index;
+    private bool? _isUsed;
+    private string? _label;
+    private ulong? _numBlocksToUnlock;
+    private ulong? _numUnspentOutputs;
+    private ulong? _unlockedBalance;
 
     public MoneroSubaddress() { }
 
     public MoneroSubaddress(string address)
     {
-        this.address = address;
+        this._address = address;
     }
 
     public MoneroSubaddress(uint accountIndex, uint index)
     {
-        this.accountIndex = accountIndex;
-        this.index = index;
+        this._accountIndex = accountIndex;
+        this._index = index;
     }
 
     public uint? GetAccountIndex()
     {
-        return accountIndex;
+        return _accountIndex;
     }
 
     public MoneroSubaddress SetAccountIndex(uint? accountIndex)
     {
-        this.accountIndex = accountIndex;
+        this._accountIndex = accountIndex;
         return this;
     }
 
     public uint? GetIndex()
     {
-        return index;
+        return _index;
     }
 
     public MoneroSubaddress SetIndex(uint? index)
     {
-        this.index = index;
+        this._index = index;
         return this;
     }
 
     public string? GetAddress()
     {
-        return address;
+        return _address;
     }
 
     public MoneroSubaddress SetAddress(string? address)
     {
-        this.address = address;
+        this._address = address;
         return this;
     }
 
     public string? GetLabel()
     {
-        return label;
+        return _label;
     }
 
     public MoneroSubaddress SetLabel(string? label)
     {
-        this.label = label;
+        this._label = label;
         return this;
     }
 
     public ulong? GetBalance()
     {
-        return balance;
+        return _balance;
     }
 
     public MoneroSubaddress SetBalance(ulong? balance)
     {
-        this.balance = balance;
+        this._balance = balance;
         return this;
     }
 
     public ulong? GetUnlockedBalance()
     {
-        return unlockedBalance;
+        return _unlockedBalance;
     }
 
     public MoneroSubaddress SetUnlockedBalance(ulong? unlockedBalance)
     {
-        this.unlockedBalance = unlockedBalance;
+        this._unlockedBalance = unlockedBalance;
         return this;
     }
 
     public ulong? GetNumUnspentOutputs()
     {
-        return numUnspentOutputs;
+        return _numUnspentOutputs;
     }
 
     public MoneroSubaddress SetNumUnspentOutputs(ulong? numUnspentOutputs)
     {
-        this.numUnspentOutputs = numUnspentOutputs;
+        this._numUnspentOutputs = numUnspentOutputs;
         return this;
     }
 
     public bool? IsUsed()
     {
-        return isUsed;
+        return _isUsed;
     }
 
     public MoneroSubaddress SetIsUsed(bool? isUsed)
     {
-        this.isUsed = isUsed;
+        this._isUsed = isUsed;
         return this;
     }
 
     public ulong? GetNumBlocksToUnlock()
     {
-        return numBlocksToUnlock;
+        return _numBlocksToUnlock;
     }
 
     public MoneroSubaddress SetNumBlocksToUnlock(ulong? numBlocksToUnlock)
     {
-        this.numBlocksToUnlock = numBlocksToUnlock;
+        this._numBlocksToUnlock = numBlocksToUnlock;
         return this;
     }
 }

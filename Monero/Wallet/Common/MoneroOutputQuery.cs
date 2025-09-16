@@ -2,10 +2,10 @@ namespace Monero.Wallet.Common;
 
 public class MoneroOutputQuery : MoneroOutputWallet
 {
-    private ulong? maxAmount;
-    private ulong? minAmount;
-    private List<uint>? subaddressIndices;
-    protected MoneroTxQuery? txQuery;
+    private ulong? _maxAmount;
+    private ulong? _minAmount;
+    private List<uint>? _subaddressIndices;
+    protected MoneroTxQuery? _txQuery;
 
     public MoneroOutputQuery() { }
 
@@ -13,21 +13,21 @@ public class MoneroOutputQuery : MoneroOutputWallet
     {
         if (query.GetMinAmount() != null)
         {
-            minAmount = query.GetMinAmount();
+            _minAmount = query.GetMinAmount();
         }
 
         if (query.GetMaxAmount() != null)
         {
-            maxAmount = query.GetMaxAmount();
+            _maxAmount = query.GetMaxAmount();
         }
 
-        if (query.subaddressIndices != null)
+        if (query._subaddressIndices != null)
         {
-            subaddressIndices = new List<uint>(query.subaddressIndices);
+            _subaddressIndices = new List<uint>(query._subaddressIndices);
         }
 
-        txQuery =
-            query.txQuery; // reference original by default, MoneroTxQuery's deep copy will Set this to itself
+        _txQuery =
+            query._txQuery; // reference original by default, MoneroTxQuery's deep copy will Set this to itself
     }
 
     public override MoneroOutputQuery Clone()
@@ -37,34 +37,34 @@ public class MoneroOutputQuery : MoneroOutputWallet
 
     public ulong? GetMinAmount()
     {
-        return minAmount;
+        return _minAmount;
     }
 
     public MoneroOutputQuery SetMinAmount(ulong minAmount)
     {
-        this.minAmount = minAmount;
+        this._minAmount = minAmount;
         return this;
     }
 
     public ulong? GetMaxAmount()
     {
-        return maxAmount;
+        return _maxAmount;
     }
 
     public MoneroOutputQuery SetMaxAmount(ulong maxAmount)
     {
-        this.maxAmount = maxAmount;
+        this._maxAmount = maxAmount;
         return this;
     }
 
     public MoneroTxQuery? GetTxQuery()
     {
-        return txQuery;
+        return _txQuery;
     }
 
     public MoneroOutputQuery SetTxQuery(MoneroTxQuery? txQuery)
     {
-        this.txQuery = txQuery;
+        this._txQuery = txQuery;
         if (txQuery != null)
         {
             txQuery.SetOutputQuery(this);
@@ -75,12 +75,12 @@ public class MoneroOutputQuery : MoneroOutputWallet
 
     public List<uint>? GetSubaddressIndices()
     {
-        return subaddressIndices;
+        return _subaddressIndices;
     }
 
     public MoneroOutputQuery SetSubaddressIndices(List<uint>? subaddressIndices)
     {
-        this.subaddressIndices = subaddressIndices;
+        this._subaddressIndices = subaddressIndices;
         return this;
     }
 

@@ -4,1089 +4,1089 @@ namespace Monero.Daemon.Common;
 
 public class MoneroDaemonConfig
 {
-    private string? path;
-    private bool? allowLocalIp;
-    private string? banList;
-    private int? blockSyncSize;
-    private string? booststrapDaemonLogin;
-    private string? bootstrapDaemonAddress;
-    private bool? confirmExternalBind;
+    private string? _path;
+    private bool? _allowLocalIp;
+    private string? _banList;
+    private int? _blockSyncSize;
+    private string? _booststrapDaemonLogin;
+    private string? _bootstrapDaemonAddress;
+    private bool? _confirmExternalBind;
 
     // Server
-    private string? dataDir;
-    private string? dbSyncMode;
-    private bool? detach;
-    private bool? disableDnsCheckpoints;
-    private bool? disableRpcBan;
+    private string? _dataDir;
+    private string? _dbSyncMode;
+    private bool? _detach;
+    private bool? _disableDnsCheckpoints;
+    private bool? _disableRpcBan;
 
-    private bool? enableDnsBlocklist;
-    private bool? enforceDnsCheckpointing;
-    private List<string> exclusiveNodes = [];
-    private bool? fastBlockSync;
-    private bool? hideMyPort;
-    private string? i2pAnonymousInbound;
-    private string? i2pTxProxy;
-    private string? igd;
-    private List<string> inPeers = [];
-    private int? limitRate;
-    private int? limitRateDown;
-    private int? limitRateUp;
+    private bool? _enableDnsBlocklist;
+    private bool? _enforceDnsCheckpointing;
+    private List<string> _exclusiveNodes = [];
+    private bool? _fastBlockSync;
+    private bool? _hideMyPort;
+    private string? _i2PAnonymousInbound;
+    private string? _i2PTxProxy;
+    private string? _igd;
+    private List<string> _inPeers = [];
+    private int? _limitRate;
+    private int? _limitRateDown;
+    private int? _limitRateUp;
 
     // Log
-    private string? logFile;
-    private int? logLevel;
-    private int? maxConcurrency;
+    private string? _logFile;
+    private int? _logLevel;
+    private int? _maxConcurrency;
 
-    private int? maxConnectionsPerIp;
+    private int? _maxConnectionsPerIp;
 
-    private int? maxLogFiles;
-    private int? maxLogFileSize;
-    private ulong? maxTxPoolWeight;
+    private int? _maxLogFiles;
+    private int? _maxLogFileSize;
+    private ulong? _maxTxPoolWeight;
 
     // Network type
-    private MoneroNetworkType networkType = MoneroNetworkType.Mainnet;
-    private bool? noIgd;
-    private bool? nonInteractive;
-    private bool? noSync;
-    private bool? noZmq;
-    private bool? offline;
-    private List<string> outPeers = [];
+    private MoneroNetworkType _networkType = MoneroNetworkType.Mainnet;
+    private bool? _noIgd;
+    private bool? _nonInteractive;
+    private bool? _noSync;
+    private bool? _noZmq;
+    private bool? _offline;
+    private List<string> _outPeers = [];
 
-    // P2P Netwrork
-    private string? p2pBindIp;
-    private string? p2pBindIpv6Address;
-    private int? p2pBindPort;
-    private int? p2pBindPortIpv6;
-    private int? p2pExternalPort;
-    private bool? p2pIgnoreIpv4;
-    private bool? p2pUseIpv6;
-    private bool? padTransactions;
-    private List<string> peers = [];
-    private string? pidFile;
-    private int? prepBlocksThreads;
-    private List<string> priorityNodes = [];
+    // P2P Network
+    private string? _p2PBindIp;
+    private string? _p2PBindIpv6Address;
+    private int? _p2PBindPort;
+    private int? _p2PBindPortIpv6;
+    private int? _p2PExternalPort;
+    private bool? _p2PIgnoreIpv4;
+    private bool? _p2PUseIpv6;
+    private bool? _padTransactions;
+    private List<string> _peers = [];
+    private string? _pidFile;
+    private int? _prepBlocksThreads;
+    private List<string> _priorityNodes = [];
 
-    private string? proxy;
+    private string? _proxy;
 
     // Performance
-    private bool? pruneBlockchain;
+    private bool? _pruneBlockchain;
 
     // Node RPC API
-    private bool? publicNode;
+    private bool? _publicNode;
 
-    private bool? restrictedRpc;
-    private string? rpcAccessControlOrigins;
-    private string? rpcBindIp;
-    private string? rpcBindIpv6Address;
-    private int? rpcBindPort;
-    private bool? rpcIgnoreIpv4;
-    private string? rpcLogin;
-    private int? rpcMacConnectionsPerPrivateIp;
-    private int? rpcMaxConnections;
-    private int? rpcMaxConnectionsPerPublicIp;
-    private int? rpcMaxResponseSoftLimit;
-    private string? rpcRestrictedBindIp;
-    private string? rpcRestrictedBindIpv6Address;
-    private int? rpcRestrictedBindPort;
-    private string? rpcSsl;
-    private bool? rpcSslAllowAnyCert;
-    private bool? rpcSslAllowChained;
-    private List<string> rpcSslAllowedFingerprints = [];
-    private string? rpcSslCaCertificates;
-    private string? rpcSslCertificate;
-    private string? rpcSslPrivateKey;
-    private bool? rpcUseIpv6;
-    private string? seedNode;
-    private bool? syncPrunedBlocks;
-    private string? torAnonymousInbound;
+    private bool? _restrictedRpc;
+    private string? _rpcAccessControlOrigins;
+    private string? _rpcBindIp;
+    private string? _rpcBindIpv6Address;
+    private int? _rpcBindPort;
+    private bool? _rpcIgnoreIpv4;
+    private string? _rpcLogin;
+    private int? _rpcMacConnectionsPerPrivateIp;
+    private int? _rpcMaxConnections;
+    private int? _rpcMaxConnectionsPerPublicIp;
+    private int? _rpcMaxResponseSoftLimit;
+    private string? _rpcRestrictedBindIp;
+    private string? _rpcRestrictedBindIpv6Address;
+    private int? _rpcRestrictedBindPort;
+    private string? _rpcSsl;
+    private bool? _rpcSslAllowAnyCert;
+    private bool? _rpcSslAllowChained;
+    private List<string> _rpcSslAllowedFingerprints = [];
+    private string? _rpcSslCaCertificates;
+    private string? _rpcSslCertificate;
+    private string? _rpcSslPrivateKey;
+    private bool? _rpcUseIpv6;
+    private string? _seedNode;
+    private bool? _syncPrunedBlocks;
+    private string? _torAnonymousInbound;
 
     // Tor/I2P and proxies
-    private string? torTxProxy;
-    private string? zmqPub;
-    private string? zmqRpcBindIp;
-    private int? zmqRpcBindPort;
+    private string? _torTxProxy;
+    private string? _zmqPub;
+    private string? _zmqRpcBindIp;
+    private int? _zmqRpcBindPort;
 
     public string? GetPath()
     {
-        return path;
+        return _path;
     }
 
     public MoneroDaemonConfig SetPath(string? path)
     {
-        this.path = path;
+        this._path = path;
         return this;
     }
 
     public MoneroDaemonConfig SetNetworkType(MoneroNetworkType networkType)
     {
-        this.networkType = networkType;
+        this._networkType = networkType;
         return this;
     }
 
     public MoneroNetworkType GetNetworkType()
     {
-        return networkType;
+        return _networkType;
     }
 
     public MoneroDaemonConfig SetLogFile(string? logFile)
     {
-        this.logFile = logFile;
+        this._logFile = logFile;
         return this;
     }
 
     public string? GetLogFile()
     {
-        return logFile;
+        return _logFile;
     }
 
     public MoneroDaemonConfig SetLogLevel(int? logLevel)
     {
-        this.logLevel = logLevel;
+        this._logLevel = logLevel;
         return this;
     }
 
     public int? GetLogLevel()
     {
-        return logLevel;
+        return _logLevel;
     }
 
     public MoneroDaemonConfig SetMaxLogFileSize(int? maxLogFileSize)
     {
-        this.maxLogFileSize = maxLogFileSize;
+        this._maxLogFileSize = maxLogFileSize;
         return this;
     }
 
     public int? GetMaxLogFileSize()
     {
-        return maxLogFileSize;
+        return _maxLogFileSize;
     }
 
     public MoneroDaemonConfig SetMaxLogFiles(int? maxLogFiles)
     {
-        this.maxLogFiles = maxLogFiles;
+        this._maxLogFiles = maxLogFiles;
         return this;
     }
 
     public int? GetMaxLogFiles()
     {
-        return maxLogFiles;
+        return _maxLogFiles;
     }
 
     public MoneroDaemonConfig SetDataDir(string? dataDir)
     {
-        this.dataDir = dataDir;
+        this._dataDir = dataDir;
         return this;
     }
 
     public string? GetDataDir()
     {
-        return dataDir;
+        return _dataDir;
     }
 
     public MoneroDaemonConfig SetPidFile(string? pidFile)
     {
-        this.pidFile = pidFile;
+        this._pidFile = pidFile;
         return this;
     }
 
     public string? GetPidFile()
     {
-        return pidFile;
+        return _pidFile;
     }
 
     public MoneroDaemonConfig SetDetach(bool? detach)
     {
-        this.detach = detach;
+        this._detach = detach;
         return this;
     }
 
     public bool? GetDetach()
     {
-        return detach;
+        return _detach;
     }
 
     public MoneroDaemonConfig SetNonInteractive(bool? nonInteractive)
     {
-        this.nonInteractive = nonInteractive;
+        this._nonInteractive = nonInteractive;
         return this;
     }
 
     public bool? GetNonInteractive()
     {
-        return nonInteractive;
+        return _nonInteractive;
     }
 
     public MoneroDaemonConfig SetMaxTxPoolWeight(ulong? maxTxPoolWeight)
     {
-        this.maxTxPoolWeight = maxTxPoolWeight;
+        this._maxTxPoolWeight = maxTxPoolWeight;
         return this;
     }
 
     public ulong? GetMaxTxPoolWeight()
     {
-        return maxTxPoolWeight;
+        return _maxTxPoolWeight;
     }
 
     public MoneroDaemonConfig SetEnforceDnsCheckpointing(bool? enforceDnsCheckpointing)
     {
-        this.enforceDnsCheckpointing = enforceDnsCheckpointing;
+        this._enforceDnsCheckpointing = enforceDnsCheckpointing;
         return this;
     }
 
     public bool? GetEnforceDnsCheckpointing()
     {
-        return enforceDnsCheckpointing;
+        return _enforceDnsCheckpointing;
     }
 
     public MoneroDaemonConfig SetDisableDnsCheckpoints(bool? disableDnsCheckpoints)
     {
-        this.disableDnsCheckpoints = disableDnsCheckpoints;
+        this._disableDnsCheckpoints = disableDnsCheckpoints;
         return this;
     }
 
     public bool? GetDisableDnsCheckpoints()
     {
-        return disableDnsCheckpoints;
+        return _disableDnsCheckpoints;
     }
 
     public MoneroDaemonConfig SetBanList(string? banList)
     {
-        this.banList = banList;
+        this._banList = banList;
         return this;
     }
 
     public string? GetBanList()
     {
-        return banList;
+        return _banList;
     }
 
     public MoneroDaemonConfig SetEnabledDnsBlocklist(bool? enabledDnsBlocklist)
     {
-        enableDnsBlocklist = enabledDnsBlocklist;
+        _enableDnsBlocklist = enabledDnsBlocklist;
         return this;
     }
 
     public bool? GetEnabledDnsBlocklist()
     {
-        return enableDnsBlocklist;
+        return _enableDnsBlocklist;
     }
 
     public MoneroDaemonConfig SetP2pBindIp(string? p2pBindIp)
     {
-        this.p2pBindIp = p2pBindIp;
+        this._p2PBindIp = p2pBindIp;
         return this;
     }
 
     public string? GetP2pBindIp()
     {
-        return p2pBindIp;
+        return _p2PBindIp;
     }
 
     public MoneroDaemonConfig SetP2pBindPort(int? p2pBindPort)
     {
-        this.p2pBindPort = p2pBindPort;
+        this._p2PBindPort = p2pBindPort;
         return this;
     }
 
     public int? GetP2pBindPort()
     {
-        return p2pBindPort;
+        return _p2PBindPort;
     }
 
     public MoneroDaemonConfig SetP2pExternalPort(int? p2pExternalPort)
     {
-        this.p2pExternalPort = p2pExternalPort;
+        this._p2PExternalPort = p2pExternalPort;
         return this;
     }
 
     public int? GetP2pExternalPort()
     {
-        return p2pExternalPort;
+        return _p2PExternalPort;
     }
 
     public MoneroDaemonConfig SetP2pUseIpv6(bool? p2pUseIpv6)
     {
-        this.p2pUseIpv6 = p2pUseIpv6;
+        this._p2PUseIpv6 = p2pUseIpv6;
         return this;
     }
 
     public bool? GetP2pUseIpv6()
     {
-        return p2pUseIpv6;
+        return _p2PUseIpv6;
     }
 
     public MoneroDaemonConfig SetP2pBindIpv6Address(string? p2pBindIpv6Address)
     {
-        this.p2pBindIpv6Address = p2pBindIpv6Address;
+        this._p2PBindIpv6Address = p2pBindIpv6Address;
         return this;
     }
 
     public string? GetP2pBindIpv6Address()
     {
-        return p2pBindIpv6Address;
+        return _p2PBindIpv6Address;
     }
 
     public MoneroDaemonConfig SetP2pBindPortIpv6(int? p2pBindPortIpv6)
     {
-        this.p2pBindPortIpv6 = p2pBindPortIpv6;
+        this._p2PBindPortIpv6 = p2pBindPortIpv6;
         return this;
     }
 
     public int? GetP2pBindPortIpv6()
     {
-        return p2pBindPortIpv6;
+        return _p2PBindPortIpv6;
     }
 
     public MoneroDaemonConfig SetP2pIgnoreIpv4(bool? p2pIgnoreIpv4)
     {
-        this.p2pIgnoreIpv4 = p2pIgnoreIpv4;
+        this._p2PIgnoreIpv4 = p2pIgnoreIpv4;
         return this;
     }
 
     public bool? GetP2pIgnoreIpv4()
     {
-        return p2pIgnoreIpv4;
+        return _p2PIgnoreIpv4;
     }
 
     public MoneroDaemonConfig SetNoIgd(bool? noIgd)
     {
-        this.noIgd = noIgd;
+        this._noIgd = noIgd;
         return this;
     }
 
     public bool? GetNoIgd()
     {
-        return noIgd;
+        return _noIgd;
     }
 
     public MoneroDaemonConfig SetIgd(string? igd)
     {
-        this.igd = igd;
+        this._igd = igd;
         return this;
     }
 
     public string? GetIgd()
     {
-        return igd;
+        return _igd;
     }
 
     public MoneroDaemonConfig SetHideMyPort(bool? hideMyPort)
     {
-        this.hideMyPort = hideMyPort;
+        this._hideMyPort = hideMyPort;
         return this;
     }
 
     public bool? GetHideMyPort()
     {
-        return hideMyPort;
+        return _hideMyPort;
     }
 
     public MoneroDaemonConfig SetSeedNode(string? seedNode)
     {
-        this.seedNode = seedNode;
+        this._seedNode = seedNode;
         return this;
     }
 
     public string? GetSeedNode()
     {
-        return seedNode;
+        return _seedNode;
     }
 
     public MoneroDaemonConfig SetPeers(List<string> peers)
     {
-        this.peers = peers;
+        this._peers = peers;
         return this;
     }
 
     public List<string> GetPeers()
     {
-        return peers;
+        return _peers;
     }
 
     public MoneroDaemonConfig AddPeer(string peer)
     {
-        peers.Add(peer);
+        _peers.Add(peer);
         return this;
     }
 
     public MoneroDaemonConfig RemovePeer(string peer)
     {
-        peers.Remove(peer);
+        _peers.Remove(peer);
         return this;
     }
 
     public MoneroDaemonConfig RemoveAllPeers()
     {
-        peers.Clear();
+        _peers.Clear();
         return this;
     }
 
     public MoneroDaemonConfig SetPriorityNodes(List<string> priorityNodes)
     {
-        this.priorityNodes = priorityNodes;
+        this._priorityNodes = priorityNodes;
         return this;
     }
 
     public List<string> GetPriorityNodes()
     {
-        return priorityNodes;
+        return _priorityNodes;
     }
 
     public MoneroDaemonConfig AddPriorityNode(string priorityNode)
     {
-        priorityNodes.Add(priorityNode);
+        _priorityNodes.Add(priorityNode);
         return this;
     }
 
     public MoneroDaemonConfig RemovePriorityNode(string priorityNode)
     {
-        priorityNodes.Remove(priorityNode);
+        _priorityNodes.Remove(priorityNode);
         return this;
     }
 
     public MoneroDaemonConfig RemoveAllPriorityNodes()
     {
-        priorityNodes.Clear();
+        _priorityNodes.Clear();
         return this;
     }
 
     public MoneroDaemonConfig SetExclusiveNodes(List<string> exclusiveNodes)
     {
-        this.exclusiveNodes = exclusiveNodes;
+        this._exclusiveNodes = exclusiveNodes;
         return this;
     }
 
     public List<string> GetExclusiveNodes()
     {
-        return exclusiveNodes;
+        return _exclusiveNodes;
     }
 
     public MoneroDaemonConfig SetOutPeers(List<string> outPeers)
     {
-        this.outPeers = outPeers;
+        this._outPeers = outPeers;
         return this;
     }
 
     public MoneroDaemonConfig AddOutPeer(string outPeer)
     {
-        outPeers.Add(outPeer);
+        _outPeers.Add(outPeer);
         return this;
     }
 
     public MoneroDaemonConfig RemoveOutPeer(string outPeer)
     {
-        outPeers.Remove(outPeer);
+        _outPeers.Remove(outPeer);
         return this;
     }
 
     public MoneroDaemonConfig RemoveAllOutPeers()
     {
-        outPeers.Clear();
+        _outPeers.Clear();
         return this;
     }
 
     public List<string> GetOutPeers()
     {
-        return outPeers;
+        return _outPeers;
     }
 
     public MoneroDaemonConfig SetInPeers(List<string> inPeers)
     {
-        this.inPeers = inPeers;
+        this._inPeers = inPeers;
         return this;
     }
 
     public MoneroDaemonConfig AddInPeer(string inPeer)
     {
-        inPeers.Add(inPeer);
+        _inPeers.Add(inPeer);
         return this;
     }
 
     public MoneroDaemonConfig RemoveInPeer(string inPeer)
     {
-        inPeers.Remove(inPeer);
+        _inPeers.Remove(inPeer);
         return this;
     }
 
     public MoneroDaemonConfig RemoveAllInPeers()
     {
-        inPeers.Clear();
+        _inPeers.Clear();
         return this;
     }
 
     public List<string> GetInPeers()
     {
-        return inPeers;
+        return _inPeers;
     }
 
     public MoneroDaemonConfig SetLimitRateUp(int? limitRateUp)
     {
-        this.limitRateUp = limitRateUp;
+        this._limitRateUp = limitRateUp;
         return this;
     }
 
     public int? GetLimitRateUp()
     {
-        return limitRateUp;
+        return _limitRateUp;
     }
 
     public MoneroDaemonConfig SetLimitRateDown(int? limitRateDown)
     {
-        this.limitRateDown = limitRateDown;
+        this._limitRateDown = limitRateDown;
         return this;
     }
 
     public int? GetLimitRateDown()
     {
-        return limitRateDown;
+        return _limitRateDown;
     }
 
     public MoneroDaemonConfig SetLimitRate(int? limitRate)
     {
-        this.limitRate = limitRate;
+        this._limitRate = limitRate;
         return this;
     }
 
     public int? GetLimitRate()
     {
-        return limitRate;
+        return _limitRate;
     }
 
     public MoneroDaemonConfig SetOffline(bool? offline)
     {
-        this.offline = offline;
+        this._offline = offline;
         return this;
     }
 
     public bool? GetOffline()
     {
-        return offline;
+        return _offline;
     }
 
     public MoneroDaemonConfig SetAllowLocalIp(bool? allowLocalIp)
     {
-        this.allowLocalIp = allowLocalIp;
+        this._allowLocalIp = allowLocalIp;
         return this;
     }
 
     public bool? GetAllowLocalIp()
     {
-        return allowLocalIp;
+        return _allowLocalIp;
     }
 
     public MoneroDaemonConfig SetMaxConnectionsPerIp(int? maxConnectionsPerIp)
     {
-        this.maxConnectionsPerIp = maxConnectionsPerIp;
+        this._maxConnectionsPerIp = maxConnectionsPerIp;
         return this;
     }
 
     public int? GetMaxConnectionsPerIp()
     {
-        return maxConnectionsPerIp;
+        return _maxConnectionsPerIp;
     }
 
     public MoneroDaemonConfig SetTorTxProxy(string? torTxProxy)
     {
-        this.torTxProxy = torTxProxy;
+        this._torTxProxy = torTxProxy;
         return this;
     }
 
     public string? GetTorTxProxy()
     {
-        return torTxProxy;
+        return _torTxProxy;
     }
 
     public MoneroDaemonConfig SetTorAnonymousInbound(string? torAnonymousInbound)
     {
-        this.torAnonymousInbound = torAnonymousInbound;
+        this._torAnonymousInbound = torAnonymousInbound;
         return this;
     }
 
     public string? GetTorAnonymousInbound()
     {
-        return torAnonymousInbound;
+        return _torAnonymousInbound;
     }
 
     public MoneroDaemonConfig SetI2pTxProxy(string? i2pTxProxy)
     {
-        this.i2pTxProxy = i2pTxProxy;
+        this._i2PTxProxy = i2pTxProxy;
         return this;
     }
 
     public string? GetI2pTxProxy()
     {
-        return i2pTxProxy;
+        return _i2PTxProxy;
     }
 
     public MoneroDaemonConfig SetI2pAnonymousInbound(string? i2pAnonymousInbound)
     {
-        this.i2pAnonymousInbound = i2pAnonymousInbound;
+        this._i2PAnonymousInbound = i2pAnonymousInbound;
         return this;
     }
 
     public string? GetI2pAnonymousInbound()
     {
-        return i2pAnonymousInbound;
+        return _i2PAnonymousInbound;
     }
 
     public MoneroDaemonConfig SetPadTransactions(bool? padTransactions)
     {
-        this.padTransactions = padTransactions;
+        this._padTransactions = padTransactions;
         return this;
     }
 
     public bool? GetPadTransactions()
     {
-        return padTransactions;
+        return _padTransactions;
     }
 
     public MoneroDaemonConfig SetProxy(string? proxy)
     {
-        this.proxy = proxy;
+        this._proxy = proxy;
         return this;
     }
 
     public string? GetProxy()
     {
-        return proxy;
+        return _proxy;
     }
 
     public MoneroDaemonConfig SetPublicNode(bool? publicNode)
     {
-        this.publicNode = publicNode;
+        this._publicNode = publicNode;
         return this;
     }
 
     public bool? GetPublicNode()
     {
-        return publicNode;
+        return _publicNode;
     }
 
     public MoneroDaemonConfig SetRpcBindIp(string? rpcBindIp)
     {
-        this.rpcBindIp = rpcBindIp;
+        this._rpcBindIp = rpcBindIp;
         return this;
     }
 
     public string? GetRpcBindIp()
     {
-        return rpcBindIp;
+        return _rpcBindIp;
     }
 
     public MoneroDaemonConfig SetRpcBindPort(int? rpcBindPort)
     {
-        this.rpcBindPort = rpcBindPort;
+        this._rpcBindPort = rpcBindPort;
         return this;
     }
 
     public int? GetRpcBindPort()
     {
-        return rpcBindPort;
+        return _rpcBindPort;
     }
 
     public MoneroDaemonConfig SetRpcBindIpv6Address(string? rpcBindIpv6Address)
     {
-        this.rpcBindIpv6Address = rpcBindIpv6Address;
+        this._rpcBindIpv6Address = rpcBindIpv6Address;
         return this;
     }
 
     public string? GetRpcBindIpv6Address()
     {
-        return rpcBindIpv6Address;
+        return _rpcBindIpv6Address;
     }
 
     public MoneroDaemonConfig SetRpcUseIpv6(bool? rpcUseIpv6)
     {
-        this.rpcUseIpv6 = rpcUseIpv6;
+        this._rpcUseIpv6 = rpcUseIpv6;
         return this;
     }
 
     public bool? GetRpcUseIpv6()
     {
-        return rpcUseIpv6;
+        return _rpcUseIpv6;
     }
 
     public MoneroDaemonConfig SetRpcIgnoreIpv4(bool? rpcIgnoreIpv4)
     {
-        this.rpcIgnoreIpv4 = rpcIgnoreIpv4;
+        this._rpcIgnoreIpv4 = rpcIgnoreIpv4;
         return this;
     }
 
     public bool? GetRpcIgnoreIpv4()
     {
-        return rpcIgnoreIpv4;
+        return _rpcIgnoreIpv4;
     }
 
     public MoneroDaemonConfig SetRpcRestrictedBindIp(string? rpcRestrictedBindIp)
     {
-        this.rpcRestrictedBindIp = rpcRestrictedBindIp;
+        this._rpcRestrictedBindIp = rpcRestrictedBindIp;
         return this;
     }
 
     public string? GetRpcRestrictedBindIp()
     {
-        return rpcRestrictedBindIp;
+        return _rpcRestrictedBindIp;
     }
 
     public MoneroDaemonConfig SetRpcRestrictedBindPort(int? rpcRestrictedBindPort)
     {
-        this.rpcRestrictedBindPort = rpcRestrictedBindPort;
+        this._rpcRestrictedBindPort = rpcRestrictedBindPort;
         return this;
     }
 
     public int? GetRpcRestrictedBindPort()
     {
-        return rpcRestrictedBindPort;
+        return _rpcRestrictedBindPort;
     }
 
     public MoneroDaemonConfig SetRpcRestrictedBindIpv6Address(string? rpcRestrictedBindIpv6Address)
     {
-        this.rpcRestrictedBindIpv6Address = rpcRestrictedBindIpv6Address;
+        this._rpcRestrictedBindIpv6Address = rpcRestrictedBindIpv6Address;
         return this;
     }
 
     public string? GetRpcRestrictedBindIpv6Address()
     {
-        return rpcRestrictedBindIpv6Address;
+        return _rpcRestrictedBindIpv6Address;
     }
 
     public MoneroDaemonConfig SetRpcMaxConnections(int? rpcMaxConnections)
     {
-        this.rpcMaxConnections = rpcMaxConnections;
+        this._rpcMaxConnections = rpcMaxConnections;
         return this;
     }
 
     public int? GetRpcMaxConnections()
     {
-        return rpcMaxConnections;
+        return _rpcMaxConnections;
     }
 
     public MoneroDaemonConfig SetRpcMaxConnectionsPerPublicIp(int? rpcMaxConnectionsPerPublicIp)
     {
-        this.rpcMaxConnectionsPerPublicIp = rpcMaxConnectionsPerPublicIp;
+        this._rpcMaxConnectionsPerPublicIp = rpcMaxConnectionsPerPublicIp;
         return this;
     }
 
     public int? GetRpcMaxConnectionsPerPublicIp()
     {
-        return rpcMaxConnectionsPerPublicIp;
+        return _rpcMaxConnectionsPerPublicIp;
     }
 
     public MoneroDaemonConfig SetRpcMaxConnectionsPerPrivateIp(int? rpcMaxConnectionsPerPrivateIp)
     {
-        rpcMacConnectionsPerPrivateIp = rpcMaxConnectionsPerPrivateIp;
+        _rpcMacConnectionsPerPrivateIp = rpcMaxConnectionsPerPrivateIp;
         return this;
     }
 
     public int? GetRpcMaxConnectionsPerPrivateIp()
     {
-        return rpcMacConnectionsPerPrivateIp;
+        return _rpcMacConnectionsPerPrivateIp;
     }
 
     public MoneroDaemonConfig SetRpcMaxResponseSoftLimit(int? rpcMaxResponseSoftLimit)
     {
-        this.rpcMaxResponseSoftLimit = rpcMaxResponseSoftLimit;
+        this._rpcMaxResponseSoftLimit = rpcMaxResponseSoftLimit;
         return this;
     }
 
     public int? GetRpcMaxResponseSoftLimit()
     {
-        return rpcMaxResponseSoftLimit;
+        return _rpcMaxResponseSoftLimit;
     }
 
     public MoneroDaemonConfig SetRpcSsl(string? rpcSsl)
     {
-        this.rpcSsl = rpcSsl;
+        this._rpcSsl = rpcSsl;
         return this;
     }
 
     public string? GetRpcSsl()
     {
-        return rpcSsl;
+        return _rpcSsl;
     }
 
     public MoneroDaemonConfig SetRpcSslPrivateKey(string? rpcSslPrivateKey)
     {
-        this.rpcSslPrivateKey = rpcSslPrivateKey;
+        this._rpcSslPrivateKey = rpcSslPrivateKey;
         return this;
     }
 
     public string? GetRpcSslPrivateKey()
     {
-        return rpcSslPrivateKey;
+        return _rpcSslPrivateKey;
     }
 
     public MoneroDaemonConfig SetRpcSslCertificate(string? rpcSslCertificate)
     {
-        this.rpcSslCertificate = rpcSslCertificate;
+        this._rpcSslCertificate = rpcSslCertificate;
         return this;
     }
 
     public string? GetRpcSslCertificate()
     {
-        return rpcSslCertificate;
+        return _rpcSslCertificate;
     }
 
     public MoneroDaemonConfig SetRpcSslAllowedFingerprints(List<string> rpcSslAllowedFingerprints)
     {
-        this.rpcSslAllowedFingerprints = rpcSslAllowedFingerprints;
+        this._rpcSslAllowedFingerprints = rpcSslAllowedFingerprints;
         return this;
     }
 
     public List<string> GetRpcSslAllowedFingerprints()
     {
-        return rpcSslAllowedFingerprints;
+        return _rpcSslAllowedFingerprints;
     }
 
     public MoneroDaemonConfig SetRpcSslAllowAnyCert(bool? rpcSslAllowAnyCert)
     {
-        this.rpcSslAllowAnyCert = rpcSslAllowAnyCert;
+        this._rpcSslAllowAnyCert = rpcSslAllowAnyCert;
         return this;
     }
 
     public bool? GetRpcSslAllowAnyCert()
     {
-        return rpcSslAllowAnyCert;
+        return _rpcSslAllowAnyCert;
     }
 
     public MoneroDaemonConfig SetRpcSslCaCertificates(string? rpcSslCaCertificates)
     {
-        this.rpcSslCaCertificates = rpcSslCaCertificates;
+        this._rpcSslCaCertificates = rpcSslCaCertificates;
         return this;
     }
 
     public string? GetRpcSslCaCertificates()
     {
-        return rpcSslCaCertificates;
+        return _rpcSslCaCertificates;
     }
 
     public MoneroDaemonConfig SetRpcSslAllowChained(bool? rpcSslAllowChained)
     {
-        this.rpcSslAllowChained = rpcSslAllowChained;
+        this._rpcSslAllowChained = rpcSslAllowChained;
         return this;
     }
 
     public bool? GetRpcSslAllowChained()
     {
-        return rpcSslAllowChained;
+        return _rpcSslAllowChained;
     }
 
     public MoneroDaemonConfig SetRpcLogin(string? rpcLogin)
     {
-        this.rpcLogin = rpcLogin;
+        this._rpcLogin = rpcLogin;
         return this;
     }
 
     public string? GetRpcLogin()
     {
-        return rpcLogin;
+        return _rpcLogin;
     }
 
     public MoneroDaemonConfig SetRpcAccessControlOrigins(string? rpcAccessControlOrigins)
     {
-        this.rpcAccessControlOrigins = rpcAccessControlOrigins;
+        this._rpcAccessControlOrigins = rpcAccessControlOrigins;
         return this;
     }
 
     public string? GetRpcAccessControlOrigins()
     {
-        return rpcAccessControlOrigins;
+        return _rpcAccessControlOrigins;
     }
 
     public MoneroDaemonConfig SetDisableRpcBan(bool? disableRpcBan)
     {
-        this.disableRpcBan = disableRpcBan;
+        this._disableRpcBan = disableRpcBan;
         return this;
     }
 
     public bool? GetDisableRpcBan()
     {
-        return disableRpcBan;
+        return _disableRpcBan;
     }
 
     public MoneroDaemonConfig SetZmqRpcBindIp(string? zmqRpcBindIp)
     {
-        this.zmqRpcBindIp = zmqRpcBindIp;
+        this._zmqRpcBindIp = zmqRpcBindIp;
         return this;
     }
 
     public string? GetZmqRpcBindIp()
     {
-        return zmqRpcBindIp;
+        return _zmqRpcBindIp;
     }
 
     public MoneroDaemonConfig SetZmqRpcBindPort(int? zmqRpcBindPort)
     {
-        this.zmqRpcBindPort = zmqRpcBindPort;
+        this._zmqRpcBindPort = zmqRpcBindPort;
         return this;
     }
 
     public int? GetZmqRpcBindPort()
     {
-        return zmqRpcBindPort;
+        return _zmqRpcBindPort;
     }
 
     public MoneroDaemonConfig SetZmqPub(string? zmqPub)
     {
-        this.zmqPub = zmqPub;
+        this._zmqPub = zmqPub;
         return this;
     }
 
     public string? GetZmqPub()
     {
-        return zmqPub;
+        return _zmqPub;
     }
 
     public MoneroDaemonConfig SetNoZmq(bool? noZmq)
     {
-        this.noZmq = noZmq;
+        this._noZmq = noZmq;
         return this;
     }
 
     public bool? GetNoZmq()
     {
-        return noZmq;
+        return _noZmq;
     }
 
     public MoneroDaemonConfig SetConfirmExternalBind(bool? confirmExternalBind)
     {
-        this.confirmExternalBind = confirmExternalBind;
+        this._confirmExternalBind = confirmExternalBind;
         return this;
     }
 
     public bool? GetConfirmExternalBind()
     {
-        return confirmExternalBind;
+        return _confirmExternalBind;
     }
 
     public MoneroDaemonConfig SetRestrictedRpc(bool? restrictedRpc)
     {
-        this.restrictedRpc = restrictedRpc;
+        this._restrictedRpc = restrictedRpc;
         return this;
     }
 
     public bool? GetRestrictedRpc()
     {
-        return restrictedRpc;
+        return _restrictedRpc;
     }
 
     public MoneroDaemonConfig SetPruneBlockchain(bool? pruneBlockchain)
     {
-        this.pruneBlockchain = pruneBlockchain;
+        this._pruneBlockchain = pruneBlockchain;
         return this;
     }
 
     public bool? GetPruneBlockchain()
     {
-        return pruneBlockchain;
+        return _pruneBlockchain;
     }
 
     public MoneroDaemonConfig SetSyncPrunedBlocks(bool? syncPrunedBlocks)
     {
-        this.syncPrunedBlocks = syncPrunedBlocks;
+        this._syncPrunedBlocks = syncPrunedBlocks;
         return this;
     }
 
     public bool? GetSyncPrunedBlocks()
     {
-        return syncPrunedBlocks;
+        return _syncPrunedBlocks;
     }
 
     public MoneroDaemonConfig SetDbSyncMode(string? dbSyncMode)
     {
-        this.dbSyncMode = dbSyncMode;
+        this._dbSyncMode = dbSyncMode;
         return this;
     }
 
     public string? GetDbSyncMode()
     {
-        return dbSyncMode;
+        return _dbSyncMode;
     }
 
     public MoneroDaemonConfig SetMaxConcurrency(int? maxConcurrency)
     {
-        this.maxConcurrency = maxConcurrency;
+        this._maxConcurrency = maxConcurrency;
         return this;
     }
 
     public int? GetMaxConcurrency()
     {
-        return maxConcurrency;
+        return _maxConcurrency;
     }
 
     public MoneroDaemonConfig SetPrepBlocksThreads(int? prepBlocksThreads)
     {
-        this.prepBlocksThreads = prepBlocksThreads;
+        this._prepBlocksThreads = prepBlocksThreads;
         return this;
     }
 
     public int? GetPrepBlocksThreads()
     {
-        return prepBlocksThreads;
+        return _prepBlocksThreads;
     }
 
     public MoneroDaemonConfig SetFastBlockSync(bool? fastBlockSync)
     {
-        this.fastBlockSync = fastBlockSync;
+        this._fastBlockSync = fastBlockSync;
         return this;
     }
 
     public bool? GetFastBlockSync()
     {
-        return fastBlockSync;
+        return _fastBlockSync;
     }
 
     public MoneroDaemonConfig SetBlockSyncSize(int? blockSyncSize)
     {
-        this.blockSyncSize = blockSyncSize;
+        this._blockSyncSize = blockSyncSize;
         return this;
     }
 
     public int? GetBlockSyncSize()
     {
-        return blockSyncSize;
+        return _blockSyncSize;
     }
 
     public MoneroDaemonConfig SetBootstrapDaemonAddress(string? bootstrapDaemonAddress)
     {
-        this.bootstrapDaemonAddress = bootstrapDaemonAddress;
+        this._bootstrapDaemonAddress = bootstrapDaemonAddress;
         return this;
     }
 
     public string? GetBootstrapDaemonAddress()
     {
-        return bootstrapDaemonAddress;
+        return _bootstrapDaemonAddress;
     }
 
     public MoneroDaemonConfig SetBootstrapDaemonLogin(string? booststrapDaemonLogin)
     {
-        this.booststrapDaemonLogin = booststrapDaemonLogin;
+        this._booststrapDaemonLogin = booststrapDaemonLogin;
         return this;
     }
 
     public string? GetBootstrapDaemonLogin()
     {
-        return booststrapDaemonLogin;
+        return _booststrapDaemonLogin;
     }
 
     public MoneroDaemonConfig SetNoSync(bool? noSync)
     {
-        this.noSync = noSync;
+        this._noSync = noSync;
         return this;
     }
 
     public bool? GetNoSync()
     {
-        return noSync;
+        return _noSync;
     }
 
     public List<string> ToCommandList()
     {
         List<string> cmd = [];
 
-        if (!string.IsNullOrEmpty(path))
+        if (!string.IsNullOrEmpty(_path))
         {
-            cmd.Add(path);
+            cmd.Add(_path);
         }
 
         MoneroNetworkType moneroNetworkType = GetNetworkType();
@@ -1100,475 +1100,475 @@ public class MoneroDaemonConfig
             cmd.Add("--stagenet");
         }
 
-        if (!string.IsNullOrEmpty(logFile))
+        if (!string.IsNullOrEmpty(_logFile))
         {
             cmd.Add("--log-file");
-            cmd.Add(logFile);
+            cmd.Add(_logFile);
         }
 
-        if (logLevel != null)
+        if (_logLevel != null)
         {
             cmd.Add("--log-level");
-            cmd.Add(((int)logLevel).ToString());
+            cmd.Add(((int)_logLevel).ToString());
         }
 
-        if (maxLogFileSize != null)
+        if (_maxLogFileSize != null)
         {
             cmd.Add("--max-log-file-size");
-            cmd.Add(((int)maxLogFileSize).ToString());
+            cmd.Add(((int)_maxLogFileSize).ToString());
         }
 
-        if (maxLogFiles != null)
+        if (_maxLogFiles != null)
         {
             cmd.Add("--max-log-files");
-            cmd.Add(((int)maxLogFiles).ToString());
+            cmd.Add(((int)_maxLogFiles).ToString());
         }
 
-        if (!string.IsNullOrEmpty(dataDir))
+        if (!string.IsNullOrEmpty(_dataDir))
         {
             cmd.Add("--data-dir");
-            cmd.Add(dataDir);
+            cmd.Add(_dataDir);
         }
 
-        if (!string.IsNullOrEmpty(pidFile))
+        if (!string.IsNullOrEmpty(_pidFile))
         {
             cmd.Add("--pid-file");
-            cmd.Add(pidFile);
+            cmd.Add(_pidFile);
         }
 
-        if (detach == true)
+        if (_detach == true)
         {
             cmd.Add("--detach");
         }
 
-        if (nonInteractive == true)
+        if (_nonInteractive == true)
         {
             cmd.Add("--non-interactive");
         }
 
-        if (maxTxPoolWeight != null)
+        if (_maxTxPoolWeight != null)
         {
             cmd.Add("--max-txpool-weight");
-            cmd.Add(((int)maxTxPoolWeight).ToString());
+            cmd.Add(((int)_maxTxPoolWeight).ToString());
         }
 
-        if (enforceDnsCheckpointing == true)
+        if (_enforceDnsCheckpointing == true)
         {
             cmd.Add("--enforce-dns-checkpointing");
         }
 
-        if (disableDnsCheckpoints == true)
+        if (_disableDnsCheckpoints == true)
         {
             cmd.Add("--disable-dns-checkpoints");
         }
 
-        if (!string.IsNullOrEmpty(banList))
+        if (!string.IsNullOrEmpty(_banList))
         {
             cmd.Add("--ban-list");
-            cmd.Add(banList);
+            cmd.Add(_banList);
         }
 
-        if (enableDnsBlocklist == true)
+        if (_enableDnsBlocklist == true)
         {
             cmd.Add("--enable-dns-blocklist");
         }
 
-        if (!string.IsNullOrEmpty(p2pBindIp))
+        if (!string.IsNullOrEmpty(_p2PBindIp))
         {
             cmd.Add("--p2p-bind-ip");
-            cmd.Add(p2pBindIp);
+            cmd.Add(_p2PBindIp);
         }
 
-        if (p2pBindPort != null && p2pBindPort >= 0)
+        if (_p2PBindPort != null && _p2PBindPort >= 0)
         {
             cmd.Add("--p2p-bind-port");
-            cmd.Add(((int)p2pBindPort).ToString());
+            cmd.Add(((int)_p2PBindPort).ToString());
         }
 
-        if (p2pExternalPort != null && p2pExternalPort >= 0)
+        if (_p2PExternalPort != null && _p2PExternalPort >= 0)
         {
             cmd.Add("--p2p-external-port");
-            cmd.Add(((int)p2pExternalPort).ToString());
+            cmd.Add(((int)_p2PExternalPort).ToString());
         }
 
-        if (p2pUseIpv6 == true)
+        if (_p2PUseIpv6 == true)
         {
             cmd.Add("--p2p-use-ipv6");
         }
 
-        if (!string.IsNullOrEmpty(p2pBindIpv6Address))
+        if (!string.IsNullOrEmpty(_p2PBindIpv6Address))
         {
             cmd.Add("--p2p-bind-ipv6-address");
-            cmd.Add(p2pBindIpv6Address);
+            cmd.Add(_p2PBindIpv6Address);
         }
 
-        if (p2pBindPortIpv6 != null && p2pBindPortIpv6 >= 0)
+        if (_p2PBindPortIpv6 != null && _p2PBindPortIpv6 >= 0)
         {
             cmd.Add("--p2p-bind-port-ipv6");
-            cmd.Add(((int)p2pBindPortIpv6).ToString());
+            cmd.Add(((int)_p2PBindPortIpv6).ToString());
         }
 
-        if (p2pIgnoreIpv4 == true)
+        if (_p2PIgnoreIpv4 == true)
         {
             cmd.Add("--p2p-ignore-ipv4");
         }
 
-        if (noIgd == true)
+        if (_noIgd == true)
         {
             cmd.Add("--no-igd");
         }
 
-        if (!string.IsNullOrEmpty(igd))
+        if (!string.IsNullOrEmpty(_igd))
         {
             cmd.Add("--igd");
-            cmd.Add(igd);
+            cmd.Add(_igd);
         }
 
-        if (hideMyPort == true)
+        if (_hideMyPort == true)
         {
             cmd.Add("--hide-my-port");
         }
 
-        if (!string.IsNullOrEmpty(seedNode))
+        if (!string.IsNullOrEmpty(_seedNode))
         {
             cmd.Add("--seed-node");
-            cmd.Add(seedNode);
+            cmd.Add(_seedNode);
         }
 
-        if (peers.Count > 0)
+        if (_peers.Count > 0)
         {
-            foreach (string peer in peers)
+            foreach (string peer in _peers)
             {
                 cmd.Add("--peer");
                 cmd.Add(peer);
             }
         }
 
-        if (priorityNodes.Count > 0)
+        if (_priorityNodes.Count > 0)
         {
-            foreach (string priorityNode in priorityNodes)
+            foreach (string priorityNode in _priorityNodes)
             {
                 cmd.Add("--priority-node");
                 cmd.Add(priorityNode);
             }
         }
 
-        if (exclusiveNodes.Count > 0)
+        if (_exclusiveNodes.Count > 0)
         {
-            foreach (string exclusiveNode in exclusiveNodes)
+            foreach (string exclusiveNode in _exclusiveNodes)
             {
                 cmd.Add("--exclusive-node");
                 cmd.Add(exclusiveNode);
             }
         }
 
-        if (outPeers.Count > 0)
+        if (_outPeers.Count > 0)
         {
-            foreach (string outPeer in outPeers)
+            foreach (string outPeer in _outPeers)
             {
                 cmd.Add("--out-peers");
                 cmd.Add(outPeer);
             }
         }
 
-        if (inPeers.Count > 0)
+        if (_inPeers.Count > 0)
         {
-            foreach (string inPeer in inPeers)
+            foreach (string inPeer in _inPeers)
             {
                 cmd.Add("--in-peers");
                 cmd.Add(inPeer);
             }
         }
 
-        if (limitRateUp != null && limitRateUp >= 0)
+        if (_limitRateUp != null && _limitRateUp >= 0)
         {
             cmd.Add("--limit-rate-up");
-            cmd.Add(((int)limitRateUp).ToString());
+            cmd.Add(((int)_limitRateUp).ToString());
         }
 
-        if (limitRateDown != null && limitRateDown >= 0)
+        if (_limitRateDown != null && _limitRateDown >= 0)
         {
             cmd.Add("--limit-rate-down");
-            cmd.Add(((int)limitRateDown).ToString());
+            cmd.Add(((int)_limitRateDown).ToString());
         }
 
-        if (limitRate != null && limitRate >= 0)
+        if (_limitRate != null && _limitRate >= 0)
         {
             cmd.Add("--limit-rate");
-            cmd.Add(((int)limitRate).ToString());
+            cmd.Add(((int)_limitRate).ToString());
         }
 
-        if (offline == true)
+        if (_offline == true)
         {
             cmd.Add("--offline");
         }
 
-        if (allowLocalIp == true)
+        if (_allowLocalIp == true)
         {
             cmd.Add("--allow-local-ip");
         }
 
-        if (maxConnectionsPerIp != null && maxConnectionsPerIp >= 0)
+        if (_maxConnectionsPerIp != null && _maxConnectionsPerIp >= 0)
         {
             cmd.Add("--max-connections-per-ip");
-            cmd.Add(((int)maxConnectionsPerIp).ToString());
+            cmd.Add(((int)_maxConnectionsPerIp).ToString());
         }
 
-        if (!string.IsNullOrEmpty(torTxProxy))
+        if (!string.IsNullOrEmpty(_torTxProxy))
         {
             cmd.Add("--tx-proxy");
-            cmd.Add(torTxProxy);
+            cmd.Add(_torTxProxy);
         }
 
-        if (!string.IsNullOrEmpty(torAnonymousInbound))
+        if (!string.IsNullOrEmpty(_torAnonymousInbound))
         {
             cmd.Add("--anonymous-inbound");
-            cmd.Add(torAnonymousInbound);
+            cmd.Add(_torAnonymousInbound);
         }
 
-        if (!string.IsNullOrEmpty(i2pTxProxy))
+        if (!string.IsNullOrEmpty(_i2PTxProxy))
         {
             cmd.Add("--tx-proxy");
-            cmd.Add(i2pTxProxy);
+            cmd.Add(_i2PTxProxy);
         }
 
-        if (!string.IsNullOrEmpty(i2pAnonymousInbound))
+        if (!string.IsNullOrEmpty(_i2PAnonymousInbound))
         {
             cmd.Add("--anonymous-inbound");
-            cmd.Add(i2pAnonymousInbound);
+            cmd.Add(_i2PAnonymousInbound);
         }
 
-        if (padTransactions == true)
+        if (_padTransactions == true)
         {
             cmd.Add("--pad-transactions");
         }
 
-        if (!string.IsNullOrEmpty(proxy))
+        if (!string.IsNullOrEmpty(_proxy))
         {
             cmd.Add("--proxy");
-            cmd.Add(proxy);
+            cmd.Add(_proxy);
         }
 
-        if (publicNode == true)
+        if (_publicNode == true)
         {
             cmd.Add("--public-node");
         }
 
-        if (!string.IsNullOrEmpty(rpcBindIp))
+        if (!string.IsNullOrEmpty(_rpcBindIp))
         {
             cmd.Add("--rpc-bind-ip");
-            cmd.Add(rpcBindIp);
+            cmd.Add(_rpcBindIp);
         }
 
-        if (rpcBindPort != null && rpcBindPort >= 0)
+        if (_rpcBindPort != null && _rpcBindPort >= 0)
         {
             cmd.Add("--rpc-bind-port");
-            cmd.Add(((int)rpcBindPort).ToString());
+            cmd.Add(((int)_rpcBindPort).ToString());
         }
 
-        if (!string.IsNullOrEmpty(rpcBindIpv6Address))
+        if (!string.IsNullOrEmpty(_rpcBindIpv6Address))
         {
             cmd.Add("--rpc-bind-ipv6-address");
-            cmd.Add(rpcBindIpv6Address);
+            cmd.Add(_rpcBindIpv6Address);
         }
 
-        if (rpcUseIpv6 == true)
+        if (_rpcUseIpv6 == true)
         {
             cmd.Add("--rpc-use-ipv6");
         }
 
-        if (rpcIgnoreIpv4 == true)
+        if (_rpcIgnoreIpv4 == true)
         {
             cmd.Add("--rpc-ignore-ipv4");
         }
 
-        if (!string.IsNullOrEmpty(rpcRestrictedBindIp))
+        if (!string.IsNullOrEmpty(_rpcRestrictedBindIp))
         {
             cmd.Add("--rpc-restricted-bind-ip");
-            cmd.Add(rpcRestrictedBindIp);
+            cmd.Add(_rpcRestrictedBindIp);
         }
 
-        if (rpcRestrictedBindPort != null && rpcRestrictedBindPort >= 0)
+        if (_rpcRestrictedBindPort != null && _rpcRestrictedBindPort >= 0)
         {
             cmd.Add("--rpc-restricted-bind-port");
-            cmd.Add(((int)rpcRestrictedBindPort).ToString());
+            cmd.Add(((int)_rpcRestrictedBindPort).ToString());
         }
 
-        if (!string.IsNullOrEmpty(rpcRestrictedBindIpv6Address))
+        if (!string.IsNullOrEmpty(_rpcRestrictedBindIpv6Address))
         {
             cmd.Add("--rpc-restricted-bind-ipv6-address");
-            cmd.Add(rpcRestrictedBindIpv6Address);
+            cmd.Add(_rpcRestrictedBindIpv6Address);
         }
 
-        if (rpcMaxConnections != null && rpcMaxConnections >= 0)
+        if (_rpcMaxConnections != null && _rpcMaxConnections >= 0)
         {
             cmd.Add("--rpc-max-connections");
-            cmd.Add(((int)rpcMaxConnections).ToString());
+            cmd.Add(((int)_rpcMaxConnections).ToString());
         }
 
-        if (rpcMaxConnectionsPerPublicIp != null && rpcMaxConnectionsPerPublicIp >= 0)
+        if (_rpcMaxConnectionsPerPublicIp != null && _rpcMaxConnectionsPerPublicIp >= 0)
         {
             cmd.Add("--rpc-max-connections-per-public-ip");
-            cmd.Add(((int)rpcMaxConnectionsPerPublicIp).ToString());
+            cmd.Add(((int)_rpcMaxConnectionsPerPublicIp).ToString());
         }
 
-        if (rpcMacConnectionsPerPrivateIp != null && rpcMacConnectionsPerPrivateIp >= 0)
+        if (_rpcMacConnectionsPerPrivateIp != null && _rpcMacConnectionsPerPrivateIp >= 0)
         {
             cmd.Add("--rpc-max-connections-per-private-ip");
-            cmd.Add(((int)rpcMacConnectionsPerPrivateIp).ToString());
+            cmd.Add(((int)_rpcMacConnectionsPerPrivateIp).ToString());
         }
 
-        if (rpcMaxResponseSoftLimit != null && rpcMaxResponseSoftLimit >= 0)
+        if (_rpcMaxResponseSoftLimit != null && _rpcMaxResponseSoftLimit >= 0)
         {
             cmd.Add("--rpc-max-response-soft-limit");
-            cmd.Add(((int)rpcMaxResponseSoftLimit).ToString());
+            cmd.Add(((int)_rpcMaxResponseSoftLimit).ToString());
         }
 
-        if (!string.IsNullOrEmpty(rpcSsl))
+        if (!string.IsNullOrEmpty(_rpcSsl))
         {
             cmd.Add("--rpc-ssl");
-            cmd.Add(rpcSsl);
+            cmd.Add(_rpcSsl);
         }
 
-        if (!string.IsNullOrEmpty(rpcSslPrivateKey))
+        if (!string.IsNullOrEmpty(_rpcSslPrivateKey))
         {
             cmd.Add("--rpc-ssl-private-key");
-            cmd.Add(rpcSslPrivateKey);
+            cmd.Add(_rpcSslPrivateKey);
         }
 
-        if (!string.IsNullOrEmpty(rpcSslCertificate))
+        if (!string.IsNullOrEmpty(_rpcSslCertificate))
         {
             cmd.Add("--rpc-ssl-certificate");
-            cmd.Add(rpcSslCertificate);
+            cmd.Add(_rpcSslCertificate);
         }
 
-        if (rpcSslAllowedFingerprints.Count > 0)
+        if (_rpcSslAllowedFingerprints.Count > 0)
         {
-            foreach (string fingerprint in rpcSslAllowedFingerprints)
+            foreach (string fingerprint in _rpcSslAllowedFingerprints)
             {
                 cmd.Add("--rpc-ssl-allowed-fingerprint");
                 cmd.Add(fingerprint);
             }
         }
 
-        if (rpcSslAllowAnyCert == true)
+        if (_rpcSslAllowAnyCert == true)
         {
             cmd.Add("--rpc-ssl-allow-any-cert");
         }
 
-        if (!string.IsNullOrEmpty(rpcSslCaCertificates))
+        if (!string.IsNullOrEmpty(_rpcSslCaCertificates))
         {
             cmd.Add("--rpc-ssl-ca-certificates");
-            cmd.Add(rpcSslCaCertificates);
+            cmd.Add(_rpcSslCaCertificates);
         }
 
-        if (rpcSslAllowChained == true)
+        if (_rpcSslAllowChained == true)
         {
             cmd.Add("--rpc-ssl-allow-chained");
         }
 
-        if (!string.IsNullOrEmpty(rpcLogin))
+        if (!string.IsNullOrEmpty(_rpcLogin))
         {
             cmd.Add("--rpc-login");
-            cmd.Add(rpcLogin);
+            cmd.Add(_rpcLogin);
         }
 
-        if (!string.IsNullOrEmpty(rpcAccessControlOrigins))
+        if (!string.IsNullOrEmpty(_rpcAccessControlOrigins))
         {
             cmd.Add("--rpc-access-control-origins");
-            cmd.Add(rpcAccessControlOrigins);
+            cmd.Add(_rpcAccessControlOrigins);
         }
 
-        if (disableRpcBan == true)
+        if (_disableRpcBan == true)
         {
             cmd.Add("--disable-rpc-ban");
         }
 
-        if (!string.IsNullOrEmpty(zmqRpcBindIp))
+        if (!string.IsNullOrEmpty(_zmqRpcBindIp))
         {
             cmd.Add("--zmq-rpc-bind-ip");
-            cmd.Add(zmqRpcBindIp);
+            cmd.Add(_zmqRpcBindIp);
         }
 
-        if (zmqRpcBindPort != null && zmqRpcBindPort >= 0)
+        if (_zmqRpcBindPort != null && _zmqRpcBindPort >= 0)
         {
             cmd.Add("--zmq-rpc-bind-port");
-            cmd.Add(((int)zmqRpcBindPort).ToString());
+            cmd.Add(((int)_zmqRpcBindPort).ToString());
         }
 
-        if (!string.IsNullOrEmpty(zmqPub))
+        if (!string.IsNullOrEmpty(_zmqPub))
         {
             cmd.Add("--zmq-pub");
-            cmd.Add(zmqPub);
+            cmd.Add(_zmqPub);
         }
 
-        if (noZmq == true)
+        if (_noZmq == true)
         {
             cmd.Add("--no-zmq");
         }
 
-        if (confirmExternalBind == true)
+        if (_confirmExternalBind == true)
         {
             cmd.Add("--confirm-external-bind");
         }
 
-        if (restrictedRpc == true)
+        if (_restrictedRpc == true)
         {
             cmd.Add("--restricted-rpc");
         }
 
-        if (pruneBlockchain == true)
+        if (_pruneBlockchain == true)
         {
             cmd.Add("--prune-blockchain");
         }
 
-        if (syncPrunedBlocks == true)
+        if (_syncPrunedBlocks == true)
         {
             cmd.Add("--sync-pruned-blocks");
         }
 
-        if (!string.IsNullOrEmpty(dbSyncMode))
+        if (!string.IsNullOrEmpty(_dbSyncMode))
         {
             cmd.Add("--db-sync-mode");
-            cmd.Add(dbSyncMode);
+            cmd.Add(_dbSyncMode);
         }
 
-        if (maxConcurrency != null && maxConcurrency >= 0)
+        if (_maxConcurrency != null && _maxConcurrency >= 0)
         {
             cmd.Add("--max-concurrency");
-            cmd.Add(((int)maxConcurrency).ToString());
+            cmd.Add(((int)_maxConcurrency).ToString());
         }
 
-        if (prepBlocksThreads != null && prepBlocksThreads >= 0)
+        if (_prepBlocksThreads != null && _prepBlocksThreads >= 0)
         {
             cmd.Add("--prep-blocks-threads");
-            cmd.Add(((int)prepBlocksThreads).ToString());
+            cmd.Add(((int)_prepBlocksThreads).ToString());
         }
 
-        if (fastBlockSync == true)
+        if (_fastBlockSync == true)
         {
             cmd.Add("--fast-block-sync");
         }
 
-        if (blockSyncSize != null && blockSyncSize >= 0)
+        if (_blockSyncSize != null && _blockSyncSize >= 0)
         {
             cmd.Add("--block-sync-size");
-            cmd.Add(((int)blockSyncSize).ToString());
+            cmd.Add(((int)_blockSyncSize).ToString());
         }
 
-        if (!string.IsNullOrEmpty(bootstrapDaemonAddress))
+        if (!string.IsNullOrEmpty(_bootstrapDaemonAddress))
         {
             cmd.Add("--bootstrap-daemon-address");
-            cmd.Add(bootstrapDaemonAddress);
+            cmd.Add(_bootstrapDaemonAddress);
         }
 
-        if (!string.IsNullOrEmpty(booststrapDaemonLogin))
+        if (!string.IsNullOrEmpty(_booststrapDaemonLogin))
         {
             cmd.Add("--bootstrap-daemon-login");
-            cmd.Add(booststrapDaemonLogin);
+            cmd.Add(_booststrapDaemonLogin);
         }
 
-        if (noSync == true)
+        if (_noSync == true)
         {
             cmd.Add("--no-sync");
         }

@@ -5,7 +5,7 @@ namespace Monero.Wallet;
 
 public interface MoneroWallet
 {
-    static readonly string DEFAULT_LANGUAGE = "English";
+    static readonly string DefaultLanguage = "English";
 
     MoneroWalletType GetWalletType();
 

@@ -2,92 +2,92 @@ namespace Monero.Daemon.Common;
 
 public class MoneroDaemonSyncInfo
 {
-    private ulong? credits;
-    private ulong? height;
-    private uint? nextNeededPruningSeed;
-    private string? overview;
-    private List<MoneroPeer>? peers;
-    private List<MoneroConnectionSpan>? spans;
-    private ulong? targetHeight;
-    private string? topBlockHash;
+    private ulong? _credits;
+    private ulong? _height;
+    private uint? _nextNeededPruningSeed;
+    private string? _overview;
+    private List<MoneroPeer>? _peers;
+    private List<MoneroConnectionSpan>? _spans;
+    private ulong? _targetHeight;
+    private string? _topBlockHash;
 
     public ulong? GetHeight()
     {
-        return height;
+        return _height;
     }
 
     public void SetHeight(ulong? height)
     {
-        this.height = height;
+        this._height = height;
     }
 
     public List<MoneroPeer>? GetPeers()
     {
-        return peers;
+        return _peers;
     }
 
     public void SetPeers(List<MoneroPeer>? peers)
     {
-        this.peers = peers;
+        this._peers = peers;
     }
 
     public List<MoneroConnectionSpan>? GetSpans()
     {
-        return spans;
+        return _spans;
     }
 
     public void SetSpans(List<MoneroConnectionSpan>? spans)
     {
-        this.spans = spans;
+        this._spans = spans;
     }
 
     public ulong? GetTargetHeight()
     {
-        return targetHeight;
+        return _targetHeight;
     }
 
     public void SetTargetHeight(ulong? targetHeight)
     {
-        this.targetHeight = targetHeight;
+        this._targetHeight = targetHeight;
     }
 
     public uint? GetNextNeededPruningSeed()
     {
-        return nextNeededPruningSeed;
+        return _nextNeededPruningSeed;
     }
 
     public void SetNextNeededPruningSeed(uint? nextNeededPruningSeed)
     {
-        this.nextNeededPruningSeed = nextNeededPruningSeed;
+        this._nextNeededPruningSeed = nextNeededPruningSeed;
     }
 
     public string? GetOverview()
     {
-        return overview;
+        return _overview;
     }
 
     public void SetOverview(string? overview)
     {
-        this.overview = overview;
+        this._overview = overview;
     }
 
     public ulong? GetCredits()
     {
-        return credits;
+        return _credits;
     }
 
     public void SetCredits(ulong? credits)
     {
-        this.credits = credits;
+        this._credits = credits;
     }
 
     public string? GetTopBlockHash()
     {
-        return topBlockHash;
+        return _topBlockHash;
     }
 
     public void SetTopBlockHash(string? topBlockHash)
     {
-        this.topBlockHash = topBlockHash;
+        this._topBlockHash = topBlockHash;
     }
 }

@@ -5,71 +5,71 @@ namespace Monero.Wallet;
 
 internal class MoneroWalletPoller
 {
-    private readonly TaskLooper looper;
+    private readonly TaskLooper _looper;
     private readonly object _lock = new();
 
     private readonly HashSet<string>
-        prevConfirmedNotifications = []; // tx hashes of previously confirmed but not yet unlocked notifications
+        _prevConfirmedNotifications = []; // tx hashes of previously confirmed but not yet unlocked notifications
 
-    private readonly HashSet<string> prevUnconfirmedNotifications = []; // tx hashes of previous notifications
+    private readonly HashSet<string> _prevUnconfirmedNotifications = []; // tx hashes of previous notifications
 
-    private readonly ulong syncPeriodInMs; // default sync period in ms
-    private readonly MoneroWalletDefault wallet;
-    private bool isPolling;
-    private int numPolling;
-    private List<ulong> prevBalances = [];
-    private ulong prevHeight;
-    private List<MoneroTxWallet> prevLockedTxs = [];
+    private readonly ulong _syncPeriodInMs; // default sync period in ms
+    private readonly MoneroWalletDefault _wallet;
+    private bool _isPolling;
+    private int _numPolling;
+    private List<ulong> _prevBalances = [];
+    private ulong _prevHeight;
+    private List<MoneroTxWallet> _prevLockedTxs = [];
 
     public MoneroWalletPoller(MoneroWalletDefault wallet, ulong syncPeriodInMs)
     {
-        this.wallet = wallet;
-        looper = new TaskLooper(() => Poll());
-        this.syncPeriodInMs = syncPeriodInMs;
+        this._wallet = wallet;
+        _looper = new TaskLooper(() => Poll());
+        this._syncPeriodInMs = syncPeriodInMs;
     }
 
     // TODO: factor to common wallet rpc listener
     private void CheckForChangedBalances()
     {
-        ulong balance = wallet.GetBalance();
-        ulong unlockedBalance = wallet.GetUnlockedBalance();
+        ulong balance = _wallet.GetBalance();
+        ulong unlockedBalance = _wallet.GetUnlockedBalance();
         List<ulong> balances = [balance, unlockedBalance];
-        if (balances[0] == prevBalances[0] && balances[1] == prevBalances[1])
+        if (balances[0] == _prevBalances[0] && balances[1] == _prevBalances[1])
         {
             return;
         }
 
-        prevBalances = balances;
+        _prevBalances = balances;
         AnnounceBalancesChanged(balances[0], balances[1]);
     }
 
     public void SetIsPolling(bool isPolling)
     {
-        this.isPolling = isPolling;
+        this._isPolling = isPolling;
         if (isPolling)
         {
-            looper.Start(syncPeriodInMs);
+            _looper.Start(_syncPeriodInMs);
         }
         else
         {
-            looper.Stop();
+            _looper.Stop();
         }
     }
 
     public void SetPeriodInMs(ulong periodInMs)
     {
-        looper.SetPeriodInMs(periodInMs);
+        _looper.SetPeriodInMs(periodInMs);
     }
 
     public void Poll()
     {
         // skip if next poll is queued
-        if (numPolling > 1)
+        if (_numPolling > 1)
         {
             return;
         }
 
-        numPolling++;
+        _numPolling++;
 
         // synchronize polls
         lock (_lock)
@@ -77,42 +77,42 @@ internal class MoneroWalletPoller
             try
             {
                 // skip if wallet is closed
-                if (wallet.IsClosed())
+                if (_wallet.IsClosed())
                 {
-                    numPolling--;
+                    _numPolling--;
                     return;
                 }
 
                 // take initial snapshot
-                if (prevBalances.Count == 0)
+                if (_prevBalances.Count == 0)
                 {
-                    prevHeight = wallet.GetHeight();
-                    prevLockedTxs = wallet.GetTxs(new MoneroTxQuery().SetIsLocked(true));
-                    prevBalances = GetBalances(null, null);
-                    numPolling--;
+                    _prevHeight = _wallet.GetHeight();
+                    _prevLockedTxs = _wallet.GetTxs(new MoneroTxQuery().SetIsLocked(true));
+                    _prevBalances = GetBalances(null, null);
+                    _numPolling--;
                     return;
                 }
 
                 // announce height changes
-                ulong height = wallet.GetHeight();
-                if (prevHeight != height)
+                ulong height = _wallet.GetHeight();
+                if (_prevHeight != height)
                 {
-                    for (ulong i = prevHeight; i < height; i++)
+                    for (ulong i = _prevHeight; i < height; i++)
                     {
                         OnNewBlock(i);
                     }
 
-                    prevHeight = height;
+                    _prevHeight = height;
                 }
 
                 // get locked txs for comparison to previous
                 ulong minHeight = Math.Max(0, height - 70); // only monitor recent txs
-                List<MoneroTxWallet> lockedTxs = wallet.GetTxs(new MoneroTxQuery().SetIsLocked(true)
+                List<MoneroTxWallet> lockedTxs = _wallet.GetTxs(new MoneroTxQuery().SetIsLocked(true)
                     .SetMinHeight(minHeight).SetIncludeOutputs(true));
 
                 // collect hashes of txs no longer locked
                 List<string> noLongerLockedHashes = [];
-                foreach (MoneroTxWallet prevLockedTx in prevLockedTxs)
+                foreach (MoneroTxWallet prevLockedTx in _prevLockedTxs)
                 {
                     if (GetTx(lockedTxs, prevLockedTx.GetHash()) == null)
                     {
@@ -121,20 +121,20 @@ internal class MoneroWalletPoller
                 }
 
                 // save locked txs for next comparison
-                prevLockedTxs = lockedTxs;
+                _prevLockedTxs = lockedTxs;
 
                 // fetch txs which are no longer locked
                 List<MoneroTxWallet> unlockedTxs = noLongerLockedHashes.Count == 0
                     ? []
-                    : wallet.GetTxs(new MoneroTxQuery().SetIsLocked(false).SetMinHeight(minHeight)
+                    : _wallet.GetTxs(new MoneroTxQuery().SetIsLocked(false).SetMinHeight(minHeight)
                         .SetHashes(noLongerLockedHashes).SetIncludeOutputs(true));
 
                 // announce new unconfirmed and confirmed txs
                 foreach (MoneroTxWallet lockedTx in lockedTxs)
                 {
                     bool unannounced = lockedTx.IsConfirmed() == true
-                        ? prevConfirmedNotifications.Add(lockedTx.GetHash()!)
-                        : prevUnconfirmedNotifications.Add(lockedTx.GetHash()!);
+                        ? _prevConfirmedNotifications.Add(lockedTx.GetHash()!)
+                        : _prevUnconfirmedNotifications.Add(lockedTx.GetHash()!);
                     if (unannounced)
                     {
                         NotifyOutputs(lockedTx);
@@ -144,21 +144,21 @@ internal class MoneroWalletPoller
                 // announce new unlocked outputs
                 foreach (MoneroTxWallet unlockedTx in unlockedTxs)
                 {
-                    prevUnconfirmedNotifications.Remove(unlockedTx.GetHash()!); // stop tracking tx notifications
-                    prevConfirmedNotifications.Remove(unlockedTx.GetHash()!);
+                    _prevUnconfirmedNotifications.Remove(unlockedTx.GetHash()!); // stop tracking tx notifications
+                    _prevConfirmedNotifications.Remove(unlockedTx.GetHash()!);
                     NotifyOutputs(unlockedTx);
                 }
 
                 // announce balance changes
                 CheckForChangedBalances();
-                numPolling--;
+                _numPolling--;
             }
             catch (Exception e)
             {
-                numPolling--;
-                if (isPolling)
+                _numPolling--;
+                if (_isPolling)
                 {
-                    MoneroUtils.Log(0, "Failed to background poll wallet '" + wallet.GetPath() + "': " + e.Message);
+                    MoneroUtils.Log(0, "Failed to background poll wallet '" + _wallet.GetPath() + "': " + e.Message);
                 }
             }
         }
@@ -243,13 +243,13 @@ internal class MoneroWalletPoller
 
     private List<MoneroWalletListener> GetListeners()
     {
-        return wallet.GetListeners();
+        return _wallet.GetListeners();
     }
 
     public List<ulong> GetBalances(uint? accountIdx, uint? subaddressIdx)
     {
-        ulong balance = wallet.GetBalance(accountIdx, subaddressIdx);
-        ulong unlockedBalance = wallet.GetUnlockedBalance(accountIdx, subaddressIdx);
+        ulong balance = _wallet.GetBalance(accountIdx, subaddressIdx);
+        ulong unlockedBalance = _wallet.GetUnlockedBalance(accountIdx, subaddressIdx);
         return [balance, unlockedBalance];
     }
 
