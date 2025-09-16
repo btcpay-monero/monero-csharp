@@ -267,7 +267,8 @@ public class TestMoneroConnectionManager
             Assert.True(connectionManager.IsConnected());
 
             // test polling current connection
-            connectionManager.SetConnection((MoneroRpcConnection?)null);
+            MoneroRpcConnection? nullConnection = null;
+            connectionManager.SetConnection(nullConnection);
             Assert.False(connectionManager.IsConnected());
             numExpectedChanges++;
             Assert.True(numExpectedChanges == listener.ChangedConnections.Count);
@@ -279,7 +280,7 @@ public class TestMoneroConnectionManager
             Assert.True(numExpectedChanges == listener.ChangedConnections.Count);
 
             // test polling all connections
-            connectionManager.SetConnection((MoneroRpcConnection?)null);
+            connectionManager.SetConnection(nullConnection);
             numExpectedChanges++;
             Assert.True(numExpectedChanges == listener.ChangedConnections.Count);
             connectionManager.StartPolling((ulong)TestUtils.SYNC_PERIOD_IN_MS, null, null,
