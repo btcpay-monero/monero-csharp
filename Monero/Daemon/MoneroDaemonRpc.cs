@@ -486,8 +486,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return GetBlocksByHeight(heights);
     }
 
-    public override List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight,
-        ulong? maxChunkSize = null)
+    public override List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight, ulong? maxChunkSize)
     {
         if (startHeight == null)
         {
@@ -510,7 +509,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return blocks;
     }
 
-    public override MoneroBlockTemplate GetBlockTemplate(string walletAddress, int? reserveSize = null)
+    public override MoneroBlockTemplate GetBlockTemplate(string walletAddress, int? reserveSize)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("wallet_address", walletAddress);
@@ -526,7 +525,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return GetBandwidthLimits()[0];
     }
 
-    public override MoneroFeeEstimate GetFeeEstimate(int? graceBlocks = null)
+    public override MoneroFeeEstimate GetFeeEstimate(int? graceBlocks)
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = rpc.SendJsonRequest("get_fee_estimate");
         MoneroJsonRpcParams? result = resp.Result!;
@@ -639,7 +638,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return ConvertRpcMiningStatus(resp);
     }
 
-    public override MoneroMinerTxSum GetMinerTxSum(ulong height, ulong? numBlocks = null)
+    public override MoneroMinerTxSum GetMinerTxSum(ulong height, ulong? numBlocks)
     {
         if (numBlocks == null)
         {
@@ -659,14 +658,14 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
     }
 
     public override List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts,
-        bool? isCumulative = null, ulong? startHeight = null, ulong? endHeight = null)
+        bool? isCumulative, ulong? startHeight, ulong? endHeight)
     {
         throw new NotImplementedException(
             "MoneroDaemonRpc.GetOutputDistribution(): not implemented (response 'distribution' field is binary)");
     }
 
-    public override List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts = null,
-        int? minCount = null, int? maxCount = null, bool? isUnlocked = null, int? recentCutoff = null)
+    public override List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts,
+        int? minCount, int? maxCount, bool? isUnlocked, int? recentCutoff)
     {
         // build request params
         MoneroJsonRpcParams parameters = [];
@@ -771,7 +770,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return ConvertRpcSyncInfo(result);
     }
 
-    public override List<string> GetTxHexes(List<string> txHashes, bool prune = false)
+    public override List<string> GetTxHexes(List<string> txHashes, bool prune)
     {
         List<string> hexes = [];
         foreach (MoneroTx tx in GetTxs(txHashes, prune))
@@ -826,7 +825,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return ConvertRpcTxPoolStats(((JObject)resp["pool_stats"]!).ToObject<Dictionary<string, object?>>());
     }
 
-    public override List<MoneroTx> GetTxs(List<string> txHashes, bool prune = false)
+    public override List<MoneroTx> GetTxs(List<string> txHashes, bool prune)
     {
         // validate input
         if (txHashes.Count == 0)
@@ -1039,7 +1038,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         CheckResponseStatus(resp.Result);
     }
 
-    public override MoneroSubmitTxResult SubmitTxHex(string txHex, bool doNotRelay = false)
+    public override MoneroSubmitTxResult SubmitTxHex(string txHex, bool doNotRelay)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("tx_as_hex", txHex);

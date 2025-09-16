@@ -6,8 +6,23 @@ public class MoneroIntegratedAddress
     private string? _paymentId;
     private string? _standardAddress;
 
-    public MoneroIntegratedAddress(string? standardAddress = null, string? paymentId = null,
-        string? integratedAddress = null)
+    public MoneroIntegratedAddress()
+    {
+
+    }
+
+    public MoneroIntegratedAddress(string? standardAddress)
+    {
+        _standardAddress = standardAddress;
+    }
+
+    public MoneroIntegratedAddress(string? standardAddress, string? paymentId)
+    {
+        _standardAddress = standardAddress;
+        _paymentId = paymentId;
+    }
+
+    public MoneroIntegratedAddress(string? standardAddress, string? paymentId, string? integratedAddress)
     {
         _standardAddress = standardAddress;
         _paymentId = paymentId;

@@ -5,7 +5,17 @@ public class MoneroDestination
     private string? _address;
     private ulong? _amount;
 
-    public MoneroDestination(string? address = null, ulong? amount = null)
+    public MoneroDestination()
+    {
+
+    }
+
+    public MoneroDestination(string? address)
+    {
+        _address = address;
+    }
+
+    public MoneroDestination(string? address, ulong? amount)
     {
         _address = address;
         _amount = amount;

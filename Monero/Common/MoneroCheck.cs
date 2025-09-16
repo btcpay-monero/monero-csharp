@@ -4,7 +4,12 @@ public class MoneroCheck
 {
     protected bool _isGood;
 
-    public MoneroCheck(bool isGood = false)
+    public MoneroCheck()
+    {
+        _isGood = false;
+    }
+
+    public MoneroCheck(bool isGood)
     {
         this._isGood = isGood;
     }

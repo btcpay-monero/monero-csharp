@@ -9,11 +9,23 @@ public class MoneroAccount
     private string? tag;
     private ulong unlockedBalance;
 
-    public MoneroAccount(uint? index = null, string? primaryAddress = null)
+    public MoneroAccount()
+    {
+        balance = 0;
+        unlockedBalance = 0;
+    }
+
+    public MoneroAccount(uint? index)
+    {
+        this.index = index;
+        balance = 0;
+        unlockedBalance = 0;
+    }
+
+    public MoneroAccount(uint? index, string? primaryAddress)
     {
         this.index = index;
         this.primaryAddress = primaryAddress;
-        subaddresses = [];
         balance = 0;
         unlockedBalance = 0;
     }

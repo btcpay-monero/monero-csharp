@@ -5,7 +5,17 @@ public class MoneroVersion
     private bool? _isRelease;
     private int? _number;
 
-    public MoneroVersion(int? number = null, bool? isRelease = null)
+    public MoneroVersion()
+    {
+
+    }
+
+    public MoneroVersion(int? number)
+    {
+        _number = number;
+    }
+
+    public MoneroVersion(int? number, bool? isRelease)
     {
         _number = number;
         _isRelease = isRelease;

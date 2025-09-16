@@ -242,8 +242,13 @@ public class MoneroConnectionManager
         _poller.Start(periodMs);
     }
 
+    private void StartPollingPrioritizedConnections(ulong periodMs)
+    {
+        StartPollingPrioritizedConnections(periodMs, null);
+    }
+
     private void StartPollingPrioritizedConnections(ulong periodMs,
-        List<MoneroRpcConnection>? excludedConnections = null)
+        List<MoneroRpcConnection>? excludedConnections)
     {
         _poller = new TaskLooper(() =>
         {
@@ -253,8 +258,34 @@ public class MoneroConnectionManager
         _poller.Start(periodMs);
     }
 
-    public MoneroConnectionManager StartPolling(ulong? periodMs = null, bool? autoSwitch = null,
-        ulong? timeoutMs = null, PollType? pollType = null, List<MoneroRpcConnection>? excludedConnections = null)
+    public MoneroConnectionManager StartPolling()
+    {
+        return StartPolling(null, null, null, null, null);
+    }
+
+    public MoneroConnectionManager StartPolling(ulong? periodMs)
+    {
+        return StartPolling(periodMs, null, null, null, null);
+    }
+
+    public MoneroConnectionManager StartPolling(ulong? periodMs, bool? autoSwitch)
+    {
+        return StartPolling(periodMs, autoSwitch, null, null, null);
+    }
+
+    public MoneroConnectionManager StartPolling(ulong? periodMs, bool? autoSwitch, ulong? timeoutMs)
+    {
+        return StartPolling(periodMs, autoSwitch, timeoutMs, null, null);
+    }
+
+    public MoneroConnectionManager StartPolling(ulong? periodMs, bool? autoSwitch,
+        ulong? timeoutMs, PollType? pollType)
+    {
+        return StartPolling(periodMs, autoSwitch, timeoutMs, pollType, null);
+    }
+
+    public MoneroConnectionManager StartPolling(ulong? periodMs, bool? autoSwitch,
+        ulong? timeoutMs, PollType? pollType, List<MoneroRpcConnection>? excludedConnections)
     {
         // apply defaults
         if (periodMs == null)
@@ -443,8 +474,17 @@ public class MoneroConnectionManager
         return this;
     }
 
-    public MoneroConnectionManager AddRpcConnection(string uri, string? username = null, string? password = null,
-        string? zmqUri = null)
+    public MoneroConnectionManager AddRpcConnection(string uri)
+    {
+        return AddRpcConnection(uri, null, null, null);
+    }
+
+    public MoneroConnectionManager AddRpcConnection(string uri, string? username, string? password)
+    {
+        return AddRpcConnection(uri, username, password, null);
+    }
+
+    public MoneroConnectionManager AddRpcConnection(string uri, string? username, string? password, string? zmqUri)
     {
         return AddConnection(new MoneroRpcConnection(uri, username, password, zmqUri));
     }
@@ -494,8 +534,17 @@ public class MoneroConnectionManager
         return this;
     }
 
-    public MoneroConnectionManager SetConnection(string uri, string? username = null, string? password = null,
-        string? zmqUri = null)
+    public MoneroConnectionManager SetConnection(string uri)
+    {
+        return SetConnection(new MoneroRpcConnection(uri, null, null, null));
+    }
+
+    public MoneroConnectionManager SetConnection(string uri, string? username, string? password)
+    {
+        return SetConnection(new MoneroRpcConnection(uri, username, password, null));
+    }
+
+    public MoneroConnectionManager SetConnection(string uri, string? username, string? password, string? zmqUri)
     {
         return SetConnection(new MoneroRpcConnection(uri, username, password, zmqUri));
     }
@@ -598,7 +647,12 @@ public class MoneroConnectionManager
         return CheckConnections(_connections, null);
     }
 
-    public MoneroRpcConnection? GetBestAvailableConnection(List<MoneroRpcConnection>? excludedConnections = null)
+    public MoneroRpcConnection? GetBestAvailableConnection()
+    {
+        return GetBestAvailableConnection(null);
+    }
+
+    public MoneroRpcConnection? GetBestAvailableConnection(List<MoneroRpcConnection>? excludedConnections)
     {
         throw new NotImplementedException(
             "This method is not implemented yet. Please implement the logic to get the best available connection excluding the specified connections.");
@@ -606,7 +660,7 @@ public class MoneroConnectionManager
 
     public MoneroConnectionManager Disconnect()
     {
-        SetConnection(null);
+        SetConnection((MoneroRpcConnection?)null);
         return this;
     }
 

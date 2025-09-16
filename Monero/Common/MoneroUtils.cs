@@ -433,8 +433,13 @@ public static class MoneroUtils
         return new MoneroDecodedAddress(address, (MoneroAddressType)addressType, networkType.Type);
     }
 
+    public static MoneroIntegratedAddress GetIntegratedAddress(MoneroNetworkType networkType, string standardAddress)
+    {
+        return GetIntegratedAddress(networkType, standardAddress, null);
+    }
+
     public static MoneroIntegratedAddress GetIntegratedAddress(MoneroNetworkType networkType, string standardAddress,
-        string? paymentId = null)
+        string? paymentId)
     {
         throw new NotImplementedException("MoneroUtils.GetIntegratedAddress(): not implemented.");
     }

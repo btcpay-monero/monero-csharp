@@ -5,7 +5,17 @@ public class MoneroMultisigInitResult
     private string? _address;
     private string? _multisigHex;
 
-    public MoneroMultisigInitResult(string? address = null, string? multisigHex = null)
+    public MoneroMultisigInitResult()
+    {
+
+    }
+
+    public MoneroMultisigInitResult(string? address)
+    {
+        _address = address;
+    }
+
+    public MoneroMultisigInitResult(string? address, string? multisigHex)
     {
         _address = address;
         _multisigHex = multisigHex;

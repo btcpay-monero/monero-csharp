@@ -7,8 +7,31 @@ public class MoneroAddressBookEntry
     private uint? index;
     private string? paymentId;
 
-    public MoneroAddressBookEntry(uint? index = null, string? address = null, string? description = null,
-        string? paymentId = null)
+    public MoneroAddressBookEntry()
+    {
+
+    }
+
+    public MoneroAddressBookEntry(uint? index)
+    {
+        this.index = index;
+    }
+
+    public MoneroAddressBookEntry(uint? index, string? address)
+    {
+        this.index = index;
+        this.address = address;
+    }
+
+    public MoneroAddressBookEntry(uint? index, string? address, string? description)
+    {
+        this.index = index;
+        this.address = address;
+        this.description = description;
+    }
+
+    public MoneroAddressBookEntry(uint? index, string? address, string? description,
+        string? paymentId)
     {
         this.index = index;
         this.address = address;

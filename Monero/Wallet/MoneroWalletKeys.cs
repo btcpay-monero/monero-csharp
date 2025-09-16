@@ -52,12 +52,12 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroAccount CreateAccount(string? label = null)
+    public override MoneroAccount CreateAccount(string? label)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroSubaddress CreateSubaddress(uint accountIdx, string? label = null)
+    public override MoneroSubaddress CreateSubaddress(uint accountIdx, string? label)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -93,7 +93,7 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroKeyImage> ExportKeyImages(bool all = false)
+    public override List<MoneroKeyImage> ExportKeyImages(bool all)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -103,7 +103,7 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string ExportOutputs(bool all = false)
+    public override string ExportOutputs(bool all)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -113,12 +113,12 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroAccount GetAccount(uint accountIdx, bool includeSubaddresses = false)
+    public override MoneroAccount GetAccount(uint accountIdx, bool includeSubaddresses)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroAccount> GetAccounts(bool includeSubaddresses = false, string? tag = null)
+    public override List<MoneroAccount> GetAccounts(bool includeSubaddresses, string? tag)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -148,7 +148,7 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override ulong GetBalance(uint? accountIdx = null, uint? subaddressIdx = null)
+    public override ulong GetBalance(uint? accountIdx, uint? subaddressIdx)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -178,8 +178,7 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress = null,
-        string? paymentId = null)
+    public override MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress, string? paymentId)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -249,12 +248,12 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetSpendProof(string txHash, string? message = null)
+    public override string GetSpendProof(string txHash, string? message)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroSubaddress> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices = null)
+    public override List<MoneroSubaddress> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -274,7 +273,7 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetTxProof(string txHash, string address, string? message = null)
+    public override string GetTxProof(string txHash, string address, string? message)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -284,7 +283,7 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override ulong GetUnlockedBalance(uint? accountIdx = null, uint? subaddressIdx = null)
+    public override ulong GetUnlockedBalance(uint? accountIdx, uint? subaddressIdx)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -409,9 +408,8 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string SignMessage(string message,
-        MoneroMessageSignatureType signatureType = MoneroMessageSignatureType.SIGN_WITH_SPEND_KEY, uint accountIdx = 0,
-        uint subaddressIdx = 0)
+    public override string SignMessage(string message, MoneroMessageSignatureType signatureType,
+        uint accountIdx, uint subaddressIdx)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -431,7 +429,7 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void StartSyncing(ulong? syncPeriodInMs = null)
+    public override void StartSyncing(ulong? syncPeriodInMs)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -471,7 +469,7 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroSyncResult Sync(ulong? startHeight = null, MoneroWalletListener? listener = null)
+    public override MoneroSyncResult Sync(ulong? startHeight, MoneroWalletListener? listener)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }

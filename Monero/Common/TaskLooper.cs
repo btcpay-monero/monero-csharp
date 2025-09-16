@@ -23,7 +23,12 @@ public class TaskLooper
         }
     }
 
-    public void Start(ulong periodInMs, bool targetFixedPeriod = false)
+    public void Start(ulong periodInMs)
+    {
+        Start(periodInMs, false);
+    }
+
+    public void Start(ulong periodInMs, bool targetFixedPeriod)
     {
         if (periodInMs <= 0)
         {

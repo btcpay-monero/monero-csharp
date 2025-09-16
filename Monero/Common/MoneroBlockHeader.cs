@@ -1,6 +1,6 @@
 namespace Monero.Common;
 
-public class MoneroBlockHeader
+public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 {
     private ulong? _cumulativeDifficulty;
     private ulong? _depth;
@@ -277,6 +277,11 @@ public class MoneroBlockHeader
         return this;
     }
 
+    public override bool Equals(object? other)
+    {
+        return Equals(other as MoneroBlockHeader);
+    }
+
     public virtual bool Equals(MoneroBlockHeader? other)
     {
         if (other == null)
@@ -307,5 +312,10 @@ public class MoneroBlockHeader
                _prevHash == other._prevHash &&
                _reward == other._reward &&
                _powHash == other._powHash;
+    }
+
+    public override int GetHashCode()
+    {
+        throw new NotImplementedException();
     }
 }

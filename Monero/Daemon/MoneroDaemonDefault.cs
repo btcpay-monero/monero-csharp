@@ -62,16 +62,36 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract List<MoneroBlock> GetBlocksByRange(ulong? startHeight, ulong? endHeight);
 
-    public abstract List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight,
-        ulong? maxChunkSize = null);
+    public virtual List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight)
+    {
+        return GetBlocksByRangeChunked(startHeight, endHeight, null);
+    }
 
-    public abstract MoneroBlockTemplate GetBlockTemplate(string walletAddress, int? reserveSize = null);
+    public abstract List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight,
+        ulong? maxChunkSize);
+
+    public MoneroBlockTemplate GetBlockTemplate(string walletAddress)
+    {
+        return GetBlockTemplate(walletAddress, null);
+    }
+
+    public abstract MoneroBlockTemplate GetBlockTemplate(string walletAddress, int? reserveSize);
 
     public abstract int GetDownloadLimit();
 
-    public abstract MoneroFeeEstimate GetFeeEstimate(int? graceBlocks = null);
+    public virtual MoneroFeeEstimate GetFeeEstimate()
+    {
+        return GetFeeEstimate(null);
+    }
 
-    public abstract MoneroMinerTxSum GetMinerTxSum(ulong height, ulong? numBlocks = null);
+    public abstract MoneroFeeEstimate GetFeeEstimate(int? graceBlocks);
+
+    public virtual MoneroMinerTxSum GetMinerTxSum(ulong height)
+    {
+        return GetMinerTxSum(height, null);
+    }
+
+    public abstract MoneroMinerTxSum GetMinerTxSum(ulong height, ulong? numBlocks);
 
     public abstract MoneroHardForkInfo GetHardForkInfo();
 
@@ -97,11 +117,54 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract MoneroMiningStatus GetMiningStatus();
 
-    public abstract List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts,
-        bool? isCumulative = null, ulong? startHeight = null, ulong? endHeight = null);
+    public virtual List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts)
+    {
+        return GetOutputDistribution(amounts, null, null, null);
+    }
 
-    public abstract List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts = null,
-        int? minCount = null, int? maxCount = null, bool? isUnlocked = null, int? recentCutoff = null);
+    public virtual List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative)
+    {
+        return GetOutputDistribution(amounts, isCumulative, null, null);
+    }
+
+    public virtual List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
+        ulong? startHeight)
+    {
+        return GetOutputDistribution(amounts, isCumulative, startHeight, null);
+    }
+
+    public abstract List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
+        ulong? startHeight, ulong? endHeight);
+
+    public virtual List<MoneroOutputHistogramEntry> GetOutputHistogram()
+    {
+        return GetOutputHistogram(null, null, null, null, null);
+    }
+
+    public virtual List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts)
+    {
+        return GetOutputHistogram(amounts, null, null, null, null);
+    }
+
+    public virtual List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount)
+    {
+        return GetOutputHistogram(amounts, minCount, null, null, null);
+    }
+
+    public virtual List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount,
+        int? maxCount)
+    {
+        return GetOutputHistogram(amounts, minCount, maxCount, null, null);
+    }
+
+    public virtual List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount,
+        int? maxCount, bool? isUnlocked)
+    {
+        return GetOutputHistogram(amounts, minCount, maxCount, isUnlocked, null);
+    }
+
+    public abstract List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount,
+        int? maxCount, bool? isUnlocked, int? recentCutoff);
 
     public abstract List<MoneroOutput> GetOutputs(List<MoneroOutput> outputs);
 
@@ -111,21 +174,36 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract MoneroDaemonSyncInfo GetSyncInfo();
 
-    public virtual MoneroTx? GetTx(string txHash, bool prune = false)
+    public virtual MoneroTx? GetTx(string txHash)
+    {
+        return GetTx(txHash, false);
+    }
+
+    public virtual MoneroTx? GetTx(string txHash, bool prune)
     {
         List<MoneroTx> txs = GetTxs([txHash], prune);
 
         return txs.FirstOrDefault();
     }
 
-    public virtual string? GetTxHex(string txHash, bool prune = false)
+    public virtual string? GetTxHex(string txHash)
+    {
+        return GetTxHex(txHash, false);
+    }
+
+    public virtual string? GetTxHex(string txHash, bool prune)
     {
         List<string> hexes = GetTxHexes([txHash], prune);
 
         return hexes.FirstOrDefault();
     }
 
-    public abstract List<string> GetTxHexes(List<string> txHashes, bool prune = false);
+    public virtual List<string> GetTxHexes(List<string> txHashes)
+    {
+        return GetTxHexes(txHashes, false);
+    }
+
+    public abstract List<string> GetTxHexes(List<string> txHashes, bool prune);
 
     public abstract List<MoneroTx> GetTxPool();
 
@@ -133,7 +211,12 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract MoneroTxPoolStats GetTxPoolStats();
 
-    public abstract List<MoneroTx> GetTxs(List<string> txHashes, bool prune = false);
+    public virtual List<MoneroTx> GetTxs(List<string> txHashes)
+    {
+        return GetTxs(txHashes, false);
+    }
+
+    public abstract List<MoneroTx> GetTxs(List<string> txHashes, bool prune);
 
     public abstract int GetUploadLimit();
 
@@ -190,7 +273,12 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
 
     public abstract void SubmitBlocks(List<string> blockBlobs);
 
-    public abstract MoneroSubmitTxResult SubmitTxHex(string txHex, bool doNotRelay = false);
+    public MoneroSubmitTxResult SubmitTxHex(string txHex)
+    {
+        return SubmitTxHex(txHex, false);
+    }
+
+    public abstract MoneroSubmitTxResult SubmitTxHex(string txHex, bool doNotRelay);
 
     public abstract MoneroBlockHeader WaitForNextBlockHeader();
 }

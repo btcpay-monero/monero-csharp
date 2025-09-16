@@ -5,18 +5,39 @@ using Newtonsoft.Json;
 
 namespace Monero.Common;
 
-public class MoneroRpcConnection : MoneroConnection
+public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnection>
 {
     private HttpClient? _httpClient;
     private bool? _isAuthenticated;
     private string? _password;
-
     private bool _printStackTrace;
     private string? _username;
     private string? _zmqUri;
+    private readonly object _lock = new();
 
-    public MoneroRpcConnection(string? uri = null, string? username = null, string? password = null,
-        string? zmqUri = null, int priority = 0) : base(uri, null, priority)
+    public MoneroRpcConnection()
+    {
+        SetCredentials(null, null);
+    }
+
+    public MoneroRpcConnection(string? uri) : base(uri)
+    {
+        SetCredentials(null, null);
+    }
+
+    public MoneroRpcConnection(string? uri, string? username, string? password) : base(uri)
+    {
+        SetCredentials(username, password);
+    }
+
+    public MoneroRpcConnection(string? uri, string? username, string? password, string? zmqUri) : base(uri)
+    {
+        _zmqUri = zmqUri;
+        SetCredentials(username, password);
+    }
+
+    public MoneroRpcConnection(string? uri, string? username, string? password,
+        string? zmqUri, int priority) : base(uri, null, priority)
     {
         _zmqUri = zmqUri;
         SetCredentials(username, password);
@@ -31,6 +52,124 @@ public class MoneroRpcConnection : MoneroConnection
         _printStackTrace = other._printStackTrace;
         SetCredentials(_username, _password);
     }
+
+    #region Private Methods
+
+    private static void ValidateHttpResponse(HttpResponseMessage resp)
+    {
+        int code = (int)resp.StatusCode;
+        if (code < 200 || code > 299)
+        {
+            string? content = null;
+            try
+            {
+                content = resp.Content.ReadAsStringAsync().Result;
+            }
+            catch
+            {
+                // could not get content
+            }
+
+            string message = $"{code} {resp.ReasonPhrase}";
+            if (!string.IsNullOrEmpty(content))
+            {
+                message += $": {content}";
+            }
+
+            throw new MoneroRpcError(message, code, "");
+        }
+    }
+
+    private void HandleRpcError(Dictionary<string, object>? error, string method, object? parameters)
+    {
+        if (error != null)
+        {
+            string? message = error.TryGetValue("message", out object? value) ? value.ToString() : "";
+            int code = error.TryGetValue("code", out object? value1
+            ) ? Convert.ToInt32(value1) : -1;
+
+            if (string.IsNullOrEmpty(message))
+            {
+                message = $"Received error response from RPC request with method '{method}' to {_uri}";
+            }
+
+            throw new MoneroRpcError(message, code, method, parameters);
+        }
+    }
+
+    private void ValidateRpcResponse<T>(MoneroJsonRpcResponse<T>? rpcResponse, string method, object? parameters)
+    {
+        if (rpcResponse == null)
+        {
+            throw new MoneroRpcInvalidResponseError(method, _uri, parameters);
+        }
+
+        HandleRpcError(rpcResponse.Error, method, parameters);
+    }
+
+    private void ValidateRpcResponse(Dictionary<string, object>? rpcResponse, string method, object? parameters)
+    {
+        if (rpcResponse == null)
+        {
+            throw new MoneroRpcInvalidResponseError(method, _uri, parameters);
+        }
+
+        Dictionary<string, object>? error = (Dictionary<string, object>?)rpcResponse.GetValueOrDefault("error");
+
+        HandleRpcError(error, method, parameters);
+    }
+
+    private T? SendRequest<T>(string path, object? parameters, ulong? timeoutMs)
+    {
+        if (_httpClient == null)
+        {
+            throw new MoneroError("Http client is null");
+        }
+
+        try
+        {
+            string jsonBody = "";
+
+            if (parameters != null)
+            {
+                jsonBody = JsonConvert.SerializeObject(parameters);
+            }
+
+            if (_printStackTrace)
+            {
+                try
+                {
+                    throw new Exception($"Debug stack trace for JSON request with method '{path}' and body {jsonBody}");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+
+            StringContent content = new(jsonBody, Encoding.UTF8, "application/json");
+
+            using CancellationTokenSource cts = new(TimeSpan.FromMilliseconds(timeoutMs ?? _timeoutMs));
+
+            HttpResponseMessage httpResponse = _httpClient.PostAsync(new Uri($"{_uri}/{path}"), content, cts.Token)
+                .GetAwaiter()
+                .GetResult();
+
+            ValidateHttpResponse(httpResponse);
+
+            string respStr = httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+            return JsonConvert.DeserializeObject<T>(respStr);
+        }
+        catch (Exception e2)
+        {
+            throw new MoneroError(e2);
+        }
+    }
+
+    #endregion
+
+    #region Public Methods
 
     public bool IsOnion()
     {
@@ -68,6 +207,11 @@ public class MoneroRpcConnection : MoneroConnection
         return !IsOnion() && !IsI2P();
     }
 
+    public override bool Equals(object? other)
+    {
+        return Equals(other as MoneroRpcConnection);
+    }
+
     public bool Equals(MoneroRpcConnection? other)
     {
         if (other == null)
@@ -85,69 +229,6 @@ public class MoneroRpcConnection : MoneroConnection
                _uri == other._uri &&
                _proxyUri == other._proxyUri &&
                _zmqUri == other._zmqUri;
-    }
-
-    private static void ValidateHttpResponse(HttpResponseMessage resp)
-    {
-        int code = (int)resp.StatusCode;
-        if (code < 200 || code > 299)
-        {
-            string? content = null;
-            try
-            {
-                content = resp.Content.ReadAsStringAsync().Result;
-            }
-            catch
-            {
-                // could not get content
-            }
-
-            string message = $"{code} {resp.ReasonPhrase}";
-            if (!string.IsNullOrEmpty(content))
-            {
-                message += $": {content}";
-            }
-
-            throw new MoneroRpcError(message, code, "");
-        }
-    }
-
-    private void HandleRpcError(Dictionary<string, object>? error, string method, object? parameters)
-    {
-        if (error != null)
-        {
-            string? message = error.ContainsKey("message") ? error["message"].ToString() : "";
-            int code = error.ContainsKey("code") ? Convert.ToInt32(error["code"]) : -1;
-
-            if (string.IsNullOrEmpty(message))
-            {
-                message = $"Received error response from RPC request with method '{method}' to {_uri}";
-            }
-
-            throw new MoneroRpcError(message, code, method, parameters);
-        }
-    }
-
-    private void ValidateRpcResponse<T>(MoneroJsonRpcResponse<T>? rpcResponse, string method, object? parameters)
-    {
-        if (rpcResponse == null)
-        {
-            throw new MoneroRpcInvalidResponseError(method, _uri, parameters);
-        }
-
-        HandleRpcError(rpcResponse.Error, method, parameters);
-    }
-
-    private void ValidateRpcResponse(Dictionary<string, object>? rpcResponse, string method, object? parameters)
-    {
-        if (rpcResponse == null)
-        {
-            throw new MoneroRpcInvalidResponseError(method, _uri, parameters);
-        }
-
-        Dictionary<string, object>? error = (Dictionary<string, object>?)rpcResponse.GetValueOrDefault("error");
-
-        HandleRpcError(error, method, parameters);
     }
 
     public override MoneroRpcConnection Clone()
@@ -177,7 +258,7 @@ public class MoneroRpcConnection : MoneroConnection
 
     public override bool CheckConnection(ulong timeoutMs)
     {
-        lock (this)
+        lock (_lock)
         {
             bool? isOnlineBefore = _isOnline;
             bool? isAuthenticatedBefore = _isAuthenticated;
@@ -347,24 +428,53 @@ public class MoneroRpcConnection : MoneroConnection
         _printStackTrace = printStackTrace;
     }
 
+    #region Json Request
+
+    public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method)
+    {
+        Dictionary<string, object?>? parameters = null;
+        return SendJsonRequest(method, parameters);
+    }
+
     public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method,
-        Dictionary<string, object?>? parameters = null, ulong timeoutMs = 20000)
+        Dictionary<string, object?>? parameters)
+    {
+        return SendJsonRequest(method, parameters, 20000);
+    }
+
+    public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method,
+        Dictionary<string, object?>? parameters, ulong timeoutMs)
     {
         return SendJsonRequest<Dictionary<string, object?>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
+    }
+
+    public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method, List<string> parameters)
+    {
+        return SendJsonRequest(method, parameters, 20000);
     }
 
     public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method, List<string> parameters,
-        ulong timeoutMs = 20000)
+        ulong timeoutMs)
     {
         return SendJsonRequest<Dictionary<string, object?>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
     }
 
-    public MoneroJsonRpcResponse<string> SendJsonRequest(string method, List<ulong> parameters, ulong timeoutMs = 20000)
+    public MoneroJsonRpcResponse<string> SendJsonRequest(string method, List<ulong> parameters)
+    {
+        return SendJsonRequest(method, parameters, 20000);
+    }
+
+    public MoneroJsonRpcResponse<string> SendJsonRequest(string method, List<ulong> parameters, ulong timeoutMs)
     {
         return SendJsonRequest<string>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
     }
 
-    public MoneroJsonRpcResponse<T> SendJsonRequest<T>(MoneroJsonRpcRequest rpcRequest, ulong timeoutMs = 20000)
+    public MoneroJsonRpcResponse<T> SendJsonRequest<T>(MoneroJsonRpcRequest rpcRequest)
+    {
+        return SendJsonRequest<T>(rpcRequest, 20000);
+    }
+
+    public MoneroJsonRpcResponse<T> SendJsonRequest<T>(MoneroJsonRpcRequest rpcRequest, ulong timeoutMs)
     {
         if (_httpClient == null)
         {
@@ -386,8 +496,22 @@ public class MoneroRpcConnection : MoneroConnection
         }
     }
 
-    public Dictionary<string, object?> SendPathRequest(string path, Dictionary<string, object?>? parameters = null,
-        ulong? timeoutMs = null)
+    #endregion
+
+    #region Path Request
+
+    public Dictionary<string, object?> SendPathRequest(string path)
+    {
+        return SendPathRequest(path, null);
+    }
+
+    public Dictionary<string, object?> SendPathRequest(string path, Dictionary<string, object?>? parameters)
+    {
+        return SendPathRequest(path, parameters, null);
+    }
+
+    public Dictionary<string, object?> SendPathRequest(string path, Dictionary<string, object?>? parameters,
+        ulong? timeoutMs)
     {
         if (_httpClient == null)
         {
@@ -407,57 +531,32 @@ public class MoneroRpcConnection : MoneroConnection
         }
     }
 
-    public byte[] SendBinaryRequest(string method, Dictionary<string, object?>? parameters = null,
-        ulong timeoutMs = 20000)
+    #endregion
+
+    #region Binary Request
+
+    public byte[] SendBinaryRequest(string method)
+    {
+        return SendBinaryRequest(method, null);
+    }
+
+    public byte[] SendBinaryRequest(string method, Dictionary<string, object?>? parameters)
+    {
+        return SendBinaryRequest(method, parameters, 20000);
+    }
+
+    public byte[] SendBinaryRequest(string method, Dictionary<string, object?>? parameters, ulong timeoutMs)
     {
         throw new NotImplementedException("MoneroRpcConnection.SendBinaryRequest(): not implemented");
     }
 
-    private T? SendRequest<T>(string path, object? parameters, ulong? timeoutMs)
+    public override int GetHashCode()
     {
-        if (_httpClient == null)
-        {
-            throw new MoneroError("Http client is null");
-        }
-
-        try
-        {
-            string jsonBody = "";
-
-            if (parameters != null)
-            {
-                jsonBody = JsonConvert.SerializeObject(parameters);
-            }
-
-            if (_printStackTrace)
-            {
-                try
-                {
-                    throw new Exception($"Debug stack trace for JSON request with method '{path}' and body {jsonBody}");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-
-            StringContent content = new(jsonBody, Encoding.UTF8, "application/json");
-
-            using CancellationTokenSource cts = new(TimeSpan.FromMilliseconds(timeoutMs ?? _timeoutMs));
-
-            HttpResponseMessage httpResponse = _httpClient.PostAsync(new Uri($"{_uri}/{path}"), content, cts.Token)
-                .GetAwaiter()
-                .GetResult();
-
-            ValidateHttpResponse(httpResponse);
-
-            string respStr = httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-            return JsonConvert.DeserializeObject<T>(respStr);
-        }
-        catch (Exception e2)
-        {
-            throw new MoneroError(e2);
-        }
+        throw new NotImplementedException();
     }
+
+    #endregion
+
+    #endregion
+
 }

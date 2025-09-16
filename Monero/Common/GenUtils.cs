@@ -5,8 +5,23 @@ namespace Monero.Common;
 
 public static class GenUtils
 {
-    public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined = null, bool? resolveTrue = null,
-        bool? resolveMax = null)
+    public static T? Reconcile<T>(T? val1, T? val2)
+    {
+        return Reconcile(val1, val2, null, null, null);
+    }
+
+    public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined)
+    {
+        return Reconcile(val1, val2, resolveDefined, null, null);
+    }
+
+    public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined, bool? resolveTrue)
+    {
+        return Reconcile(val1, val2, resolveDefined, resolveTrue, null);
+    }
+
+    public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined, bool? resolveTrue,
+        bool? resolveMax)
     {
         // check for the same reference
         if (ReferenceEquals(val1, val2))
@@ -42,7 +57,7 @@ public static class GenUtils
                 return default!;
             }
 
-            return val1 == null ? val2 : val1!;
+            return val1 == null ? val2 : val1;
         }
 
         // resolve different booleans
@@ -181,8 +196,17 @@ public static class GenUtils
         }
     }
 
-    public static string KvLine(object? key, object? value, int indent, bool newline = true,
-        bool ignoreUndefined = true)
+    public static string KvLine(object? key, object? value, int indent)
+    {
+        return KvLine(key, value, indent, true, true);
+    }
+
+    public static string KvLine(object? key, object? value, int indent, bool newline)
+    {
+        return KvLine(key, value, indent, newline, true);
+    }
+
+    public static string KvLine(object? key, object? value, int indent, bool newline, bool ignoreUndefined)
     {
         if (value == null && ignoreUndefined)
         {

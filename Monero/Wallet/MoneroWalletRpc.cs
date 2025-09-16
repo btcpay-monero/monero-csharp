@@ -510,8 +510,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         return subaddress;
     }
 
-    public override MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress = null,
-        string? paymentId = null)
+    public override MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress, string? paymentId)
     {
         try
         {
@@ -562,7 +561,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         throw new MoneroError("monero-wallet-rpc does not support getting a height by date");
     }
 
-    public override MoneroSyncResult Sync(ulong? startHeight = null, MoneroWalletListener? listener = null)
+    public override MoneroSyncResult Sync(ulong? startHeight, MoneroWalletListener? listener)
     {
         if (listener != null)
         {
@@ -593,7 +592,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         }
     }
 
-    public override void StartSyncing(ulong? syncPeriodInMs = null)
+    public override void StartSyncing(ulong? syncPeriodInMs)
     {
         // convert ms to seconds for rpc parameter
         ulong syncPeriodInSeconds = (syncPeriodInMs == null ? DEFAULT_SYNC_PERIOD_IN_MS : (ulong)syncPeriodInMs) / 1000;
@@ -645,17 +644,17 @@ public class MoneroWalletRpc : MoneroWalletDefault
         rpc.SendJsonRequest("rescan_blockchain");
     }
 
-    public override ulong GetBalance(uint? accountIdx = null, uint? subaddressIdx = null)
+    public override ulong GetBalance(uint? accountIdx, uint? subaddressIdx)
     {
         return GetBalances(accountIdx, subaddressIdx)[0];
     }
 
-    public override ulong GetUnlockedBalance(uint? accountIdx = null, uint? subaddressIdx = null)
+    public override ulong GetUnlockedBalance(uint? accountIdx, uint? subaddressIdx)
     {
         return GetBalances(accountIdx, subaddressIdx)[1];
     }
 
-    public override List<MoneroAccount> GetAccounts(bool includeSubaddresses = false, string? tag = null)
+    public override List<MoneroAccount> GetAccounts(bool includeSubaddresses, string? tag)
     {
         return GetAccounts(includeSubaddresses, tag, false);
     }
@@ -749,7 +748,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         return accounts;
     }
 
-    public override MoneroAccount GetAccount(uint accountIdx, bool includeSubaddresses = false)
+    public override MoneroAccount GetAccount(uint accountIdx, bool includeSubaddresses)
     {
         return GetAccount(accountIdx, includeSubaddresses, false);
     }
@@ -772,7 +771,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         throw new MoneroError("Account with index " + accountIdx + " does not exist");
     }
 
-    public override MoneroAccount CreateAccount(string? label = null)
+    public override MoneroAccount CreateAccount(string? label)
     {
         label = string.IsNullOrEmpty(label) ? null : label;
         MoneroJsonRpcParams parameters = [];
@@ -784,7 +783,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
             : new MoneroAccount((uint?)result["account_index"], (string?)result["address"], 0, 0, null);
     }
 
-    public override List<MoneroSubaddress> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices = null)
+    public override List<MoneroSubaddress> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices)
     {
         return GetSubaddresses(accountIdx, subaddressIndices, false);
     }
@@ -882,7 +881,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         return subaddresses;
     }
 
-    public override MoneroSubaddress CreateSubaddress(uint accountIdx, string? label = null)
+    public override MoneroSubaddress CreateSubaddress(uint accountIdx, string? label)
     {
         // send request
         MoneroJsonRpcParams parameters = [];
@@ -1080,7 +1079,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         return outputs;
     }
 
-    public override string ExportOutputs(bool all = false)
+    public override string ExportOutputs(bool all)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("all", all);
@@ -1689,7 +1688,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         }
     }
 
-    public override string GetTxProof(string txHash, string address, string? message = null)
+    public override string GetTxProof(string txHash, string address, string? message)
     {
         try
         {
@@ -1755,7 +1754,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         }
     }
 
-    public override string GetSpendProof(string txHash, string? message = null)
+    public override string GetSpendProof(string txHash, string? message)
     {
         try
         {

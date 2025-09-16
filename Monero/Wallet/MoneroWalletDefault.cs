@@ -39,7 +39,12 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public abstract MoneroCheckTx CheckTxProof(string txHash, string address, string message, string signature);
 
-    public virtual void Close(bool save = false)
+    public virtual void Close()
+    {
+        Close(false);
+    }
+
+    public virtual void Close(bool save)
     {
         if (connectionManager != null && connectionManagerListener != null)
         {
@@ -52,9 +57,19 @@ public abstract class MoneroWalletDefault : MoneroWallet
         isClosed = true;
     }
 
-    public abstract MoneroAccount CreateAccount(string? label = null);
+    public MoneroAccount CreateAccount()
+    {
+        return CreateAccount(null);
+    }
 
-    public abstract MoneroSubaddress CreateSubaddress(uint accountIdx, string? label = null);
+    public abstract MoneroAccount CreateAccount(string? label);
+
+    public MoneroSubaddress CreateSubaddress(uint accountIdx)
+    {
+        return CreateSubaddress(accountIdx, null);
+    }
+
+    public abstract MoneroSubaddress CreateSubaddress(uint accountIdx, string? label);
 
     public virtual MoneroTxWallet CreateTx(MoneroTxConfig config)
     {
@@ -97,22 +112,47 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public abstract MoneroMultisigInitResult ExchangeMultisigKeys(List<string> multisigHexes, string password);
 
-    public abstract List<MoneroKeyImage> ExportKeyImages(bool all = false);
+    public List<MoneroKeyImage> ExportKeyImages()
+    {
+        return ExportKeyImages(false);
+    }
+
+    public abstract List<MoneroKeyImage> ExportKeyImages(bool all);
 
     public abstract string ExportMultisigHex();
 
-    public abstract string ExportOutputs(bool all = false);
+    public string ExportOutputs()
+    {
+        return ExportOutputs(false);
+    }
+
+    public abstract string ExportOutputs(bool all);
 
     public abstract void FreezeOutput(string keyImage);
 
-    public abstract MoneroAccount GetAccount(uint accountIdx, bool includeSubaddresses = false);
+    public MoneroAccount GetAccount(uint accountIdx)
+    {
+        return GetAccount(accountIdx, false);
+    }
+
+    public abstract MoneroAccount GetAccount(uint accountIdx, bool includeSubaddresses);
+
+    public List<MoneroAccount> GetAccounts()
+    {
+        return GetAccounts(false);
+    }
 
     public virtual List<MoneroAccount> GetAccounts(string tag)
     {
         return GetAccounts(false, tag);
     }
 
-    public abstract List<MoneroAccount> GetAccounts(bool includeSubaddresses = false, string? tag = null);
+    public List<MoneroAccount> GetAccounts(bool includeSubaddresses)
+    {
+        return GetAccounts(includeSubaddresses, null);
+    }
+
+    public abstract List<MoneroAccount> GetAccounts(bool includeSubaddresses, string? tag);
 
     public abstract List<MoneroAccountTag> GetAccountTags();
 
@@ -129,7 +169,17 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public abstract string? GetAttribute(string key);
 
-    public abstract ulong GetBalance(uint? accountIdx = null, uint? subaddressIdx = null);
+    public ulong GetBalance()
+    {
+        return GetBalance(null);
+    }
+
+    public ulong GetBalance(uint? accountIdx)
+    {
+        return GetBalance(accountIdx, null);
+    }
+
+    public abstract ulong GetBalance(uint? accountIdx, uint? subaddressIdx);
 
     public virtual MoneroConnectionManager? GetConnectionManager()
     {
@@ -172,8 +222,17 @@ public abstract class MoneroWalletDefault : MoneroWallet
         return inTransfers;
     }
 
-    public abstract MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress = null,
-        string? paymentId = null);
+    public MoneroIntegratedAddress GetIntegratedAddress()
+    {
+        return GetIntegratedAddress(null);
+    }
+
+    public MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress)
+    {
+        return GetIntegratedAddress(standardAddress, null);
+    }
+
+    public abstract MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress, string? paymentId);
 
     public virtual List<MoneroWalletListener> GetListeners()
     {
@@ -242,7 +301,12 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public abstract string GetSeedLanguage();
 
-    public abstract string GetSpendProof(string txHash, string? message = null);
+    public string GetSpendProof(string txHash)
+    {
+        return GetSpendProof(txHash, null);
+    }
+
+    public abstract string GetSpendProof(string txHash, string? message);
 
     public virtual MoneroSubaddress GetSubaddress(uint accountIdx, uint subaddressIdx)
     {
@@ -260,7 +324,12 @@ public abstract class MoneroWalletDefault : MoneroWallet
         return subaddresses[0];
     }
 
-    public abstract List<MoneroSubaddress> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices = null);
+    public List<MoneroSubaddress> GetSubaddresses(uint accountIdx)
+    {
+        return GetSubaddresses(accountIdx, null);
+    }
+
+    public abstract List<MoneroSubaddress> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices);
 
     public virtual List<MoneroTransfer> GetTransfers()
     {
@@ -305,7 +374,12 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public abstract List<string> GetTxNotes(List<string> txHashes);
 
-    public abstract string GetTxProof(string txHash, string address, string? message = null);
+    public string GetTxProof(string txHash, string address)
+    {
+        return GetTxProof(txHash, address, null);
+    }
+
+    public abstract string GetTxProof(string txHash, string address, string? message);
 
     public virtual List<MoneroTxWallet> GetTxs()
     {
@@ -319,7 +393,17 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public abstract List<MoneroTxWallet> GetTxs(MoneroTxQuery? query);
 
-    public abstract ulong GetUnlockedBalance(uint? accountIdx = null, uint? subaddressIdx = null);
+    public ulong GetUnlockedBalance()
+    {
+        return GetBalance(null);
+    }
+
+    public ulong GetUnlockedBalance(uint? accountIdx)
+    {
+        return GetBalance(accountIdx, null);
+    }
+
+    public abstract ulong GetUnlockedBalance(uint? accountIdx, uint? subaddressIdx);
 
     public abstract MoneroVersion GetVersion();
 
@@ -444,11 +528,16 @@ public abstract class MoneroWalletDefault : MoneroWallet
         SetDaemonConnection(connectionManager.GetConnection());
     }
 
-    public virtual void SetDaemonConnection(string? uri, string? username = null, string? password = null)
+    public virtual void SetDaemonConnection(string uri)
+    {
+        SetDaemonConnection(uri, null, null);
+    }
+
+    public virtual void SetDaemonConnection(string? uri, string? username, string? password)
     {
         if (uri == null)
         {
-            SetDaemonConnection(null);
+            SetDaemonConnection((MoneroRpcConnection?)null);
         }
         else
         {
@@ -469,9 +558,22 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public abstract void SetTxNotes(List<string> txHashes, List<string> notes);
 
-    public abstract string SignMessage(string message,
-        MoneroMessageSignatureType signatureType = MoneroMessageSignatureType.SIGN_WITH_SPEND_KEY, uint accountIdx = 0,
-        uint subaddressIdx = 0);
+    public virtual string SignMessage(string message)
+    {
+        return SignMessage(message, MoneroMessageSignatureType.SIGN_WITH_SPEND_KEY, 0, 0);
+    }
+
+    public virtual string SignMessage(string message, MoneroMessageSignatureType signatureType)
+    {
+        return SignMessage(message, signatureType, 0, 0);
+    }
+
+    public virtual string SignMessage(string message, MoneroMessageSignatureType signatureType, uint accountIdx)
+    {
+        return SignMessage(message, signatureType, accountIdx, 0);
+    }
+
+    public abstract string SignMessage(string message, MoneroMessageSignatureType signatureType, uint accountIdx, uint subaddressIdx);
 
     public abstract MoneroMultisigSignResult SignMultisigTxHex(string multisigTxHex);
 
@@ -479,7 +581,12 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public abstract void StartMining(ulong numThreads, bool backgroundMining, bool ignoreBattery);
 
-    public abstract void StartSyncing(ulong? SyncPeriodInMs = null);
+    public virtual void StartSyncing()
+    {
+        StartSyncing(null);
+    }
+
+    public abstract void StartSyncing(ulong? syncPeriodInMs);
 
     public abstract void StopMining();
 
@@ -495,12 +602,22 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public abstract List<MoneroTxWallet> SweepUnlocked(MoneroTxConfig config);
 
+    public virtual MoneroSyncResult Sync()
+    {
+        return Sync(null, null);
+    }
+
     public virtual MoneroSyncResult Sync(MoneroWalletListener listener)
     {
         return Sync(null, listener);
     }
 
-    public abstract MoneroSyncResult Sync(ulong? startHeight = null, MoneroWalletListener? listener = null);
+    public virtual MoneroSyncResult Sync(ulong? startHeight)
+    {
+        return Sync(startHeight, null);
+    }
+
+    public abstract MoneroSyncResult Sync(ulong? startHeight, MoneroWalletListener? listener);
 
     public abstract void TagAccounts(string tag, List<uint> accountIndices);
 

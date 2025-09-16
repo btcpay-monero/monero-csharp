@@ -2,8 +2,8 @@ namespace Monero.Common;
 
 public abstract class MoneroConnection
 {
-    public static readonly ulong DefaultTimeout = 2000;
-    protected Dictionary<string, string?> _attributes = [];
+    public static readonly ulong DefaultTimeout = 20000;
+    protected readonly Dictionary<string, string?> _attributes = [];
     protected bool? _isOnline;
     protected int _priority;
     protected string? _proxyUri;
@@ -11,7 +11,36 @@ public abstract class MoneroConnection
     protected ulong _timeoutMs;
     protected string? _uri;
 
-    protected MoneroConnection(string? uri = null, string? proxyUri = null, int priority = 0, ulong timeoutMs = 2000)
+    protected MoneroConnection()
+    {
+        _priority = 0;
+        _timeoutMs = 20000;
+    }
+
+    protected MoneroConnection(string? uri)
+    {
+        _uri = uri;
+        _priority = 0;
+        _timeoutMs = 20000;
+    }
+
+    protected MoneroConnection(string? uri, string? proxyUri)
+    {
+        _uri = uri;
+        _proxyUri = proxyUri;
+        _priority = 0;
+        _timeoutMs = 20000;
+    }
+
+    protected MoneroConnection(string? uri, string? proxyUri, int priority)
+    {
+        _uri = uri;
+        _proxyUri = proxyUri;
+        _priority = priority;
+        _timeoutMs = 20000;
+    }
+
+    protected MoneroConnection(string? uri, string? proxyUri, int priority, ulong timeoutMs)
     {
         _uri = uri;
         _proxyUri = proxyUri;

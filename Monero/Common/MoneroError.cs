@@ -4,7 +4,11 @@ public class MoneroError : Exception
 {
     private readonly int? _code;
 
-    public MoneroError(string message, int? code = null) : base(message)
+    public MoneroError(string message) : base(message)
+    {
+    }
+
+    public MoneroError(string message, int? code) : base(message)
     {
         _code = code;
     }

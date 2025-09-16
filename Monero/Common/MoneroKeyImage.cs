@@ -12,7 +12,17 @@ public class MoneroKeyImage
     private string? _hex;
     private string? _signature;
 
-    public MoneroKeyImage(string? hex = null, string? signature = null)
+    public MoneroKeyImage()
+    {
+
+    }
+
+    public MoneroKeyImage(string? hex)
+    {
+        _hex = hex;
+    }
+
+    public MoneroKeyImage(string? hex, string? signature)
     {
         _hex = hex;
         _signature = signature;
@@ -73,11 +83,6 @@ public class MoneroKeyImage
 
     public MoneroKeyImage Merge(MoneroKeyImage? keyImage)
     {
-        if (keyImage == this)
-        {
-            return this;
-        }
-
-        return this;
+        throw new NotImplementedException("MoneroKeyImage.Merge(): not implemented");
     }
 }

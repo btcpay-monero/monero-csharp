@@ -45,7 +45,14 @@ public interface MoneroWallet
      * @param username is the username to authenticate with the daemon (optional)
      * @param password is the password to authenticate with the daemon (optional)
      */
-    void SetDaemonConnection(string? uri, string? username = null, string? password = null);
+    void SetDaemonConnection(string? uri, string? username, string? password);
+
+    /**
+     * Set the wallet's daemon connection.
+     *
+     * @param uri is the daemon's URI
+     */
+    void SetDaemonConnection(string uri);
 
     /**
      * Set the wallet's daemon connection
@@ -180,7 +187,26 @@ public interface MoneroWallet
      * @param paymentId is the payment ID to generate an integrated address from (randomly generated if null)
      * @return the integrated address
      */
-    MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress = null, string? paymentId = null);
+    MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress, string? paymentId);
+
+    /**
+     * Get an integrated address based on the given standard address and payment
+     * ID. Uses the wallet's primary address if an address is not given.
+     * Generates a random payment ID if a payment ID is not given.
+     *
+     * @param standardAddress is the standard address to generate the integrated address from (wallet's primary address if null)
+     * @return the integrated address
+     */
+    MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress);
+
+    /**
+     * Get an integrated address based on the given standard address and payment
+     * ID. Uses the wallet's primary address if an address is not given.
+     * Generates a random payment ID if a payment ID is not given.
+     *
+     * @return the integrated address
+     */
+    MoneroIntegratedAddress GetIntegratedAddress();
 
     /**
      * Decode an integrated address to Get its standard address and payment id.
@@ -229,14 +255,34 @@ public interface MoneroWallet
      * @param listener listener to receive notifications during Synchronization
      * @return the Sync result
      */
-    MoneroSyncResult Sync(ulong? startHeight = null, MoneroWalletListener? listener = null);
+    MoneroSyncResult Sync(ulong? startHeight, MoneroWalletListener? listener);
+
+    /**
+     * Synchronize the wallet with the daemon as a one-time Synchronous process.
+     *
+     * @param startHeight is the start height to Sync from (defaults to the last Synced block)
+     * @return the Sync result
+     */
+    MoneroSyncResult Sync(ulong? startHeight);
+
+    /**
+     * Synchronize the wallet with the daemon as a one-time Synchronous process.
+     *
+     * @return the Sync result
+     */
+    MoneroSyncResult Sync();
 
     /**
      * Start background Synchronizing with a maximum period between Syncs.
      *
      * @param SyncPeriodInMs maximum period between Syncs in milliseconds
      */
-    void StartSyncing(ulong? SyncPeriodInMs = null);
+    void StartSyncing(ulong? syncPeriodInMs);
+
+    /**
+     * Start background Synchronizing with a maximum period between Syncs.
+     */
+    void StartSyncing();
 
     /**
      * Stop Synchronizing the wallet with the daemon.
@@ -277,7 +323,22 @@ public interface MoneroWallet
      * @param subaddressIdx index of the subaddress to Get the balance of (default all subaddresses if null)
      * @return the requested balance
      */
-    ulong GetBalance(uint? accountIdx = null, uint? subaddressIdx = null);
+    ulong GetBalance(uint? accountIdx, uint? subaddressIdx);
+
+    /**
+     * Get account's balance.
+     *
+     * @param accountIdx index of the account to Get the balance of (default all accounts if null)
+     * @return the requested balance
+     */
+    ulong GetBalance(uint? accountIdx);
+
+    /**
+     * Get a wallet's balance.
+     *
+     * @return the requested balance
+     */
+    ulong GetBalance();
 
     /**
      * Get a subaddress's unlocked balance.
@@ -286,7 +347,22 @@ public interface MoneroWallet
      * @param subaddressIdx index of the subaddress to Get the unlocked balance of (default all subaddresses if null)
      * @return the requested unlocked balance
      */
-    ulong GetUnlockedBalance(uint? accountIdx = null, uint? subaddressIdx = null);
+    ulong GetUnlockedBalance(uint? accountIdx, uint? subaddressIdx);
+
+    /**
+     * Get a account's unlocked balance.
+     *
+     * @param accountIdx index of the subaddress to Get the unlocked balance of (default all accounts if null)
+     * @return the requested unlocked balance
+     */
+    ulong GetUnlockedBalance(uint? accountIdx);
+
+    /**
+     * Get a wallet's unlocked balance.
+     * 
+     * @return the requested unlocked balance
+     */
+    ulong GetUnlockedBalance();
 
     /**
      * Get accounts with a given tag.
@@ -303,7 +379,22 @@ public interface MoneroWallet
      * @param tag is the tag for filtering accounts, all accounts if null
      * @return all accounts with the given tag
      */
-    List<MoneroAccount> GetAccounts(bool includeSubaddresses = false, string? tag = null);
+    List<MoneroAccount> GetAccounts(bool includeSubaddresses, string? tag);
+
+    /**
+     * Get accounts with a given tag.
+     *
+     * @param includeSubaddresses specifies if subaddresses should be included
+     * @return all accounts with the given tag
+     */
+    List<MoneroAccount> GetAccounts(bool includeSubaddresses);
+
+    /**
+     * Get accounts with a given tag.
+     *
+     * @return all accounts with the given tag
+     */
+    List<MoneroAccount> GetAccounts();
 
     /**
      * Get an account.
@@ -312,7 +403,15 @@ public interface MoneroWallet
      * @param includeSubaddresses specifies if subaddresses should be included
      * @return the retrieved account
      */
-    MoneroAccount GetAccount(uint accountIdx, bool includeSubaddresses = false);
+    MoneroAccount GetAccount(uint accountIdx, bool includeSubaddresses);
+
+    /**
+     * Get an account.
+     *
+     * @param accountIdx specifies the account to Get
+     * @return the retrieved account
+     */
+    MoneroAccount GetAccount(uint accountIdx);
 
     /**
      * Create a new account with a label for the first subaddress.
@@ -320,7 +419,14 @@ public interface MoneroWallet
      * @param label specifies the label for account's first subaddress (optional)
      * @return the created account
      */
-    MoneroAccount CreateAccount(string? label = null);
+    MoneroAccount CreateAccount(string? label);
+
+    /**
+     * Create a new account.
+     *
+     * @return the created account
+     */
+    MoneroAccount CreateAccount();
 
     /**
      * Set an account label.
@@ -337,7 +443,15 @@ public interface MoneroWallet
      * @param subaddressIndices are specific subaddresses to Get (optional)
      * @return the retrieved subaddresses
      */
-    List<MoneroSubaddress> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices = null);
+    List<MoneroSubaddress> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices);
+
+    /**
+     * Get subaddresses in an account.
+     *
+     * @param accountIdx specifies the account to Get subaddresses within
+     * @return the retrieved subaddresses
+     */
+    List<MoneroSubaddress> GetSubaddresses(uint accountIdx);
 
     /**
      * Get a subaddress.
@@ -352,10 +466,19 @@ public interface MoneroWallet
      * Create a subaddress within an account.
      *
      * @param accountIdx specifies the index of the account to Create the subaddress within
-     * @param label specifies the the label for the subaddress (optional)
+     * @param label specifies the label for the subaddress (optional)
      * @return the created subaddress
      */
-    MoneroSubaddress CreateSubaddress(uint accountIdx, string? label = null);
+    MoneroSubaddress CreateSubaddress(uint accountIdx, string? label);
+
+    /**
+     * Create a subaddress within an account.
+     *
+     * @param accountIdx specifies the index of the account to Create the subaddress within
+     * @return the created subaddress
+     */
+    MoneroSubaddress CreateSubaddress(uint accountIdx);
+
 
     /**
      * Set a subaddress label.
@@ -583,7 +706,14 @@ public interface MoneroWallet
      * @param all exports all outputs if true, else exports the outputs since the last export
      * @return outputs in hex format
      */
-    string ExportOutputs(bool all = false);
+    string ExportOutputs(bool all);
+
+    /**
+     * Export outputs in hex format.
+     *
+     * @return outputs in hex format
+     */
+    string ExportOutputs();
 
     /**
      * Import outputs in hex format.
@@ -599,7 +729,14 @@ public interface MoneroWallet
      * @param all exports all key images if true, else exports the key images since the last export
      * @return signed key images
      */
-    List<MoneroKeyImage> ExportKeyImages(bool all = false);
+    List<MoneroKeyImage> ExportKeyImages(bool all);
+
+    /**
+     * Export signed key images.
+     *
+     * @return signed key images
+     */
+    List<MoneroKeyImage> ExportKeyImages();
 
     /**
      * Import signed key images and verify their spent status.
@@ -821,9 +958,35 @@ public interface MoneroWallet
      * @param subaddressIdx the subaddress index of the message signature (default 0)
      * @return the signature
      */
-    string SignMessage(string message,
-        MoneroMessageSignatureType signatureType = MoneroMessageSignatureType.SIGN_WITH_SPEND_KEY, uint accountIdx = 0,
-        uint subaddressIdx = 0);
+    string SignMessage(string message, MoneroMessageSignatureType signatureType, uint accountIdx, uint subaddressIdx);
+
+    /**
+     * Sign a message.
+     *
+     * @param message the message to sign
+     * @param signatureType sign with spend key or view key
+     * @param accountIdx the account index of the message signature (default 0)
+     * @return the signature
+     */
+    string SignMessage(string message, MoneroMessageSignatureType signatureType, uint accountIdx);
+
+    /**
+     * Sign a message.
+     *
+     * @param message the message to sign
+     * @param signatureType sign with spend key or view key
+     * @return the signature
+     */
+    string SignMessage(string message, MoneroMessageSignatureType signatureType);
+
+    /**
+     * Sign a message.
+     *
+     * @param message the message to sign
+     * @param signatureType sign with spend key or view key
+     * @return the signature
+     */
+    string SignMessage(string message);
 
     /**
      * Verify a signature on a message.
@@ -861,7 +1024,16 @@ public interface MoneroWallet
      * @param message is a message to include with the signature to further authenticate the proof (optional)
      * @return the transaction signature
      */
-    string GetTxProof(string txHash, string address, string? message = null);
+    string GetTxProof(string txHash, string address, string? message);
+
+    /**
+     * Get a transaction signature to prove it.
+     *
+     * @param txHash specifies the transaction to prove
+     * @param address is the destination public address of the transaction
+     * @return the transaction signature
+     */
+    string GetTxProof(string txHash, string address);
 
     /**
      * Prove a transaction by checking its signature.
@@ -881,7 +1053,15 @@ public interface MoneroWallet
      * @param message is a message to include with the signature to further authenticate the proof (optional)
      * @return the transaction signature
      */
-    string GetSpendProof(string txHash, string? message = null);
+    string GetSpendProof(string txHash, string? message);
+
+    /**
+     * Generate a signature to prove a spend. Unlike proving a transaction, it does not require the destination public address.
+     *
+     * @param txHash specifies the transaction to prove
+     * @return the transaction signature
+     */
+    string GetSpendProof(string txHash);
 
     /**
      * Prove a spend using a signature. Unlike proving a transaction, it does not require the destination public address.
@@ -1171,7 +1351,12 @@ public interface MoneroWallet
      *
      * @param save specifies if the wallet should be saved before being closed (default false)
      */
-    void Close(bool save = false);
+    void Close(bool save);
+
+    /**
+     * Close the wallet without saving.
+     */
+    void Close();
 
     /**
      * Indicates if this wallet is closed or not.

@@ -6,7 +6,23 @@ public class MoneroKeyImageImportResult
     private ulong? _spentAmount;
     private ulong? _unspentAmount;
 
-    public MoneroKeyImageImportResult(ulong? height = null, ulong? spentAmount = null, ulong? unspentAmount = null)
+    public MoneroKeyImageImportResult()
+    {
+
+    }
+
+    public MoneroKeyImageImportResult(ulong? height)
+    {
+        _height = height;
+    }
+
+    public MoneroKeyImageImportResult(ulong? height, ulong? spentAmount)
+    {
+        _height = height;
+        _spentAmount = spentAmount;
+    }
+
+    public MoneroKeyImageImportResult(ulong? height, ulong? spentAmount, ulong? unspentAmount)
     {
         _height = height;
         _spentAmount = spentAmount;

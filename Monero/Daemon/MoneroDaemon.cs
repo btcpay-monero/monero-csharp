@@ -12,7 +12,8 @@ public interface MoneroDaemon
     bool IsTrusted();
     ulong GetHeight();
     string GetBlockHash(ulong height);
-    MoneroBlockTemplate GetBlockTemplate(string walletAddress, int? reserveSize = null);
+    MoneroBlockTemplate GetBlockTemplate(string walletAddress, int? reserveSize);
+    MoneroBlockTemplate GetBlockTemplate(string walletAddress);
     MoneroBlockHeader GetLastBlockHeader();
     MoneroBlockHeader GetBlockHeaderByHash(string blockHash);
     MoneroBlockHeader GetBlockHeaderByHeight(ulong blockHeight);
@@ -22,15 +23,22 @@ public interface MoneroDaemon
     MoneroBlock GetBlockByHeight(ulong blockHeight);
     List<MoneroBlock> GetBlocksByHeight(List<ulong> blockHeights);
     List<MoneroBlock> GetBlocksByRange(ulong? startHeight, ulong? endHeight);
-    List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight, ulong? maxChunkSize = null);
+    List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight, ulong? maxChunkSize);
+    List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight);
     List<string> GetBlockHashes(List<string> blockHashes, ulong startHeight);
-    MoneroTx? GetTx(string txHash, bool prune = false);
-    List<MoneroTx> GetTxs(List<string> txHashes, bool prune = false);
-    string? GetTxHex(string txHash, bool prune = false);
-    List<string> GetTxHexes(List<string> txHashes, bool prune = false);
-    MoneroFeeEstimate GetFeeEstimate(int? graceBlocks = null);
-    MoneroMinerTxSum GetMinerTxSum(ulong height, ulong? numBlocks = null);
-    MoneroSubmitTxResult SubmitTxHex(string txHex, bool doNotRelay = false);
+    MoneroTx? GetTx(string txHash, bool prune);
+    List<MoneroTx> GetTxs(List<string> txHashes, bool prune);
+    List<MoneroTx> GetTxs(List<string> txHashes);
+    string? GetTxHex(string txHash, bool prune);
+    string? GetTxHex(string txHash);
+    List<string> GetTxHexes(List<string> txHashes, bool prune);
+    List<string> GetTxHexes(List<string> txHashes);
+    MoneroFeeEstimate GetFeeEstimate(int? graceBlocks);
+    MoneroFeeEstimate GetFeeEstimate();
+    MoneroMinerTxSum GetMinerTxSum(ulong height, ulong? numBlocks);
+    MoneroMinerTxSum GetMinerTxSum(ulong height);
+    MoneroSubmitTxResult SubmitTxHex(string txHex, bool doNotRelay);
+    MoneroSubmitTxResult SubmitTxHex(string txHex);
     void RelayTxByHash(string txHash);
     void RelayTxsByHash(List<string> txHashes);
     List<MoneroTx> GetTxPool();
@@ -42,13 +50,20 @@ public interface MoneroDaemon
     MoneroKeyImage.SpentStatus GetKeyImageSpentStatus(string keyImage);
     List<MoneroKeyImage.SpentStatus> GetKeyImageSpentStatuses(List<string> keyImage);
     List<MoneroOutput> GetOutputs(List<MoneroOutput> outputs);
-
-    List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts = null, int? minCount = null,
-        int? maxCount = null, bool? isUnlocked = null, int? recentCutoff = null);
-
-    List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative = null,
-        ulong? startHeight = null, ulong? endHeight = null);
-
+    List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount, int? maxCount,
+        bool? isUnlocked, int? recentCutoff);
+    List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount, int? maxCount,
+        bool? isUnlocked);
+    List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount, int? maxCount);
+    List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount);
+    List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts);
+    List<MoneroOutputHistogramEntry> GetOutputHistogram();
+    List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
+        ulong? startHeight, ulong? endHeight);
+    List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
+        ulong? startHeight);
+    List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative);
+    List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts);
     MoneroDaemonInfo GetInfo();
     MoneroDaemonSyncInfo GetSyncInfo();
     MoneroHardForkInfo GetHardForkInfo();

@@ -4,9 +4,9 @@ namespace Monero.Wallet.Common;
 
 public class MoneroCheckTx : MoneroCheck
 {
-    public bool? inTxPool;
-    public ulong? numConfirmations;
-    public ulong? receivedAmount;
+    private bool? inTxPool;
+    private ulong? numConfirmations;
+    private ulong? receivedAmount;
 
     public bool? InTxPool()
     {

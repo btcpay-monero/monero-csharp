@@ -7,8 +7,32 @@ public class MoneroMessageSignatureResult
     private MoneroMessageSignatureType? _signatureType;
     private int? _version;
 
-    public MoneroMessageSignatureResult(bool isGood = false, bool? isOld = null,
-        MoneroMessageSignatureType? signatureType = null, int? version = null)
+    public MoneroMessageSignatureResult()
+    {
+        _isGood = false;
+    }
+
+    public MoneroMessageSignatureResult(bool isGood)
+    {
+        _isGood = isGood;
+    }
+
+    public MoneroMessageSignatureResult(bool isGood, bool? isOld)
+    {
+        _isGood = isGood;
+        _isOld = isOld;
+    }
+
+    public MoneroMessageSignatureResult(bool isGood, bool? isOld,
+        MoneroMessageSignatureType? signatureType)
+    {
+        _isGood = isGood;
+        _isOld = isOld;
+        _signatureType = signatureType;
+    }
+
+    public MoneroMessageSignatureResult(bool isGood, bool? isOld,
+        MoneroMessageSignatureType? signatureType, int? version)
     {
         _isGood = isGood;
         _isOld = isOld;

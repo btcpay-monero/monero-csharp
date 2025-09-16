@@ -6,6 +6,7 @@ namespace Monero.Wallet;
 internal class MoneroWalletPoller
 {
     private readonly TaskLooper looper;
+    private readonly object _lock = new();
 
     private readonly HashSet<string>
         prevConfirmedNotifications = []; // tx hashes of previously confirmed but not yet unlocked notifications
@@ -71,7 +72,7 @@ internal class MoneroWalletPoller
         numPolling++;
 
         // synchronize polls
-        lock (this)
+        lock (_lock)
         {
             try
             {

@@ -10,7 +10,12 @@ public class MoneroJsonRpcRequest : MoneroHttpRequest
     [JsonProperty("params", Order = 2, NullValueHandling = NullValueHandling.Ignore)]
     public object? Params;
 
-    public MoneroJsonRpcRequest(string method, object? parameters = null)
+    public MoneroJsonRpcRequest(string method)
+    {
+        Method = method;
+    }
+
+    public MoneroJsonRpcRequest(string method, object? parameters)
     {
         Method = method;
         Params = parameters;

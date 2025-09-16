@@ -460,11 +460,11 @@ public abstract class TestMoneroWalletCommon
         Assert.True(moneroWallet.IsConnectedToDaemon());
 
         // nullify daemon connection
-        moneroWallet.SetDaemonConnection(null);
+        moneroWallet.SetDaemonConnection((MoneroRpcConnection?)null);
         Assert.Null(moneroWallet.GetDaemonConnection());
         moneroWallet.SetDaemonConnection(TestUtils.DAEMON_RPC_URI);
         Assert.True(new MoneroRpcConnection(TestUtils.DAEMON_RPC_URI).Equals(moneroWallet.GetDaemonConnection()));
-        moneroWallet.SetDaemonConnection(null);
+        moneroWallet.SetDaemonConnection((MoneroRpcConnection?)null);
         Assert.Null(moneroWallet.GetDaemonConnection());
 
         // set daemon uri to non-daemon
@@ -523,7 +523,7 @@ public abstract class TestMoneroWalletCommon
         Assert.True(connection2 == moneroWallet.GetDaemonConnection());
 
         // disconnect
-        connectionManager.SetConnection(null);
+        connectionManager.SetConnection((MoneroRpcConnection?)null);
         Assert.Null(moneroWallet.GetDaemonConnection());
         Assert.False(moneroWallet.IsConnectedToDaemon());
 

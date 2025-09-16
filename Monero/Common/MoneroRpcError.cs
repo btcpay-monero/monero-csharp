@@ -5,7 +5,23 @@ public class MoneroRpcError : MoneroError
     private readonly object? _params;
     private readonly string? _rpcMethod;
 
-    public MoneroRpcError(string message, int? code = null, string? rpcMethod = null, object? parameters = null) :
+    public MoneroRpcError(string message) :
+        base(message, null)
+    {
+    }
+
+    public MoneroRpcError(string message, int? code) :
+        base(message, code)
+    {
+    }
+
+    public MoneroRpcError(string message, int? code, string? rpcMethod) :
+        base(message, code)
+    {
+        _rpcMethod = rpcMethod;
+    }
+
+    public MoneroRpcError(string message, int? code, string? rpcMethod, object? parameters) :
         base(message, code)
     {
         _rpcMethod = rpcMethod;
