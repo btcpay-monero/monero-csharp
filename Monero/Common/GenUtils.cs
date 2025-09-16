@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text;
 
 namespace Monero.Common;
 
@@ -193,12 +194,12 @@ public static class GenUtils
 
     public static string GetIndent(int length)
     {
-        string str = "";
+        var sb = new StringBuilder();
         for (int i = 0; i < length; i++)
         {
-            str += "  "; // two spaces
+            sb.Append("  "); // two spaces
         }
 
-        return str;
+        return sb.ToString();
     }
 }

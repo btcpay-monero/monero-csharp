@@ -1323,7 +1323,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         {
             try
             {
-                result = daemon.DownloadUpdate("./ohhai/there");
+                daemon.DownloadUpdate("./ohhai/there");
                 throw new Exception("Should have thrown error");
             }
             catch (MoneroRpcError e)

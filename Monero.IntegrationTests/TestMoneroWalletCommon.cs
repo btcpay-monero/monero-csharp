@@ -153,7 +153,7 @@ public abstract class TestMoneroWalletCommon
             {
                 string invalidMnemonic =
                     "memoir desk algebra inbound innocent unplugs fully okay five inflamed giant factual ritual toyed topic snake unhappy guarded tweezers haunted inundate giant";
-                moneroWallet = CreateWallet(new MoneroWalletConfig().SetSeed(invalidMnemonic)
+                CreateWallet(new MoneroWalletConfig().SetSeed(invalidMnemonic)
                     .SetRestoreHeight(TestUtils.FIRST_RECEIVE_HEIGHT));
             }
             catch (Exception e)

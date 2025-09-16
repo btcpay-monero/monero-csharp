@@ -28,19 +28,18 @@ internal class MoneroWalletPoller
     }
 
     // TODO: factor to common wallet rpc listener
-    private bool CheckForChangedBalances()
+    private void CheckForChangedBalances()
     {
         ulong balance = wallet.GetBalance();
         ulong unlockedBalance = wallet.GetUnlockedBalance();
         List<ulong> balances = [balance, unlockedBalance];
-        if (balances[0] != prevBalances[0] || balances[1] != prevBalances[1])
+        if (balances[0] == prevBalances[0] && balances[1] == prevBalances[1])
         {
-            prevBalances = balances;
-            AnnounceBalancesChanged(balances[0], balances[1]);
-            return true;
+            return;
         }
 
-        return false;
+        prevBalances = balances;
+        AnnounceBalancesChanged(balances[0], balances[1]);
     }
 
     public void SetIsPolling(bool isPolling)

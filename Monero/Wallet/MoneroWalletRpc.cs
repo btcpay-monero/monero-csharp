@@ -217,7 +217,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         return this;
     }
 
-    private MoneroWalletRpc CreateWalletFromSeed(MoneroWalletConfig config)
+    private void CreateWalletFromSeed(MoneroWalletConfig config)
     {
         config = config.Clone();
         if (string.IsNullOrEmpty(config.GetLanguage()))
@@ -240,10 +240,9 @@ public class MoneroWalletRpc : MoneroWalletDefault
 
         Clear();
         path = config.GetPath();
-        return this;
     }
 
-    private MoneroWalletRpc CreateWalletFromKeys(MoneroWalletConfig config)
+    private void CreateWalletFromKeys(MoneroWalletConfig config)
     {
         config = config.Clone();
         if (config.GetSeedOffset() != null)
@@ -271,7 +270,6 @@ public class MoneroWalletRpc : MoneroWalletDefault
 
         Clear();
         path = config.GetPath();
-        return this;
     }
 
     private static void HandleCreateWalletError(string? name, MoneroRpcError e)
