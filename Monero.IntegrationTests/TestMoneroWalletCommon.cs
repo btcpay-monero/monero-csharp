@@ -21,13 +21,18 @@ public abstract class TestMoneroWalletCommon
     private static readonly int SEND_MAX_DIFF = 60;
     private static readonly int SEND_DIVISOR = 10;
     private static readonly int NUM_BLOCKS_LOCKED = 10;
-    protected MoneroDaemonRpc? daemon; // daemon instance to test
+    protected MoneroDaemonRpc daemon; // daemon instance to test
 
     // instance variables
     protected MoneroWallet wallet = new MoneroWalletRpc(""); // wallet instance to test
 
     protected MoneroDaemonRpc GetTestDaemon() { return TestUtils.GetDaemonRpc(); }
     protected abstract MoneroWallet GetTestWallet();
+
+    protected TestMoneroWalletCommon()
+    {
+        daemon = TestUtils.GetDaemonRpc();
+    }
 
     protected MoneroWallet OpenWallet(string path, string? password)
     {
@@ -355,7 +360,7 @@ public abstract class TestMoneroWalletCommon
             // transfer funds to subaddress with high index
             wallet.CreateTx(new MoneroTxConfig()
                 .SetAccountIndex(0)
-                .AddDestination(receiver.GetSubaddress(0, 85000).GetAddress(), TestUtils.MAX_FEE)
+                .AddDestination(receiver.GetSubaddress(0, 85000).GetAddress()!, TestUtils.MAX_FEE)
                 .SetRelay(true));
 
             // observe unconfirmed funds
@@ -539,7 +544,7 @@ public abstract class TestMoneroWalletCommon
         moneroWallet.AddListener(new MoneroWalletListener());
         connectionManager.SetAutoSwitch(false);
         connectionManager.SetConnection("http://foo.bar.xyz");
-        Assert.True("http://foo.bar.xyz" == moneroWallet.GetDaemonConnection().GetUri());
+        Assert.True("http://foo.bar.xyz" == moneroWallet.GetDaemonConnection()!.GetUri());
         Assert.False(moneroWallet.IsConnectedToDaemon());
         Thread.Sleep(5000);
         Assert.False(moneroWallet.IsConnectedToDaemon());
@@ -646,10 +651,10 @@ public abstract class TestMoneroWalletCommon
         Assert.True(wallet.GetPrimaryAddress() == wallet.GetSubaddress(0, 0).GetAddress());
         foreach (MoneroAccount account in wallet.GetAccounts(true))
         {
-            foreach (MoneroSubaddress subaddress in account.GetSubaddresses())
+            foreach (MoneroSubaddress subaddress in account.GetSubaddresses()!)
             {
                 Assert.True(subaddress.GetAddress() ==
-                            wallet.GetAddress((uint)account.GetIndex(), (uint)subaddress.GetIndex()));
+                            wallet.GetAddress((uint)account.GetIndex()!, (uint)subaddress.GetIndex()!));
             }
         }
     }
@@ -661,7 +666,7 @@ public abstract class TestMoneroWalletCommon
         Assert.True(TEST_NON_RELAYS);
         List<MoneroAccount> accounts = wallet.GetAccounts(true);
         uint accountIdx = (uint)accounts.Count - 1;
-        uint subaddressIdx = (uint)accounts[accounts.Count - 1].GetSubaddresses().Count;
+        uint subaddressIdx = (uint)accounts[accounts.Count - 1].GetSubaddresses()!.Count;
         string address = wallet.GetAddress(accountIdx, subaddressIdx);
         Assert.NotNull(address);
         Assert.True(address.Length > 0);

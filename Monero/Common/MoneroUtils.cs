@@ -147,7 +147,7 @@ public static class MoneroUtils
         }
     }
 
-    public static bool IsValidPublicViewKey(string publicViewKey)
+    public static bool IsValidPublicViewKey(string? publicViewKey)
     {
         try
         {
@@ -160,7 +160,7 @@ public static class MoneroUtils
         }
     }
 
-    public static bool IsValidPrivateSpendKey(string privateSpendKey)
+    public static bool IsValidPrivateSpendKey(string? privateSpendKey)
     {
         try
         {
@@ -173,7 +173,7 @@ public static class MoneroUtils
         }
     }
 
-    public static bool IsValidPublicSpendKey(string publicSpendKey)
+    public static bool IsValidPublicSpendKey(string? publicSpendKey)
     {
         try
         {
@@ -194,7 +194,7 @@ public static class MoneroUtils
         }
     }
 
-    public static void ValidatePublicViewKey(string publicViewKey)
+    public static void ValidatePublicViewKey(string? publicViewKey)
     {
         if (!IsHex64(publicViewKey))
         {
@@ -202,7 +202,7 @@ public static class MoneroUtils
         }
     }
 
-    public static void ValidatePrivateSpendKey(string privateSpendKey)
+    public static void ValidatePrivateSpendKey(string? privateSpendKey)
     {
         if (!IsHex64(privateSpendKey))
         {
@@ -210,7 +210,7 @@ public static class MoneroUtils
         }
     }
 
-    public static void ValidatePublicSpendKey(string publicSpendKey)
+    public static void ValidatePublicSpendKey(string? publicSpendKey)
     {
         if (!IsHex64(publicSpendKey))
         {
@@ -241,8 +241,13 @@ public static class MoneroUtils
         DecodeAddress(address);
     }
 
-    public static void ValidatePaymentId(string paymentId)
+    public static void ValidatePaymentId(string? paymentId)
     {
+        if (paymentId == null)
+        {
+            throw new MoneroInvalidPaymentIdError("null");
+        }
+
         bool result = paymentId.Length == 16 || paymentId.Length == 64;
 
         if (!result)
@@ -251,7 +256,7 @@ public static class MoneroUtils
         }
     }
 
-    public static bool IsValidPaymentId(string paymentId)
+    public static bool IsValidPaymentId(string? paymentId)
     {
         try
         {
@@ -264,15 +269,20 @@ public static class MoneroUtils
         }
     }
 
-    public static void ValidateHex(string str)
+    public static void ValidateHex(string? str)
     {
+        if (str == null)
+        {
+            throw new MoneroError("Invalid hex: null");
+        }
+
         if (!Regex.IsMatch(str, @"^([0-9A-Fa-f]{2})+$"))
         {
             throw new MoneroError("Invalid hex: " + str);
         }
     }
 
-    public static bool IsValidHex(string str)
+    public static bool IsValidHex(string? str)
     {
         try
         {
@@ -285,8 +295,13 @@ public static class MoneroUtils
         }
     }
 
-    public static void ValidateBase58(string standardAddress)
+    public static void ValidateBase58(string? standardAddress)
     {
+        if (standardAddress == null)
+        {
+            throw new MoneroError("Invalid Base58 null");
+        }
+
         foreach (char c in standardAddress)
         {
             if (!Chars.Contains(c))
@@ -296,7 +311,7 @@ public static class MoneroUtils
         }
     }
 
-    public static bool IsValidBase58(string standardAddress)
+    public static bool IsValidBase58(string? standardAddress)
     {
         try
         {

@@ -61,7 +61,7 @@ public class TestMoneroWalletRpc : TestMoneroWalletCommon
 
             return moneroWalletRpc;
         }
-        catch (MoneroError e)
+        catch (MoneroError)
         {
             try { TestUtils.StopWalletRpcProcess(moneroWalletRpc); }
             catch (Exception e2) { throw new Exception(e2.Message); }

@@ -63,7 +63,7 @@ public class TestMoneroRpcConnection
 
         // Test monerod JSON request
 
-        MoneroJsonRpcResponse<Dictionary<string, object>> jsonResponse = connection.SendJsonRequest("get_info");
+        MoneroJsonRpcResponse<Dictionary<string, object?>> jsonResponse = connection.SendJsonRequest("get_info");
 
         Assert.NotNull(jsonResponse);
         Assert.Null(jsonResponse.Error);
@@ -71,10 +71,10 @@ public class TestMoneroRpcConnection
 
         // Test monerod PATH request
 
-        Dictionary<string, object> pathResponse = connection.SendPathRequest("get_info");
+        Dictionary<string, object?> pathResponse = connection.SendPathRequest("get_info");
 
         Assert.NotNull(pathResponse);
-        Assert.False(pathResponse.TryGetValue("error", out object _));
+        Assert.False(pathResponse.TryGetValue("error", out object? _));
 
         // Test monerod BINARY request
 

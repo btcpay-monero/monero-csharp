@@ -588,8 +588,13 @@ public class MoneroConnectionManager
         return this;
     }
 
-    public MoneroConnectionManager RemoveConnection(string uri)
+    public MoneroConnectionManager RemoveConnection(string? uri)
     {
+        if (uri == null)
+        {
+            throw new MoneroError("Uri is null");
+        }
+
         lock (_connectionsLock)
         {
             MoneroRpcConnection? connection = _connections.Find(connection => connection.GetUri() == uri);

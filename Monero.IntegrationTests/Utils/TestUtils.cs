@@ -220,12 +220,12 @@ internal abstract class TestUtils
             MoneroTxWallet copy2 = tx2.Clone();
             if (copy1.IsConfirmed() == true)
             {
-                copy1.SetBlock(tx1.GetBlock().Clone().SetTxs([copy1]));
+                copy1.SetBlock(tx1.GetBlock()!.Clone().SetTxs([copy1]));
             }
 
             if (copy2.IsConfirmed() == true)
             {
-                copy2.SetBlock(tx2.GetBlock().Clone().SetTxs([copy2]));
+                copy2.SetBlock(tx2.GetBlock()!.Clone().SetTxs([copy2]));
             }
 
             copy1.Merge(copy2);

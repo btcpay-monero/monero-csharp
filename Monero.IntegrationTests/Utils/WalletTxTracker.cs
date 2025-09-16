@@ -55,11 +55,11 @@ public class WalletTxTracker
 
                 if (tx.IsFailed() == true)
                 {
-                    daemon.FlushTxPool(tx.GetHash()); // flush tx if failed
+                    daemon.FlushTxPool(tx.GetHash()!); // flush tx if failed
                 }
                 else
                 {
-                    txHashesPool.Add(tx.GetHash());
+                    txHashesPool.Add(tx.GetHash()!);
                 }
             }
 
@@ -86,7 +86,7 @@ public class WalletTxTracker
                         StartMining.Start();
                         miningStarted = true;
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         // no problem
                     }

@@ -25,20 +25,20 @@ public class TestMoneroUtils
         // get integrated address with randomly generated payment id
         MoneroIntegratedAddress integratedAddress = GetIntegratedAddress(networkType, primaryAddress);
         True(primaryAddress == integratedAddress.GetStandardAddress());
-        True(16 == integratedAddress.GetPaymentId().Length);
-        True(106 == integratedAddress.GetIntegratedAddress().Length);
+        True(16 == integratedAddress.GetPaymentId()!.Length);
+        True(106 == integratedAddress.GetIntegratedAddress()!.Length);
 
         // get integrated address with specific payment id
         integratedAddress = GetIntegratedAddress(networkType, primaryAddress, paymentId);
         True(primaryAddress == integratedAddress.GetStandardAddress());
         True(paymentId == integratedAddress.GetPaymentId());
-        True(106 == integratedAddress.GetIntegratedAddress().Length);
+        True(106 == integratedAddress.GetIntegratedAddress()!.Length);
 
         // get integrated address with subaddress
         integratedAddress = GetIntegratedAddress(networkType, subaddress, paymentId);
         True(subaddress == integratedAddress.GetStandardAddress());
         True(paymentId == integratedAddress.GetPaymentId());
-        True(106 == integratedAddress.GetIntegratedAddress().Length);
+        True(106 == integratedAddress.GetIntegratedAddress()!.Length);
 
         // get integrated address with invalid payment id
         try
