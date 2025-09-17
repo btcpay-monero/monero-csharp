@@ -124,7 +124,7 @@ public abstract class MoneroConnection
 
     public abstract bool? IsConnected();
 
-    public abstract bool CheckConnection(ulong timeoutMs);
+    public abstract Task<bool> CheckConnection(ulong timeoutMs);
 
     public abstract MoneroConnection Clone();
 }

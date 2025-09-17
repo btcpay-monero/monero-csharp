@@ -15,7 +15,7 @@ public class WalletTxTracker
         clearedWallets.Clear();
     }
 
-    public void WaitForWalletTxsToClearPool(MoneroWallet wallet)
+    public async Task WaitForWalletTxsToClearPool(MoneroWallet wallet)
     {
         List<MoneroWallet> wallets = [wallet];
         // get wallet tx hashes
@@ -24,8 +24,8 @@ public class WalletTxTracker
         {
             if (!clearedWallets.Contains(moneroWallet))
             {
-                moneroWallet.Sync();
-                foreach (MoneroTxWallet tx in moneroWallet.GetTxs())
+                await moneroWallet.Sync();
+                foreach (MoneroTxWallet tx in await moneroWallet.GetTxs())
                 {
                     string? txHash = tx.GetHash();
                     if (txHash == null)
@@ -46,7 +46,7 @@ public class WalletTxTracker
         {
             // get hashes of relayed, non-failed txs in the pool
             List<string> txHashesPool = [];
-            foreach (MoneroTx tx in daemon.GetTxPool())
+            foreach (MoneroTx tx in await daemon.GetTxPool())
             {
                 if (tx.IsRelayed() != true)
                 {
@@ -55,7 +55,7 @@ public class WalletTxTracker
 
                 if (tx.IsFailed() == true)
                 {
-                    daemon.FlushTxPool(tx.GetHash()!); // flush tx if failed
+                    await daemon.FlushTxPool(tx.GetHash()!); // flush tx if failed
                 }
                 else
                 {
@@ -78,7 +78,7 @@ public class WalletTxTracker
                 isFirst = false;
                 MoneroUtils.Log(0,
                     "Waiting for wallet txs to clear from the pool in order to fully sync and avoid double spend attempts (known issue)");
-                MoneroMiningStatus miningStatus = daemon.GetMiningStatus();
+                MoneroMiningStatus miningStatus = await daemon.GetMiningStatus();
                 if (!miningStatus.IsActive() == true)
                 {
                     try
@@ -101,13 +101,13 @@ public class WalletTxTracker
         // stop mining if started mining
         if (miningStarted)
         {
-            daemon.StopMining();
+            await daemon.StopMining();
         }
 
         // sync wallets with the pool
         foreach (MoneroWallet moneroWallet in wallets)
         {
-            moneroWallet.Sync();
+            await moneroWallet.Sync();
             clearedWallets.Add(moneroWallet);
         }
     }

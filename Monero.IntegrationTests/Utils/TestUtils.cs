@@ -97,7 +97,7 @@ internal abstract class TestUtils
         return daemonRpc;
     }
 
-    public static MoneroWalletRpc GetWalletRpc()
+    public static async Task<MoneroWalletRpc> GetWalletRpc()
     {
         if (walletRpc == null)
         {
@@ -109,7 +109,7 @@ internal abstract class TestUtils
         // attempt to open test wallet
         try
         {
-            walletRpc.OpenWallet(WALLET_NAME, WALLET_PASSWORD);
+            await walletRpc.OpenWallet(WALLET_NAME, WALLET_PASSWORD);
         }
         catch (MoneroRpcError e)
         {
@@ -117,7 +117,7 @@ internal abstract class TestUtils
             if (e.GetCode() == -1)
             {
                 // create wallet
-                walletRpc.CreateWallet(new MoneroWalletConfig().SetPath(WALLET_NAME).SetPassword(WALLET_PASSWORD)
+                await walletRpc.CreateWallet(new MoneroWalletConfig().SetPath(WALLET_NAME).SetPassword(WALLET_PASSWORD)
                     .SetSeed(SEED).SetRestoreHeight(FIRST_RECEIVE_HEIGHT));
             }
             else
@@ -127,13 +127,13 @@ internal abstract class TestUtils
         }
 
         // ensure we're testing the right wallet
-        Assert.Equal(SEED, walletRpc.GetSeed());
-        Assert.Equal(ADDRESS, walletRpc.GetPrimaryAddress());
+        Assert.Equal(SEED, await walletRpc.GetSeed());
+        Assert.Equal(ADDRESS, await walletRpc.GetPrimaryAddress());
 
         // sync and save wallet
-        walletRpc.Sync();
-        walletRpc.Save();
-        walletRpc.StartSyncing((ulong)SYNC_PERIOD_IN_MS);
+        await walletRpc.Sync();
+        await walletRpc.Save();
+        await walletRpc.StartSyncing((ulong)SYNC_PERIOD_IN_MS);
 
         // return cached wallet rpc
         return walletRpc;
@@ -179,9 +179,9 @@ internal abstract class TestUtils
         return "5B8s3obCY2ETeQB3GNAGPK2zRGen5UeW1WzegSizVsmf6z5NvM2GLoN6zzk1vHyzGAAfA8pGhuYAeCFZjHAp59jRVQkunGS";
     }
 
-    public static string GetExternalWalletAddress()
+    public static async Task<string> GetExternalWalletAddress()
     {
-        MoneroDaemonInfo? info = GetDaemonRpc().GetInfo();
+        MoneroDaemonInfo? info = await GetDaemonRpc().GetInfo();
 
         if (info == null)
         {

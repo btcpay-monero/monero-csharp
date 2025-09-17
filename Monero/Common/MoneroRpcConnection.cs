@@ -13,7 +13,7 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
     private bool _printStackTrace;
     private string? _username;
     private string? _zmqUri;
-    private readonly object _lock = new();
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     public MoneroRpcConnection()
     {
@@ -119,7 +119,7 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
         HandleRpcError(error, method, parameters);
     }
 
-    private T? SendRequest<T>(string path, object? parameters, ulong? timeoutMs)
+    private async Task<T?> SendRequest<T>(string path, object? parameters, ulong? timeoutMs)
     {
         if (_httpClient == null)
         {
@@ -157,7 +157,7 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
             ValidateHttpResponse(httpResponse);
 
-            string respStr = httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            string respStr = await httpResponse.Content.ReadAsStringAsync();
 
             return JsonConvert.DeserializeObject<T>(respStr);
         }
@@ -251,61 +251,62 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
         return _isAuthenticated;
     }
 
-    public bool CheckConnection()
+    public async Task<bool> CheckConnection()
     {
-        return CheckConnection(_timeoutMs);
+        return await CheckConnection(_timeoutMs);
     }
 
-    public override bool CheckConnection(ulong timeoutMs)
+    public override async Task<bool> CheckConnection(ulong timeoutMs)
     {
-        lock (_lock)
+        await _semaphore.WaitAsync();
+
+        bool? isOnlineBefore = _isOnline;
+        bool? isAuthenticatedBefore = _isAuthenticated;
+        ulong startTime = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        try
         {
-            bool? isOnlineBefore = _isOnline;
-            bool? isAuthenticatedBefore = _isAuthenticated;
-            ulong startTime = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            try
+            MoneroJsonRpcRequest request = new("get_version");
+            MoneroJsonRpcResponse<Dictionary<string, object>>? response = await
+                SendJsonRequest<Dictionary<string, object>>(request, timeoutMs);
+            if (response == null)
             {
-                MoneroJsonRpcRequest request = new("get_version");
-                MoneroJsonRpcResponse<Dictionary<string, object>>? response =
-                    SendJsonRequest<Dictionary<string, object>>(request, timeoutMs);
-                if (response == null)
-                {
-                    throw new Exception("Invalid response");
-                }
-
-                _isOnline = true;
-                _isAuthenticated = true;
-            }
-            catch (Exception e)
-            {
-                _isOnline = false;
-                _isAuthenticated = null;
-                _responseTime = null;
-
-                if (e is MoneroRpcError error)
-                {
-                    if (error.GetCode() == 401)
-                    {
-                        _isOnline = true;
-                        _isAuthenticated = false;
-                    }
-                    else if (error.GetCode() == 404)
-                    {
-                        // fallback to latency check
-                        _isOnline = true;
-                        _isAuthenticated = true;
-                    }
-                }
+                throw new Exception("Invalid response");
             }
 
-            ulong now = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            if (_isOnline == true)
-            {
-                _responseTime = now - startTime;
-            }
-
-            return isOnlineBefore != _isOnline || isAuthenticatedBefore != _isAuthenticated;
+            _isOnline = true;
+            _isAuthenticated = true;
         }
+        catch (Exception e)
+        {
+            _isOnline = false;
+            _isAuthenticated = null;
+            _responseTime = null;
+
+            if (e is MoneroRpcError error)
+            {
+                if (error.GetCode() == 401)
+                {
+                    _isOnline = true;
+                    _isAuthenticated = false;
+                }
+                else if (error.GetCode() == 404)
+                {
+                    // fallback to latency check
+                    _isOnline = true;
+                    _isAuthenticated = true;
+                }
+            }
+        }
+
+        ulong now = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        if (_isOnline == true)
+        {
+            _responseTime = now - startTime;
+        }
+
+        _semaphore.Release();
+
+        return isOnlineBefore != _isOnline || isAuthenticatedBefore != _isAuthenticated;
     }
 
     public override MoneroRpcConnection SetAttribute(string key, string value)
@@ -430,51 +431,51 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
     #region Json Request
 
-    public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method)
+    public async Task<MoneroJsonRpcResponse<Dictionary<string, object?>>> SendJsonRequest(string method)
     {
         Dictionary<string, object?>? parameters = null;
-        return SendJsonRequest(method, parameters);
+        return await SendJsonRequest(method, parameters);
     }
 
-    public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method,
+    public async Task<MoneroJsonRpcResponse<Dictionary<string, object?>>> SendJsonRequest(string method,
         Dictionary<string, object?>? parameters)
     {
-        return SendJsonRequest(method, parameters, 20000);
+        return await SendJsonRequest(method, parameters, 20000);
     }
 
-    public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method,
+    public async Task<MoneroJsonRpcResponse<Dictionary<string, object?>>> SendJsonRequest(string method,
         Dictionary<string, object?>? parameters, ulong timeoutMs)
     {
-        return SendJsonRequest<Dictionary<string, object?>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
+        return await SendJsonRequest<Dictionary<string, object?>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
     }
 
-    public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method, List<string> parameters)
+    public async Task<MoneroJsonRpcResponse<Dictionary<string, object?>>> SendJsonRequest(string method, List<string> parameters)
     {
-        return SendJsonRequest(method, parameters, 20000);
+        return await SendJsonRequest(method, parameters, 20000);
     }
 
-    public MoneroJsonRpcResponse<Dictionary<string, object?>> SendJsonRequest(string method, List<string> parameters,
+    public async Task<MoneroJsonRpcResponse<Dictionary<string, object?>>> SendJsonRequest(string method, List<string> parameters,
         ulong timeoutMs)
     {
-        return SendJsonRequest<Dictionary<string, object?>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
+        return await SendJsonRequest<Dictionary<string, object?>>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
     }
 
-    public MoneroJsonRpcResponse<string> SendJsonRequest(string method, List<ulong> parameters)
+    public async Task<MoneroJsonRpcResponse<string>> SendJsonRequest(string method, List<ulong> parameters)
     {
-        return SendJsonRequest(method, parameters, 20000);
+        return await SendJsonRequest(method, parameters, 20000);
     }
 
-    public MoneroJsonRpcResponse<string> SendJsonRequest(string method, List<ulong> parameters, ulong timeoutMs)
+    public async Task<MoneroJsonRpcResponse<string>> SendJsonRequest(string method, List<ulong> parameters, ulong timeoutMs)
     {
-        return SendJsonRequest<string>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
+        return await SendJsonRequest<string>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
     }
 
-    public MoneroJsonRpcResponse<T> SendJsonRequest<T>(MoneroJsonRpcRequest rpcRequest)
+    public async Task<MoneroJsonRpcResponse<T>> SendJsonRequest<T>(MoneroJsonRpcRequest rpcRequest)
     {
-        return SendJsonRequest<T>(rpcRequest, 20000);
+        return await SendJsonRequest<T>(rpcRequest, 20000);
     }
 
-    public MoneroJsonRpcResponse<T> SendJsonRequest<T>(MoneroJsonRpcRequest rpcRequest, ulong timeoutMs)
+    public async Task<MoneroJsonRpcResponse<T>> SendJsonRequest<T>(MoneroJsonRpcRequest rpcRequest, ulong timeoutMs)
     {
         if (_httpClient == null)
         {
@@ -484,7 +485,7 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
         try
         {
             MoneroJsonRpcResponse<T>? rpcResponse =
-                SendRequest<MoneroJsonRpcResponse<T>>("json_rpc", rpcRequest, timeoutMs);
+                await SendRequest<MoneroJsonRpcResponse<T>>("json_rpc", rpcRequest, timeoutMs);
 
             ValidateRpcResponse(rpcResponse, rpcRequest.Method, rpcRequest.Params);
 
@@ -500,17 +501,17 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
     #region Path Request
 
-    public Dictionary<string, object?> SendPathRequest(string path)
+    public async Task<Dictionary<string, object?>> SendPathRequest(string path)
     {
-        return SendPathRequest(path, null);
+        return await SendPathRequest(path, null);
     }
 
-    public Dictionary<string, object?> SendPathRequest(string path, Dictionary<string, object?>? parameters)
+    public async Task<Dictionary<string, object?>> SendPathRequest(string path, Dictionary<string, object?>? parameters)
     {
-        return SendPathRequest(path, parameters, null);
+        return await SendPathRequest(path, parameters, null);
     }
 
-    public Dictionary<string, object?> SendPathRequest(string path, Dictionary<string, object?>? parameters,
+    public async Task<Dictionary<string, object?>> SendPathRequest(string path, Dictionary<string, object?>? parameters,
         ulong? timeoutMs)
     {
         if (_httpClient == null)
@@ -520,7 +521,7 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
         try
         {
-            Dictionary<string, object>? respMap = SendRequest<Dictionary<string, object>>(path, parameters, timeoutMs);
+            Dictionary<string, object>? respMap = await SendRequest<Dictionary<string, object>>(path, parameters, timeoutMs);
 
             ValidateRpcResponse(respMap, path, parameters);
             return respMap!;
@@ -535,17 +536,17 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
     #region Binary Request
 
-    public byte[] SendBinaryRequest(string method)
+    public async Task<byte[]> SendBinaryRequest(string method)
     {
-        return SendBinaryRequest(method, null);
+        return await SendBinaryRequest(method, null);
     }
 
-    public byte[] SendBinaryRequest(string method, Dictionary<string, object?>? parameters)
+    public async Task<byte[]> SendBinaryRequest(string method, Dictionary<string, object?>? parameters)
     {
-        return SendBinaryRequest(method, parameters, 20000);
+        return await SendBinaryRequest(method, parameters, 20000);
     }
 
-    public byte[] SendBinaryRequest(string method, Dictionary<string, object?>? parameters, ulong timeoutMs)
+    public Task<byte[]> SendBinaryRequest(string method, Dictionary<string, object?>? parameters, ulong timeoutMs)
     {
         throw new NotImplementedException("MoneroRpcConnection.SendBinaryRequest(): not implemented");
     }

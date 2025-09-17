@@ -7,27 +7,27 @@ namespace Monero.IntegrationTests;
 
 public class TestMoneroWalletRpc : TestMoneroWalletCommon
 {
-    protected override void CloseWallet(MoneroWallet walletInstance, bool save)
+    protected override Task CloseWallet(MoneroWallet walletInstance, bool save)
     {
         throw new NotImplementedException();
     }
 
-    protected override MoneroWallet CreateWallet(MoneroWalletConfig config)
+    protected override Task<MoneroWallet> CreateWallet(MoneroWalletConfig config)
     {
         throw new NotImplementedException();
     }
 
-    protected override List<string> GetSeedLanguages()
+    protected override Task<List<string>> GetSeedLanguages()
     {
         throw new NotImplementedException();
     }
 
-    protected override MoneroWallet GetTestWallet()
+    protected override async Task<MoneroWallet> GetTestWallet()
     {
-        return TestUtils.GetWalletRpc();
+        return await TestUtils.GetWalletRpc();
     }
 
-    protected override MoneroWallet OpenWallet(MoneroWalletConfig config)
+    protected override async Task<MoneroWallet> OpenWallet(MoneroWalletConfig config)
     {
         // assign defaults
         if (config == null)
@@ -52,11 +52,11 @@ public class TestMoneroWalletRpc : TestMoneroWalletCommon
         // open wallet
         try
         {
-            moneroWalletRpc.OpenWallet(config);
-            moneroWalletRpc.SetDaemonConnection(moneroWalletRpc.GetDaemonConnection(), true, null); // set daemon as trusted
-            if (moneroWalletRpc.IsConnectedToDaemon())
+            await moneroWalletRpc.OpenWallet(config);
+            await moneroWalletRpc.SetDaemonConnection(await moneroWalletRpc.GetDaemonConnection(), true, null); // set daemon as trusted
+            if (await moneroWalletRpc.IsConnectedToDaemon())
             {
-                moneroWalletRpc.StartSyncing((ulong)TestUtils.SYNC_PERIOD_IN_MS);
+                await moneroWalletRpc.StartSyncing((ulong)TestUtils.SYNC_PERIOD_IN_MS);
             }
 
             return moneroWalletRpc;

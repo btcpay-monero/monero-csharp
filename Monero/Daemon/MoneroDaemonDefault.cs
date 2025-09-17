@@ -16,222 +16,222 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
         }
     }
 
-    public abstract MoneroDaemonUpdateCheckResult CheckForUpdate();
+    public abstract Task<MoneroDaemonUpdateCheckResult> CheckForUpdate();
 
-    public virtual MoneroDaemonUpdateDownloadResult DownloadUpdate()
+    public virtual Task<MoneroDaemonUpdateDownloadResult> DownloadUpdate()
     {
         return DownloadUpdate(null);
     }
 
-    public abstract MoneroDaemonUpdateDownloadResult DownloadUpdate(string? path);
+    public abstract Task<MoneroDaemonUpdateDownloadResult> DownloadUpdate(string? path);
 
-    public virtual void FlushTxPool()
+    public virtual async Task FlushTxPool()
     {
         List<string> emptyList = [];
-        FlushTxPool(emptyList);
+        await FlushTxPool(emptyList);
     }
 
-    public virtual void FlushTxPool(string txHash)
+    public virtual async Task FlushTxPool(string txHash)
     {
-        FlushTxPool([txHash]);
+        await FlushTxPool([txHash]);
     }
 
-    public abstract void FlushTxPool(List<string> txHashes);
+    public abstract Task FlushTxPool(List<string> txHashes);
 
-    public abstract List<string> GetAltBlockHashes();
+    public abstract Task<List<string>> GetAltBlockHashes();
 
-    public abstract List<MoneroAltChain> GetAltChains();
+    public abstract Task<List<MoneroAltChain>> GetAltChains();
 
-    public abstract MoneroBlock GetBlockByHash(string blockHash);
+    public abstract Task<MoneroBlock> GetBlockByHash(string blockHash);
 
-    public abstract MoneroBlock GetBlockByHeight(ulong blockHeight);
+    public abstract Task<MoneroBlock> GetBlockByHeight(ulong blockHeight);
 
-    public abstract string GetBlockHash(ulong height);
+    public abstract Task<string> GetBlockHash(ulong height);
 
-    public abstract List<string> GetBlockHashes(List<string> blockHashes, ulong startHeight);
+    public abstract Task<List<string>> GetBlockHashes(List<string> blockHashes, ulong startHeight);
 
-    public abstract MoneroBlockHeader GetBlockHeaderByHash(string blockHash);
+    public abstract Task<MoneroBlockHeader> GetBlockHeaderByHash(string blockHash);
 
-    public abstract MoneroBlockHeader GetBlockHeaderByHeight(ulong blockHeight);
+    public abstract Task<MoneroBlockHeader> GetBlockHeaderByHeight(ulong blockHeight);
 
-    public abstract List<MoneroBlockHeader> GetBlockHeadersByRange(ulong startHeight, ulong endHeight);
+    public abstract Task<List<MoneroBlockHeader>> GetBlockHeadersByRange(ulong startHeight, ulong endHeight);
 
-    public abstract List<MoneroBlock> GetBlocksByHash(List<string> blockHashes, ulong startHeight, bool prune);
+    public abstract Task<List<MoneroBlock>> GetBlocksByHash(List<string> blockHashes, ulong startHeight, bool prune);
 
-    public abstract List<MoneroBlock> GetBlocksByHeight(List<ulong> blockHeights);
+    public abstract Task<List<MoneroBlock>> GetBlocksByHeight(List<ulong> blockHeights);
 
-    public abstract List<MoneroBlock> GetBlocksByRange(ulong? startHeight, ulong? endHeight);
+    public abstract Task<List<MoneroBlock>> GetBlocksByRange(ulong? startHeight, ulong? endHeight);
 
-    public virtual List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight)
+    public virtual async Task<List<MoneroBlock>> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight)
     {
-        return GetBlocksByRangeChunked(startHeight, endHeight, null);
+        return await GetBlocksByRangeChunked(startHeight, endHeight, null);
     }
 
-    public abstract List<MoneroBlock> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight,
+    public abstract Task<List<MoneroBlock>> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight,
         ulong? maxChunkSize);
 
-    public MoneroBlockTemplate GetBlockTemplate(string walletAddress)
+    public virtual async Task<MoneroBlockTemplate> GetBlockTemplate(string walletAddress)
     {
-        return GetBlockTemplate(walletAddress, null);
+        return await GetBlockTemplate(walletAddress, null);
     }
 
-    public abstract MoneroBlockTemplate GetBlockTemplate(string walletAddress, int? reserveSize);
+    public abstract Task<MoneroBlockTemplate> GetBlockTemplate(string walletAddress, int? reserveSize);
 
-    public abstract int GetDownloadLimit();
+    public abstract Task<int> GetDownloadLimit();
 
-    public virtual MoneroFeeEstimate GetFeeEstimate()
+    public virtual async Task<MoneroFeeEstimate> GetFeeEstimate()
     {
-        return GetFeeEstimate(null);
+        return await GetFeeEstimate(null);
     }
 
-    public abstract MoneroFeeEstimate GetFeeEstimate(int? graceBlocks);
+    public abstract Task<MoneroFeeEstimate> GetFeeEstimate(int? graceBlocks);
 
-    public virtual MoneroMinerTxSum GetMinerTxSum(ulong height)
+    public virtual async Task<MoneroMinerTxSum> GetMinerTxSum(ulong height)
     {
-        return GetMinerTxSum(height, null);
+        return await GetMinerTxSum(height, null);
     }
 
-    public abstract MoneroMinerTxSum GetMinerTxSum(ulong height, ulong? numBlocks);
+    public abstract Task<MoneroMinerTxSum> GetMinerTxSum(ulong height, ulong? numBlocks);
 
-    public abstract MoneroHardForkInfo GetHardForkInfo();
+    public abstract Task<MoneroHardForkInfo> GetHardForkInfo();
 
-    public abstract ulong GetHeight();
+    public abstract Task<ulong> GetHeight();
 
-    public abstract MoneroDaemonInfo GetInfo();
+    public abstract Task<MoneroDaemonInfo> GetInfo();
 
-    public virtual MoneroKeyImage.SpentStatus GetKeyImageSpentStatus(string keyImage)
+    public virtual async Task<MoneroKeyImage.SpentStatus> GetKeyImageSpentStatus(string keyImage)
     {
-        return GetKeyImageSpentStatuses([keyImage])[0];
+        return (await GetKeyImageSpentStatuses([keyImage]))[0];
     }
 
-    public abstract List<MoneroKeyImage.SpentStatus> GetKeyImageSpentStatuses(List<string> keyImage);
+    public abstract Task<List<MoneroKeyImage.SpentStatus>> GetKeyImageSpentStatuses(List<string> keyImage);
 
-    public abstract List<MoneroPeer> GetKnownPeers();
+    public abstract Task<List<MoneroPeer>> GetKnownPeers();
 
-    public abstract MoneroBlockHeader GetLastBlockHeader();
+    public abstract Task<MoneroBlockHeader> GetLastBlockHeader();
 
     public virtual List<MoneroDaemonListener> GetListeners()
     {
         return [.. _listeners];
     }
 
-    public abstract MoneroMiningStatus GetMiningStatus();
+    public abstract Task<MoneroMiningStatus> GetMiningStatus();
 
-    public virtual List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts)
+    public virtual async Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts)
     {
-        return GetOutputDistribution(amounts, null, null, null);
+        return await GetOutputDistribution(amounts, null, null, null);
     }
 
-    public virtual List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative)
+    public virtual async Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts, bool? isCumulative)
     {
-        return GetOutputDistribution(amounts, isCumulative, null, null);
+        return await GetOutputDistribution(amounts, isCumulative, null, null);
     }
 
-    public virtual List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
+    public virtual async Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
         ulong? startHeight)
     {
-        return GetOutputDistribution(amounts, isCumulative, startHeight, null);
+        return await GetOutputDistribution(amounts, isCumulative, startHeight, null);
     }
 
-    public abstract List<MoneroOutputDistributionEntry> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
+    public abstract Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
         ulong? startHeight, ulong? endHeight);
 
-    public virtual List<MoneroOutputHistogramEntry> GetOutputHistogram()
+    public virtual async Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram()
     {
-        return GetOutputHistogram(null, null, null, null, null);
+        return await GetOutputHistogram(null, null, null, null, null);
     }
 
-    public virtual List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts)
+    public virtual async Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts)
     {
-        return GetOutputHistogram(amounts, null, null, null, null);
+        return await GetOutputHistogram(amounts, null, null, null, null);
     }
 
-    public virtual List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount)
+    public virtual async Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts, int? minCount)
     {
-        return GetOutputHistogram(amounts, minCount, null, null, null);
+        return await GetOutputHistogram(amounts, minCount, null, null, null);
     }
 
-    public virtual List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount,
+    public virtual async Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts, int? minCount,
         int? maxCount)
     {
-        return GetOutputHistogram(amounts, minCount, maxCount, null, null);
+        return await GetOutputHistogram(amounts, minCount, maxCount, null, null);
     }
 
-    public virtual List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount,
+    public virtual async Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts, int? minCount,
         int? maxCount, bool? isUnlocked)
     {
-        return GetOutputHistogram(amounts, minCount, maxCount, isUnlocked, null);
+        return await GetOutputHistogram(amounts, minCount, maxCount, isUnlocked, null);
     }
 
-    public abstract List<MoneroOutputHistogramEntry> GetOutputHistogram(List<ulong>? amounts, int? minCount,
+    public abstract Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts, int? minCount,
         int? maxCount, bool? isUnlocked, int? recentCutoff);
 
-    public abstract List<MoneroOutput> GetOutputs(List<MoneroOutput> outputs);
+    public abstract Task<List<MoneroOutput>> GetOutputs(List<MoneroOutput> outputs);
 
-    public abstract List<MoneroBan> GetPeerBans();
+    public abstract Task<List<MoneroBan>> GetPeerBans();
 
-    public abstract List<MoneroPeer> GetPeers();
+    public abstract Task<List<MoneroPeer>> GetPeers();
 
-    public abstract MoneroDaemonSyncInfo GetSyncInfo();
+    public abstract Task<MoneroDaemonSyncInfo> GetSyncInfo();
 
-    public virtual MoneroTx? GetTx(string txHash)
+    public virtual async Task<MoneroTx?> GetTx(string txHash)
     {
-        return GetTx(txHash, false);
+        return await GetTx(txHash, false);
     }
 
-    public virtual MoneroTx? GetTx(string txHash, bool prune)
+    public virtual async Task<MoneroTx?> GetTx(string txHash, bool prune)
     {
-        List<MoneroTx> txs = GetTxs([txHash], prune);
+        List<MoneroTx> txs = await GetTxs([txHash], prune);
 
         return txs.FirstOrDefault();
     }
 
-    public virtual string? GetTxHex(string txHash)
+    public virtual async Task<string?> GetTxHex(string txHash)
     {
-        return GetTxHex(txHash, false);
+        return await GetTxHex(txHash, false);
     }
 
-    public virtual string? GetTxHex(string txHash, bool prune)
+    public virtual async Task<string?> GetTxHex(string txHash, bool prune)
     {
-        List<string> hexes = GetTxHexes([txHash], prune);
+        List<string> hexes = await GetTxHexes([txHash], prune);
 
         return hexes.FirstOrDefault();
     }
 
-    public virtual List<string> GetTxHexes(List<string> txHashes)
+    public virtual async Task<List<string>> GetTxHexes(List<string> txHashes)
     {
-        return GetTxHexes(txHashes, false);
+        return await GetTxHexes(txHashes, false);
     }
 
-    public abstract List<string> GetTxHexes(List<string> txHashes, bool prune);
+    public abstract Task<List<string>> GetTxHexes(List<string> txHashes, bool prune);
 
-    public abstract List<MoneroTx> GetTxPool();
+    public abstract Task<List<MoneroTx>> GetTxPool();
 
-    public abstract List<string> GetTxPoolHashes();
+    public abstract Task<List<string>> GetTxPoolHashes();
 
-    public abstract MoneroTxPoolStats GetTxPoolStats();
+    public abstract Task<MoneroTxPoolStats> GetTxPoolStats();
 
-    public virtual List<MoneroTx> GetTxs(List<string> txHashes)
+    public virtual async Task<List<MoneroTx>> GetTxs(List<string> txHashes)
     {
-        return GetTxs(txHashes, false);
+        return await GetTxs(txHashes, false);
     }
 
-    public abstract List<MoneroTx> GetTxs(List<string> txHashes, bool prune);
+    public abstract Task<List<MoneroTx>> GetTxs(List<string> txHashes, bool prune);
 
-    public abstract int GetUploadLimit();
+    public abstract Task<int> GetUploadLimit();
 
-    public abstract MoneroVersion GetVersion();
+    public abstract Task<MoneroVersion> GetVersion();
 
-    public abstract bool IsTrusted();
+    public abstract Task<bool> IsTrusted();
 
-    public abstract MoneroPruneResult PruneBlockchain(bool check);
+    public abstract Task<MoneroPruneResult> PruneBlockchain(bool check);
 
-    public virtual void RelayTxByHash(string txHash)
+    public virtual async Task RelayTxByHash(string txHash)
     {
-        RelayTxsByHash([txHash]);
+        await RelayTxsByHash([txHash]);
     }
 
-    public abstract void RelayTxsByHash(List<string> txHashes);
+    public abstract Task RelayTxsByHash(List<string> txHashes);
 
     public virtual void RemoveListener(MoneroDaemonListener listener)
     {
@@ -241,44 +241,44 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
         }
     }
 
-    public abstract int ResetDownloadLimit();
+    public abstract Task<int> ResetDownloadLimit();
 
-    public abstract int ResetUploadLimit();
+    public abstract Task<int> ResetUploadLimit();
 
-    public abstract int SetDownloadLimit(int limit);
+    public abstract Task<int> SetDownloadLimit(int limit);
 
-    public abstract void SetIncomingPeerLimit(int limit);
+    public abstract Task SetIncomingPeerLimit(int limit);
 
-    public abstract void SetOutgoingPeerLimit(int limit);
+    public abstract Task SetOutgoingPeerLimit(int limit);
 
-    public virtual void SetPeerBan(MoneroBan ban)
+    public virtual async Task SetPeerBan(MoneroBan ban)
     {
-        SetPeerBans([ban]);
+        await SetPeerBans([ban]);
     }
 
-    public abstract void SetPeerBans(List<MoneroBan> bans);
+    public abstract Task SetPeerBans(List<MoneroBan> bans);
 
-    public abstract int SetUploadLimit(int limit);
+    public abstract Task<int> SetUploadLimit(int limit);
 
-    public abstract void StartMining(string? address, ulong? numThreads, bool? isBackground, bool? ignoreBattery);
+    public abstract Task StartMining(string? address, ulong? numThreads, bool? isBackground, bool? ignoreBattery);
 
-    public abstract void Stop();
+    public abstract Task Stop();
 
-    public abstract void StopMining();
+    public abstract Task StopMining();
 
-    public virtual void SubmitBlock(string blockBlob)
+    public virtual async Task SubmitBlock(string blockBlob)
     {
-        SubmitBlocks([blockBlob]);
+        await SubmitBlocks([blockBlob]);
     }
 
-    public abstract void SubmitBlocks(List<string> blockBlobs);
+    public abstract Task SubmitBlocks(List<string> blockBlobs);
 
-    public MoneroSubmitTxResult SubmitTxHex(string txHex)
+    public async Task<MoneroSubmitTxResult> SubmitTxHex(string txHex)
     {
-        return SubmitTxHex(txHex, false);
+        return await SubmitTxHex(txHex, false);
     }
 
-    public abstract MoneroSubmitTxResult SubmitTxHex(string txHex, bool doNotRelay);
+    public abstract Task<MoneroSubmitTxResult> SubmitTxHex(string txHex, bool doNotRelay);
 
-    public abstract MoneroBlockHeader WaitForNextBlockHeader();
+    public abstract Task<MoneroBlockHeader> WaitForNextBlockHeader();
 }

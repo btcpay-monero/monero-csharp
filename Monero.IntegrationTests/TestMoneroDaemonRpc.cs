@@ -20,7 +20,7 @@ public class MoneroDaemonRpcFixture : IDisposable
     public MoneroDaemonRpcFixture()
     {
         Daemon = TestUtils.GetDaemonRpc();
-        IsRestricted = Daemon.IsRestricted();
+        IsRestricted = Daemon.IsRestricted().GetAwaiter().GetResult();
 
         BINARY_BLOCK_CTX.HasHex = false;
         BINARY_BLOCK_CTX.HeaderIsFull = false;
@@ -72,7 +72,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         MoneroRpcConnection rpcConnection = _daemon.GetRpcConnection();
 
         Assert.True(rpcConnection.IsConnected(), "Daemon offline");
-        ulong daemonHeight = _daemon.GetHeight();
+        ulong daemonHeight = _daemon.GetHeight().GetAwaiter().GetResult();
         if (daemonHeight == 1)
         {
             MineBlocks();
@@ -83,7 +83,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can notify listeners when a new block is added to the chain
     [Fact]
-    public void TestBlockListener()
+    public async Task TestBlockListener()
     {
         Assert.True(!LiteMode && TestNotifications);
 
@@ -92,7 +92,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             // start mining if possible to help push the network along
             // TODO use wallet rpc address
             string address = TestUtils.ADDRESS;
-            try { _daemon.StartMining(address, 1, false, true); }
+            try { await _daemon.StartMining(address, 1, false, true); }
             catch (MoneroError)
             {
                 // ignore
@@ -103,7 +103,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             _daemon.AddListener(listener);
 
             // wait for the next block notification
-            MoneroBlockHeader header = _daemon.WaitForNextBlockHeader();
+            MoneroBlockHeader header = await _daemon.WaitForNextBlockHeader();
             _daemon.RemoveListener(listener); // unregister listener so daemon does not keep polling
             TestBlockHeader(header, true);
 
@@ -113,7 +113,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         finally
         {
             // stop mining
-            try { _daemon.StopMining(); }
+            try { await _daemon.StopMining(); }
             catch (MoneroError)
             {
                 // ignore
@@ -126,94 +126,94 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     #region Non Relays Tests
 
     [Fact]
-    public void TestGetVersion()
+    public async Task TestGetVersion()
     {
         Assert.True(TestNonRelays);
-        MoneroVersion version = _daemon.GetVersion();
+        MoneroVersion version = await _daemon.GetVersion();
         Assert.NotNull(version.GetNumber());
         Assert.True(version.GetNumber() > 0);
         Assert.NotNull(version.IsRelease());
     }
 
     [Fact]
-    public void TestIsTrusted()
+    public async Task TestIsTrusted()
     {
         Assert.True(TestNonRelays);
-        _daemon.IsTrusted();
+        await _daemon.IsTrusted();
     }
 
     // Can get the blockchain height
     [Fact]
-    public void TestGetHeight()
+    public async Task TestGetHeight()
     {
         Assert.True(TestNonRelays);
-        ulong height = _daemon.GetHeight();
+        ulong height = await _daemon.GetHeight();
         Assert.True(height > 0, "Height must be greater than 0");
     }
 
     // Can get a block hash by height
     [Fact]
-    public void TestGetBlockIdByHeight()
+    public async Task TestGetBlockIdByHeight()
     {
         Assert.True(TestNonRelays);
-        MoneroBlockHeader lastHeader = _daemon.GetLastBlockHeader();
-        string hash = _daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
+        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
+        string hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
         Assert.NotNull(hash);
         Assert.True(64 == hash.Length);
     }
 
     // Can get a block template
     [Fact]
-    public void TestGetBlockTemplate()
+    public async Task TestGetBlockTemplate()
     {
         Assert.True(TestNonRelays);
-        MoneroBlockTemplate template = _daemon.GetBlockTemplate(TestUtils.ADDRESS, 2);
+        MoneroBlockTemplate template = await _daemon.GetBlockTemplate(TestUtils.ADDRESS, 2);
         TestBlockTemplate(template);
     }
 
     // Can get the last block's header
     [Fact]
-    public void TestGetLastBlockHeader()
+    public async Task TestGetLastBlockHeader()
     {
         Assert.True(TestNonRelays);
-        MoneroBlockHeader lastHeader = _daemon.GetLastBlockHeader();
+        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
         TestBlockHeader(lastHeader, true);
     }
 
     // Can get a block header by hash
     [Fact]
-    public void TestGetBlockHeaderByHash()
+    public async Task TestGetBlockHeaderByHash()
     {
         Assert.True(TestNonRelays);
 
         // retrieve by hash of the last block
-        MoneroBlockHeader lastHeader = _daemon.GetLastBlockHeader();
-        string hash = _daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
-        MoneroBlockHeader header = _daemon.GetBlockHeaderByHash(hash);
+        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
+        string hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
+        MoneroBlockHeader header = await _daemon.GetBlockHeaderByHash(hash);
         TestBlockHeader(header, true);
         Assert.True(lastHeader.Equals(header));
 
         // retrieve by hash of previous to last block
-        hash = _daemon.GetBlockHash((ulong)lastHeader.GetHeight()! - 1);
-        header = _daemon.GetBlockHeaderByHash(hash);
+        hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()! - 1);
+        header = await _daemon.GetBlockHeaderByHash(hash);
         TestBlockHeader(header, true);
         Assert.True(lastHeader.GetHeight() - 1 == (ulong)header.GetHeight()!);
     }
 
     // Can get a block header by height
     [Fact]
-    public void TestGetBlockHeaderByHeight()
+    public async Task TestGetBlockHeaderByHeight()
     {
         Assert.True(TestNonRelays);
 
         // retrieve by height of the last block
-        MoneroBlockHeader lastHeader = _daemon.GetLastBlockHeader();
-        MoneroBlockHeader header = _daemon.GetBlockHeaderByHeight((ulong)lastHeader.GetHeight()!);
+        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
+        MoneroBlockHeader header = await _daemon.GetBlockHeaderByHeight((ulong)lastHeader.GetHeight()!);
         TestBlockHeader(header, true);
         Assert.True(lastHeader.Equals(header));
 
         // retrieve by height of previous to last block
-        header = _daemon.GetBlockHeaderByHeight((ulong)lastHeader.GetHeight()! - 1);
+        header = await _daemon.GetBlockHeaderByHeight((ulong)lastHeader.GetHeight()! - 1);
         TestBlockHeader(header, true);
         Assert.True(lastHeader.GetHeight() - 1 == (ulong)header.GetHeight()!);
     }
@@ -221,19 +221,19 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     // Can get block headers by range
     // TODO: test start with no end, vice versa, inclusivity
     [Fact]
-    public void TestGetBlockHeadersByRange()
+    public async Task TestGetBlockHeadersByRange()
     {
         Assert.True(TestNonRelays);
 
         // determine start and end height based on the number of blocks and how many blocks ago
         ulong numBlocks = 10;
         ulong numBlocksAgo = 10;
-        ulong currentHeight = _daemon.GetHeight();
+        ulong currentHeight = await _daemon.GetHeight();
         ulong startHeight = currentHeight - numBlocksAgo;
         ulong endHeight = currentHeight - 1;
 
         // fetch headers
-        List<MoneroBlockHeader> headers =
+        List<MoneroBlockHeader> headers = await
             _daemon.GetBlockHeadersByRange(startHeight, endHeight);
 
         // test headers
@@ -250,7 +250,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get a block by hash
     [Fact]
-    public void TestGetBlockByHash()
+    public async Task TestGetBlockByHash()
     {
         Assert.True(TestNonRelays);
 
@@ -258,24 +258,24 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         TestContext ctx = new() { HasHex = true, HasTxs = false, HeaderIsFull = true };
 
         // retrieve by hash of the last block
-        MoneroBlockHeader lastHeader = _daemon.GetLastBlockHeader();
-        string hash = _daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
-        MoneroBlock block = _daemon.GetBlockByHash(hash);
+        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
+        string hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
+        MoneroBlock block = await _daemon.GetBlockByHash(hash);
         TestBlock(block, ctx);
-        Assert.True(_daemon.GetBlockByHeight((ulong)block.GetHeight()!).Equals(block));
+        Assert.True((await _daemon.GetBlockByHeight((ulong)block.GetHeight()!)).Equals(block));
         Assert.Null(block.GetTxs());
 
         // retrieve by hash of previous to last block
-        hash = _daemon.GetBlockHash((ulong)lastHeader.GetHeight()! - 1);
-        block = _daemon.GetBlockByHash(hash);
+        hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()! - 1);
+        block = await _daemon.GetBlockByHash(hash);
         TestBlock(block, ctx);
-        Assert.True(_daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()! - 1).Equals(block));
+        Assert.True((await _daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()! - 1)).Equals(block));
         Assert.Null(block.GetTxs());
     }
 
     // Can get blocks by hash which includes transactions (binary)
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetBlocksByHashBinary()
+    public Task TestGetBlocksByHashBinary()
     {
         Assert.True(TestNonRelays);
         throw new MoneroError("Not implemented");
@@ -283,7 +283,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get a block by height
     [Fact]
-    public void TestGetBlockByHeight()
+    public async Task TestGetBlockByHeight()
     {
         Assert.True(TestNonRelays);
 
@@ -294,20 +294,20 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         ctx.HasTxs = false;
 
         // retrieve by height of the last block
-        MoneroBlockHeader lastHeader = _daemon.GetLastBlockHeader();
-        MoneroBlock block = _daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()!);
+        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
+        MoneroBlock block = await _daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()!);
         TestBlock(block, ctx);
-        Assert.True(_daemon.GetBlockByHeight((ulong)block.GetHeight()!).Equals(block));
+        Assert.True((await _daemon.GetBlockByHeight((ulong)block.GetHeight()!)).Equals(block));
 
         // retrieve by height of previous to last block
-        block = _daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()! - 1);
+        block = await _daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()! - 1);
         TestBlock(block, ctx);
         Assert.True(lastHeader.GetHeight() - 1 == (ulong)block.GetHeight()!);
     }
 
     // Can get blocks by height which includes transactions (binary)
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetBlocksByHeightBinary()
+    public async Task TestGetBlocksByHeightBinary()
     {
         Assert.True(TestNonRelays);
 
@@ -315,7 +315,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         int numBlocks = 100;
 
         // select random heights  // TODO: this is horribly inefficient way of computing last 100 blocks if not shuffling
-        ulong currentHeight = _daemon.GetHeight();
+        ulong currentHeight = await _daemon.GetHeight();
         List<ulong> allHeights = [];
         for (ulong i = 0; i < currentHeight - 1; i++)
         {
@@ -329,7 +329,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
 
         // fetch blocks
-        List<MoneroBlock> blocks = _daemon.GetBlocksByHeight(heights);
+        List<MoneroBlock> blocks = await _daemon.GetBlocksByHeight(heights);
 
         // test blocks
         bool txFound = false;
@@ -351,55 +351,55 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get blocks by range in a single request
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetBlocksByRange()
+    public async Task TestGetBlocksByRange()
     {
         Assert.True(TestNonRelays);
 
         // get height range
         ulong numBlocks = 100;
         ulong numBlocksAgo = 190;
-        ulong height = _daemon.GetHeight();
+        ulong height = await _daemon.GetHeight();
         Assert.True(height - numBlocksAgo + numBlocks - 1 < height);
         ulong startHeight = height - numBlocksAgo;
         ulong endHeight = height - numBlocksAgo + numBlocks - 1;
 
         // test known start and end heights
-        TestGetBlocksRange(startHeight, endHeight, height, false);
+        await TestGetBlocksRange(startHeight, endHeight, height, false);
 
         // test unspecified start
-        TestGetBlocksRange(null, numBlocks - 1, height, false);
+        await TestGetBlocksRange(null, numBlocks - 1, height, false);
 
         // test unspecified end
-        TestGetBlocksRange(height - numBlocks - 1, null, height, false);
+        await TestGetBlocksRange(height - numBlocks - 1, null, height, false);
     }
 
     // Can get blocks by range using chunked requests
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetBlocksByRangeChunked()
+    public async Task TestGetBlocksByRangeChunked()
     {
         Assert.True(TestNonRelays && !LiteMode);
 
         // get ulong height range
-        ulong numBlocks = Math.Min(_daemon.GetHeight() - 2, 1440); // test up to ~2 days of blocks
+        ulong numBlocks = Math.Min((await _daemon.GetHeight()) - 2, 1440); // test up to ~2 days of blocks
         Assert.True(numBlocks > 0);
-        ulong height = _daemon.GetHeight();
+        ulong height = await _daemon.GetHeight();
         Assert.True(height - numBlocks - 1 < height);
         ulong startHeight = height - numBlocks;
         ulong endHeight = height - 1;
 
         // test known start and end heights
-        TestGetBlocksRange(startHeight, endHeight, height, true);
+        await TestGetBlocksRange(startHeight, endHeight, height, true);
 
         // test unspecified start
-        TestGetBlocksRange(null, numBlocks - 1, height, true);
+        await TestGetBlocksRange(null, numBlocks - 1, height, true);
 
         // test unspecified end
-        TestGetBlocksRange(endHeight - numBlocks - 1, null, height, true);
+        await TestGetBlocksRange(endHeight - numBlocks - 1, null, height, true);
     }
 
     // Can get block hashes (binary)
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetBlockIdsBinary()
+    public Task TestGetBlockIdsBinary()
     {
         Assert.True(TestNonRelays);
         //get_hashes.bin
@@ -408,12 +408,12 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get a transaction by hash with and without pruning
     [Fact]
-    public void TestGetTxByHash()
+    public async Task TestGetTxByHash()
     {
         Assert.True(TestNonRelays);
 
         // fetch transaction hashes to test
-        List<string> txHashes = GetConfirmedTxHashes(_daemon);
+        List<string> txHashes = await GetConfirmedTxHashes(_daemon);
 
         // context for testing txs
         TestContext ctx = new() { IsPruned = false, IsConfirmed = true, FromGetTxPool = false };
@@ -421,14 +421,14 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         // fetch each tx by hash without pruning
         foreach (string txHash in txHashes)
         {
-            MoneroTx? tx = _daemon.GetTx(txHash);
+            MoneroTx? tx = await _daemon.GetTx(txHash);
             TestTx(tx, ctx);
         }
 
         // fetch each tx by hash with pruning
         foreach (string txHash in txHashes)
         {
-            MoneroTx? tx = _daemon.GetTx(txHash, true);
+            MoneroTx? tx = await _daemon.GetTx(txHash, true);
             ctx.IsPruned = true;
             TestTx(tx, ctx);
         }
@@ -436,7 +436,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         // fetch invalid hash
         try
         {
-            _daemon.GetTx("invalid tx hash");
+            await _daemon.GetTx("invalid tx hash");
             throw new MoneroError("fail");
         }
         catch (MoneroError e)
@@ -447,19 +447,19 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get transactions by hashes with and without pruning
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestGetTxsByHashes()
+    public async Task TestGetTxsByHashes()
     {
         Assert.True(TestNonRelays);
 
         // fetch transaction hashes to test
-        List<string> txHashes = GetConfirmedTxHashes(_daemon);
+        List<string> txHashes = await GetConfirmedTxHashes(_daemon);
         Assert.True(txHashes.Count > 0);
 
         // context for testing txs
         TestContext ctx = new() { IsPruned = false, IsConfirmed = true, FromGetTxPool = false };
 
         // fetch txs by hash without pruning
-        List<MoneroTx> txs = _daemon.GetTxs(txHashes);
+        List<MoneroTx> txs = await _daemon.GetTxs(txHashes);
         Assert.True(txHashes.Count == txs.Count);
         foreach (MoneroTx _tx in txs)
         {
@@ -467,7 +467,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
 
         // fetch txs by hash with pruning
-        txs = _daemon.GetTxs(txHashes, true);
+        txs = await _daemon.GetTxs(txHashes, true);
         ctx.IsPruned = true;
         Assert.True(txHashes.Count == txs.Count);
         foreach (MoneroTx _tx in txs)
@@ -476,19 +476,19 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
 
         // fetch missing hash
-        MoneroTx tx = _wallet.CreateTx(new MoneroTxConfig().SetAccountIndex(0)
-            .AddDestination(_wallet.GetPrimaryAddress(), TestUtils.MAX_FEE));
+        MoneroTx tx = await _wallet.CreateTx(new MoneroTxConfig().SetAccountIndex(0)
+            .AddDestination(await _wallet.GetPrimaryAddress(), TestUtils.MAX_FEE));
         Assert.True(_daemon.GetTx(tx.GetHash()!) != null);
         txHashes.Add(tx.GetHash()!);
         int numTxs = txs.Count;
-        txs = _daemon.GetTxs(txHashes);
+        txs = await _daemon.GetTxs(txHashes);
         Assert.True(numTxs == txs.Count);
 
         // fetch invalid hash
         txHashes.Add("invalid tx hash");
         try
         {
-            _daemon.GetTxs(txHashes);
+            await _daemon.GetTxs(txHashes);
             throw new MoneroError("fail");
         }
         catch (MoneroError e)
@@ -499,18 +499,18 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get transactions by hashes that are in the transaction pool
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestGetTxsByHashesInPool()
+    public async Task TestGetTxsByHashesInPool()
     {
         Assert.True(TestNonRelays);
-        TestUtils.WALLET_TX_TRACKER
+        await TestUtils.WALLET_TX_TRACKER
             .WaitForWalletTxsToClearPool(_wallet); // wait for wallet's txs in the pool to clear to ensure reliable sync
 
         // submit txs to the pool but don't relay
         List<string> txHashes = [];
         for (uint i = 1; i < 3; i++)
         {
-            MoneroTx tx = GetUnrelayedTx(_wallet, i);
-            MoneroSubmitTxResult result = _daemon.SubmitTxHex(tx.GetFullHex()!, true);
+            MoneroTx tx = await GetUnrelayedTx(_wallet, i);
+            MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
             TestSubmitTxResultGood(result);
             Assert.False(result.IsRelayed());
             txHashes.Add(tx.GetHash()!);
@@ -518,7 +518,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
         // fetch txs by hash
         MoneroUtils.Log(0, "Fetching txs...");
-        List<MoneroTx> txs = _daemon.GetTxs(txHashes);
+        List<MoneroTx> txs = await _daemon.GetTxs(txHashes);
         MoneroUtils.Log(0, "done");
 
         // context for testing tx
@@ -532,26 +532,26 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
 
         // clear txs from pool
-        _daemon.FlushTxPool(txHashes);
-        _wallet.Sync();
+        await _daemon.FlushTxPool(txHashes);
+        await _wallet.Sync();
     }
 
     // Can get a transaction hex by hash with and without pruning
     [Fact]
-    public void TestGetTxHexByHash()
+    public async Task TestGetTxHexByHash()
     {
         Assert.True(TestNonRelays);
 
         // fetch transaction hashes to test
-        List<string> txHashes = GetConfirmedTxHashes(_daemon);
+        List<string> txHashes = await GetConfirmedTxHashes(_daemon);
 
         // fetch each tx hex by hash with and without pruning
         List<string> hexes = [];
         List<string> hexesPruned = [];
         foreach (string txHash in txHashes)
         {
-            hexes.Add(_daemon.GetTxHex(txHash)!);
-            hexesPruned.Add(_daemon.GetTxHex(txHash, true)!);
+            hexes.Add((await _daemon.GetTxHex(txHash))!);
+            hexesPruned.Add((await _daemon.GetTxHex(txHash, true))!);
         }
 
         // test results
@@ -568,7 +568,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         // fetch invalid hash
         try
         {
-            _daemon.GetTxHex("invalid tx hash");
+            await _daemon.GetTxHex("invalid tx hash");
             throw new MoneroError("fail");
         }
         catch (MoneroError e)
@@ -579,16 +579,16 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get transaction hexes by hashes with and without pruning
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestGetTxHexesByHashes()
+    public async Task TestGetTxHexesByHashes()
     {
         Assert.True(TestNonRelays);
 
         // fetch transaction hashes to test
-        List<string> txHashes = GetConfirmedTxHashes(_daemon);
+        List<string> txHashes = await GetConfirmedTxHashes(_daemon);
 
         // fetch tx hexes by hash with and without pruning
-        List<string> hexes = _daemon.GetTxHexes(txHashes);
-        List<string> hexesPruned = _daemon.GetTxHexes(txHashes, true);
+        List<string> hexes = await _daemon.GetTxHexes(txHashes);
+        List<string> hexesPruned = await _daemon.GetTxHexes(txHashes, true);
 
         // test results
         Assert.True(hexes.Count == txHashes.Count);
@@ -605,7 +605,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         txHashes.Add("invalid tx hash");
         try
         {
-            _daemon.GetTxHexes(txHashes);
+            await _daemon.GetTxHexes(txHashes);
             throw new MoneroError("fail");
         }
         catch (MoneroError e)
@@ -616,20 +616,20 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get the miner transaction sum
     [Fact(Skip = "Not supported by regtest daemon")]
-    public void TestGetMinerTxSum()
+    public async Task TestGetMinerTxSum()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        MoneroMinerTxSum sum = _daemon.GetMinerTxSum(0, Math.Min(50000, _daemon.GetHeight()));
+        MoneroMinerTxSum sum = await _daemon.GetMinerTxSum(0, Math.Min(50000, await _daemon.GetHeight()));
         TestMinerTxSum(sum);
     }
 
     // Can get a fee estimate
     [Fact]
-    public void TestGetFeeEstimate()
+    public async Task TestGetFeeEstimate()
     {
         Assert.True(TestNonRelays);
-        MoneroFeeEstimate feeEstimate = _daemon.GetFeeEstimate();
+        MoneroFeeEstimate feeEstimate = await _daemon.GetFeeEstimate();
         TestUtils.TestUnsignedBigInteger(feeEstimate.GetFee(), true);
         Assert.True(feeEstimate.GetFees().Count == 4); // slow, normal, fast, fastest
         for (int i = 0; i < 4; i++)
@@ -642,19 +642,19 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get all transactions in the transaction pool
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestGetTxsInPool()
+    public async Task TestGetTxsInPool()
     {
         Assert.True(TestNonRelays);
-        TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
+        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
 
         // submit tx to pool but don't relay
-        MoneroTx tx = GetUnrelayedTx(_wallet, 1);
-        MoneroSubmitTxResult result = _daemon.SubmitTxHex(tx.GetFullHex()!, true);
+        MoneroTx tx = await GetUnrelayedTx(_wallet, 1);
+        MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
         TestSubmitTxResultGood(result);
         Assert.True(result.IsRelayed() == false);
 
         // fetch txs in pool
-        List<MoneroTx> txs = _daemon.GetTxPool();
+        List<MoneroTx> txs = await _daemon.GetTxPool();
 
         // context for testing tx
         TestContext ctx = new() { IsPruned = false, IsConfirmed = false, FromGetTxPool = true };
@@ -667,13 +667,13 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
 
         // flush the tx from the pool, gg
-        _daemon.FlushTxPool(tx.GetHash()!);
-        _wallet.Sync();
+        await _daemon.FlushTxPool(tx.GetHash()!);
+        await _wallet.Sync();
     }
 
     // Can get hashes of transactions in the transaction pool (binary)
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetIdsOfTxsInPoolBin()
+    public Task TestGetIdsOfTxsInPoolBin()
     {
         Assert.True(TestNonRelays);
         // TODO: get_transaction_pool_hashes.bin
@@ -682,7 +682,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get the transaction pool backlog (binary)
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetTxPoolBacklogBin()
+    public Task TestGetTxPoolBacklogBin()
     {
         Assert.True(TestNonRelays);
         // TODO: get_txpool_backlog
@@ -691,10 +691,10 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get transaction pool statistics
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestGetTxPoolStatistics()
+    public async Task TestGetTxPoolStatistics()
     {
         Assert.True(TestNonRelays);
-        TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
+        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
         Exception? err = null;
         Collection txIds = [];
         try
@@ -703,13 +703,13 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             for (uint i = 1; i < 3; i++)
             {
                 // submit tx hex
-                MoneroTx tx = GetUnrelayedTx(_wallet, i);
-                MoneroSubmitTxResult result = _daemon.SubmitTxHex(tx.GetFullHex()!, true);
+                MoneroTx tx = await GetUnrelayedTx(_wallet, i);
+                MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
                 Assert.True(result.IsGood());
                 txIds.Add(tx.GetHash());
 
                 // get tx pool stats
-                MoneroTxPoolStats stats = _daemon.GetTxPoolStats();
+                MoneroTxPoolStats stats = await _daemon.GetTxPoolStats();
                 Assert.True(stats.GetNumTxs() > i - 1);
                 TestTxPoolStats(stats);
             }
@@ -722,60 +722,60 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can flush all transactions from the pool
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestFlushTxsFromPool()
+    public async Task TestFlushTxsFromPool()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
+        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
 
         // preserve original transactions in the pool
-        List<MoneroTx> txPoolBefore = _daemon.GetTxPool();
+        List<MoneroTx> txPoolBefore = await _daemon.GetTxPool();
 
         // submit txs to the pool but don't relay
         for (uint i = 1; i < 3; i++)
         {
-            MoneroTx tx = GetUnrelayedTx(_wallet, i);
-            MoneroSubmitTxResult result = _daemon.SubmitTxHex(tx.GetFullHex()!, true);
+            MoneroTx tx = await GetUnrelayedTx(_wallet, i);
+            MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
             TestSubmitTxResultGood(result);
         }
 
-        Assert.True(txPoolBefore.Count + 2 == _daemon.GetTxPool().Count);
+        Assert.True(txPoolBefore.Count + 2 == (await _daemon.GetTxPool()).Count);
 
         // flush tx pool
-        _daemon.FlushTxPool();
-        Assert.True(0 == _daemon.GetTxPool().Count);
+        await _daemon.FlushTxPool();
+        Assert.True(0 == (await _daemon.GetTxPool()).Count);
 
         // re-submit original transactions
         foreach (MoneroTx tx in txPoolBefore)
         {
-            MoneroSubmitTxResult result = _daemon.SubmitTxHex(tx.GetFullHex()!, tx.IsRelayed() == true);
+            MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, tx.IsRelayed() == true);
             TestSubmitTxResultGood(result);
         }
 
         // pool is back to original state
-        Assert.True(txPoolBefore.Count == _daemon.GetTxPool().Count);
+        Assert.True(txPoolBefore.Count == (await _daemon.GetTxPool()).Count);
 
         // sync wallet for next test
-        _wallet.Sync();
+        await _wallet.Sync();
     }
 
     // Can flush a transaction from the pool by hash
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestFlushTxFromPoolByHash()
+    public async Task TestFlushTxFromPoolByHash()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
+        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
 
         // preserve original transactions in the pool
-        List<MoneroTx> txPoolBefore = _daemon.GetTxPool();
+        List<MoneroTx> txPoolBefore = await _daemon.GetTxPool();
 
         // submit txs to the pool but don't relay
         List<MoneroTx> txs = [];
         for (uint i = 1; i < 3; i++)
         {
-            MoneroTx tx = GetUnrelayedTx(_wallet, i);
-            MoneroSubmitTxResult result = _daemon.SubmitTxHex(tx.GetFullHex()!, true);
+            MoneroTx tx = await GetUnrelayedTx(_wallet, i);
+            MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
             TestSubmitTxResultGood(result);
             txs.Add(tx);
         }
@@ -784,64 +784,64 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         for (int i = 0; i < txs.Count; i++)
         {
             // flush tx from pool
-            _daemon.FlushTxPool(txs[i].GetHash()!);
+            await _daemon.FlushTxPool(txs[i].GetHash()!);
 
             // test tx pool
-            List<MoneroTx> poolTxs = _daemon.GetTxPool();
+            List<MoneroTx> poolTxs = await _daemon.GetTxPool();
             Assert.True(txs.Count - i - 1 == poolTxs.Count);
         }
 
         // pool is back to original state
-        Assert.True(txPoolBefore.Count == _daemon.GetTxPool().Count);
+        Assert.True(txPoolBefore.Count == (await _daemon.GetTxPool()).Count);
 
         // sync wallet for next test
-        _wallet.Sync();
+        await _wallet.Sync();
     }
 
     // Can flush transactions from the pool by hashes
     [Fact(Skip = "Needs monero wallet rpc")]
-    public void TestFlushTxsFromPoolByHashes()
+    public async Task TestFlushTxsFromPoolByHashes()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
+        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
 
         // preserve original transactions in the pool
-        List<MoneroTx> txPoolBefore = _daemon.GetTxPool();
+        List<MoneroTx> txPoolBefore = await _daemon.GetTxPool();
 
         // submit txs to the pool but don't relay
         List<string> txHashes = [];
         for (uint i = 1; i < 3; i++)
         {
-            MoneroTx tx = GetUnrelayedTx(_wallet, i);
-            MoneroSubmitTxResult result = _daemon.SubmitTxHex(tx.GetFullHex()!, true);
+            MoneroTx tx = await GetUnrelayedTx(_wallet, i);
+            MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
             TestSubmitTxResultGood(result);
             txHashes.Add(tx.GetHash()!);
         }
 
-        Assert.True(txPoolBefore.Count + txHashes.Count == _daemon.GetTxPool().Count);
+        Assert.True(txPoolBefore.Count + txHashes.Count == (await _daemon.GetTxPool()).Count);
 
         // remove all txs by hashes
-        _daemon.FlushTxPool(txHashes);
+        await _daemon.FlushTxPool(txHashes);
 
         // pool is back to original state
-        Assert.True(txPoolBefore.Count == _daemon.GetTxPool().Count);
-        _wallet.Sync();
+        Assert.True(txPoolBefore.Count == (await _daemon.GetTxPool()).Count);
+        await _wallet.Sync();
     }
 
     // Can get the spent status of key images
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestGetSpentStatusOfKeyImages()
+    public async Task TestGetSpentStatusOfKeyImages()
     {
         Assert.True(TestNonRelays);
-        TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
+        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
 
         // submit txs to the pool to collect key images then flush them
         List<MoneroTx> txs = [];
         for (uint i = 1; i < 3; i++)
         {
-            MoneroTx tx = GetUnrelayedTx(_wallet, i);
-            _daemon.SubmitTxHex(tx.GetFullHex()!, true);
+            MoneroTx tx = await GetUnrelayedTx(_wallet, i);
+            await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
             txs.Add(tx);
         }
 
@@ -852,7 +852,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             txHashes.Add(tx.GetHash()!);
         }
 
-        foreach (MoneroTx tx in _daemon.GetTxs(txHashes))
+        foreach (MoneroTx tx in await _daemon.GetTxs(txHashes))
         {
             foreach (MoneroOutput input in tx.GetInputs()!)
             {
@@ -860,23 +860,23 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             }
         }
 
-        _daemon.FlushTxPool(txHashes);
+        await _daemon.FlushTxPool(txHashes);
 
         // key images are not spent
-        TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.NotSpent);
+        await TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.NotSpent);
 
         // submit txs to the pool but don't relay
         foreach (MoneroTx tx in txs)
         {
-            _daemon.SubmitTxHex(tx.GetFullHex()!, true);
+            await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
         }
 
         // key images are in the tx pool
-        TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.TxPool);
+        await TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.TxPool);
 
         // collect key images of confirmed txs
         keyImages = [];
-        txs = GetConfirmedTxs(_daemon, 10);
+        txs = await GetConfirmedTxs(_daemon, 10);
         foreach (MoneroTx tx in txs)
         {
             foreach (MoneroOutput input in tx.GetInputs()!)
@@ -886,15 +886,15 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
 
         // key images are all spent
-        TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.Confirmed);
+        await TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.Confirmed);
 
         // flush this test's txs from pool
-        _daemon.FlushTxPool(txHashes);
+        await _daemon.FlushTxPool(txHashes);
     }
 
     // Can get output indices given a list of transaction hashes (binary)
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetOutputIndicesFromTxIdsBinary()
+    public Task TestGetOutputIndicesFromTxIdsBinary()
     {
         Assert.True(TestNonRelays);
         throw new Exception("Not implemented"); // get_o_indexes.bin
@@ -902,7 +902,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get outputs given a list of output amounts and indices (binary)
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetOutputsFromAmountsAndIndicesBinary()
+    public Task TestGetOutputsFromAmountsAndIndicesBinary()
     {
         Assert.True(TestNonRelays);
         throw new Exception("Not implemented"); // get_outs.bin
@@ -910,10 +910,10 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get an output histogram (binary)
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetOutputHistogramBinary()
+    public async Task TestGetOutputHistogramBinary()
     {
         Assert.True(TestNonRelays);
-        List<MoneroOutputHistogramEntry> entries =
+        List<MoneroOutputHistogramEntry> entries = await
             _daemon.GetOutputHistogram();
         Assert.True(entries.Count > 0);
         foreach (MoneroOutputHistogramEntry entry in entries)
@@ -924,7 +924,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get an output distribution (binary)
     [Fact(Skip = "Binary request not implemented")]
-    public void TestGetOutputDistributionBinary()
+    public async Task TestGetOutputDistributionBinary()
     {
         Assert.True(TestNonRelays);
         List<ulong> amounts = [];
@@ -936,7 +936,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         amounts.Add(10000);
         amounts.Add(100000);
         amounts.Add(1000000);
-        List<MoneroOutputDistributionEntry> entries = _daemon.GetOutputDistribution(amounts);
+        List<MoneroOutputDistributionEntry> entries = await _daemon.GetOutputDistribution(amounts);
         foreach (MoneroOutputDistributionEntry entry in entries)
         {
             TestOutputDistributionEntry(entry);
@@ -945,38 +945,38 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get general information
     [Fact]
-    public void TestGetGeneralInformation()
+    public async Task TestGetGeneralInformation()
     {
         Assert.True(TestNonRelays);
-        MoneroDaemonInfo info = _daemon.GetInfo();
+        MoneroDaemonInfo info = await _daemon.GetInfo();
         TestInfo(info);
     }
 
     // Can get sync information
     [Fact]
-    public void TestGetSyncInformation()
+    public async Task TestGetSyncInformation()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        MoneroDaemonSyncInfo syncInfo = _daemon.GetSyncInfo();
+        MoneroDaemonSyncInfo syncInfo = await _daemon.GetSyncInfo();
         TestSyncInfo(syncInfo);
     }
 
     // Can get hard fork information
     [Fact]
-    public void TestGetHardForkInformation()
+    public async Task TestGetHardForkInformation()
     {
         Assert.True(TestNonRelays);
-        MoneroHardForkInfo hardForkInfo = _daemon.GetHardForkInfo();
+        MoneroHardForkInfo hardForkInfo = await _daemon.GetHardForkInfo();
         TestHardForkInfo(hardForkInfo);
     }
 
     // Can get alternative chains
     [Fact]
-    public void TestGetAlternativeChains()
+    public async Task TestGetAlternativeChains()
     {
         Assert.True(TestNonRelays);
-        List<MoneroAltChain> altChains = _daemon.GetAltChains();
+        List<MoneroAltChain> altChains = await _daemon.GetAltChains();
         foreach (MoneroAltChain altChain in altChains)
         {
             TestAltChain(altChain);
@@ -985,10 +985,10 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get alternative block hashes
     [Fact]
-    public void TestGetAlternativeBlockIds()
+    public async Task TestGetAlternativeBlockIds()
     {
         Assert.True(TestNonRelays);
-        List<string> altBlockIds = _daemon.GetAltBlockHashes();
+        List<string> altBlockIds = await _daemon.GetAltBlockHashes();
         foreach (string altBlockId in altBlockIds)
         {
             Assert.NotNull(altBlockId);
@@ -998,22 +998,22 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get, set, and reset a download bandwidth limit
     [Fact]
-    public void TestSetDownloadBandwidth()
+    public async Task TestSetDownloadBandwidth()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        int initVal = _daemon.GetDownloadLimit();
+        int initVal = await _daemon.GetDownloadLimit();
         Assert.True(initVal > 0);
         int setVal = initVal * 2;
-        _daemon.SetDownloadLimit(setVal);
-        Assert.True(setVal == _daemon.GetDownloadLimit());
-        int resetVal = _daemon.ResetDownloadLimit();
+        await _daemon.SetDownloadLimit(setVal);
+        Assert.True(setVal == await _daemon.GetDownloadLimit());
+        int resetVal = await _daemon.ResetDownloadLimit();
         Assert.True(initVal == resetVal);
 
         // test invalid limits
         try
         {
-            _daemon.SetDownloadLimit(0);
+            await _daemon.SetDownloadLimit(0);
             throw new MoneroError("Should have thrown error on invalid input");
         }
         catch (MoneroError e)
@@ -1021,27 +1021,27 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             Assert.True("Download limit must be an integer greater than 0" == e.Message);
         }
 
-        Assert.True(_daemon.GetDownloadLimit() == initVal);
+        Assert.True((await _daemon.GetDownloadLimit()) == initVal);
     }
 
     // Can get, set, and reset an upload bandwidth limit
     [Fact]
-    public void TestSetUploadBandwidth()
+    public async Task TestSetUploadBandwidth()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        int initVal = _daemon.GetUploadLimit();
+        int initVal = await _daemon.GetUploadLimit();
         Assert.True(initVal > 0);
         int setVal = initVal * 2;
-        _daemon.SetUploadLimit(setVal);
-        Assert.True(setVal == _daemon.GetUploadLimit());
-        int resetVal = _daemon.ResetUploadLimit();
+        await _daemon.SetUploadLimit(setVal);
+        Assert.True(setVal == await _daemon.GetUploadLimit());
+        int resetVal = await _daemon.ResetUploadLimit();
         Assert.True(initVal == resetVal);
 
         // test invalid limits
         try
         {
-            _daemon.SetUploadLimit(0);
+            await _daemon.SetUploadLimit(0);
             throw new Exception("Should have thrown error on invalid input");
         }
         catch (MoneroError e)
@@ -1049,16 +1049,16 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             Assert.True("Upload limit must be an integer greater than 0" == e.Message);
         }
 
-        Assert.True(initVal == _daemon.GetUploadLimit());
+        Assert.True(initVal == await _daemon.GetUploadLimit());
     }
 
     // Can get peers with active incoming or outgoing connections
     [Fact]
-    public void TestGetPeers()
+    public async Task TestGetPeers()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        List<MoneroPeer> peers = _daemon.GetPeers();
+        List<MoneroPeer> peers = await _daemon.GetPeers();
         Assert.True(peers.Count > 0, "Daemon has no incoming or outgoing peers to test");
         foreach (MoneroPeer peer in peers)
         {
@@ -1068,11 +1068,11 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can get all known peers which may be online or offline
     [Fact(Skip = "Daemon has no known peers to test")]
-    public void TestGetKnownPeers()
+    public async Task TestGetKnownPeers()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        List<MoneroPeer> peers = _daemon.GetKnownPeers();
+        List<MoneroPeer> peers = await _daemon.GetKnownPeers();
         Assert.True(peers.Count > 0, "Daemon has no known peers to test");
         foreach (MoneroPeer peer in peers)
         {
@@ -1082,29 +1082,29 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can limit the number of outgoing peers
     [Fact]
-    public void TestSetOutgoingPeerLimit()
+    public async Task TestSetOutgoingPeerLimit()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        _daemon.SetOutgoingPeerLimit(0);
-        _daemon.SetOutgoingPeerLimit(8);
-        _daemon.SetOutgoingPeerLimit(10);
+        await _daemon.SetOutgoingPeerLimit(0);
+        await _daemon.SetOutgoingPeerLimit(8);
+        await _daemon.SetOutgoingPeerLimit(10);
     }
 
     // Can limit the number of incoming peers
     [Fact]
-    public void TestSetIncomingPeerLimit()
+    public async Task TestSetIncomingPeerLimit()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        _daemon.SetIncomingPeerLimit(0);
-        _daemon.SetIncomingPeerLimit(8);
-        _daemon.SetIncomingPeerLimit(10);
+        await _daemon.SetIncomingPeerLimit(0);
+        await _daemon.SetIncomingPeerLimit(8);
+        await _daemon.SetIncomingPeerLimit(10);
     }
 
     // Can ban a peer
     [Fact]
-    public void TestBanPeer()
+    public async Task TestBanPeer()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
@@ -1114,10 +1114,10 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         ban.SetHost("192.168.1.51");
         ban.SetIsBanned(true);
         ban.SetSeconds(60);
-        _daemon.SetPeerBan(ban);
+        await _daemon.SetPeerBan(ban);
 
         // test ban
-        List<MoneroBan> bans = _daemon.GetPeerBans();
+        List<MoneroBan> bans = await _daemon.GetPeerBans();
         bool found = false;
         foreach (MoneroBan aBan in bans)
         {
@@ -1133,7 +1133,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can ban peers
     [Fact]
-    public void TestBanPeers()
+    public async Task TestBanPeers()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
@@ -1150,10 +1150,10 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         List<MoneroBan> bans = [];
         bans.Add(ban1);
         bans.Add(ban2);
-        _daemon.SetPeerBans(bans);
+        await _daemon.SetPeerBans(bans);
 
         // test bans
-        bans = _daemon.GetPeerBans();
+        bans = await _daemon.GetPeerBans();
         bool found1 = false;
         bool found2 = false;
         foreach (MoneroBan aBan in bans)
@@ -1176,31 +1176,31 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can start and stop mining
     [Fact(Skip = "Fails on github CI")]
-    public void TestMining()
+    public async Task TestMining()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
 
         // stop mining at the beginning of test
-        try { _daemon.StopMining(); }
+        try { await _daemon.StopMining(); }
         catch (MoneroError) { }
 
         // generate address to mine to
         // TODO use wallet rpc
         string address = TestUtils.ADDRESS;
         // start mining
-        _daemon.StartMining(address, 1, false, true);
+        await _daemon.StartMining(address, 1, false, true);
 
         GenUtils.WaitFor(30);
 
         // stop mining
-        _daemon.StopMining();
+        await _daemon.StopMining();
     }
 
     // Can get mining status
     // TODO why this test fails on github runner?
     [Fact(Skip = "Fails on github CI")]
-    public void TestGetMiningStatus()
+    public async Task TestGetMiningStatus()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
@@ -1208,14 +1208,14 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         try
         {
             // stop mining at the beginning of test
-            try { _daemon.StopMining(); }
+            try { await _daemon.StopMining(); }
             catch (MoneroError)
             {
                 // ignore
             }
 
             // test status without mining
-            MoneroMiningStatus status = _daemon.GetMiningStatus();
+            MoneroMiningStatus status = await _daemon.GetMiningStatus();
             Assert.False(status.IsActive());
             Assert.Null(status.GetAddress());
             Assert.True(0 == (long)status.GetSpeed()!);
@@ -1227,8 +1227,8 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             string address = TestUtils.ADDRESS;
             ulong threadCount = 1;
             bool isBackground = false;
-            _daemon.StartMining(address, threadCount, isBackground, true);
-            status = _daemon.GetMiningStatus();
+            await _daemon.StartMining(address, threadCount, isBackground, true);
+            status = await _daemon.GetMiningStatus();
             Assert.True(status.IsActive());
             Assert.True(address == status.GetAddress());
             Assert.True(status.GetSpeed() >= 0);
@@ -1238,7 +1238,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         finally
         {
             // stop mining at end of test
-            try { _daemon.StopMining(); }
+            try { await _daemon.StopMining(); }
             catch (MoneroError)
             {
                 // ignore
@@ -1248,19 +1248,19 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can submit a mined block to the network
     [Fact(Skip = "Not supported by regtest daemon")]
-    public void TestSubmitMinedBlock()
+    public async Task TestSubmitMinedBlock()
     {
         Assert.True(TestNonRelays);
 
         // get template to mine on
-        MoneroBlockTemplate template = _daemon.GetBlockTemplate(TestUtils.ADDRESS);
+        MoneroBlockTemplate template = await _daemon.GetBlockTemplate(TestUtils.ADDRESS);
 
         // TODO monero rpc: way to get mining nonce when found in order to submit?
 
         // try to submit block hashing blob without nonce
         try
         {
-            _daemon.SubmitBlock(template.GetBlockTemplateBlob()!);
+            await _daemon.SubmitBlock(template.GetBlockTemplateBlob()!);
             throw new Exception("Should have thrown error");
         }
         catch (MoneroRpcError e)
@@ -1272,11 +1272,11 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can prune the blockchain
     [Fact(Skip = "Not supported by regtest daemon")]
-    public void TestPruneBlockchain()
+    public async Task TestPruneBlockchain()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        MoneroPruneResult result = _daemon.PruneBlockchain(true);
+        MoneroPruneResult result = await _daemon.PruneBlockchain(true);
         if (result.IsPruned() == true)
         {
             Assert.True(result.GetPruningSeed() > 0);
@@ -1289,28 +1289,28 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can check for an update
     [Fact(Skip = "Unstable update call")]
-    public void TestCheckForUpdate()
+    public async Task TestCheckForUpdate()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-        MoneroDaemonUpdateCheckResult result = _daemon.CheckForUpdate();
+        MoneroDaemonUpdateCheckResult result = await _daemon.CheckForUpdate();
         TestUpdateCheckResult(result);
     }
 
     // Can download an update
     [Fact(Skip = "Non supported by regtest daemon")]
-    public void TestDownloadUpdate()
+    public async Task TestDownloadUpdate()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
 
         // download to default path
-        MoneroDaemonUpdateDownloadResult result = _daemon.DownloadUpdate();
+        MoneroDaemonUpdateDownloadResult result = await _daemon.DownloadUpdate();
         TestUpdateDownloadResult(result, null);
 
         // download to defined path
         string path = "test_download_" + DateTime.Now + ".tar.bz2";
-        result = _daemon.DownloadUpdate(path);
+        result = await _daemon.DownloadUpdate(path);
         TestUpdateDownloadResult(result, path);
 
         // test invalid path
@@ -1318,7 +1318,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         {
             try
             {
-                _daemon.DownloadUpdate("./ohhai/there");
+                await _daemon.DownloadUpdate("./ohhai/there");
                 throw new Exception("Should have thrown error");
             }
             catch (MoneroRpcError e)
@@ -1331,20 +1331,20 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can be stopped
     [Fact(Skip = "Disabled")]
-    public void TestStop()
+    public async Task TestStop()
     {
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
 
         // stop the daemon
-        _daemon.Stop();
+        await _daemon.Stop();
 
         // give the daemon time to shut down
         GenUtils.WaitFor(TestUtils.SYNC_PERIOD_IN_MS);
         // try to interact with the daemon
         try
         {
-            _daemon.GetHeight();
+            await _daemon.GetHeight();
             throw new Exception("Should have thrown error");
         }
         catch (MoneroError e)
@@ -1359,27 +1359,27 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can submit a tx in hex format to the pool and relay in one call
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestSubmitAndRelayTxHex()
+    public async Task TestSubmitAndRelayTxHex()
     {
         Assert.True(TestRelays && !LiteMode);
 
         // wait one time for wallet txs in the pool to clear
         // TODO monero-project: update from pool does not prevent creating double spend tx
-        TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
+        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
 
         // create 2 txs, the second will double spend outputs of first
         MoneroTx
-            tx1 = GetUnrelayedTx(_wallet,
+            tx1 = await GetUnrelayedTx(_wallet,
                 2); // TODO: this test requires tx to be from/to different accounts else the occlusion issue (#4500) causes the tx to not be recognized by the wallet at all
-        MoneroTx tx2 = GetUnrelayedTx(_wallet, 2);
+        MoneroTx tx2 = await GetUnrelayedTx(_wallet, 2);
 
         // submit and relay tx1
-        MoneroSubmitTxResult result = _daemon.SubmitTxHex(tx1.GetFullHex()!);
+        MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx1.GetFullHex()!);
         Assert.True(result.IsRelayed());
         TestSubmitTxResultGood(result);
 
         // tx1 is in the pool
-        List<MoneroTx> txs = _daemon.GetTxPool();
+        List<MoneroTx> txs = await _daemon.GetTxPool();
         bool found = false;
         foreach (MoneroTx aTx in txs)
         {
@@ -1394,16 +1394,16 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         Assert.True(found, "Tx1 was not found after being submitted to the daemon's tx pool");
 
         // tx1 is recognized by the wallet
-        _wallet.Sync();
-        _wallet.GetTx(tx1.GetHash()!);
+        await _wallet.Sync();
+        await _wallet.GetTx(tx1.GetHash()!);
 
         // submit and relay tx2 hex which double spends tx1
-        result = _daemon.SubmitTxHex(tx2.GetFullHex()!);
+        result = await _daemon.SubmitTxHex(tx2.GetFullHex()!);
         Assert.True(result.IsRelayed());
         TestSubmitTxResultDoubleSpend(result);
 
         // tx2 is in not the pool
-        txs = _daemon.GetTxPool();
+        txs = await _daemon.GetTxPool();
         found = false;
         foreach (MoneroTx aTx in txs)
         {
@@ -1422,25 +1422,25 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
     // Can submit a tx in hex format to the pool then relay
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestSubmitThenRelayTxHex()
+    public async Task TestSubmitThenRelayTxHex()
     {
         Assert.True(TestRelays && !LiteMode);
-        TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
-        MoneroTx tx = GetUnrelayedTx(_wallet, 1);
-        TestSubmitThenRelay([tx]);
+        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
+        MoneroTx tx = await GetUnrelayedTx(_wallet, 1);
+        await TestSubmitThenRelay([tx]);
     }
 
     // Can submit txs in hex format to the pool then relay
     [Fact(Skip = "Needs monero-wallet-rpc")]
-    public void TestSubmitThenRelayTxHexes()
+    public async Task TestSubmitThenRelayTxHexes()
     {
         Assert.True(TestRelays && !LiteMode);
-        TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
+        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
         List<MoneroTx> txs = [];
-        txs.Add(GetUnrelayedTx(_wallet, 1));
-        txs.Add(GetUnrelayedTx(_wallet,
+        txs.Add(await GetUnrelayedTx(_wallet, 1));
+        txs.Add(await GetUnrelayedTx(_wallet,
             2)); // TODO: accounts cannot be re-used across send tests else isRelayed is true; wallet needs to update?
-        TestSubmitThenRelay(txs);
+        await TestSubmitThenRelay(txs);
     }
 
     #endregion
@@ -1520,14 +1520,14 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
     }
 
-    private void TestGetBlocksRange(ulong? startHeight, ulong? endHeight, ulong chainHeight, bool chunked)
+    private async Task TestGetBlocksRange(ulong? startHeight, ulong? endHeight, ulong chainHeight, bool chunked)
     {
         // fetch blocks by range
         ulong realStartHeight = startHeight == null ? 0 : (ulong)startHeight;
         ulong realEndHeight = endHeight == null ? chainHeight - 1 : (ulong)endHeight;
         List<MoneroBlock> blocks = chunked
-            ? _daemon.GetBlocksByRangeChunked((ulong)startHeight!, (ulong)endHeight!)
-            : _daemon.GetBlocksByRange((ulong)startHeight!, (ulong)endHeight!);
+            ? await _daemon.GetBlocksByRangeChunked((ulong)startHeight!, (ulong)endHeight!)
+            : await _daemon.GetBlocksByRange((ulong)startHeight!, (ulong)endHeight!);
         Assert.True(realEndHeight - realStartHeight + 1 == (ulong)blocks.Count);
 
         // test each block
@@ -1538,14 +1538,14 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
     }
 
-    private static List<string> GetConfirmedTxHashes(MoneroDaemon daemon)
+    private static async Task<List<string>> GetConfirmedTxHashes(MoneroDaemon daemon)
     {
         int numTxs = 5;
         List<string> txHashes = [];
-        ulong height = daemon.GetHeight();
+        ulong height = await daemon.GetHeight();
         while (txHashes.Count < numTxs && height > 0)
         {
-            MoneroBlock block = daemon.GetBlockByHeight(--height);
+            MoneroBlock block = await daemon.GetBlockByHeight(--height);
             foreach (string txHash in block.GetTxHashes()!)
             {
                 txHashes.Add(txHash);
@@ -1555,13 +1555,13 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         return txHashes;
     }
 
-    private static MoneroTx GetUnrelayedTx(MoneroWallet wallet, uint accountIdx)
+    private static async Task<MoneroTx> GetUnrelayedTx(MoneroWallet wallet, uint accountIdx)
     {
         Assert.True(accountIdx > 0,
             "Txs sent from/to same account are not properly synced from the pool"); // TODO monero-project
-        MoneroTxConfig config = new MoneroTxConfig().SetAccountIndex(accountIdx).SetAddress(wallet.GetPrimaryAddress())
+        MoneroTxConfig config = new MoneroTxConfig().SetAccountIndex(accountIdx).SetAddress(await wallet.GetPrimaryAddress())
             .SetAmount(TestUtils.MAX_FEE);
-        MoneroTx tx = wallet.CreateTx(config);
+        MoneroTx tx = await wallet.CreateTx(config);
         Assert.True(tx.GetFullHex()!.Length > 0);
         Assert.False(tx.GetRelay());
         return tx;
@@ -2031,18 +2031,18 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     }
 
     // helper function to check the spent status of a key image or array of key images
-    private void TestSpentStatuses(List<string> keyImages,
+    private async Task TestSpentStatuses(List<string> keyImages,
         MoneroKeyImage.SpentStatus expectedStatus)
     {
         // test image
         foreach (string keyImage in keyImages)
         {
-            Assert.True(expectedStatus == _daemon.GetKeyImageSpentStatus(keyImage));
+            Assert.True(expectedStatus == await _daemon.GetKeyImageSpentStatus(keyImage));
         }
 
         // test array of images
         List<MoneroKeyImage.SpentStatus> statuses =
-            keyImages.Count == 0 ? [] : _daemon.GetKeyImageSpentStatuses(keyImages);
+            keyImages.Count == 0 ? [] : await _daemon.GetKeyImageSpentStatuses(keyImages);
         Assert.True(keyImages.Count == statuses.Count);
         foreach (MoneroKeyImage.SpentStatus status in statuses)
         {
@@ -2050,13 +2050,13 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
     }
 
-    private static List<MoneroTx> GetConfirmedTxs(MoneroDaemon daemon, int numTxs)
+    private static async Task<List<MoneroTx>> GetConfirmedTxs(MoneroDaemon daemon, int numTxs)
     {
         List<MoneroTx> txs = [];
         long numBlocksPerReq = 50;
-        for (long startIdx = (long)daemon.GetHeight() - numBlocksPerReq - 1; startIdx >= 0; startIdx -= numBlocksPerReq)
+        for (long startIdx = (long)(await daemon.GetHeight()) - numBlocksPerReq - 1; startIdx >= 0; startIdx -= numBlocksPerReq)
         {
-            List<MoneroBlock> blocks =
+            List<MoneroBlock> blocks = await
                 daemon.GetBlocksByRange((ulong)startIdx, (ulong)(startIdx + numBlocksPerReq));
             foreach (MoneroBlock block in blocks)
             {
@@ -2350,19 +2350,19 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         Assert.True(entry.GetNumRecentInstances() >= 0);
     }
 
-    private void TestSubmitThenRelay(List<MoneroTx> txs)
+    private async Task TestSubmitThenRelay(List<MoneroTx> txs)
     {
         // submit txs hex but don't relay
         List<string> txHashes = [];
         foreach (MoneroTx tx in txs)
         {
             txHashes.Add(tx.GetHash()!);
-            MoneroSubmitTxResult result = _daemon.SubmitTxHex(tx.GetFullHex()!, true);
+            MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
             TestSubmitTxResultGood(result);
             Assert.False(result.IsRelayed());
 
             // ensure tx is in pool
-            List<MoneroTx> _poolTxs = _daemon.GetTxPool();
+            List<MoneroTx> _poolTxs = await _daemon.GetTxPool();
             bool found = false;
             foreach (MoneroTx aTx in _poolTxs)
             {
@@ -2377,7 +2377,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             Assert.True(found, "Tx was not found after being submitted to the daemon's tx pool");
 
             // fetch tx by hash and ensure not relayed
-            MoneroTx? fetchedTx = _daemon.GetTx(tx.GetHash()!);
+            MoneroTx? fetchedTx = await _daemon.GetTx(tx.GetHash()!);
             Assert.False(fetchedTx?.IsRelayed());
         }
 
@@ -2386,16 +2386,16 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         {
             if (txHashes.Count == 1)
             {
-                _daemon.RelayTxByHash(txHashes[0]);
+                await _daemon.RelayTxByHash(txHashes[0]);
             }
             else
             {
-                _daemon.RelayTxsByHash(txHashes);
+                await _daemon.RelayTxsByHash(txHashes);
             }
         }
         catch (Exception)
         {
-            _daemon.FlushTxPool(txHashes); // flush txs when relay fails to prevent double spends in other tests
+            await _daemon.FlushTxPool(txHashes); // flush txs when relay fails to prevent double spends in other tests
             throw;
         }
 
@@ -2404,7 +2404,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         catch (Exception e) { throw new Exception(e.Message); }
 
         // ensure txs are relayed
-        List<MoneroTx> poolTxs = _daemon.GetTxPool();
+        List<MoneroTx> poolTxs = await _daemon.GetTxPool();
         foreach (MoneroTx tx in txs)
         {
             bool found = false;

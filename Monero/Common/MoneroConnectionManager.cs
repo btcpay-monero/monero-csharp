@@ -203,16 +203,16 @@ public class MoneroConnectionManager
         }
     }
 
-    private bool CheckConnections(List<MoneroRpcConnection> connections, List<MoneroRpcConnection>? excludedConnections)
+    private Task<bool> CheckConnections(List<MoneroRpcConnection> connections, List<MoneroRpcConnection>? excludedConnections)
     {
         throw new NotImplementedException("");
     }
 
-    private void CheckPrioritizedConnections(List<MoneroRpcConnection>? excludedConnections)
+    private async Task CheckPrioritizedConnections(List<MoneroRpcConnection>? excludedConnections)
     {
         foreach (List<MoneroRpcConnection> prioritizedConnections in GetConnectionsInAscendingPriority())
         {
-            bool hasConnection = CheckConnections(prioritizedConnections, excludedConnections);
+            bool hasConnection = await CheckConnections(prioritizedConnections, excludedConnections);
             if (hasConnection)
             {
                 return;
@@ -222,9 +222,9 @@ public class MoneroConnectionManager
 
     private void StartPollingConnection(ulong periodMs)
     {
-        _poller = new TaskLooper(() =>
+        _poller = new TaskLooper(async () =>
         {
-            try { CheckConnection(); }
+            try { await CheckConnection(); }
             catch (Exception e) { MoneroUtils.Log(0, e.StackTrace != null ? e.StackTrace : ""); }
         });
         _poller.Start(periodMs);
@@ -232,9 +232,9 @@ public class MoneroConnectionManager
 
     private void StartPollingConnections(ulong periodMs)
     {
-        _poller = new TaskLooper(() =>
+        _poller = new TaskLooper(async () =>
         {
-            try { CheckConnections(); }
+            try { await CheckConnections(); }
             catch (Exception e) { MoneroUtils.Log(0, e.StackTrace != null ? e.StackTrace : ""); }
         });
         _poller.Start(periodMs);
@@ -248,9 +248,9 @@ public class MoneroConnectionManager
     private void StartPollingPrioritizedConnections(ulong periodMs,
         List<MoneroRpcConnection>? excludedConnections)
     {
-        _poller = new TaskLooper(() =>
+        _poller = new TaskLooper(async () =>
         {
-            try { CheckPrioritizedConnections(excludedConnections); }
+            try { await CheckPrioritizedConnections(excludedConnections); }
             catch (Exception e) { MoneroUtils.Log(0, e.StackTrace != null ? e.StackTrace : ""); }
         });
         _poller.Start(periodMs);
@@ -612,13 +612,13 @@ public class MoneroConnectionManager
         return this;
     }
 
-    public MoneroConnectionManager CheckConnection()
+    public async Task<MoneroConnectionManager> CheckConnection()
     {
         bool connectionChanged = false;
         MoneroRpcConnection? connection = GetConnection();
         if (connection != null)
         {
-            if (connection.CheckConnection(_timeoutMs))
+            if (await connection.CheckConnection(_timeoutMs))
             {
                 connectionChanged = true;
             }
@@ -645,9 +645,9 @@ public class MoneroConnectionManager
         return this;
     }
 
-    public bool CheckConnections()
+    public async Task<bool> CheckConnections()
     {
-        return CheckConnections(_connections, null);
+        return await CheckConnections(_connections, null);
     }
 
     public MoneroRpcConnection? GetBestAvailableConnection()

@@ -22,278 +22,278 @@ public class MoneroWalletKeys : MoneroWalletDefault
 
     #region Override Base Methods
 
-    public override int AddAddressBookEntry(string address, string description)
+    public override Task<int> AddAddressBookEntry(string address, string description)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void ChangePassword(string oldPassword, string newPassword)
+    public override Task ChangePassword(string oldPassword, string newPassword)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroCheckReserve CheckReserveProof(string address, string message, string signature)
+    public override Task<MoneroCheckReserve> CheckReserveProof(string address, string message, string signature)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override bool CheckSpendProof(string txHash, string message, string signature)
+    public override Task<bool> CheckSpendProof(string txHash, string message, string signature)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroCheckTx CheckTxKey(string txHash, string txKey, string address)
+    public override Task<MoneroCheckTx> CheckTxKey(string txHash, string txKey, string address)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroCheckTx CheckTxProof(string txHash, string address, string message, string signature)
+    public override Task<MoneroCheckTx> CheckTxProof(string txHash, string address, string message, string signature)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroAccount CreateAccount(string? label)
+    public override Task<MoneroAccount> CreateAccount(string? label)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroSubaddress CreateSubaddress(uint accountIdx, string? label)
+    public override Task<MoneroSubaddress> CreateSubaddress(uint accountIdx, string? label)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroTxWallet> CreateTxs(MoneroTxConfig config)
+    public override Task<List<MoneroTxWallet>> CreateTxs(MoneroTxConfig config)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroIntegratedAddress DecodeIntegratedAddress(string integratedAddress)
+    public override Task<MoneroIntegratedAddress> DecodeIntegratedAddress(string integratedAddress)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void DeleteAddressBookEntry(uint entryIdx)
+    public override Task DeleteAddressBookEntry(uint entryIdx)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroTxSet DescribeTxSet(MoneroTxSet txSet)
+    public override Task<MoneroTxSet> DescribeTxSet(MoneroTxSet txSet)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void EditAddressBookEntry(uint index, bool setAddress, string address, bool setDescription,
+    public override Task EditAddressBookEntry(uint index, bool setAddress, string address, bool setDescription,
         string description)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroMultisigInitResult ExchangeMultisigKeys(List<string> multisigHexes, string password)
+    public override Task<MoneroMultisigInitResult> ExchangeMultisigKeys(List<string> multisigHexes, string password)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroKeyImage> ExportKeyImages(bool all)
+    public override Task<List<MoneroKeyImage>> ExportKeyImages(bool all)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string ExportMultisigHex()
+    public override Task<string> ExportMultisigHex()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string ExportOutputs(bool all)
+    public override Task<string> ExportOutputs(bool all)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void FreezeOutput(string keyImage)
+    public override Task FreezeOutput(string keyImage)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroAccount GetAccount(uint accountIdx, bool includeSubaddresses)
+    public override Task<MoneroAccount> GetAccount(uint accountIdx, bool includeSubaddresses)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroAccount> GetAccounts(bool includeSubaddresses, string? tag)
+    public override Task<List<MoneroAccount>> GetAccounts(bool includeSubaddresses, string? tag)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroAccountTag> GetAccountTags()
+    public override Task<List<MoneroAccountTag>> GetAccountTags()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetAddress(uint accountIdx, uint subaddressIdx)
+    public override Task<string> GetAddress(uint accountIdx, uint subaddressIdx)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroAddressBookEntry> GetAddressBookEntries(List<uint>? entryIndices)
+    public override Task<List<MoneroAddressBookEntry>> GetAddressBookEntries(List<uint>? entryIndices)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroSubaddress GetAddressIndex(string address)
+    public override Task<MoneroSubaddress> GetAddressIndex(string address)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string? GetAttribute(string key)
+    public override Task<string?> GetAttribute(string key)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override ulong GetBalance(uint? accountIdx, uint? subaddressIdx)
+    public override Task<ulong> GetBalance(uint? accountIdx, uint? subaddressIdx)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroRpcConnection? GetDaemonConnection()
+    public override Task<MoneroRpcConnection?> GetDaemonConnection()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override ulong GetDaemonHeight()
+    public override Task<ulong> GetDaemonHeight()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroTxPriority GetDefaultFeePriority()
+    public override Task<MoneroTxPriority> GetDefaultFeePriority()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override ulong GetHeight()
+    public override Task<ulong> GetHeight()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override ulong GetHeightByDate(int year, int month, int day)
+    public override Task<ulong> GetHeightByDate(int year, int month, int day)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroIntegratedAddress GetIntegratedAddress(string? standardAddress, string? paymentId)
+    public override Task<MoneroIntegratedAddress> GetIntegratedAddress(string? standardAddress, string? paymentId)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroMultisigInfo GetMultisigInfo()
+    public override Task<MoneroMultisigInfo> GetMultisigInfo()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroKeyImage> GetNewKeyImagesFromLastImport()
+    public override Task<List<MoneroKeyImage>> GetNewKeyImagesFromLastImport()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroOutputWallet> GetOutputs(MoneroOutputQuery query)
+    public override Task<List<MoneroOutputWallet>> GetOutputs(MoneroOutputQuery query)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetPath()
+    public override Task<string> GetPath()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetPaymentUri(MoneroTxConfig config)
+    public override Task<string> GetPaymentUri(MoneroTxConfig config)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetPrivateSpendKey()
+    public override Task<string> GetPrivateSpendKey()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetPrivateViewKey()
+    public override Task<string> GetPrivateViewKey()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetPublicSpendKey()
+    public override Task<string> GetPublicSpendKey()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetPublicViewKey()
+    public override Task<string> GetPublicViewKey()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetReserveProofAccount(uint accountIdx, ulong amount, string message)
+    public override Task<string> GetReserveProofAccount(uint accountIdx, ulong amount, string message)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetReserveProofWallet(string message)
+    public override Task<string> GetReserveProofWallet(string message)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetSeed()
+    public override Task<string> GetSeed()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetSeedLanguage()
+    public override Task<string> GetSeedLanguage()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetSpendProof(string txHash, string? message)
+    public override Task<string> GetSpendProof(string txHash, string? message)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroSubaddress> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices)
+    public override Task<List<MoneroSubaddress>> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroTransfer> GetTransfers(MoneroTransferQuery query)
+    public override Task<List<MoneroTransfer>> GetTransfers(MoneroTransferQuery query)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetTxKey(string txHash)
+    public override Task<string> GetTxKey(string txHash)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<string> GetTxNotes(List<string> txHashes)
+    public override Task<List<string>> GetTxNotes(List<string> txHashes)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string GetTxProof(string txHash, string address, string? message)
+    public override Task<string> GetTxProof(string txHash, string address, string? message)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroTxWallet> GetTxs(MoneroTxQuery? query)
+    public override Task<List<MoneroTxWallet>> GetTxs(MoneroTxQuery? query)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override ulong GetUnlockedBalance(uint? accountIdx, uint? subaddressIdx)
+    public override Task<ulong> GetUnlockedBalance(uint? accountIdx, uint? subaddressIdx)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroVersion GetVersion()
+    public override Task<MoneroVersion> GetVersion()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroNetworkType GetNetworkType()
+    public override Task<MoneroNetworkType> GetNetworkType()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
@@ -303,195 +303,200 @@ public class MoneroWalletKeys : MoneroWalletDefault
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroKeyImageImportResult ImportKeyImages(List<MoneroKeyImage> keyImages)
+    public override Task<MoneroKeyImageImportResult> ImportKeyImages(List<MoneroKeyImage> keyImages)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override int ImportMultisigHex(List<string> multisigHexes)
+    public override Task<int> ImportMultisigHex(List<string> multisigHexes)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override int ImportOutputs(string outputsHex)
+    public override Task<int> ImportOutputs(string outputsHex)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override bool IsConnectedToDaemon()
+    public override Task<bool> IsConnectedToDaemon()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override bool IsMultisigImportNeeded()
+    public override Task<bool> IsMultisigImportNeeded()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override bool IsOutputFrozen(string keyImage)
+    public override Task<bool> IsOutputFrozen(string keyImage)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override bool IsViewOnly()
+    public override Task<bool> IsViewOnly()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string MakeMultisig(List<string> multisigHexes, int threshold, string password)
+    public override Task<string> MakeMultisig(List<string> multisigHexes, int threshold, string password)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroTxConfig ParsePaymentUri(string uri)
+    public override Task<MoneroTxConfig> ParsePaymentUri(string uri)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string PrepareMultisig()
+    public override Task<string> PrepareMultisig()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<string> RelayTxs(List<string> txMetadatas)
+    public override Task<List<string>> RelayTxs(List<string> txMetadatas)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void RescanBlockchain()
+    public override Task RescanBlockchain()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void RescanSpent()
+    public override Task RescanSpent()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void Save()
+    public override Task Save()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void ScanTxs(List<string> txHashes)
+    public override Task ScanTxs(List<string> txHashes)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void SetAccountTagLabel(string tag, string label)
+    public override Task SetAccountTagLabel(string tag, string label)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void SetAttribute(string key, string val)
+    public override Task SetAttribute(string key, string val)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void SetDaemonConnection(MoneroRpcConnection? daemonConnection)
+    public override Task SetDaemonConnection(MoneroRpcConnection? daemonConnection)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void SetProxyUri(string? uri)
+    public override Task SetProxyUri(string? uri)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void SetSubaddressLabel(uint accountIdx, uint subaddressIdx, string? label)
+    public override Task SetSubaddressLabel(uint accountIdx, uint subaddressIdx, string? label)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void SetTxNotes(List<string> txHashes, List<string> notes)
+    public override Task SetTxNotes(List<string> txHashes, List<string> notes)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override string SignMessage(string message, MoneroMessageSignatureType signatureType,
+    public override Task<string> SignMessage(string message, MoneroMessageSignatureType signatureType,
         uint accountIdx, uint subaddressIdx)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroMultisigSignResult SignMultisigTxHex(string multisigTxHex)
+    public override Task<MoneroMultisigSignResult> SignMultisigTxHex(string multisigTxHex)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroTxSet SignTxs(string unsignedTxHex)
+    public override Task<MoneroTxSet> SignTxs(string unsignedTxHex)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void StartMining(ulong numThreads, bool backgroundMining, bool ignoreBattery)
+    public override Task StartMining(ulong numThreads, bool backgroundMining, bool ignoreBattery)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void StartSyncing(ulong? syncPeriodInMs)
+    public override Task StartSyncing(ulong? syncPeriodInMs)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void StopMining()
+    public override Task StopMining()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void StopSyncing()
+    public override Task StopSyncing()
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<string> SubmitMultisigTxHex(string signedMultisigTxHex)
+    public override Task<List<string>> SubmitMultisigTxHex(string signedMultisigTxHex)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<string> SubmitTxs(string signedTxHex)
+    public override Task<List<string>> SubmitTxs(string signedTxHex)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroTxWallet> SweepDust(bool relay)
+    public override Task<List<MoneroTxWallet>> SweepDust(bool relay)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroTxWallet SweepOutput(MoneroTxConfig config)
+    public override Task<MoneroTxWallet> SweepOutput(MoneroTxConfig config)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override List<MoneroTxWallet> SweepUnlocked(MoneroTxConfig config)
+    public override Task<List<MoneroTxWallet>> SweepUnlocked(MoneroTxConfig config)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroSyncResult Sync(ulong? startHeight, MoneroWalletListener? listener)
+    public override Task<MoneroSyncResult> Sync(ulong? startHeight, MoneroWalletListener? listener)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void TagAccounts(string tag, List<uint> accountIndices)
+    public override Task TagAccounts(string tag, List<uint> accountIndices)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void ThawOutput(string keyImage)
+    public override Task ThawOutput(string keyImage)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override void UntagAccounts(List<uint> accountIndices)
+    public override Task UntagAccounts(List<uint> accountIndices)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
     }
 
-    public override MoneroMessageSignatureResult VerifyMessage(string message, string address, string signature)
+    public override Task<MoneroMessageSignatureResult> VerifyMessage(string message, string address, string signature)
     {
         throw new NotImplementedException("Not supported by keys only wallet");
+    }
+
+    public override Task Close(bool save)
+    {
+        throw new NotImplementedException();
     }
 
     #endregion
