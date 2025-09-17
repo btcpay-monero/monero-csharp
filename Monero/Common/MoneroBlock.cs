@@ -38,7 +38,7 @@ public class MoneroBlock : MoneroBlockHeader
 
         if (block.GetTxHashes() != null)
         {
-            _txHashes = new List<string>(block.GetTxHashes()!);
+            _txHashes = block.GetTxHashes()!;
         }
     }
 

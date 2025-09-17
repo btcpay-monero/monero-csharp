@@ -76,12 +76,7 @@ public class TestMoneroRpcConnection
         Assert.NotNull(pathResponse);
         Assert.False(pathResponse.TryGetValue("error", out object? _));
 
-        // Test monerod BINARY request
-
         // TODO implement MoneroRpcConnection.SendBinaryRequest()
-
-        //var binaryResponse = connection.SendBinaryRequest("get_outs.bin");
-        //Assert.NotNull(binaryResponse);
     }
 
     private static void TestConnection(MoneroRpcConnection? connection, string? uri, bool online)

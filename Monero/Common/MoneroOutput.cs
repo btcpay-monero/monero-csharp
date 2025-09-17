@@ -14,7 +14,7 @@ public class MoneroOutput
         // nothing to build
     }
 
-    public MoneroOutput(MoneroOutput output)
+    protected MoneroOutput(MoneroOutput output)
     {
         if (output._keyImage != null)
         {
@@ -25,7 +25,7 @@ public class MoneroOutput
         _index = output._index;
         if (output._ringOutputIndices != null)
         {
-            _ringOutputIndices = new List<ulong>(output._ringOutputIndices);
+            _ringOutputIndices = output._ringOutputIndices;
         }
 
         _stealthPublicKey = output._stealthPublicKey;

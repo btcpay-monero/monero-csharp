@@ -15,12 +15,12 @@ public class MoneroOutgoingTransfer : MoneroTransfer
     {
         if (transfer._subaddressIndices != null)
         {
-            _subaddressIndices = new List<uint>(transfer._subaddressIndices);
+            _subaddressIndices = transfer._subaddressIndices;
         }
 
         if (transfer._addresses != null)
         {
-            _addresses = new List<string>(transfer._addresses);
+            _addresses = transfer._addresses;
         }
 
         if (transfer._destinations != null)

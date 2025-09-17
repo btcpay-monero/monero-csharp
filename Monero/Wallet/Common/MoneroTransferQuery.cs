@@ -21,13 +21,13 @@ public class MoneroTransferQuery : MoneroTransfer
         _address = query._address;
         if (query._addresses != null)
         {
-            _addresses = new List<string>(query._addresses);
+            _addresses = query._addresses;
         }
 
         _subaddressIndex = query._subaddressIndex;
         if (query._subaddressIndices != null)
         {
-            _subaddressIndices = new List<uint>(query._subaddressIndices);
+            _subaddressIndices = query._subaddressIndices;
         }
 
         if (query._destinations != null)
@@ -41,7 +41,7 @@ public class MoneroTransferQuery : MoneroTransfer
 
         _hasDestinations = query._hasDestinations;
         _txQuery =
-            query._txQuery; // reference original by default, MoneroTxQuery's deep copy will Set this to itself
+            query._txQuery; // to reference original by default, MoneroTxQuery's deep copy will Set this to itself
     }
 
     public override MoneroTransferQuery Clone()

@@ -91,7 +91,7 @@ public class MoneroTx
 
         if (tx._outputIndices != null)
         {
-            _outputIndices = new List<ulong>(tx._outputIndices);
+            _outputIndices = tx._outputIndices;
         }
 
         _metadata = tx._metadata;
@@ -110,7 +110,7 @@ public class MoneroTx
         _maxUsedBlockHash = tx._maxUsedBlockHash;
         if (tx._signatures != null)
         {
-            _signatures = new List<string>(tx._signatures);
+            _signatures = tx._signatures;
         }
     }
 

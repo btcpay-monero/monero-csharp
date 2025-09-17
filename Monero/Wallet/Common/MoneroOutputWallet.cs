@@ -34,7 +34,6 @@ public class MoneroOutputWallet : MoneroOutput
 
     public override MoneroOutputWallet SetTx(MoneroTx? tx)
     {
-        //if (tx != null && !(tx instanceof MoneroTxWallet)) throw new MoneroError("Wallet output's transaction must be of type MoneroTxWallet");
         base.SetTx(tx);
         return this;
     }

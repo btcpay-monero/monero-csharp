@@ -21,10 +21,8 @@ public class MoneroConnectionManager
     private readonly List<MoneroConnectionManagerListener> _listeners = [];
     private readonly object _listenersLock = new();
 
-    //private TaskLooper poller;
     private readonly Dictionary<MoneroRpcConnection, List<ulong?>> _responseTimes = [];
 
-    //private ConnectionComparator _connectionComparator = new ConnectionComparator();
     private bool _autoSwitch = DefaultAutoSwitch;
 
     private MoneroRpcConnection? _currentConnection;
@@ -684,7 +682,6 @@ public class MoneroConnectionManager
     public MoneroConnectionManager Reset()
     {
         RemoveListeners();
-        //StopPolling();
         Clear();
         _timeoutMs = DefaultTimeout;
         _autoSwitch = DefaultAutoSwitch;

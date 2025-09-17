@@ -220,7 +220,7 @@ public class TestMoneroUtils
             .SetAmount(XmrToAtomicUnits(0.25))
             .SetRecipientName("John Doe")
             .SetNote("My transfer to wallet");
-        string paymentUri = ""; //MoneroUtils.GetPaymentUri(config);
+        string paymentUri = "";
         True(
             "monero:42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L?tx_amount=0.25&recipient_name=John%20Doe&tx_description=My%20transfer%20to%20wallet" ==
             paymentUri);

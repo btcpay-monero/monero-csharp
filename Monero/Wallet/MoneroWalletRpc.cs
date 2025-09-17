@@ -12,14 +12,10 @@ namespace Monero.Wallet;
 public class MoneroWalletRpc : MoneroWalletDefault
 {
     // class variables
-    //private static readonly MoneroTxHeightComparer TX_HEIGHT_COMPARATOR = new();
-    private static readonly int ErrorCodeInvalidPaymentId = -5; // invalid payment id error code
+    private const int ErrorCodeInvalidPaymentId = -5; // invalid payment id error code
 
-    private static readonly ulong
-        DefaultSyncPeriodInMs =
-            20000; // default period between syncs in ms (defined by DEFAULT_AUTO_REFRESH_PERIOD in wallet_rpc_server.cpp)
+    private const ulong DefaultSyncPeriodInMs = 20000; // default period between syncs in ms (defined by DEFAULT_AUTO_REFRESH_PERIOD in wallet_rpc_server.cpp)
 
-    //private WalletRpcZmqListener zmqListener;                // listener which processes zmq notifications from monero-wallet-rpc
     private readonly Dictionary<uint, Dictionary<uint, string?>?>
         _addressCache = []; // cache static addresses to reduce requests
 
@@ -80,7 +76,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         Clear();
         _path = config.GetPath();
 
-        // set connection manager or server
+        // set a connection manager or server
         if (config.GetConnectionManager() != null)
         {
             if (config.GetServer() != null)
@@ -2240,23 +2236,17 @@ public class MoneroWalletRpc : MoneroWalletDefault
 
     private void RefreshListening()
     {
-        if (_rpc.GetZmqUri() == null)
+        if (_rpc.GetZmqUri() != null)
         {
-            if (_walletPoller == null && _listeners.Count > 0)
-            {
-                _walletPoller = new MoneroWalletPoller(this, _syncPeriodInMs);
-            }
-
-            if (_walletPoller != null)
-            {
-                _walletPoller.SetIsPolling(_listeners.Count > 0);
-            }
+            return;
         }
-        //else
-        //{
-        //    if (zmqListener == null && listeners.size() > 0) zmqListener = new WalletRpcZmqListener();
-        //    if (zmqListener != null) zmqListener.setIsPolling(listeners.size() > 0);
-        //}
+
+        if (_walletPoller == null && _listeners.Count > 0)
+        {
+            _walletPoller = new MoneroWalletPoller(this, _syncPeriodInMs);
+        }
+
+        _walletPoller?.SetIsPolling(_listeners.Count > 0);
     }
 
     private void Poll() { throw new NotImplementedException(); }
@@ -2488,10 +2478,6 @@ public class MoneroWalletRpc : MoneroWalletDefault
                         throw new MoneroError("Tx not in block");
                     }
                 }
-                //        if (tx.GetId().equals("38436c710dfbebfb24a14cddfd430d422e7282bbe94da5e080643a1bd2880b44")) {
-                //          System.out.println(rpcTx);
-                //          System.out.println(tx.GetOutgoingAmount().compareTo(BigInteger.valueOf(0)) == 0);
-                //        }
 
                 // replace transfer amount with destination sum
                 // TODO monero-wallet-rpc: confirmed tx from/to same account has amount 0 but cached transfers
@@ -2941,7 +2927,6 @@ public class MoneroWalletRpc : MoneroWalletDefault
             {
                 // label belongs to the first subaddress
             }
-            //else LOGGER.warning("ignoring unexpected account field: " + key + ": " + val);
         }
 
         if ("".Equals(account.GetTag()))
@@ -3001,7 +2986,6 @@ public class MoneroWalletRpc : MoneroWalletDefault
             {
                 // ignoring
             }
-            //else LOGGER.warning("ignoring unexpected subaddress field: " + key + ": " + val);
         }
 
         return subaddress;

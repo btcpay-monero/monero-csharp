@@ -23,11 +23,11 @@ public class MoneroOutputQuery : MoneroOutputWallet
 
         if (query._subaddressIndices != null)
         {
-            _subaddressIndices = new List<uint>(query._subaddressIndices);
+            _subaddressIndices = query._subaddressIndices;
         }
 
         _txQuery =
-            query._txQuery; // reference original by default, MoneroTxQuery's deep copy will Set this to itself
+            query._txQuery; // to reference original by default, MoneroTxQuery's deep copy will Set this to itself
     }
 
     public override MoneroOutputQuery Clone()

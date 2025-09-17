@@ -27,13 +27,13 @@ public class MoneroTxQuery : MoneroTxWallet
         _isIncoming = query._isIncoming;
         if (query._hashes != null)
         {
-            _hashes = new List<string>(query._hashes);
+            _hashes = query._hashes;
         }
 
         _hasPaymentId = query._hasPaymentId;
         if (query._paymentIds != null)
         {
-            _paymentIds = new List<string>(query._paymentIds);
+            _paymentIds = query._paymentIds;
         }
 
         _height = query._height;

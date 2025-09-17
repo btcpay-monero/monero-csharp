@@ -21,7 +21,7 @@ public class MoneroFeeEstimate
     public MoneroFeeEstimate(MoneroFeeEstimate feeEstimate)
     {
         _fee = feeEstimate._fee;
-        _fees = new List<ulong>(feeEstimate._fees);
+        _fees = feeEstimate._fees;
         _quantizationMask = feeEstimate._quantizationMask;
     }
 
