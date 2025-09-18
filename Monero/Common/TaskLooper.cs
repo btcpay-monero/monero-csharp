@@ -57,7 +57,7 @@ public class TaskLooper
 
             try
             {
-                await _task(); // 👈 ora supporta async
+                await _task();
             }
             catch (Exception ex)
             {
