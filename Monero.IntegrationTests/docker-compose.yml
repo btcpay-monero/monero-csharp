@@ -4,12 +4,24 @@ services:
     build:
       context: ..
       dockerfile: Monero.IntegrationTests/Dockerfile
+    environment:
+      XMR_DAEMON_URI: http://node2:18081
+      XMR_WALLET_URI: http://xmr_wallet:18082
     depends_on:
       - xmr_wallet
     extra_hosts:
       - "tests:127.0.0.1"
     volumes:
       - ../coverage:/coverage
+
+  # The dev container is not used, it is just handy to run `docker-compose up dev` to start all services
+  dev:
+    image: alpine:3.22.1
+    container_name: dev
+    command: [ "/bin/sh", "-c", "trap : TERM INT; while :; do echo Ready to code and debug like a rockstar!!!; sleep 2073600; done & wait" ]
+    depends_on:
+      - node2
+      - xmr_wallet
 
   node1:
     image: btcpayserver/monero:0.18.4.2

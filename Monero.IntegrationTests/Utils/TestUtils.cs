@@ -2,7 +2,6 @@ using System.Numerics;
 
 using Monero.Common;
 using Monero.Daemon;
-using Monero.Daemon.Common;
 using Monero.Wallet;
 using Monero.Wallet.Common;
 
@@ -17,14 +16,10 @@ internal abstract class TestUtils
     public static readonly string MONERO_BINS_DIR = "";
 
     // monero daemon rpc endpoint configuration (change per your configuration)
-    public static readonly string DAEMON_RPC_URI = "http://node2:18081";
+    public static readonly string DAEMON_RPC_URI = GetDefaultEnv("XMR_DAEMON_URI", "http://127.0.0.1:18081");
     public static readonly string DAEMON_RPC_USERNAME = "";
     public static readonly string DAEMON_RPC_PASSWORD = "";
     public static readonly string DAEMON_LOCAL_PATH = MONERO_BINS_DIR + "/monerod";
-
-    // monero wallet rpc configuration (change per your configuration)
-    public static readonly int
-        WALLET_RPC_PORT_START = 18082; // test wallet executables will bind to consecutive ports after these
 
     public static readonly bool WALLET_RPC_ZMQ_ENABLED = false;
     public static readonly int WALLET_RPC_ZMQ_PORT_START = 58083;
@@ -32,8 +27,7 @@ internal abstract class TestUtils
     public static readonly string WALLET_RPC_USERNAME = "";
     public static readonly string WALLET_RPC_PASSWORD = "";
     public static readonly string WALLET_RPC_ZMQ_DOMAIN = "127.0.0.1";
-    public static readonly string WALLET_RPC_DOMAIN = "http://xmr_wallet";
-    public static readonly string WALLET_RPC_URI = WALLET_RPC_DOMAIN + ":" + WALLET_RPC_PORT_START;
+    public static readonly string WALLET_RPC_URI = GetDefaultEnv("XMR_WALLET_URI", "http://127.0.0.1:18082");
 
     public static readonly string WALLET_RPC_ZMQ_URI =
         "tcp://" + WALLET_RPC_ZMQ_DOMAIN + ":" + WALLET_RPC_ZMQ_PORT_START;
@@ -42,7 +36,7 @@ internal abstract class TestUtils
     public static readonly string WALLET_RPC_LOCAL_WALLET_DIR = MONERO_BINS_DIR;
 
     public static readonly string
-        WALLET_RPC_ACCESS_CONTROL_ORIGINS = "http://localhost:8080"; // cors access from web browser
+        WALLET_RPC_ACCESS_CONTROL_ORIGINS = "http://localhost:8080"; // cors accesses from a web browser
 
     // test wallet config
     public static readonly string WALLET_NAME = "test_wallet_1";
@@ -70,7 +64,7 @@ internal abstract class TestUtils
 
     public static readonly string
         OFFLINE_SERVER_URI =
-            "offline_server_uri"; // dummy server uri to remain offline because wallet2 connects to default if not given
+            "offline_server_uri"; // fake server uri to remain offline because wallet2 connects to default if not given
 
     public static readonly int AUTO_CONNECT_TIMEOUT_MS = 3000;
 
@@ -106,14 +100,14 @@ internal abstract class TestUtils
             walletRpc = new MoneroWalletRpc(rpc);
         }
 
-        // attempt to open test wallet
+        // attempt to open a test wallet
         try
         {
             await walletRpc.OpenWallet(WALLET_NAME, WALLET_PASSWORD);
         }
         catch (MoneroRpcError e)
         {
-            // -1 returned when wallet does not exist or fails to open e.g. it's already open by another application
+            // -1 returned when the wallet does not exist or fails to open e.g. it's already open by another application
             if (e.GetCode() == -1)
             {
                 // create wallet
@@ -179,62 +173,9 @@ internal abstract class TestUtils
         return "5B8s3obCY2ETeQB3GNAGPK2zRGen5UeW1WzegSizVsmf6z5NvM2GLoN6zzk1vHyzGAAfA8pGhuYAeCFZjHAp59jRVQkunGS";
     }
 
-    public static async Task<string> GetExternalWalletAddress()
+    private static string GetDefaultEnv(string key, string defaultValue)
     {
-        MoneroDaemonInfo? info = await GetDaemonRpc().GetInfo();
-
-        if (info == null)
-        {
-            throw new MoneroError("Failed to get daemon info");
-        }
-
-        MoneroNetworkType? networkType = info.GetNetworkType();
-
-        switch (networkType)
-        {
-            case MoneroNetworkType.Stagenet:
-                return
-                    "78Zq71rS1qK4CnGt8utvMdWhVNMJexGVEDM2XsSkBaGV9bDSnRFFhWrQTbmCACqzevE8vth9qhWfQ9SUENXXbLnmMVnBwgW"; // subaddress
-            case MoneroNetworkType.Testnet:
-                return
-                    "BhsbVvqW4Wajf4a76QW3hA2B3easR5QdNE5L8NwkY7RWXCrfSuaUwj1DDUsk3XiRGHBqqsK3NPvsATwcmNNPUQQ4SRR2b3V"; // subaddress
-            case MoneroNetworkType.Mainnet:
-                return
-                    "87a1Yf47UqyQFCrMqqtxfvhJN9se3PgbmU7KUFWqhSu5aih6YsZYoxfjgyxAM1DztNNSdoYTZYn9xa3vHeJjoZqdAybnLzN"; // subaddress
-            default:
-                throw new MoneroError("Invalid network type: " + networkType);
-        }
-    }
-
-    public static MoneroWallet CreateWalletGroundTruth(MoneroNetworkType networkType, string seed, ulong? startHeight,
-        ulong? restoreHeight)
-    {
-        throw new NotImplementedException("MoneroWalletFull is not implemented");
-    }
-
-    public static bool TxsMergeable(MoneroTxWallet tx1, MoneroTxWallet tx2)
-    {
-        try
-        {
-            MoneroTxWallet copy1 = tx1.Clone();
-            MoneroTxWallet copy2 = tx2.Clone();
-            if (copy1.IsConfirmed() == true)
-            {
-                copy1.SetBlock(tx1.GetBlock()!.Clone().SetTxs([copy1]));
-            }
-
-            if (copy2.IsConfirmed() == true)
-            {
-                copy2.SetBlock(tx2.GetBlock()!.Clone().SetTxs([copy2]));
-            }
-
-            copy1.Merge(copy2);
-            return true;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return false;
-        }
+        var currentValue = Environment.GetEnvironmentVariable(key);
+        return string.IsNullOrEmpty(currentValue) ? defaultValue : currentValue;
     }
 }
