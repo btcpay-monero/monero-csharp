@@ -20,7 +20,7 @@ public class MoneroBlockTemplate
 
     public void SetBlockTemplateBlob(string? blockTemplateBlob)
     {
-        this._blockTemplateBlob = blockTemplateBlob;
+        _blockTemplateBlob = blockTemplateBlob;
     }
 
     public string? GetBlockHashingBlob()
@@ -30,7 +30,7 @@ public class MoneroBlockTemplate
 
     public void SetBlockHashingBlob(string? blockHashingBlob)
     {
-        this._blockHashingBlob = blockHashingBlob;
+        _blockHashingBlob = blockHashingBlob;
     }
 
     public ulong? GetDifficulty()
@@ -40,7 +40,7 @@ public class MoneroBlockTemplate
 
     public void SetDifficulty(ulong? difficulty)
     {
-        this._difficulty = difficulty;
+        _difficulty = difficulty;
     }
 
     public ulong? GetExpectedReward()
@@ -50,7 +50,7 @@ public class MoneroBlockTemplate
 
     public void SetExpectedReward(ulong? expectedReward)
     {
-        this._expectedReward = expectedReward;
+        _expectedReward = expectedReward;
     }
 
     public ulong? GetHeight()
@@ -60,7 +60,7 @@ public class MoneroBlockTemplate
 
     public void SetHeight(ulong? height)
     {
-        this._height = height;
+        _height = height;
     }
 
     public string? GetPrevHash()
@@ -70,7 +70,7 @@ public class MoneroBlockTemplate
 
     public void SetPrevHash(string? prevHash)
     {
-        this._prevHash = prevHash;
+        _prevHash = prevHash;
     }
 
     public ulong? GetReservedOffset()
@@ -80,7 +80,7 @@ public class MoneroBlockTemplate
 
     public void SetReservedOffset(ulong? reservedOffset)
     {
-        this._reservedOffset = reservedOffset;
+        _reservedOffset = reservedOffset;
     }
 
     public ulong? GetSeedHeight()
@@ -90,7 +90,7 @@ public class MoneroBlockTemplate
 
     public void SetSeedHeight(ulong? seedHeight)
     {
-        this._seedHeight = seedHeight;
+        _seedHeight = seedHeight;
     }
 
     public string? GetSeedHash()
@@ -100,7 +100,7 @@ public class MoneroBlockTemplate
 
     public void SetSeedHash(string? seedHash)
     {
-        this._seedHash = seedHash;
+        _seedHash = seedHash;
     }
 
     public string? GetNextSeedHash()
@@ -110,6 +110,6 @@ public class MoneroBlockTemplate
 
     public void SetNextSeedHash(string? nextSeedHash)
     {
-        this._nextSeedHash = nextSeedHash;
+        _nextSeedHash = nextSeedHash;
     }
 }

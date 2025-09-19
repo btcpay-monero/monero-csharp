@@ -10,14 +10,13 @@ public class MoneroCheckReserve : MoneroCheck
     public MoneroCheckReserve()
         : base(false)
     {
-
     }
 
     public MoneroCheckReserve(bool isGood, ulong? totalAmount, ulong? unconfirmedSpentAmount)
         : base(isGood)
     {
-        this._totalAmount = totalAmount;
-        this._unconfirmedSpentAmount = unconfirmedSpentAmount;
+        _totalAmount = totalAmount;
+        _unconfirmedSpentAmount = unconfirmedSpentAmount;
     }
 
     public ulong? GetTotalAmount()
@@ -27,7 +26,7 @@ public class MoneroCheckReserve : MoneroCheck
 
     public MoneroCheckReserve SetTotalAmount(ulong? totalAmount)
     {
-        this._totalAmount = totalAmount;
+        _totalAmount = totalAmount;
         return this;
     }
 
@@ -38,7 +37,7 @@ public class MoneroCheckReserve : MoneroCheck
 
     public MoneroCheckReserve SetUnconfirmedSpentAmount(ulong? unconfirmedSpentAmount)
     {
-        this._unconfirmedSpentAmount = unconfirmedSpentAmount;
+        _unconfirmedSpentAmount = unconfirmedSpentAmount;
         return this;
     }
 }

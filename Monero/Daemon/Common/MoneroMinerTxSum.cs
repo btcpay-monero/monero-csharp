@@ -12,7 +12,7 @@ public class MoneroMinerTxSum
 
     public void SetEmissionSum(ulong? emissionSum)
     {
-        this._emissionSum = emissionSum;
+        _emissionSum = emissionSum;
     }
 
     public ulong? GetFeeSum()
@@ -22,6 +22,6 @@ public class MoneroMinerTxSum
 
     public void SetFeeSum(ulong? feeSum)
     {
-        this._feeSum = feeSum;
+        _feeSum = feeSum;
     }
 }

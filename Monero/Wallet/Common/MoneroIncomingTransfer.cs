@@ -41,7 +41,7 @@ public class MoneroIncomingTransfer : MoneroTransfer
 
     public MoneroIncomingTransfer SetSubaddressIndex(uint? subaddressIndex)
     {
-        this._subaddressIndex = subaddressIndex;
+        _subaddressIndex = subaddressIndex;
         return this;
     }
 
@@ -52,7 +52,7 @@ public class MoneroIncomingTransfer : MoneroTransfer
 
     public MoneroIncomingTransfer SetAddress(string? address)
     {
-        this._address = address;
+        _address = address;
         return this;
     }
 
@@ -63,7 +63,7 @@ public class MoneroIncomingTransfer : MoneroTransfer
 
     public MoneroIncomingTransfer SetNumSuggestedConfirmations(ulong? numSuggestedConfirmations)
     {
-        this._numSuggestedConfirmations = numSuggestedConfirmations;
+        _numSuggestedConfirmations = numSuggestedConfirmations;
         return this;
     }
 }

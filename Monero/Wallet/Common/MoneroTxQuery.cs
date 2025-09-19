@@ -74,7 +74,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public override MoneroTxQuery SetIsOutgoing(bool? isOutgoing)
     {
-        this._isOutgoing = isOutgoing;
+        _isOutgoing = isOutgoing;
         return this;
     }
 
@@ -85,7 +85,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public override MoneroTxQuery SetIsIncoming(bool? isIncoming)
     {
-        this._isIncoming = isIncoming;
+        _isIncoming = isIncoming;
         return this;
     }
 
@@ -112,7 +112,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public MoneroTxQuery SetHashes(List<string>? hashes)
     {
-        this._hashes = hashes;
+        _hashes = hashes;
         return this;
     }
 
@@ -123,7 +123,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public MoneroTxQuery SetHasPaymentId(bool? hasPaymentId)
     {
-        this._hasPaymentId = hasPaymentId;
+        _hasPaymentId = hasPaymentId;
         return this;
     }
 
@@ -134,7 +134,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public MoneroTxQuery SetPaymentIds(List<string>? paymentIds)
     {
-        this._paymentIds = paymentIds;
+        _paymentIds = paymentIds;
         return this;
     }
 
@@ -159,7 +159,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public MoneroTxQuery SetHeight(ulong? height)
     {
-        this._height = height;
+        _height = height;
         return this;
     }
 
@@ -170,7 +170,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public MoneroTxQuery SetMinHeight(ulong? minHeight)
     {
-        this._minHeight = minHeight;
+        _minHeight = minHeight;
         return this;
     }
 
@@ -181,7 +181,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public MoneroTxQuery SetMaxHeight(ulong? maxHeight)
     {
-        this._maxHeight = maxHeight;
+        _maxHeight = maxHeight;
         return this;
     }
 
@@ -198,7 +198,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public MoneroTxQuery SetIncludeOutputs(bool? includeOutputs)
     {
-        this._includeOutputs = includeOutputs;
+        _includeOutputs = includeOutputs;
         return this;
     }
 
@@ -209,7 +209,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public MoneroTxQuery SetTransferQuery(MoneroTransferQuery? transferQuery)
     {
-        this._transferQuery = transferQuery;
+        _transferQuery = transferQuery;
         if (transferQuery != null)
         {
             transferQuery.SetTxQuery(this);
@@ -225,7 +225,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public MoneroTxQuery SetInputQuery(MoneroOutputQuery? inputQuery)
     {
-        this._inputQuery = inputQuery;
+        _inputQuery = inputQuery;
         if (inputQuery != null)
         {
             inputQuery.SetTxQuery(this);
@@ -241,7 +241,7 @@ public class MoneroTxQuery : MoneroTxWallet
 
     public MoneroTxQuery SetOutputQuery(MoneroOutputQuery? outputQuery)
     {
-        this._outputQuery = outputQuery;
+        _outputQuery = outputQuery;
         if (outputQuery != null)
         {
             outputQuery.SetTxQuery(this);

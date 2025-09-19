@@ -11,14 +11,14 @@ public class MoneroCheck
 
     public MoneroCheck(bool isGood)
     {
-        this._isGood = isGood;
+        _isGood = isGood;
     }
 
     public virtual bool IsGood() { return _isGood; }
 
     public virtual MoneroCheck SetIsGood(bool isGood)
     {
-        this._isGood = isGood;
+        _isGood = isGood;
         return this;
     }
 }

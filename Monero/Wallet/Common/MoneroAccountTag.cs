@@ -8,7 +8,6 @@ public class MoneroAccountTag
 
     public MoneroAccountTag()
     {
-
     }
 
     public MoneroAccountTag(string? tag)

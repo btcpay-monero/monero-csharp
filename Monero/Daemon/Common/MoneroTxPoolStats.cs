@@ -23,7 +23,7 @@ public class MoneroTxPoolStats
 
     public void SetNumTxs(int? numTxs)
     {
-        this._numTxs = numTxs;
+        _numTxs = numTxs;
     }
 
     public int? GetNumNotRelayed()
@@ -33,7 +33,7 @@ public class MoneroTxPoolStats
 
     public void SetNumNotRelayed(int? numNotRelayed)
     {
-        this._numNotRelayed = numNotRelayed;
+        _numNotRelayed = numNotRelayed;
     }
 
     public int? GetNumFailing()
@@ -43,7 +43,7 @@ public class MoneroTxPoolStats
 
     public void SetNumFailing(int? numFailing)
     {
-        this._numFailing = numFailing;
+        _numFailing = numFailing;
     }
 
     public int? GetNumDoubleSpends()
@@ -53,7 +53,7 @@ public class MoneroTxPoolStats
 
     public void SetNumDoubleSpends(int? numDoubleSpends)
     {
-        this._numDoubleSpends = numDoubleSpends;
+        _numDoubleSpends = numDoubleSpends;
     }
 
     public int? GetNum10M()
@@ -63,7 +63,7 @@ public class MoneroTxPoolStats
 
     public void SetNum10M(int? num10M)
     {
-        this._num10M = num10M;
+        _num10M = num10M;
     }
 
     public ulong? GetFeeTotal()
@@ -73,7 +73,7 @@ public class MoneroTxPoolStats
 
     public void SetFeeTotal(ulong? feeTotal)
     {
-        this._feeTotal = feeTotal;
+        _feeTotal = feeTotal;
     }
 
     public ulong? GetBytesMax()
@@ -83,7 +83,7 @@ public class MoneroTxPoolStats
 
     public void SetBytesMax(ulong? bytesMax)
     {
-        this._bytesMax = bytesMax;
+        _bytesMax = bytesMax;
     }
 
     public ulong? GetBytesMed()
@@ -93,7 +93,7 @@ public class MoneroTxPoolStats
 
     public void SetBytesMed(ulong? bytesMed)
     {
-        this._bytesMed = bytesMed;
+        _bytesMed = bytesMed;
     }
 
     public ulong? GetBytesMin()
@@ -103,7 +103,7 @@ public class MoneroTxPoolStats
 
     public void SetBytesMin(ulong? bytesMin)
     {
-        this._bytesMin = bytesMin;
+        _bytesMin = bytesMin;
     }
 
     public ulong? GetBytesTotal()
@@ -113,7 +113,7 @@ public class MoneroTxPoolStats
 
     public void SetBytesTotal(ulong? bytesTotal)
     {
-        this._bytesTotal = bytesTotal;
+        _bytesTotal = bytesTotal;
     }
 
     public Dictionary<ulong, int>? GetHisto()
@@ -123,7 +123,7 @@ public class MoneroTxPoolStats
 
     public void SetHisto(Dictionary<ulong, int> histo)
     {
-        this._histo = histo;
+        _histo = histo;
     }
 
     public ulong? GetHisto98Pc()
@@ -133,7 +133,7 @@ public class MoneroTxPoolStats
 
     public void SetHisto98Pc(ulong? histo98Pc)
     {
-        this._histo98Pc = histo98Pc;
+        _histo98Pc = histo98Pc;
     }
 
     public ulong? GetOldestTimestamp()
@@ -143,6 +143,6 @@ public class MoneroTxPoolStats
 
     public void SetOldestTimestamp(ulong? oldestTimestamp)
     {
-        this._oldestTimestamp = oldestTimestamp;
+        _oldestTimestamp = oldestTimestamp;
     }
 }

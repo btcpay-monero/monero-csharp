@@ -14,7 +14,7 @@ public class MoneroOutputHistogramEntry
 
     public void SetAmount(ulong? amount)
     {
-        this._amount = amount;
+        _amount = amount;
     }
 
     public ulong? GetNumInstances()
@@ -24,7 +24,7 @@ public class MoneroOutputHistogramEntry
 
     public void SetNumInstances(ulong? numInstances)
     {
-        this._numInstances = numInstances;
+        _numInstances = numInstances;
     }
 
     public ulong? GetNumUnlockedInstances()
@@ -34,7 +34,7 @@ public class MoneroOutputHistogramEntry
 
     public void SetNumUnlockedInstances(ulong? numUnlockedInstances)
     {
-        this._numUnlockedInstances = numUnlockedInstances;
+        _numUnlockedInstances = numUnlockedInstances;
     }
 
     public ulong? GetNumRecentInstances()
@@ -44,6 +44,6 @@ public class MoneroOutputHistogramEntry
 
     public void SetNumRecentInstances(ulong? numRecentInstances)
     {
-        this._numRecentInstances = numRecentInstances;
+        _numRecentInstances = numRecentInstances;
     }
 }

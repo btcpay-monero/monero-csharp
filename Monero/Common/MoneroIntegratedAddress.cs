@@ -8,7 +8,6 @@ public class MoneroIntegratedAddress
 
     public MoneroIntegratedAddress()
     {
-
     }
 
     public MoneroIntegratedAddress(string? standardAddress)

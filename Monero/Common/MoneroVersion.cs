@@ -7,7 +7,6 @@ public class MoneroVersion
 
     public MoneroVersion()
     {
-
     }
 
     public MoneroVersion(int? number)

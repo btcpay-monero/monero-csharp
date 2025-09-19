@@ -15,7 +15,7 @@ public class MoneroMiningStatus
 
     public void SetIsActive(bool? isActive)
     {
-        this._isActive = isActive;
+        _isActive = isActive;
     }
 
     public bool? IsBackground()
@@ -25,7 +25,7 @@ public class MoneroMiningStatus
 
     public void SetIsBackground(bool? isBackground)
     {
-        this._isBackground = isBackground;
+        _isBackground = isBackground;
     }
 
     public string? GetAddress()
@@ -35,7 +35,7 @@ public class MoneroMiningStatus
 
     public void SetAddress(string? address)
     {
-        this._address = address;
+        _address = address;
     }
 
     public ulong? GetSpeed()
@@ -45,7 +45,7 @@ public class MoneroMiningStatus
 
     public void SetSpeed(ulong? speed)
     {
-        this._speed = speed;
+        _speed = speed;
     }
 
     public uint? GetNumThreads()
@@ -55,6 +55,6 @@ public class MoneroMiningStatus
 
     public void SetNumThreads(uint? numThreads)
     {
-        this._numThreads = numThreads;
+        _numThreads = numThreads;
     }
 }

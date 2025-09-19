@@ -14,7 +14,6 @@ public class MoneroKeyImage
 
     public MoneroKeyImage()
     {
-
     }
 
     public MoneroKeyImage(string? hex)

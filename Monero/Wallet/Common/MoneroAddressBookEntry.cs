@@ -9,34 +9,33 @@ public class MoneroAddressBookEntry
 
     public MoneroAddressBookEntry()
     {
-
     }
 
     public MoneroAddressBookEntry(uint? index)
     {
-        this._index = index;
+        _index = index;
     }
 
     public MoneroAddressBookEntry(uint? index, string? address)
     {
-        this._index = index;
-        this._address = address;
+        _index = index;
+        _address = address;
     }
 
     public MoneroAddressBookEntry(uint? index, string? address, string? description)
     {
-        this._index = index;
-        this._address = address;
-        this._description = description;
+        _index = index;
+        _address = address;
+        _description = description;
     }
 
     public MoneroAddressBookEntry(uint? index, string? address, string? description,
         string? paymentId)
     {
-        this._index = index;
-        this._address = address;
-        this._paymentId = paymentId;
-        this._description = description;
+        _index = index;
+        _address = address;
+        _paymentId = paymentId;
+        _description = description;
     }
 
 
@@ -47,7 +46,7 @@ public class MoneroAddressBookEntry
 
     public MoneroAddressBookEntry SetIndex(uint? index)
     {
-        this._index = index;
+        _index = index;
         return this;
     }
 
@@ -58,7 +57,7 @@ public class MoneroAddressBookEntry
 
     public MoneroAddressBookEntry SetAddress(string? address)
     {
-        this._address = address;
+        _address = address;
         return this;
     }
 
@@ -69,7 +68,7 @@ public class MoneroAddressBookEntry
 
     public MoneroAddressBookEntry SetPaymentId(string? paymentId)
     {
-        this._paymentId = paymentId;
+        _paymentId = paymentId;
         return this;
     }
 
@@ -80,7 +79,7 @@ public class MoneroAddressBookEntry
 
     public MoneroAddressBookEntry SetDescription(string? description)
     {
-        this._description = description;
+        _description = description;
         return this;
     }
 }

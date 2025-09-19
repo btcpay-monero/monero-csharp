@@ -7,7 +7,6 @@ public class MoneroMultisigInitResult
 
     public MoneroMultisigInitResult()
     {
-
     }
 
     public MoneroMultisigInitResult(string? address)

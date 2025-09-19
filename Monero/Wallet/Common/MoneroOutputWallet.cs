@@ -51,7 +51,7 @@ public class MoneroOutputWallet : MoneroOutput
 
     public MoneroOutputWallet SetAccountIndex(uint? accountIndex)
     {
-        this._accountIndex = accountIndex;
+        _accountIndex = accountIndex;
         return this;
     }
 
@@ -62,7 +62,7 @@ public class MoneroOutputWallet : MoneroOutput
 
     public MoneroOutputWallet SetSubaddressIndex(uint? subaddressIndex)
     {
-        this._subaddressIndex = subaddressIndex;
+        _subaddressIndex = subaddressIndex;
         return this;
     }
 
@@ -79,7 +79,7 @@ public class MoneroOutputWallet : MoneroOutput
 
     public MoneroOutputWallet SetIsSpent(bool? isSpent)
     {
-        this._isSpent = isSpent;
+        _isSpent = isSpent;
         return this;
     }
 
@@ -90,7 +90,7 @@ public class MoneroOutputWallet : MoneroOutput
 
     public MoneroOutputWallet SetIsFrozen(bool? isFrozen)
     {
-        this._isFrozen = isFrozen;
+        _isFrozen = isFrozen;
         return this;
     }
 

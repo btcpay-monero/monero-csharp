@@ -44,9 +44,6 @@ public class MoneroDaemonRpcFixture : IDisposable
 
 public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 {
-    private readonly MoneroDaemonRpc _daemon;
-    private readonly MoneroWalletRpc _wallet;
-
     private static readonly bool LiteMode = false;
     private static readonly bool TestNonRelays = true;
     private static readonly bool TestRelays = true; // creates and relays outgoing txs
@@ -54,6 +51,8 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     private static bool RESTRICTED_RPC;
 
     private static TestContext BINARY_BLOCK_CTX = new();
+    private readonly MoneroDaemonRpc _daemon;
+    private readonly MoneroWalletRpc _wallet;
 
     private readonly MoneroDaemonRpcFixture fixture;
 
@@ -378,7 +377,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         Assert.True(TestNonRelays && !LiteMode);
 
         // get ulong height range
-        ulong numBlocks = Math.Min((await _daemon.GetHeight()) - 2, 1440); // test up to ~2 days of blocks
+        ulong numBlocks = Math.Min(await _daemon.GetHeight() - 2, 1440); // test up to ~2 days of blocks
         Assert.True(numBlocks > 0);
         ulong height = await _daemon.GetHeight();
         Assert.True(height - numBlocks - 1 < height);
@@ -963,7 +962,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             Assert.True("Download limit must be an integer greater than 0" == e.Message);
         }
 
-        Assert.True((await _daemon.GetDownloadLimit()) == initVal);
+        Assert.True(await _daemon.GetDownloadLimit() == initVal);
     }
 
     // Can get, set, and reset an upload bandwidth limit
@@ -1123,9 +1122,12 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         Assert.True(TestNonRelays);
         Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
 
-        // stop mining at the beginning of test
+        // stop mining at the beginning of the test
         try { await _daemon.StopMining(); }
-        catch (MoneroError) { }
+        catch (MoneroError)
+        {
+            // ignore
+        }
 
         // generate address to mine to
         // TODO use wallet rpc
@@ -1480,7 +1482,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
     }
 
-    private static async Task<List<string>> GetConfirmedTxHashes(MoneroDaemon daemon)
+    private static async Task<List<string>> GetConfirmedTxHashes(IMoneroDaemon daemon)
     {
         int numTxs = 5;
         List<string> txHashes = [];
@@ -1497,11 +1499,12 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         return txHashes;
     }
 
-    private static async Task<MoneroTx> GetUnrelayedTx(MoneroWallet wallet, uint accountIdx)
+    private static async Task<MoneroTx> GetUnrelayedTx(IMoneroWallet wallet, uint accountIdx)
     {
         Assert.True(accountIdx > 0,
             "Txs sent from/to same account are not properly synced from the pool"); // TODO monero-project
-        MoneroTxConfig config = new MoneroTxConfig().SetAccountIndex(accountIdx).SetAddress(await wallet.GetPrimaryAddress())
+        MoneroTxConfig config = new MoneroTxConfig().SetAccountIndex(accountIdx)
+            .SetAddress(await wallet.GetPrimaryAddress())
             .SetAmount(TestUtils.MAX_FEE);
         MoneroTx tx = await wallet.CreateTx(config);
         Assert.True(tx.GetFullHex()!.Length > 0);
@@ -1992,11 +1995,13 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         }
     }
 
-    private static async Task<List<MoneroTx>> GetConfirmedTxs(MoneroDaemon daemon, int numTxs)
+    private static async Task<List<MoneroTx>> GetConfirmedTxs(IMoneroDaemon daemon, int numTxs)
     {
         List<MoneroTx> txs = [];
         long numBlocksPerReq = 50;
-        for (long startIdx = (long)(await daemon.GetHeight()) - numBlocksPerReq - 1; startIdx >= 0; startIdx -= numBlocksPerReq)
+        for (long startIdx = (long)await daemon.GetHeight() - numBlocksPerReq - 1;
+             startIdx >= 0;
+             startIdx -= numBlocksPerReq)
         {
             List<MoneroBlock> blocks = await
                 daemon.GetBlocksByRange((ulong)startIdx, (ulong)(startIdx + numBlocksPerReq));

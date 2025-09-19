@@ -3,7 +3,7 @@ using Monero.Daemon.Common;
 
 namespace Monero.Daemon;
 
-public abstract class MoneroDaemonDefault : MoneroDaemon
+public abstract class MoneroDaemonDefault : IMoneroDaemon
 {
     protected Dictionary<ulong, MoneroBlockHeader> _cachedHeaders = [];
     protected List<MoneroDaemonListener> _listeners = [];
@@ -122,18 +122,21 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
         return await GetOutputDistribution(amounts, null, null, null);
     }
 
-    public virtual async Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts, bool? isCumulative)
+    public virtual async Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts,
+        bool? isCumulative)
     {
         return await GetOutputDistribution(amounts, isCumulative, null, null);
     }
 
-    public virtual async Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
+    public virtual async Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts,
+        bool? isCumulative,
         ulong? startHeight)
     {
         return await GetOutputDistribution(amounts, isCumulative, startHeight, null);
     }
 
-    public abstract Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
+    public abstract Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts,
+        bool? isCumulative,
         ulong? startHeight, ulong? endHeight);
 
     public virtual async Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram()
@@ -173,11 +176,6 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
     public abstract Task<List<MoneroPeer>> GetPeers();
 
     public abstract Task<MoneroDaemonSyncInfo> GetSyncInfo();
-
-    public virtual async Task<MoneroTx?> GetTx(string txHash)
-    {
-        return await GetTx(txHash, false);
-    }
 
     public virtual async Task<MoneroTx?> GetTx(string txHash, bool prune)
     {
@@ -281,4 +279,9 @@ public abstract class MoneroDaemonDefault : MoneroDaemon
     public abstract Task<MoneroSubmitTxResult> SubmitTxHex(string txHex, bool doNotRelay);
 
     public abstract Task<MoneroBlockHeader> WaitForNextBlockHeader();
+
+    public virtual async Task<MoneroTx?> GetTx(string txHash)
+    {
+        return await GetTx(txHash, false);
+    }
 }

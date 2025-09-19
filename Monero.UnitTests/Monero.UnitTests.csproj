@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Monero\Monero.csproj" />
+        <ProjectReference Include="..\Monero\Monero.csproj"/>
     </ItemGroup>
 
 </Project>

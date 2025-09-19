@@ -13,9 +13,9 @@ public class MoneroFeeEstimate
 
     public MoneroFeeEstimate(ulong? fee, List<ulong> fees, ulong? quantizationMask)
     {
-        this._fee = fee;
-        this._fees = fees;
-        this._quantizationMask = quantizationMask;
+        _fee = fee;
+        _fees = fees;
+        _quantizationMask = quantizationMask;
     }
 
     public MoneroFeeEstimate(MoneroFeeEstimate feeEstimate)
@@ -32,7 +32,7 @@ public class MoneroFeeEstimate
 
     public MoneroFeeEstimate SetFee(ulong? fee)
     {
-        this._fee = fee;
+        _fee = fee;
         return this;
     }
 
@@ -43,7 +43,7 @@ public class MoneroFeeEstimate
 
     public MoneroFeeEstimate SetFees(List<ulong> fees)
     {
-        this._fees = fees;
+        _fees = fees;
         return this;
     }
 
@@ -54,7 +54,7 @@ public class MoneroFeeEstimate
 
     public MoneroFeeEstimate SetQuantizationMask(ulong? quantizationMask)
     {
-        this._quantizationMask = quantizationMask;
+        _quantizationMask = quantizationMask;
         return this;
     }
 

@@ -49,7 +49,7 @@ public class MoneroBlock : MoneroBlockHeader
 
     public MoneroBlock SetHex(string? hex)
     {
-        this._hex = hex;
+        _hex = hex;
         return this;
     }
 
@@ -60,7 +60,7 @@ public class MoneroBlock : MoneroBlockHeader
 
     public MoneroBlock SetMinerTx(MoneroTx? minerTx)
     {
-        this._minerTx = minerTx;
+        _minerTx = minerTx;
         return this;
     }
 
@@ -71,7 +71,7 @@ public class MoneroBlock : MoneroBlockHeader
 
     public MoneroBlock SetTxs(List<MoneroTx>? txs)
     {
-        this._txs = txs;
+        _txs = txs;
         if (txs != null)
         {
             foreach (MoneroTx tx in txs)
@@ -116,7 +116,7 @@ public class MoneroBlock : MoneroBlockHeader
 
     public MoneroBlock SetTxHashes(List<string>? txHashes)
     {
-        this._txHashes = txHashes;
+        _txHashes = txHashes;
         return this;
     }
 

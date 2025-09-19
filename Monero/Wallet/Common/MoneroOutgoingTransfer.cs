@@ -56,7 +56,7 @@ public class MoneroOutgoingTransfer : MoneroTransfer
 
     public MoneroOutgoingTransfer SetSubaddressIndices(List<uint> subaddressIndices)
     {
-        this._subaddressIndices = subaddressIndices;
+        _subaddressIndices = subaddressIndices;
         return this;
     }
 
@@ -67,7 +67,7 @@ public class MoneroOutgoingTransfer : MoneroTransfer
 
     public MoneroOutgoingTransfer SetAddresses(List<string> addresses)
     {
-        this._addresses = addresses;
+        _addresses = addresses;
         return this;
     }
 
@@ -78,7 +78,7 @@ public class MoneroOutgoingTransfer : MoneroTransfer
 
     public MoneroOutgoingTransfer SetDestinations(List<MoneroDestination>? destinations)
     {
-        this._destinations = destinations;
+        _destinations = destinations;
         return this;
     }
 }

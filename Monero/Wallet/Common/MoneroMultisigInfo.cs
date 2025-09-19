@@ -9,7 +9,6 @@ public class MoneroMultisigInfo
 
     public MoneroMultisigInfo()
     {
-
     }
 
     public MoneroMultisigInfo(bool? isMultisig, bool? isReady, int? threshold, int? numParticipants)

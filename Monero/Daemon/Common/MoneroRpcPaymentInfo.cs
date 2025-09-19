@@ -12,7 +12,7 @@ public class MoneroRpcPaymentInfo
 
     public void SetCredits(ulong? credits)
     {
-        this._credits = credits;
+        _credits = credits;
     }
 
     public string? GetTopBlockHash()
@@ -22,6 +22,6 @@ public class MoneroRpcPaymentInfo
 
     public void SetTopBlockHash(string? topBlockHash)
     {
-        this._topBlockHash = topBlockHash;
+        _topBlockHash = topBlockHash;
     }
 }

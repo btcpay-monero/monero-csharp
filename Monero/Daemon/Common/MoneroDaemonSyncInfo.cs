@@ -16,7 +16,7 @@ public class MoneroDaemonSyncInfo : MoneroRpcPaymentInfo
 
     public void SetHeight(ulong? height)
     {
-        this._height = height;
+        _height = height;
     }
 
     public List<MoneroPeer>? GetPeers()
@@ -26,7 +26,7 @@ public class MoneroDaemonSyncInfo : MoneroRpcPaymentInfo
 
     public void SetPeers(List<MoneroPeer>? peers)
     {
-        this._peers = peers;
+        _peers = peers;
     }
 
     public List<MoneroConnectionSpan>? GetSpans()
@@ -36,7 +36,7 @@ public class MoneroDaemonSyncInfo : MoneroRpcPaymentInfo
 
     public void SetSpans(List<MoneroConnectionSpan>? spans)
     {
-        this._spans = spans;
+        _spans = spans;
     }
 
     public ulong? GetTargetHeight()
@@ -46,7 +46,7 @@ public class MoneroDaemonSyncInfo : MoneroRpcPaymentInfo
 
     public void SetTargetHeight(ulong? targetHeight)
     {
-        this._targetHeight = targetHeight;
+        _targetHeight = targetHeight;
     }
 
     public uint? GetNextNeededPruningSeed()
@@ -56,7 +56,7 @@ public class MoneroDaemonSyncInfo : MoneroRpcPaymentInfo
 
     public void SetNextNeededPruningSeed(uint? nextNeededPruningSeed)
     {
-        this._nextNeededPruningSeed = nextNeededPruningSeed;
+        _nextNeededPruningSeed = nextNeededPruningSeed;
     }
 
     public string? GetOverview()
@@ -66,7 +66,6 @@ public class MoneroDaemonSyncInfo : MoneroRpcPaymentInfo
 
     public void SetOverview(string? overview)
     {
-        this._overview = overview;
+        _overview = overview;
     }
-
 }

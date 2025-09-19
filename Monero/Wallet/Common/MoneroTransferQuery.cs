@@ -56,7 +56,7 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTransferQuery SetTxQuery(MoneroTxQuery? txQuery)
     {
-        this._txQuery = txQuery;
+        _txQuery = txQuery;
         if (txQuery != null)
         {
             txQuery.SetTransferQuery(this);
@@ -72,7 +72,7 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTransferQuery SetIsIncoming(bool? isIncoming)
     {
-        this._isIncoming = isIncoming;
+        _isIncoming = isIncoming;
         return this;
     }
 
@@ -94,7 +94,7 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTransferQuery SetAddress(string? address)
     {
-        this._address = address;
+        _address = address;
         return this;
     }
 
@@ -105,7 +105,7 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTransferQuery SetAddresses(List<string>? addresses)
     {
-        this._addresses = addresses;
+        _addresses = addresses;
         return this;
     }
 
@@ -122,7 +122,7 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTransferQuery SetSubaddressIndex(uint? subaddressIndex)
     {
-        this._subaddressIndex = subaddressIndex;
+        _subaddressIndex = subaddressIndex;
         return this;
     }
 
@@ -133,7 +133,7 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTransferQuery SetSubaddressIndices(List<uint>? subaddressIndices)
     {
-        this._subaddressIndices = subaddressIndices;
+        _subaddressIndices = subaddressIndices;
         return this;
     }
 
@@ -144,7 +144,7 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTransferQuery SetDestinations(List<MoneroDestination>? destinations)
     {
-        this._destinations = destinations;
+        _destinations = destinations;
         return this;
     }
 
@@ -155,7 +155,7 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTransferQuery SetHasDestinations(bool? hasDestinations)
     {
-        this._hasDestinations = hasDestinations;
+        _hasDestinations = hasDestinations;
         return this;
     }
 

@@ -12,7 +12,7 @@ public class MoneroPruneResult
 
     public void SetIsPruned(bool? isPruned)
     {
-        this._isPruned = isPruned;
+        _isPruned = isPruned;
     }
 
     public int? GetPruningSeed()
@@ -22,6 +22,6 @@ public class MoneroPruneResult
 
     public void SetPruningSeed(int? pruningSeed)
     {
-        this._pruningSeed = pruningSeed;
+        _pruningSeed = pruningSeed;
     }
 }

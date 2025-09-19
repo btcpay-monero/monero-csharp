@@ -175,7 +175,7 @@ internal abstract class TestUtils
 
     private static string GetDefaultEnv(string key, string defaultValue)
     {
-        var currentValue = Environment.GetEnvironmentVariable(key);
+        string? currentValue = Environment.GetEnvironmentVariable(key);
         return string.IsNullOrEmpty(currentValue) ? defaultValue : currentValue;
     }
 }

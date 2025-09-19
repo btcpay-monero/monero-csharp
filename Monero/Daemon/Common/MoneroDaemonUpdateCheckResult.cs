@@ -34,7 +34,7 @@ public class MoneroDaemonUpdateCheckResult
 
     public void SetIsUpdateAvailable(bool? isUpdateAvailable)
     {
-        this._isUpdateAvailable = isUpdateAvailable;
+        _isUpdateAvailable = isUpdateAvailable;
     }
 
     public string? GetVersion()
@@ -44,7 +44,7 @@ public class MoneroDaemonUpdateCheckResult
 
     public void SetVersion(string? version)
     {
-        this._version = version;
+        _version = version;
     }
 
     public string? GetHash()
@@ -54,7 +54,7 @@ public class MoneroDaemonUpdateCheckResult
 
     public void SetHash(string? hash)
     {
-        this._hash = hash;
+        _hash = hash;
     }
 
     public string? GetAutoUri()
@@ -64,7 +64,7 @@ public class MoneroDaemonUpdateCheckResult
 
     public void SetAutoUri(string? autoUri)
     {
-        this._autoUri = autoUri;
+        _autoUri = autoUri;
     }
 
     public string? GetUserUri()
@@ -74,6 +74,6 @@ public class MoneroDaemonUpdateCheckResult
 
     public void SetUserUri(string? userUri)
     {
-        this._userUri = userUri;
+        _userUri = userUri;
     }
 }

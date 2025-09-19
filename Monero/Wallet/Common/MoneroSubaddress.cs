@@ -16,13 +16,13 @@ public class MoneroSubaddress
 
     public MoneroSubaddress(string address)
     {
-        this._address = address;
+        _address = address;
     }
 
     public MoneroSubaddress(uint accountIndex, uint index)
     {
-        this._accountIndex = accountIndex;
-        this._index = index;
+        _accountIndex = accountIndex;
+        _index = index;
     }
 
     public uint? GetAccountIndex()
@@ -32,7 +32,7 @@ public class MoneroSubaddress
 
     public MoneroSubaddress SetAccountIndex(uint? accountIndex)
     {
-        this._accountIndex = accountIndex;
+        _accountIndex = accountIndex;
         return this;
     }
 
@@ -43,7 +43,7 @@ public class MoneroSubaddress
 
     public MoneroSubaddress SetIndex(uint? index)
     {
-        this._index = index;
+        _index = index;
         return this;
     }
 
@@ -54,7 +54,7 @@ public class MoneroSubaddress
 
     public MoneroSubaddress SetAddress(string? address)
     {
-        this._address = address;
+        _address = address;
         return this;
     }
 
@@ -65,7 +65,7 @@ public class MoneroSubaddress
 
     public MoneroSubaddress SetLabel(string? label)
     {
-        this._label = label;
+        _label = label;
         return this;
     }
 
@@ -76,7 +76,7 @@ public class MoneroSubaddress
 
     public MoneroSubaddress SetBalance(ulong? balance)
     {
-        this._balance = balance;
+        _balance = balance;
         return this;
     }
 
@@ -87,7 +87,7 @@ public class MoneroSubaddress
 
     public MoneroSubaddress SetUnlockedBalance(ulong? unlockedBalance)
     {
-        this._unlockedBalance = unlockedBalance;
+        _unlockedBalance = unlockedBalance;
         return this;
     }
 
@@ -98,7 +98,7 @@ public class MoneroSubaddress
 
     public MoneroSubaddress SetNumUnspentOutputs(ulong? numUnspentOutputs)
     {
-        this._numUnspentOutputs = numUnspentOutputs;
+        _numUnspentOutputs = numUnspentOutputs;
         return this;
     }
 
@@ -109,7 +109,7 @@ public class MoneroSubaddress
 
     public MoneroSubaddress SetIsUsed(bool? isUsed)
     {
-        this._isUsed = isUsed;
+        _isUsed = isUsed;
         return this;
     }
 
@@ -120,7 +120,7 @@ public class MoneroSubaddress
 
     public MoneroSubaddress SetNumBlocksToUnlock(ulong? numBlocksToUnlock)
     {
-        this._numBlocksToUnlock = numBlocksToUnlock;
+        _numBlocksToUnlock = numBlocksToUnlock;
         return this;
     }
 }

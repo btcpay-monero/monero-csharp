@@ -8,19 +8,19 @@ namespace Monero.IntegrationTests.Utils;
 
 public class WalletTxTracker
 {
-    private readonly List<MoneroWallet> clearedWallets = [];
+    private readonly List<IMoneroWallet> clearedWallets = [];
 
     public void Reset()
     {
         clearedWallets.Clear();
     }
 
-    public async Task WaitForWalletTxsToClearPool(MoneroWallet wallet)
+    public async Task WaitForWalletTxsToClearPool(IMoneroWallet wallet)
     {
-        List<MoneroWallet> wallets = [wallet];
+        List<IMoneroWallet> wallets = [wallet];
         // get wallet tx hashes
         List<string> txHashesWallet = [];
-        foreach (MoneroWallet moneroWallet in wallets)
+        foreach (IMoneroWallet moneroWallet in wallets)
         {
             if (!clearedWallets.Contains(moneroWallet))
             {
@@ -41,7 +41,7 @@ public class WalletTxTracker
         // loop until all wallet txs clear from the pool
         bool isFirst = true;
         bool miningStarted = false;
-        MoneroDaemon daemon = TestUtils.GetDaemonRpc();
+        IMoneroDaemon daemon = TestUtils.GetDaemonRpc();
         while (true)
         {
             // get hashes of relayed, non-failed txs in the pool
@@ -105,7 +105,7 @@ public class WalletTxTracker
         }
 
         // sync wallets with the pool
-        foreach (MoneroWallet moneroWallet in wallets)
+        foreach (IMoneroWallet moneroWallet in wallets)
         {
             await moneroWallet.Sync();
             clearedWallets.Add(moneroWallet);

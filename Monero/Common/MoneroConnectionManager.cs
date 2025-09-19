@@ -18,7 +18,7 @@ public class MoneroConnectionManager
     private readonly List<MoneroRpcConnection> _connections = [];
     private readonly object _connectionsLock = new();
 
-    private readonly List<MoneroConnectionManagerListener> _listeners = [];
+    private readonly List<IMoneroConnectionManagerListener> _listeners = [];
     private readonly object _listenersLock = new();
 
     private readonly Dictionary<MoneroRpcConnection, List<ulong?>> _responseTimes = [];
@@ -27,15 +27,15 @@ public class MoneroConnectionManager
 
     private MoneroRpcConnection? _currentConnection;
 
-    private ulong _timeoutMs = DefaultTimeout;
-
     private TaskLooper? _poller;
+
+    private ulong _timeoutMs = DefaultTimeout;
 
     private void OnConnectionChanged(MoneroRpcConnection? connection)
     {
         lock (_listenersLock)
         {
-            foreach (MoneroConnectionManagerListener listener in _listeners)
+            foreach (IMoneroConnectionManagerListener listener in _listeners)
             {
                 listener.OnConnectionChanged(connection);
             }
@@ -48,6 +48,7 @@ public class MoneroConnectionManager
         {
             return null;
         }
+
         // get best response
         MoneroRpcConnection? bestResponse = null;
 
@@ -203,7 +204,8 @@ public class MoneroConnectionManager
         }
     }
 
-    private Task<bool> CheckConnections(List<MoneroRpcConnection> connections, List<MoneroRpcConnection>? excludedConnections)
+    private Task<bool> CheckConnections(List<MoneroRpcConnection> connections,
+        List<MoneroRpcConnection>? excludedConnections)
     {
         throw new NotImplementedException("");
     }
@@ -373,7 +375,7 @@ public class MoneroConnectionManager
         }
     }
 
-    public bool HasListener(MoneroConnectionManagerListener listener)
+    public bool HasListener(IMoneroConnectionManagerListener listener)
     {
         lock (_listenersLock)
         {
@@ -381,7 +383,7 @@ public class MoneroConnectionManager
         }
     }
 
-    public MoneroConnectionManager AddListener(MoneroConnectionManagerListener listener)
+    public MoneroConnectionManager AddListener(IMoneroConnectionManagerListener listener)
     {
         lock (_listenersLock)
         {
@@ -394,7 +396,7 @@ public class MoneroConnectionManager
         return this;
     }
 
-    public MoneroConnectionManager RemoveListener(MoneroConnectionManagerListener listener)
+    public MoneroConnectionManager RemoveListener(IMoneroConnectionManagerListener listener)
     {
         lock (_listenersLock)
         {
@@ -414,7 +416,7 @@ public class MoneroConnectionManager
         return this;
     }
 
-    public List<MoneroConnectionManagerListener> GetListeners()
+    public List<IMoneroConnectionManagerListener> GetListeners()
     {
         lock (_listenersLock)
         {
@@ -713,8 +715,8 @@ public class MoneroConnectionManager
 
     private class ConnectionComparator : Comparer<MoneroRpcConnection>
     {
+        public readonly MoneroRpcConnection? CurrentConnection = null;
         public readonly ConnectionPriorityComparator PriorityComparator = new();
-        public MoneroRpcConnection? CurrentConnection = null;
 
         public override int Compare(MoneroRpcConnection? c1, MoneroRpcConnection? c2)
         {
@@ -751,7 +753,7 @@ public class MoneroConnectionManager
                 {
                     string c1Uri = c1.GetUri() ?? "";
                     string c2Uri = c2.GetUri() ?? "";
-                    return String.Compare(c1Uri, c2Uri, StringComparison.Ordinal);
+                    return string.Compare(c1Uri, c2Uri, StringComparison.Ordinal);
                 }
 
                 return PriorityComparator.Compare(c1.GetPriority(), c2.GetPriority()) *

@@ -17,7 +17,7 @@ public class MoneroConnectionSpan
 
     public void SetConnectionId(string? connectionId)
     {
-        this._connectionId = connectionId;
+        _connectionId = connectionId;
     }
 
     public ulong? GetNumBlocks()
@@ -27,7 +27,7 @@ public class MoneroConnectionSpan
 
     public void SetNumBlocks(ulong? numBlocks)
     {
-        this._numBlocks = numBlocks;
+        _numBlocks = numBlocks;
     }
 
     public string? GetRemoteAddress()
@@ -37,7 +37,7 @@ public class MoneroConnectionSpan
 
     public void SetRemoteAddress(string? remoteAddress)
     {
-        this._remoteAddress = remoteAddress;
+        _remoteAddress = remoteAddress;
     }
 
     public ulong? GetRate()
@@ -47,7 +47,7 @@ public class MoneroConnectionSpan
 
     public void SetRate(ulong? rate)
     {
-        this._rate = rate;
+        _rate = rate;
     }
 
     public ulong? GetSpeed()
@@ -57,7 +57,7 @@ public class MoneroConnectionSpan
 
     public void SetSpeed(ulong? speed)
     {
-        this._speed = speed;
+        _speed = speed;
     }
 
     public ulong? GetSize()
@@ -67,7 +67,7 @@ public class MoneroConnectionSpan
 
     public void SetSize(ulong? size)
     {
-        this._size = size;
+        _size = size;
     }
 
     public ulong? GetStartHeight()
@@ -77,6 +77,6 @@ public class MoneroConnectionSpan
 
     public void SetStartHeight(ulong? startHeight)
     {
-        this._startHeight = startHeight;
+        _startHeight = startHeight;
     }
 }

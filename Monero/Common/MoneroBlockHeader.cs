@@ -44,6 +44,38 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
         _powHash = header._powHash;
     }
 
+    public virtual bool Equals(MoneroBlockHeader? other)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+
+        if (other == this)
+        {
+            return true;
+        }
+
+        return _hash == other._hash &&
+               _height == other._height &&
+               _timestamp == other._timestamp &&
+               _size == other._size &&
+               _weight == other._weight &&
+               _longTermWeight == other._longTermWeight &&
+               _depth == other._depth &&
+               _difficulty == other._difficulty &&
+               _cumulativeDifficulty == other._cumulativeDifficulty &&
+               _majorVersion == other._majorVersion &&
+               _minorVersion == other._minorVersion &&
+               _nonce == other._nonce &&
+               _minerTxHash == other._minerTxHash &&
+               _numTxs == other._numTxs &&
+               _orphanStatus == other._orphanStatus &&
+               _prevHash == other._prevHash &&
+               _reward == other._reward &&
+               _powHash == other._powHash;
+    }
+
     public string? GetHash()
     {
         return _hash;
@@ -51,7 +83,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetHash(string? hash)
     {
-        this._hash = hash;
+        _hash = hash;
         return this;
     }
 
@@ -62,7 +94,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetHeight(ulong? height)
     {
-        this._height = height;
+        _height = height;
         return this;
     }
 
@@ -73,7 +105,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetTimestamp(ulong? timestamp)
     {
-        this._timestamp = timestamp;
+        _timestamp = timestamp;
         return this;
     }
 
@@ -84,7 +116,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetSize(ulong? size)
     {
-        this._size = size;
+        _size = size;
         return this;
     }
 
@@ -95,7 +127,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetWeight(ulong? weight)
     {
-        this._weight = weight;
+        _weight = weight;
         return this;
     }
 
@@ -106,7 +138,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetLongTermWeight(ulong? longTermWeight)
     {
-        this._longTermWeight = longTermWeight;
+        _longTermWeight = longTermWeight;
         return this;
     }
 
@@ -117,7 +149,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetDepth(ulong? depth)
     {
-        this._depth = depth;
+        _depth = depth;
         return this;
     }
 
@@ -128,7 +160,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetDifficulty(ulong? difficulty)
     {
-        this._difficulty = difficulty;
+        _difficulty = difficulty;
         return this;
     }
 
@@ -139,7 +171,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetCumulativeDifficulty(ulong? cumulativeDifficulty)
     {
-        this._cumulativeDifficulty = cumulativeDifficulty;
+        _cumulativeDifficulty = cumulativeDifficulty;
         return this;
     }
 
@@ -150,7 +182,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetMajorVersion(uint? majorVersion)
     {
-        this._majorVersion = majorVersion;
+        _majorVersion = majorVersion;
         return this;
     }
 
@@ -161,7 +193,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetMinorVersion(uint? minorVersion)
     {
-        this._minorVersion = minorVersion;
+        _minorVersion = minorVersion;
         return this;
     }
 
@@ -172,7 +204,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetNonce(ulong? nonce)
     {
-        this._nonce = nonce;
+        _nonce = nonce;
         return this;
     }
 
@@ -183,7 +215,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetMinerTxHash(string? minerTxHash)
     {
-        this._minerTxHash = minerTxHash;
+        _minerTxHash = minerTxHash;
         return this;
     }
 
@@ -194,7 +226,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetNumTxs(uint? numTxs)
     {
-        this._numTxs = numTxs;
+        _numTxs = numTxs;
         return this;
     }
 
@@ -205,7 +237,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetOrphanStatus(bool? orphanStatus)
     {
-        this._orphanStatus = orphanStatus;
+        _orphanStatus = orphanStatus;
         return this;
     }
 
@@ -216,7 +248,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetPrevHash(string? prevHash)
     {
-        this._prevHash = prevHash;
+        _prevHash = prevHash;
         return this;
     }
 
@@ -227,7 +259,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetReward(ulong? reward)
     {
-        this._reward = reward;
+        _reward = reward;
         return this;
     }
 
@@ -238,7 +270,7 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 
     public virtual MoneroBlockHeader SetPowHash(string? powHash)
     {
-        this._powHash = powHash;
+        _powHash = powHash;
         return this;
     }
 
@@ -280,38 +312,6 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
     public override bool Equals(object? other)
     {
         return Equals(other as MoneroBlockHeader);
-    }
-
-    public virtual bool Equals(MoneroBlockHeader? other)
-    {
-        if (other == null)
-        {
-            return false;
-        }
-
-        if (other == this)
-        {
-            return true;
-        }
-
-        return _hash == other._hash &&
-               _height == other._height &&
-               _timestamp == other._timestamp &&
-               _size == other._size &&
-               _weight == other._weight &&
-               _longTermWeight == other._longTermWeight &&
-               _depth == other._depth &&
-               _difficulty == other._difficulty &&
-               _cumulativeDifficulty == other._cumulativeDifficulty &&
-               _majorVersion == other._majorVersion &&
-               _minorVersion == other._minorVersion &&
-               _nonce == other._nonce &&
-               _minerTxHash == other._minerTxHash &&
-               _numTxs == other._numTxs &&
-               _orphanStatus == other._orphanStatus &&
-               _prevHash == other._prevHash &&
-               _reward == other._reward &&
-               _powHash == other._powHash;
     }
 
     public override int GetHashCode()

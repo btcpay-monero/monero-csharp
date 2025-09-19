@@ -65,6 +65,7 @@ public abstract class MoneroTransfer
         {
             throw new MoneroError("Cannot merge null transfer");
         }
+
         if (this == transfer)
         {
             return this;

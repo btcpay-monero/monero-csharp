@@ -20,6 +20,6 @@ public class MoneroDaemonUpdateDownloadResult : MoneroDaemonUpdateCheckResult
 
     public void SetDownloadPath(string? downloadPath)
     {
-        this._downloadPath = downloadPath;
+        _downloadPath = downloadPath;
     }
 }

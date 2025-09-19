@@ -4,7 +4,6 @@ namespace Monero.Daemon.Common;
 
 public class MoneroDaemonConfig
 {
-    private string? _path;
     private bool? _allowLocalIp;
     private string? _banList;
     private int? _blockSyncSize;
@@ -61,6 +60,7 @@ public class MoneroDaemonConfig
     private bool? _p2PIgnoreIpv4;
     private bool? _p2PUseIpv6;
     private bool? _padTransactions;
+    private string? _path;
     private List<string> _peers = [];
     private string? _pidFile;
     private int? _prepBlocksThreads;
@@ -113,13 +113,13 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetPath(string? path)
     {
-        this._path = path;
+        _path = path;
         return this;
     }
 
     public MoneroDaemonConfig SetNetworkType(MoneroNetworkType networkType)
     {
-        this._networkType = networkType;
+        _networkType = networkType;
         return this;
     }
 
@@ -130,7 +130,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetLogFile(string? logFile)
     {
-        this._logFile = logFile;
+        _logFile = logFile;
         return this;
     }
 
@@ -141,7 +141,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetLogLevel(int? logLevel)
     {
-        this._logLevel = logLevel;
+        _logLevel = logLevel;
         return this;
     }
 
@@ -152,7 +152,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetMaxLogFileSize(int? maxLogFileSize)
     {
-        this._maxLogFileSize = maxLogFileSize;
+        _maxLogFileSize = maxLogFileSize;
         return this;
     }
 
@@ -163,7 +163,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetMaxLogFiles(int? maxLogFiles)
     {
-        this._maxLogFiles = maxLogFiles;
+        _maxLogFiles = maxLogFiles;
         return this;
     }
 
@@ -174,7 +174,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetDataDir(string? dataDir)
     {
-        this._dataDir = dataDir;
+        _dataDir = dataDir;
         return this;
     }
 
@@ -185,7 +185,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetPidFile(string? pidFile)
     {
-        this._pidFile = pidFile;
+        _pidFile = pidFile;
         return this;
     }
 
@@ -196,7 +196,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetDetach(bool? detach)
     {
-        this._detach = detach;
+        _detach = detach;
         return this;
     }
 
@@ -207,7 +207,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetNonInteractive(bool? nonInteractive)
     {
-        this._nonInteractive = nonInteractive;
+        _nonInteractive = nonInteractive;
         return this;
     }
 
@@ -218,7 +218,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetMaxTxPoolWeight(ulong? maxTxPoolWeight)
     {
-        this._maxTxPoolWeight = maxTxPoolWeight;
+        _maxTxPoolWeight = maxTxPoolWeight;
         return this;
     }
 
@@ -229,7 +229,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetEnforceDnsCheckpointing(bool? enforceDnsCheckpointing)
     {
-        this._enforceDnsCheckpointing = enforceDnsCheckpointing;
+        _enforceDnsCheckpointing = enforceDnsCheckpointing;
         return this;
     }
 
@@ -240,7 +240,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetDisableDnsCheckpoints(bool? disableDnsCheckpoints)
     {
-        this._disableDnsCheckpoints = disableDnsCheckpoints;
+        _disableDnsCheckpoints = disableDnsCheckpoints;
         return this;
     }
 
@@ -251,7 +251,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetBanList(string? banList)
     {
-        this._banList = banList;
+        _banList = banList;
         return this;
     }
 
@@ -273,7 +273,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetP2pBindIp(string? p2pBindIp)
     {
-        this._p2PBindIp = p2pBindIp;
+        _p2PBindIp = p2pBindIp;
         return this;
     }
 
@@ -284,7 +284,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetP2pBindPort(int? p2pBindPort)
     {
-        this._p2PBindPort = p2pBindPort;
+        _p2PBindPort = p2pBindPort;
         return this;
     }
 
@@ -295,7 +295,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetP2pExternalPort(int? p2pExternalPort)
     {
-        this._p2PExternalPort = p2pExternalPort;
+        _p2PExternalPort = p2pExternalPort;
         return this;
     }
 
@@ -306,7 +306,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetP2pUseIpv6(bool? p2pUseIpv6)
     {
-        this._p2PUseIpv6 = p2pUseIpv6;
+        _p2PUseIpv6 = p2pUseIpv6;
         return this;
     }
 
@@ -317,7 +317,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetP2pBindIpv6Address(string? p2pBindIpv6Address)
     {
-        this._p2PBindIpv6Address = p2pBindIpv6Address;
+        _p2PBindIpv6Address = p2pBindIpv6Address;
         return this;
     }
 
@@ -328,7 +328,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetP2pBindPortIpv6(int? p2pBindPortIpv6)
     {
-        this._p2PBindPortIpv6 = p2pBindPortIpv6;
+        _p2PBindPortIpv6 = p2pBindPortIpv6;
         return this;
     }
 
@@ -339,7 +339,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetP2pIgnoreIpv4(bool? p2pIgnoreIpv4)
     {
-        this._p2PIgnoreIpv4 = p2pIgnoreIpv4;
+        _p2PIgnoreIpv4 = p2pIgnoreIpv4;
         return this;
     }
 
@@ -350,7 +350,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetNoIgd(bool? noIgd)
     {
-        this._noIgd = noIgd;
+        _noIgd = noIgd;
         return this;
     }
 
@@ -361,7 +361,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetIgd(string? igd)
     {
-        this._igd = igd;
+        _igd = igd;
         return this;
     }
 
@@ -372,7 +372,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetHideMyPort(bool? hideMyPort)
     {
-        this._hideMyPort = hideMyPort;
+        _hideMyPort = hideMyPort;
         return this;
     }
 
@@ -383,7 +383,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetSeedNode(string? seedNode)
     {
-        this._seedNode = seedNode;
+        _seedNode = seedNode;
         return this;
     }
 
@@ -394,7 +394,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetPeers(List<string> peers)
     {
-        this._peers = peers;
+        _peers = peers;
         return this;
     }
 
@@ -423,7 +423,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetPriorityNodes(List<string> priorityNodes)
     {
-        this._priorityNodes = priorityNodes;
+        _priorityNodes = priorityNodes;
         return this;
     }
 
@@ -452,7 +452,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetExclusiveNodes(List<string> exclusiveNodes)
     {
-        this._exclusiveNodes = exclusiveNodes;
+        _exclusiveNodes = exclusiveNodes;
         return this;
     }
 
@@ -463,7 +463,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetOutPeers(List<string> outPeers)
     {
-        this._outPeers = outPeers;
+        _outPeers = outPeers;
         return this;
     }
 
@@ -492,7 +492,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetInPeers(List<string> inPeers)
     {
-        this._inPeers = inPeers;
+        _inPeers = inPeers;
         return this;
     }
 
@@ -521,7 +521,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetLimitRateUp(int? limitRateUp)
     {
-        this._limitRateUp = limitRateUp;
+        _limitRateUp = limitRateUp;
         return this;
     }
 
@@ -532,7 +532,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetLimitRateDown(int? limitRateDown)
     {
-        this._limitRateDown = limitRateDown;
+        _limitRateDown = limitRateDown;
         return this;
     }
 
@@ -543,7 +543,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetLimitRate(int? limitRate)
     {
-        this._limitRate = limitRate;
+        _limitRate = limitRate;
         return this;
     }
 
@@ -554,7 +554,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetOffline(bool? offline)
     {
-        this._offline = offline;
+        _offline = offline;
         return this;
     }
 
@@ -565,7 +565,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetAllowLocalIp(bool? allowLocalIp)
     {
-        this._allowLocalIp = allowLocalIp;
+        _allowLocalIp = allowLocalIp;
         return this;
     }
 
@@ -576,7 +576,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetMaxConnectionsPerIp(int? maxConnectionsPerIp)
     {
-        this._maxConnectionsPerIp = maxConnectionsPerIp;
+        _maxConnectionsPerIp = maxConnectionsPerIp;
         return this;
     }
 
@@ -587,7 +587,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetTorTxProxy(string? torTxProxy)
     {
-        this._torTxProxy = torTxProxy;
+        _torTxProxy = torTxProxy;
         return this;
     }
 
@@ -598,7 +598,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetTorAnonymousInbound(string? torAnonymousInbound)
     {
-        this._torAnonymousInbound = torAnonymousInbound;
+        _torAnonymousInbound = torAnonymousInbound;
         return this;
     }
 
@@ -609,7 +609,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetI2pTxProxy(string? i2pTxProxy)
     {
-        this._i2PTxProxy = i2pTxProxy;
+        _i2PTxProxy = i2pTxProxy;
         return this;
     }
 
@@ -620,7 +620,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetI2pAnonymousInbound(string? i2pAnonymousInbound)
     {
-        this._i2PAnonymousInbound = i2pAnonymousInbound;
+        _i2PAnonymousInbound = i2pAnonymousInbound;
         return this;
     }
 
@@ -631,7 +631,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetPadTransactions(bool? padTransactions)
     {
-        this._padTransactions = padTransactions;
+        _padTransactions = padTransactions;
         return this;
     }
 
@@ -642,7 +642,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetProxy(string? proxy)
     {
-        this._proxy = proxy;
+        _proxy = proxy;
         return this;
     }
 
@@ -653,7 +653,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetPublicNode(bool? publicNode)
     {
-        this._publicNode = publicNode;
+        _publicNode = publicNode;
         return this;
     }
 
@@ -664,7 +664,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcBindIp(string? rpcBindIp)
     {
-        this._rpcBindIp = rpcBindIp;
+        _rpcBindIp = rpcBindIp;
         return this;
     }
 
@@ -675,7 +675,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcBindPort(int? rpcBindPort)
     {
-        this._rpcBindPort = rpcBindPort;
+        _rpcBindPort = rpcBindPort;
         return this;
     }
 
@@ -686,7 +686,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcBindIpv6Address(string? rpcBindIpv6Address)
     {
-        this._rpcBindIpv6Address = rpcBindIpv6Address;
+        _rpcBindIpv6Address = rpcBindIpv6Address;
         return this;
     }
 
@@ -697,7 +697,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcUseIpv6(bool? rpcUseIpv6)
     {
-        this._rpcUseIpv6 = rpcUseIpv6;
+        _rpcUseIpv6 = rpcUseIpv6;
         return this;
     }
 
@@ -708,7 +708,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcIgnoreIpv4(bool? rpcIgnoreIpv4)
     {
-        this._rpcIgnoreIpv4 = rpcIgnoreIpv4;
+        _rpcIgnoreIpv4 = rpcIgnoreIpv4;
         return this;
     }
 
@@ -719,7 +719,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcRestrictedBindIp(string? rpcRestrictedBindIp)
     {
-        this._rpcRestrictedBindIp = rpcRestrictedBindIp;
+        _rpcRestrictedBindIp = rpcRestrictedBindIp;
         return this;
     }
 
@@ -730,7 +730,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcRestrictedBindPort(int? rpcRestrictedBindPort)
     {
-        this._rpcRestrictedBindPort = rpcRestrictedBindPort;
+        _rpcRestrictedBindPort = rpcRestrictedBindPort;
         return this;
     }
 
@@ -741,7 +741,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcRestrictedBindIpv6Address(string? rpcRestrictedBindIpv6Address)
     {
-        this._rpcRestrictedBindIpv6Address = rpcRestrictedBindIpv6Address;
+        _rpcRestrictedBindIpv6Address = rpcRestrictedBindIpv6Address;
         return this;
     }
 
@@ -752,7 +752,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcMaxConnections(int? rpcMaxConnections)
     {
-        this._rpcMaxConnections = rpcMaxConnections;
+        _rpcMaxConnections = rpcMaxConnections;
         return this;
     }
 
@@ -763,7 +763,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcMaxConnectionsPerPublicIp(int? rpcMaxConnectionsPerPublicIp)
     {
-        this._rpcMaxConnectionsPerPublicIp = rpcMaxConnectionsPerPublicIp;
+        _rpcMaxConnectionsPerPublicIp = rpcMaxConnectionsPerPublicIp;
         return this;
     }
 
@@ -785,7 +785,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcMaxResponseSoftLimit(int? rpcMaxResponseSoftLimit)
     {
-        this._rpcMaxResponseSoftLimit = rpcMaxResponseSoftLimit;
+        _rpcMaxResponseSoftLimit = rpcMaxResponseSoftLimit;
         return this;
     }
 
@@ -796,7 +796,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcSsl(string? rpcSsl)
     {
-        this._rpcSsl = rpcSsl;
+        _rpcSsl = rpcSsl;
         return this;
     }
 
@@ -807,7 +807,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcSslPrivateKey(string? rpcSslPrivateKey)
     {
-        this._rpcSslPrivateKey = rpcSslPrivateKey;
+        _rpcSslPrivateKey = rpcSslPrivateKey;
         return this;
     }
 
@@ -818,7 +818,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcSslCertificate(string? rpcSslCertificate)
     {
-        this._rpcSslCertificate = rpcSslCertificate;
+        _rpcSslCertificate = rpcSslCertificate;
         return this;
     }
 
@@ -829,7 +829,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcSslAllowedFingerprints(List<string> rpcSslAllowedFingerprints)
     {
-        this._rpcSslAllowedFingerprints = rpcSslAllowedFingerprints;
+        _rpcSslAllowedFingerprints = rpcSslAllowedFingerprints;
         return this;
     }
 
@@ -840,7 +840,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcSslAllowAnyCert(bool? rpcSslAllowAnyCert)
     {
-        this._rpcSslAllowAnyCert = rpcSslAllowAnyCert;
+        _rpcSslAllowAnyCert = rpcSslAllowAnyCert;
         return this;
     }
 
@@ -851,7 +851,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcSslCaCertificates(string? rpcSslCaCertificates)
     {
-        this._rpcSslCaCertificates = rpcSslCaCertificates;
+        _rpcSslCaCertificates = rpcSslCaCertificates;
         return this;
     }
 
@@ -862,7 +862,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcSslAllowChained(bool? rpcSslAllowChained)
     {
-        this._rpcSslAllowChained = rpcSslAllowChained;
+        _rpcSslAllowChained = rpcSslAllowChained;
         return this;
     }
 
@@ -873,7 +873,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcLogin(string? rpcLogin)
     {
-        this._rpcLogin = rpcLogin;
+        _rpcLogin = rpcLogin;
         return this;
     }
 
@@ -884,7 +884,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRpcAccessControlOrigins(string? rpcAccessControlOrigins)
     {
-        this._rpcAccessControlOrigins = rpcAccessControlOrigins;
+        _rpcAccessControlOrigins = rpcAccessControlOrigins;
         return this;
     }
 
@@ -895,7 +895,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetDisableRpcBan(bool? disableRpcBan)
     {
-        this._disableRpcBan = disableRpcBan;
+        _disableRpcBan = disableRpcBan;
         return this;
     }
 
@@ -906,7 +906,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetZmqRpcBindIp(string? zmqRpcBindIp)
     {
-        this._zmqRpcBindIp = zmqRpcBindIp;
+        _zmqRpcBindIp = zmqRpcBindIp;
         return this;
     }
 
@@ -917,7 +917,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetZmqRpcBindPort(int? zmqRpcBindPort)
     {
-        this._zmqRpcBindPort = zmqRpcBindPort;
+        _zmqRpcBindPort = zmqRpcBindPort;
         return this;
     }
 
@@ -928,7 +928,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetZmqPub(string? zmqPub)
     {
-        this._zmqPub = zmqPub;
+        _zmqPub = zmqPub;
         return this;
     }
 
@@ -939,7 +939,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetNoZmq(bool? noZmq)
     {
-        this._noZmq = noZmq;
+        _noZmq = noZmq;
         return this;
     }
 
@@ -950,7 +950,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetConfirmExternalBind(bool? confirmExternalBind)
     {
-        this._confirmExternalBind = confirmExternalBind;
+        _confirmExternalBind = confirmExternalBind;
         return this;
     }
 
@@ -961,7 +961,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetRestrictedRpc(bool? restrictedRpc)
     {
-        this._restrictedRpc = restrictedRpc;
+        _restrictedRpc = restrictedRpc;
         return this;
     }
 
@@ -972,7 +972,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetPruneBlockchain(bool? pruneBlockchain)
     {
-        this._pruneBlockchain = pruneBlockchain;
+        _pruneBlockchain = pruneBlockchain;
         return this;
     }
 
@@ -983,7 +983,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetSyncPrunedBlocks(bool? syncPrunedBlocks)
     {
-        this._syncPrunedBlocks = syncPrunedBlocks;
+        _syncPrunedBlocks = syncPrunedBlocks;
         return this;
     }
 
@@ -994,7 +994,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetDbSyncMode(string? dbSyncMode)
     {
-        this._dbSyncMode = dbSyncMode;
+        _dbSyncMode = dbSyncMode;
         return this;
     }
 
@@ -1005,7 +1005,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetMaxConcurrency(int? maxConcurrency)
     {
-        this._maxConcurrency = maxConcurrency;
+        _maxConcurrency = maxConcurrency;
         return this;
     }
 
@@ -1016,7 +1016,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetPrepBlocksThreads(int? prepBlocksThreads)
     {
-        this._prepBlocksThreads = prepBlocksThreads;
+        _prepBlocksThreads = prepBlocksThreads;
         return this;
     }
 
@@ -1027,7 +1027,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetFastBlockSync(bool? fastBlockSync)
     {
-        this._fastBlockSync = fastBlockSync;
+        _fastBlockSync = fastBlockSync;
         return this;
     }
 
@@ -1038,7 +1038,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetBlockSyncSize(int? blockSyncSize)
     {
-        this._blockSyncSize = blockSyncSize;
+        _blockSyncSize = blockSyncSize;
         return this;
     }
 
@@ -1049,7 +1049,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetBootstrapDaemonAddress(string? bootstrapDaemonAddress)
     {
-        this._bootstrapDaemonAddress = bootstrapDaemonAddress;
+        _bootstrapDaemonAddress = bootstrapDaemonAddress;
         return this;
     }
 
@@ -1060,7 +1060,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetBootstrapDaemonLogin(string? booststrapDaemonLogin)
     {
-        this._booststrapDaemonLogin = booststrapDaemonLogin;
+        _booststrapDaemonLogin = booststrapDaemonLogin;
         return this;
     }
 
@@ -1071,7 +1071,7 @@ public class MoneroDaemonConfig
 
     public MoneroDaemonConfig SetNoSync(bool? noSync)
     {
-        this._noSync = noSync;
+        _noSync = noSync;
         return this;
     }
 

@@ -14,7 +14,7 @@ public class MoneroBan
 
     public MoneroBan SetHost(string? host)
     {
-        this._host = host;
+        _host = host;
         return this;
     }
 
@@ -25,7 +25,7 @@ public class MoneroBan
 
     public MoneroBan SetIp(uint? ip)
     {
-        this._ip = ip;
+        _ip = ip;
         return this;
     }
 
@@ -36,7 +36,7 @@ public class MoneroBan
 
     public MoneroBan SetIsBanned(bool? isBanned)
     {
-        this._isBanned = isBanned;
+        _isBanned = isBanned;
         return this;
     }
 
@@ -47,7 +47,7 @@ public class MoneroBan
 
     public MoneroBan SetSeconds(ulong? seconds)
     {
-        this._seconds = seconds;
+        _seconds = seconds;
         return this;
     }
 }

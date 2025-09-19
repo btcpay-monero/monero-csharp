@@ -15,7 +15,7 @@ public class MoneroCheckTx : MoneroCheck
 
     public MoneroCheckTx SetInTxPool(bool? inTxPool)
     {
-        this._inTxPool = inTxPool;
+        _inTxPool = inTxPool;
         return this;
     }
 
@@ -26,7 +26,7 @@ public class MoneroCheckTx : MoneroCheck
 
     public MoneroCheckTx SetNumConfirmations(ulong? numConfirmations)
     {
-        this._numConfirmations = numConfirmations;
+        _numConfirmations = numConfirmations;
         return this;
     }
 
@@ -37,7 +37,7 @@ public class MoneroCheckTx : MoneroCheck
 
     public MoneroCheckTx SetReceivedAmount(ulong? receivedAmount)
     {
-        this._receivedAmount = receivedAmount;
+        _receivedAmount = receivedAmount;
         return this;
     }
 }

@@ -45,7 +45,7 @@ public class MoneroDaemonInfo
 
     public void SetVersion(string? version)
     {
-        this._version = version;
+        _version = version;
     }
 
     public ulong? GetNumAltBlocks()
@@ -55,7 +55,7 @@ public class MoneroDaemonInfo
 
     public void SetNumAltBlocks(ulong? numAltBlocks)
     {
-        this._numAltBlocks = numAltBlocks;
+        _numAltBlocks = numAltBlocks;
     }
 
     public ulong? GetBlockSizeLimit()
@@ -65,7 +65,7 @@ public class MoneroDaemonInfo
 
     public void SetBlockSizeLimit(ulong? blockSizeLimit)
     {
-        this._blockSizeLimit = blockSizeLimit;
+        _blockSizeLimit = blockSizeLimit;
     }
 
     public ulong? GetBlockSizeMedian()
@@ -75,7 +75,7 @@ public class MoneroDaemonInfo
 
     public void SetBlockSizeMedian(ulong? blockSizeMedian)
     {
-        this._blockSizeMedian = blockSizeMedian;
+        _blockSizeMedian = blockSizeMedian;
     }
 
     public ulong? GetBlockWeightLimit()
@@ -85,7 +85,7 @@ public class MoneroDaemonInfo
 
     public MoneroDaemonInfo SetBlockWeightLimit(ulong? blockWeightLimit)
     {
-        this._blockWeightLimit = blockWeightLimit;
+        _blockWeightLimit = blockWeightLimit;
         return this;
     }
 
@@ -96,7 +96,7 @@ public class MoneroDaemonInfo
 
     public void SetBlockWeightMedian(ulong? blockWeightMedian)
     {
-        this._blockWeightMedian = blockWeightMedian;
+        _blockWeightMedian = blockWeightMedian;
     }
 
     public string? GetBootstrapDaemonAddress()
@@ -106,7 +106,7 @@ public class MoneroDaemonInfo
 
     public void SetBootstrapDaemonAddress(string? bootstrapDaemonAddress)
     {
-        this._bootstrapDaemonAddress = bootstrapDaemonAddress;
+        _bootstrapDaemonAddress = bootstrapDaemonAddress;
     }
 
     public ulong? GetDifficulty()
@@ -116,7 +116,7 @@ public class MoneroDaemonInfo
 
     public void SetDifficulty(ulong? difficulty)
     {
-        this._difficulty = difficulty;
+        _difficulty = difficulty;
     }
 
     public ulong? GetCumulativeDifficulty()
@@ -126,7 +126,7 @@ public class MoneroDaemonInfo
 
     public void SetCumulativeDifficulty(ulong? cumulativeDifficulty)
     {
-        this._cumulativeDifficulty = cumulativeDifficulty;
+        _cumulativeDifficulty = cumulativeDifficulty;
     }
 
     public ulong? GetFreeSpace()
@@ -136,7 +136,7 @@ public class MoneroDaemonInfo
 
     public void SetFreeSpace(ulong? freeSpace)
     {
-        this._freeSpace = freeSpace;
+        _freeSpace = freeSpace;
     }
 
     public uint? GetNumOfflinePeers()
@@ -146,7 +146,7 @@ public class MoneroDaemonInfo
 
     public void SetNumOfflinePeers(uint? numOfflinePeers)
     {
-        this._numOfflinePeers = numOfflinePeers;
+        _numOfflinePeers = numOfflinePeers;
     }
 
     public uint? GetNumOnlinePeers()
@@ -156,7 +156,7 @@ public class MoneroDaemonInfo
 
     public void SetNumOnlinePeers(uint? numOnlinePeers)
     {
-        this._numOnlinePeers = numOnlinePeers;
+        _numOnlinePeers = numOnlinePeers;
     }
 
     public ulong? GetHeight()
@@ -166,7 +166,7 @@ public class MoneroDaemonInfo
 
     public void SetHeight(ulong? height)
     {
-        this._height = height;
+        _height = height;
     }
 
     public ulong? GetHeightWithoutBootstrap()
@@ -176,7 +176,7 @@ public class MoneroDaemonInfo
 
     public void SetHeightWithoutBootstrap(ulong? heightWithoutBootstrap)
     {
-        this._heightWithoutBootstrap = heightWithoutBootstrap;
+        _heightWithoutBootstrap = heightWithoutBootstrap;
     }
 
     public MoneroNetworkType? GetNetworkType()
@@ -186,7 +186,7 @@ public class MoneroDaemonInfo
 
     public void SetNetworkType(MoneroNetworkType? networkType)
     {
-        this._networkType = networkType;
+        _networkType = networkType;
     }
 
     public bool? IsOffline()
@@ -196,7 +196,7 @@ public class MoneroDaemonInfo
 
     public void SetIsOffline(bool? isOffline)
     {
-        this._isOffline = isOffline;
+        _isOffline = isOffline;
     }
 
     public uint? GetNumIncomingConnections()
@@ -206,7 +206,7 @@ public class MoneroDaemonInfo
 
     public void SetNumIncomingConnections(uint? numIncomingConnections)
     {
-        this._numIncomingConnections = numIncomingConnections;
+        _numIncomingConnections = numIncomingConnections;
     }
 
     public uint? GetNumOutgoingConnections()
@@ -216,7 +216,7 @@ public class MoneroDaemonInfo
 
     public void SetNumOutgoingConnections(uint? numOutgoingConnections)
     {
-        this._numOutgoingConnections = numOutgoingConnections;
+        _numOutgoingConnections = numOutgoingConnections;
     }
 
     public uint? GetNumRpcConnections()
@@ -226,7 +226,7 @@ public class MoneroDaemonInfo
 
     public void SetNumRpcConnections(uint? numRpcConnections)
     {
-        this._numRpcConnections = numRpcConnections;
+        _numRpcConnections = numRpcConnections;
     }
 
     public ulong? GetStartTimestamp()
@@ -236,7 +236,7 @@ public class MoneroDaemonInfo
 
     public void SetStartTimestamp(ulong? startTimestamp)
     {
-        this._startTimestamp = startTimestamp;
+        _startTimestamp = startTimestamp;
     }
 
     public ulong? GetAdjustedTimestamp()
@@ -246,7 +246,7 @@ public class MoneroDaemonInfo
 
     public void SetAdjustedTimestamp(ulong? adjustedTimestamp)
     {
-        this._adjustedTimestamp = adjustedTimestamp;
+        _adjustedTimestamp = adjustedTimestamp;
     }
 
     public ulong? GetTarget()
@@ -256,7 +256,7 @@ public class MoneroDaemonInfo
 
     public void SetTarget(ulong? target)
     {
-        this._target = target;
+        _target = target;
     }
 
     public ulong? GetTargetHeight()
@@ -266,7 +266,7 @@ public class MoneroDaemonInfo
 
     public void SetTargetHeight(ulong? targetHeight)
     {
-        this._targetHeight = targetHeight;
+        _targetHeight = targetHeight;
     }
 
     public string? GetTopBlockHash()
@@ -276,7 +276,7 @@ public class MoneroDaemonInfo
 
     public void SetTopBlockHash(string? topBlockHash)
     {
-        this._topBlockHash = topBlockHash;
+        _topBlockHash = topBlockHash;
     }
 
     public uint? GetNumTxs()
@@ -286,7 +286,7 @@ public class MoneroDaemonInfo
 
     public void SetNumTxs(uint? numTxs)
     {
-        this._numTxs = numTxs;
+        _numTxs = numTxs;
     }
 
     public uint? GetNumTxsPool()
@@ -296,7 +296,7 @@ public class MoneroDaemonInfo
 
     public void SetNumTxsPool(uint? numTxsPool)
     {
-        this._numTxsPool = numTxsPool;
+        _numTxsPool = numTxsPool;
     }
 
     public bool? GetWasBootstrapEverUsed()
@@ -306,7 +306,7 @@ public class MoneroDaemonInfo
 
     public void SetWasBootstrapEverUsed(bool? wasBootstrapEverUsed)
     {
-        this._wasBootstrapEverUsed = wasBootstrapEverUsed;
+        _wasBootstrapEverUsed = wasBootstrapEverUsed;
     }
 
     public ulong? GetDatabaseSize()
@@ -316,7 +316,7 @@ public class MoneroDaemonInfo
 
     public void SetDatabaseSize(ulong? databaseSize)
     {
-        this._databaseSize = databaseSize;
+        _databaseSize = databaseSize;
     }
 
     public bool? GetUpdateAvailable()
@@ -326,7 +326,7 @@ public class MoneroDaemonInfo
 
     public void SetUpdateAvailable(bool? updateAvailable)
     {
-        this._updateAvailable = updateAvailable;
+        _updateAvailable = updateAvailable;
     }
 
     public ulong? GetCredits()
@@ -336,7 +336,7 @@ public class MoneroDaemonInfo
 
     public void SetCredits(ulong? credits)
     {
-        this._credits = credits;
+        _credits = credits;
     }
 
     public bool? IsBusySyncing()
@@ -346,7 +346,7 @@ public class MoneroDaemonInfo
 
     public void SetIsBusySyncing(bool? isBusySyncing)
     {
-        this._isBusySyncing = isBusySyncing;
+        _isBusySyncing = isBusySyncing;
     }
 
     public bool? IsSynchronized()
@@ -356,7 +356,7 @@ public class MoneroDaemonInfo
 
     public void SetIsSynchronized(bool? isSynchronized)
     {
-        this._isSynchronized = isSynchronized;
+        _isSynchronized = isSynchronized;
     }
 
     public bool? IsRestricted()
@@ -366,6 +366,6 @@ public class MoneroDaemonInfo
 
     public void SetIsRestricted(bool? isRestricted)
     {
-        this._isRestricted = isRestricted;
+        _isRestricted = isRestricted;
     }
 }

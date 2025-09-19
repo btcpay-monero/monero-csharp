@@ -38,7 +38,7 @@ public class MoneroPeer
 
     public MoneroPeer SetId(string? id)
     {
-        this._id = id;
+        _id = id;
         return this;
     }
 
@@ -49,7 +49,7 @@ public class MoneroPeer
 
     public MoneroPeer SetAddress(string? address)
     {
-        this._address = address;
+        _address = address;
         return this;
     }
 
@@ -60,7 +60,7 @@ public class MoneroPeer
 
     public MoneroPeer SetHost(string? host)
     {
-        this._host = host;
+        _host = host;
         return this;
     }
 
@@ -71,7 +71,7 @@ public class MoneroPeer
 
     public MoneroPeer SetPort(int? port)
     {
-        this._port = port;
+        _port = port;
         return this;
     }
 
@@ -82,7 +82,7 @@ public class MoneroPeer
 
     public MoneroPeer SetIsOnline(bool isOnline)
     {
-        this._isOnline = isOnline;
+        _isOnline = isOnline;
         return this;
     }
 
@@ -93,7 +93,7 @@ public class MoneroPeer
 
     public MoneroPeer SetLastSeenTimestamp(ulong? lastSeenTimestamp)
     {
-        this._lastSeenTimestamp = lastSeenTimestamp;
+        _lastSeenTimestamp = lastSeenTimestamp;
         return this;
     }
 
@@ -104,7 +104,7 @@ public class MoneroPeer
 
     public MoneroPeer SetPruningSeed(int? pruningSeed)
     {
-        this._pruningSeed = pruningSeed;
+        _pruningSeed = pruningSeed;
         return this;
     }
 
@@ -115,7 +115,7 @@ public class MoneroPeer
 
     public MoneroPeer SetRpcPort(int? rpcPort)
     {
-        this._rpcPort = rpcPort;
+        _rpcPort = rpcPort;
         return this;
     }
 
@@ -126,7 +126,7 @@ public class MoneroPeer
 
     public MoneroPeer SetRpcCreditsPerHash(ulong? rpcCreditsPerHash)
     {
-        this._rpcCreditsPerHash = rpcCreditsPerHash;
+        _rpcCreditsPerHash = rpcCreditsPerHash;
         return this;
     }
 
@@ -137,7 +137,7 @@ public class MoneroPeer
 
     public void SetHash(string? hash)
     {
-        this._hash = hash;
+        _hash = hash;
     }
 
     public ulong? GetAvgDownload()
@@ -147,7 +147,7 @@ public class MoneroPeer
 
     public void SetAvgDownload(ulong? avgDownload)
     {
-        this._avgDownload = avgDownload;
+        _avgDownload = avgDownload;
     }
 
     public ulong? GetAvgUpload()
@@ -157,7 +157,7 @@ public class MoneroPeer
 
     public void SetAvgUpload(ulong? avgUpload)
     {
-        this._avgUpload = avgUpload;
+        _avgUpload = avgUpload;
     }
 
     public ulong? GetCurrentDownload()
@@ -167,7 +167,7 @@ public class MoneroPeer
 
     public void SetCurrentDownload(ulong? currentDownload)
     {
-        this._currentDownload = currentDownload;
+        _currentDownload = currentDownload;
     }
 
     public ulong? GetCurrentUpload()
@@ -177,7 +177,7 @@ public class MoneroPeer
 
     public void SetCurrentUpload(ulong? currentUpload)
     {
-        this._currentUpload = currentUpload;
+        _currentUpload = currentUpload;
     }
 
     public ulong? GetHeight()
@@ -187,7 +187,7 @@ public class MoneroPeer
 
     public void SetHeight(ulong? height)
     {
-        this._height = height;
+        _height = height;
     }
 
     public bool IsIncoming()
@@ -197,7 +197,7 @@ public class MoneroPeer
 
     public void SetIsIncoming(bool isIncoming)
     {
-        this._isIncoming = isIncoming;
+        _isIncoming = isIncoming;
     }
 
     public ulong? GetLiveTime()
@@ -207,7 +207,7 @@ public class MoneroPeer
 
     public void SetLiveTime(ulong? liveTime)
     {
-        this._liveTime = liveTime;
+        _liveTime = liveTime;
     }
 
     public bool IsLocalIp()
@@ -217,7 +217,7 @@ public class MoneroPeer
 
     public void SetIsLocalIp(bool isLocalIp)
     {
-        this._isLocalIp = isLocalIp;
+        _isLocalIp = isLocalIp;
     }
 
     public bool IsLocalHost()
@@ -227,7 +227,7 @@ public class MoneroPeer
 
     public void SetIsLocalHost(bool isLocalHost)
     {
-        this._isLocalHost = isLocalHost;
+        _isLocalHost = isLocalHost;
     }
 
     public int? GetNumReceives()
@@ -237,7 +237,7 @@ public class MoneroPeer
 
     public void SetNumReceives(int? numReceives)
     {
-        this._numReceives = numReceives;
+        _numReceives = numReceives;
     }
 
     public int? GetNumSends()
@@ -247,7 +247,7 @@ public class MoneroPeer
 
     public void SetNumSends(int? numSends)
     {
-        this._numSends = numSends;
+        _numSends = numSends;
     }
 
     public ulong? GetReceiveIdleTime()
@@ -257,7 +257,7 @@ public class MoneroPeer
 
     public void SetReceiveIdleTime(ulong? receiveIdleTime)
     {
-        this._receiveIdleTime = receiveIdleTime;
+        _receiveIdleTime = receiveIdleTime;
     }
 
     public ulong? GetSendIdleTime()
@@ -267,7 +267,7 @@ public class MoneroPeer
 
     public void SetSendIdleTime(ulong? sendIdleTime)
     {
-        this._sendIdleTime = sendIdleTime;
+        _sendIdleTime = sendIdleTime;
     }
 
     public string? GetState()
@@ -277,7 +277,7 @@ public class MoneroPeer
 
     public void SetState(string? state)
     {
-        this._state = state;
+        _state = state;
     }
 
     public int? GetNumSupportFlags()
@@ -287,7 +287,7 @@ public class MoneroPeer
 
     public void SetNumSupportFlags(int? numSupportFlags)
     {
-        this._numSupportFlags = numSupportFlags;
+        _numSupportFlags = numSupportFlags;
     }
 
     public MoneroConnectionType? GetConnectionType()
@@ -297,6 +297,6 @@ public class MoneroPeer
 
     public void SetConnectionType(MoneroConnectionType? type)
     {
-        this._type = type;
+        _type = type;
     }
 }

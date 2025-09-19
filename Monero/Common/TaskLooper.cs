@@ -73,7 +73,7 @@ public class TaskLooper
             if (targetFixedPeriod)
             {
                 ulong elapsed = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
-                delay = (elapsed >= _periodInMs) ? 0 : _periodInMs - elapsed;
+                delay = elapsed >= _periodInMs ? 0 : _periodInMs - elapsed;
             }
 
             try

@@ -6,12 +6,12 @@ namespace Monero.Wallet;
 internal class MoneroWalletPoller
 {
     private readonly TaskLooper _looper;
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     private readonly HashSet<string>
         _prevConfirmedNotifications = []; // tx hashes of previously confirmed but not yet unlocked notifications
 
     private readonly HashSet<string> _prevUnconfirmedNotifications = []; // tx hashes of previous notifications
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     private readonly ulong _syncPeriodInMs; // default sync period in ms
     private readonly MoneroWalletDefault _wallet;
@@ -23,9 +23,9 @@ internal class MoneroWalletPoller
 
     public MoneroWalletPoller(MoneroWalletDefault wallet, ulong syncPeriodInMs)
     {
-        this._wallet = wallet;
+        _wallet = wallet;
         _looper = new TaskLooper(() => Poll());
-        this._syncPeriodInMs = syncPeriodInMs;
+        _syncPeriodInMs = syncPeriodInMs;
     }
 
     // TODO: factor to common wallet rpc listener
@@ -45,7 +45,7 @@ internal class MoneroWalletPoller
 
     public void SetIsPolling(bool isPolling)
     {
-        this._isPolling = isPolling;
+        _isPolling = isPolling;
         if (isPolling)
         {
             _looper.Start(_syncPeriodInMs);

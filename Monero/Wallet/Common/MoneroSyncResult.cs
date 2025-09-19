@@ -7,7 +7,6 @@ public class MoneroSyncResult
 
     public MoneroSyncResult()
     {
-
     }
 
     public MoneroSyncResult(ulong? numBlocksFetched, bool? receivedMoney)

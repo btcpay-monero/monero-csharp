@@ -218,7 +218,7 @@ public static class GenUtils
 
     public static string GetIndent(int length)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
         for (int i = 0; i < length; i++)
         {
             sb.Append("  "); // two spaces

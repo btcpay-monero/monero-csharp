@@ -42,7 +42,7 @@ public class MoneroOutputQuery : MoneroOutputWallet
 
     public MoneroOutputQuery SetMinAmount(ulong minAmount)
     {
-        this._minAmount = minAmount;
+        _minAmount = minAmount;
         return this;
     }
 
@@ -53,7 +53,7 @@ public class MoneroOutputQuery : MoneroOutputWallet
 
     public MoneroOutputQuery SetMaxAmount(ulong maxAmount)
     {
-        this._maxAmount = maxAmount;
+        _maxAmount = maxAmount;
         return this;
     }
 
@@ -64,7 +64,7 @@ public class MoneroOutputQuery : MoneroOutputWallet
 
     public MoneroOutputQuery SetTxQuery(MoneroTxQuery? txQuery)
     {
-        this._txQuery = txQuery;
+        _txQuery = txQuery;
         if (txQuery != null)
         {
             txQuery.SetOutputQuery(this);
@@ -80,7 +80,7 @@ public class MoneroOutputQuery : MoneroOutputWallet
 
     public MoneroOutputQuery SetSubaddressIndices(List<uint>? subaddressIndices)
     {
-        this._subaddressIndices = subaddressIndices;
+        _subaddressIndices = subaddressIndices;
         return this;
     }
 

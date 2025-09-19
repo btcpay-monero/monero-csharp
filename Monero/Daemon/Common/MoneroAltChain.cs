@@ -15,7 +15,7 @@ public class MoneroAltChain
 
     public MoneroAltChain SetBlockHashes(List<string>? blockHashes)
     {
-        this._blockHashes = blockHashes;
+        _blockHashes = blockHashes;
         return this;
     }
 
@@ -26,7 +26,7 @@ public class MoneroAltChain
 
     public MoneroAltChain SetDifficulty(ulong? difficulty)
     {
-        this._difficulty = difficulty;
+        _difficulty = difficulty;
         return this;
     }
 
@@ -37,7 +37,7 @@ public class MoneroAltChain
 
     public MoneroAltChain SetHeight(ulong? height)
     {
-        this._height = height;
+        _height = height;
         return this;
     }
 
@@ -48,7 +48,7 @@ public class MoneroAltChain
 
     public MoneroAltChain SetLength(ulong? length)
     {
-        this._length = length;
+        _length = length;
         return this;
     }
 
@@ -59,7 +59,7 @@ public class MoneroAltChain
 
     public MoneroAltChain SetMainChainParentBlockHash(string? mainChainParentBlockHash)
     {
-        this._mainChainParentBlockHash = mainChainParentBlockHash;
+        _mainChainParentBlockHash = mainChainParentBlockHash;
         return this;
     }
 }

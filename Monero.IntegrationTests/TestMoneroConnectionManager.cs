@@ -20,7 +20,7 @@ public class TestMoneroConnectionManager
                 walletRpcs.Add(TestUtils.StartWalletRpcProcess());
             }
 
-            // create connection manager
+            // create a connection manager
             connectionManager = new MoneroConnectionManager();
 
             // listen for changes
@@ -182,7 +182,8 @@ public class TestMoneroConnectionManager
 
             // test connection order
             orderedConnections = connectionManager.GetRpcConnections();
-            TestConnectionOrder(walletRpcs, connectionManager.GetConnection(), orderedConnections, [1, 0, 4, 2, 3], 0, true);
+            TestConnectionOrder(walletRpcs, connectionManager.GetConnection(), orderedConnections, [1, 0, 4, 2, 3], 0,
+                true);
 
             for (int i = 0; i < orderedConnections.Count - 1; i++)
             {
@@ -228,7 +229,7 @@ public class TestMoneroConnectionManager
             Assert.True(numExpectedChanges == listener.ChangedConnections.Count);
 
             // check all connections and test auto switch
-            connectionManager.CheckConnections();
+            await connectionManager.CheckConnections();
             numExpectedChanges++;
             Assert.True(numExpectedChanges == listener.ChangedConnections.Count);
             Assert.True(connectionManager.IsConnected());
@@ -238,7 +239,7 @@ public class TestMoneroConnectionManager
             numExpectedChanges++;
             Assert.True(numExpectedChanges == listener.ChangedConnections.Count);
             Assert.False(connectionManager.IsConnected());
-            connectionManager.CheckConnections();
+            await connectionManager.CheckConnections();
             numExpectedChanges++;
             Assert.True(numExpectedChanges == listener.ChangedConnections.Count);
             Assert.True(connectionManager.IsConnected());
@@ -311,7 +312,8 @@ public class TestMoneroConnectionManager
         }
     }
 
-    private static int TestExpectedChanges(MoneroRpcConnection? connection, ConnectionChangeCollector listener, int numExpectedChanges)
+    private static int TestExpectedChanges(MoneroRpcConnection? connection, ConnectionChangeCollector listener,
+        int numExpectedChanges)
     {
         if (connection == null)
         {
@@ -333,7 +335,8 @@ public class TestMoneroConnectionManager
         TestConnectionOrder(walletRpcs, null, orderedConnections, indices, checkUriIndex, false);
     }
 
-    private static void TestConnectionOrder(List<MoneroWalletRpc> walletRpcs, MoneroRpcConnection? connection, List<MoneroRpcConnection> orderedConnections, List<int> indices, int checkUriIndex, bool checkConnection)
+    private static void TestConnectionOrder(List<MoneroWalletRpc> walletRpcs, MoneroRpcConnection? connection,
+        List<MoneroRpcConnection> orderedConnections, List<int> indices, int checkUriIndex, bool checkConnection)
     {
         if (indices.Count != orderedConnections.Count || indices.Count != walletRpcs.Count)
         {
@@ -363,12 +366,11 @@ public class TestMoneroConnectionManager
             i++;
         }
     }
-
 }
 
-internal class ConnectionChangeCollector : MoneroConnectionManagerListener
+internal class ConnectionChangeCollector : IMoneroConnectionManagerListener
 {
-    public List<MoneroRpcConnection?> ChangedConnections = [];
+    public readonly List<MoneroRpcConnection?> ChangedConnections = [];
 
     public void OnConnectionChanged(MoneroRpcConnection? connection)
     {

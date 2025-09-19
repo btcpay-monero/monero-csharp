@@ -64,7 +64,7 @@ public class MoneroTxWallet : MoneroTx
 
     public virtual MoneroTxWallet SetTxSet(MoneroTxSet? txSet)
     {
-        this._txSet = txSet;
+        _txSet = txSet;
         return this;
     }
 
@@ -75,7 +75,7 @@ public class MoneroTxWallet : MoneroTx
 
     public virtual MoneroTxWallet SetIsIncoming(bool? isIncoming)
     {
-        this._isIncoming = isIncoming;
+        _isIncoming = isIncoming;
         return this;
     }
 
@@ -86,7 +86,7 @@ public class MoneroTxWallet : MoneroTx
 
     public virtual MoneroTxWallet SetIsOutgoing(bool? isOutgoing)
     {
-        this._isOutgoing = isOutgoing;
+        _isOutgoing = isOutgoing;
         return this;
     }
 
@@ -197,7 +197,7 @@ public class MoneroTxWallet : MoneroTx
 
     public virtual MoneroTxWallet SetIncomingTransfers(List<MoneroIncomingTransfer>? incomingTransfers)
     {
-        this._incomingTransfers = incomingTransfers;
+        _incomingTransfers = incomingTransfers;
         return this;
     }
 
@@ -208,7 +208,7 @@ public class MoneroTxWallet : MoneroTx
 
     public virtual MoneroTxWallet SetOutgoingTransfer(MoneroOutgoingTransfer? outgoingTransfer)
     {
-        this._outgoingTransfer = outgoingTransfer;
+        _outgoingTransfer = outgoingTransfer;
         return this;
     }
 
@@ -348,7 +348,7 @@ public class MoneroTxWallet : MoneroTx
 
     public virtual MoneroTxWallet SetNote(string? note)
     {
-        this._note = note;
+        _note = note;
         return this;
     }
 
@@ -359,19 +359,19 @@ public class MoneroTxWallet : MoneroTx
 
     public virtual MoneroTxWallet SetIsLocked(bool? isLocked)
     {
-        this._isLocked = isLocked;
+        _isLocked = isLocked;
         return this;
     }
 
     public virtual MoneroTxWallet SetInputSum(ulong? inputSum)
     {
-        this._inputSum = inputSum;
+        _inputSum = inputSum;
         return this;
     }
 
     public virtual MoneroTxWallet SetOutputSum(ulong? outputSum)
     {
-        this._outputSum = outputSum;
+        _outputSum = outputSum;
         return this;
     }
 
@@ -382,19 +382,19 @@ public class MoneroTxWallet : MoneroTx
 
     public virtual MoneroTxWallet SetChangeAddress(string? changeAddress)
     {
-        this._changeAddress = changeAddress;
+        _changeAddress = changeAddress;
         return this;
     }
 
     public virtual MoneroTxWallet SetChangeAmount(ulong? changeAmount)
     {
-        this._changeAmount = changeAmount;
+        _changeAmount = changeAmount;
         return this;
     }
 
     public virtual MoneroTxWallet SetNumDummyOutputs(uint? numDummyOutputs)
     {
-        this._numDummyOutputs = numDummyOutputs;
+        _numDummyOutputs = numDummyOutputs;
         return this;
     }
 
@@ -405,7 +405,7 @@ public class MoneroTxWallet : MoneroTx
 
     public virtual MoneroTxWallet SetExtraHex(string? extraHex)
     {
-        this._extraHex = extraHex;
+        _extraHex = extraHex;
         return this;
     }
 }

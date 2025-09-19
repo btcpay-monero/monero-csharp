@@ -18,7 +18,7 @@ public class MoneroHardForkInfo : MoneroRpcPaymentInfo
 
     public void SetEarliestHeight(ulong? earliestHeight)
     {
-        this._earliestHeight = earliestHeight;
+        _earliestHeight = earliestHeight;
     }
 
     public bool? IsEnabled()
@@ -28,7 +28,7 @@ public class MoneroHardForkInfo : MoneroRpcPaymentInfo
 
     public void SetIsEnabled(bool? isEnabled)
     {
-        this._isEnabled = isEnabled;
+        _isEnabled = isEnabled;
     }
 
     public uint? GetState()
@@ -38,7 +38,7 @@ public class MoneroHardForkInfo : MoneroRpcPaymentInfo
 
     public void SetState(uint? state)
     {
-        this._state = state;
+        _state = state;
     }
 
     public uint? GetThreshold()
@@ -48,7 +48,7 @@ public class MoneroHardForkInfo : MoneroRpcPaymentInfo
 
     public void SetThreshold(uint? threshold)
     {
-        this._threshold = threshold;
+        _threshold = threshold;
     }
 
     public uint? GetVersion()
@@ -58,7 +58,7 @@ public class MoneroHardForkInfo : MoneroRpcPaymentInfo
 
     public void SetVersion(uint? version)
     {
-        this._version = version;
+        _version = version;
     }
 
     public uint? GetNumVotes()
@@ -68,7 +68,7 @@ public class MoneroHardForkInfo : MoneroRpcPaymentInfo
 
     public void SetNumVotes(uint? numVotes)
     {
-        this._numVotes = numVotes;
+        _numVotes = numVotes;
     }
 
     public uint? GetWindow()
@@ -78,7 +78,7 @@ public class MoneroHardForkInfo : MoneroRpcPaymentInfo
 
     public void SetWindow(uint? window)
     {
-        this._window = window;
+        _window = window;
     }
 
     public uint? GetVoting()
@@ -88,6 +88,6 @@ public class MoneroHardForkInfo : MoneroRpcPaymentInfo
 
     public void SetVoting(uint? voting)
     {
-        this._voting = voting;
+        _voting = voting;
     }
 }

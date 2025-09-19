@@ -17,15 +17,15 @@ public class MoneroAccount
 
     public MoneroAccount(uint? index)
     {
-        this._index = index;
+        _index = index;
         _balance = 0;
         _unlockedBalance = 0;
     }
 
     public MoneroAccount(uint? index, string? primaryAddress)
     {
-        this._index = index;
-        this._primaryAddress = primaryAddress;
+        _index = index;
+        _primaryAddress = primaryAddress;
         _balance = 0;
         _unlockedBalance = 0;
     }
@@ -33,11 +33,11 @@ public class MoneroAccount
     public MoneroAccount(uint? index, string? primaryAddress, ulong? balance, ulong? unlockedBalance,
         List<MoneroSubaddress>? subaddresses)
     {
-        this._index = index;
-        this._primaryAddress = primaryAddress;
-        this._balance = balance ?? 0;
-        this._unlockedBalance = unlockedBalance ?? 0;
-        this._subaddresses = subaddresses;
+        _index = index;
+        _primaryAddress = primaryAddress;
+        _balance = balance ?? 0;
+        _unlockedBalance = unlockedBalance ?? 0;
+        _subaddresses = subaddresses;
     }
 
     public uint? GetIndex()
@@ -47,7 +47,7 @@ public class MoneroAccount
 
     public MoneroAccount SetIndex(uint? index)
     {
-        this._index = index;
+        _index = index;
         return this;
     }
 
@@ -58,7 +58,7 @@ public class MoneroAccount
 
     public MoneroAccount SetPrimaryAddress(string? primaryAddress)
     {
-        this._primaryAddress = primaryAddress;
+        _primaryAddress = primaryAddress;
         return this;
     }
 
@@ -69,7 +69,7 @@ public class MoneroAccount
 
     public MoneroAccount SetBalance(ulong balance)
     {
-        this._balance = balance;
+        _balance = balance;
         return this;
     }
 
@@ -80,7 +80,7 @@ public class MoneroAccount
 
     public MoneroAccount SetUnlockedBalance(ulong unlockedBalance)
     {
-        this._unlockedBalance = unlockedBalance;
+        _unlockedBalance = unlockedBalance;
         return this;
     }
 
@@ -91,7 +91,7 @@ public class MoneroAccount
 
     public MoneroAccount SetTag(string? tag)
     {
-        this._tag = tag;
+        _tag = tag;
         return this;
     }
 
@@ -102,7 +102,7 @@ public class MoneroAccount
 
     public MoneroAccount SetSubaddresses(List<MoneroSubaddress>? subaddresses)
     {
-        this._subaddresses = subaddresses;
+        _subaddresses = subaddresses;
         if (subaddresses != null)
         {
             foreach (MoneroSubaddress subaddress in subaddresses)

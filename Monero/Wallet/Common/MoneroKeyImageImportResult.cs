@@ -8,7 +8,6 @@ public class MoneroKeyImageImportResult
 
     public MoneroKeyImageImportResult()
     {
-
     }
 
     public MoneroKeyImageImportResult(ulong? height)

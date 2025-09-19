@@ -15,7 +15,7 @@ public class SslOptions
 
     public void SetPrivateKeyPath(string privateKeyPath)
     {
-        this._privateKeyPath = privateKeyPath;
+        _privateKeyPath = privateKeyPath;
     }
 
     public string? GetCertificatePath()
@@ -25,7 +25,7 @@ public class SslOptions
 
     public void SetCertificatePath(string certificatePath)
     {
-        this._certificatePath = certificatePath;
+        _certificatePath = certificatePath;
     }
 
     public string? GetCertificateAuthorityFile()
@@ -35,7 +35,7 @@ public class SslOptions
 
     public void SetCertificateAuthorityFile(string certificateAuthorityFile)
     {
-        this._certificateAuthorityFile = certificateAuthorityFile;
+        _certificateAuthorityFile = certificateAuthorityFile;
     }
 
     public List<string>? GetAllowedFingerprints()
@@ -45,7 +45,7 @@ public class SslOptions
 
     public void SetAllowedFingerprints(List<string> allowedFingerprints)
     {
-        this._allowedFingerprints = allowedFingerprints;
+        _allowedFingerprints = allowedFingerprints;
     }
 
     public bool GetAllowAnyCert()
@@ -55,6 +55,6 @@ public class SslOptions
 
     public void SetAllowAnyCert(bool allowAnyCert)
     {
-        this._allowAnyCert = allowAnyCert;
+        _allowAnyCert = allowAnyCert;
     }
 }

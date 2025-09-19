@@ -43,7 +43,7 @@ public class MoneroOutput
 
     public virtual MoneroOutput SetTx(MoneroTx? tx)
     {
-        this._tx = tx;
+        _tx = tx;
         return this;
     }
 
@@ -54,7 +54,7 @@ public class MoneroOutput
 
     public MoneroOutput SetKeyImage(MoneroKeyImage? keyImage)
     {
-        this._keyImage = keyImage;
+        _keyImage = keyImage;
         return this;
     }
 
@@ -65,7 +65,7 @@ public class MoneroOutput
 
     public virtual MoneroOutput SetAmount(ulong? amount)
     {
-        this._amount = amount;
+        _amount = amount;
         return this;
     }
 
@@ -76,7 +76,7 @@ public class MoneroOutput
 
     public virtual MoneroOutput SetIndex(ulong? index)
     {
-        this._index = index;
+        _index = index;
         return this;
     }
 
@@ -87,7 +87,7 @@ public class MoneroOutput
 
     public virtual MoneroOutput SetRingOutputIndices(List<ulong>? ringOutputIndices)
     {
-        this._ringOutputIndices = ringOutputIndices;
+        _ringOutputIndices = ringOutputIndices;
         return this;
     }
 
@@ -98,7 +98,7 @@ public class MoneroOutput
 
     public virtual MoneroOutput SetStealthPublicKey(string? stealthPublicKey)
     {
-        this._stealthPublicKey = stealthPublicKey;
+        _stealthPublicKey = stealthPublicKey;
         return this;
     }
 

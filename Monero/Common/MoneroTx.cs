@@ -126,7 +126,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetBlock(MoneroBlock? block)
     {
-        this._block = block;
+        _block = block;
         return this;
     }
 
@@ -142,7 +142,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetHash(string? hash)
     {
-        this._hash = hash;
+        _hash = hash;
         return this;
     }
 
@@ -153,7 +153,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetVersion(uint? version)
     {
-        this._version = version;
+        _version = version;
         return this;
     }
 
@@ -175,7 +175,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetPaymentId(string? paymentId)
     {
-        this._paymentId = paymentId;
+        _paymentId = paymentId;
         return this;
     }
 
@@ -186,7 +186,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetFee(ulong? fee)
     {
-        this._fee = fee;
+        _fee = fee;
         return this;
     }
 
@@ -197,7 +197,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetRingSize(uint? ringSize)
     {
-        this._ringSize = ringSize;
+        _ringSize = ringSize;
         return this;
     }
 
@@ -208,7 +208,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetRelay(bool? relay)
     {
-        this._relay = relay;
+        _relay = relay;
         return this;
     }
 
@@ -241,7 +241,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetInTxPool(bool? inTxPool)
     {
-        this._inTxPool = inTxPool;
+        _inTxPool = inTxPool;
         return this;
     }
 
@@ -252,7 +252,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetNumConfirmations(ulong? numConfirmations)
     {
-        this._numConfirmations = numConfirmations;
+        _numConfirmations = numConfirmations;
         return this;
     }
 
@@ -263,7 +263,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetUnlockTime(ulong? unlockTime)
     {
-        this._unlockTime = unlockTime;
+        _unlockTime = unlockTime;
         return this;
     }
 
@@ -274,7 +274,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetLastRelayedTimestamp(ulong? lastRelayedTimestamp)
     {
-        this._lastRelayedTimestamp = lastRelayedTimestamp;
+        _lastRelayedTimestamp = lastRelayedTimestamp;
         return this;
     }
 
@@ -285,7 +285,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetReceivedTimestamp(ulong? receivedTimestamp)
     {
-        this._receivedTimestamp = receivedTimestamp;
+        _receivedTimestamp = receivedTimestamp;
         return this;
     }
 
@@ -307,7 +307,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetKey(string? key)
     {
-        this._key = key;
+        _key = key;
         return this;
     }
 
@@ -318,7 +318,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetFullHex(string? fullHex)
     {
-        this._fullHex = fullHex;
+        _fullHex = fullHex;
         return this;
     }
 
@@ -329,7 +329,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetPrunedHex(string? prunedHex)
     {
-        this._prunedHex = prunedHex;
+        _prunedHex = prunedHex;
         return this;
     }
 
@@ -340,7 +340,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetPrunableHex(string? prunableHex)
     {
-        this._prunableHex = prunableHex;
+        _prunableHex = prunableHex;
         return this;
     }
 
@@ -351,7 +351,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetPrunableHash(string? prunableHash)
     {
-        this._prunableHash = prunableHash;
+        _prunableHash = prunableHash;
         return this;
     }
 
@@ -362,7 +362,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetSize(ulong? size)
     {
-        this._size = size;
+        _size = size;
         return this;
     }
 
@@ -373,7 +373,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetWeight(ulong? weight)
     {
-        this._weight = weight;
+        _weight = weight;
         return this;
     }
 
@@ -384,7 +384,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetInputs(List<MoneroOutput>? inputs)
     {
-        this._inputs = inputs;
+        _inputs = inputs;
         return this;
     }
 
@@ -395,7 +395,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetOutputs(List<MoneroOutput>? outputs)
     {
-        this._outputs = outputs;
+        _outputs = outputs;
         return this;
     }
 
@@ -406,7 +406,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetOutputIndices(List<ulong>? outputIndices)
     {
-        this._outputIndices = outputIndices;
+        _outputIndices = outputIndices;
         return this;
     }
 
@@ -417,7 +417,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetMetadata(string? metadata)
     {
-        this._metadata = metadata;
+        _metadata = metadata;
         return this;
     }
 
@@ -428,7 +428,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetExtra(byte[]? extra)
     {
-        this._extra = extra;
+        _extra = extra;
         return this;
     }
 
@@ -439,7 +439,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetRctSignatures(object? rctSignatures)
     {
-        this._rctSignatures = rctSignatures;
+        _rctSignatures = rctSignatures;
         return this;
     }
 
@@ -450,7 +450,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetRctSigPrunable(object? rctSigPrunable)
     {
-        this._rctSigPrunable = rctSigPrunable;
+        _rctSigPrunable = rctSigPrunable;
         return this;
     }
 
@@ -483,7 +483,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetLastFailedHeight(ulong? lastFailedHeight)
     {
-        this._lastFailedHeight = lastFailedHeight;
+        _lastFailedHeight = lastFailedHeight;
         return this;
     }
 
@@ -494,7 +494,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetLastFailedHash(string? lastFailedHash)
     {
-        this._lastFailedHash = lastFailedHash;
+        _lastFailedHash = lastFailedHash;
         return this;
     }
 
@@ -505,7 +505,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetMaxUsedBlockHeight(ulong? maxUsedBlockHeight)
     {
-        this._maxUsedBlockHeight = maxUsedBlockHeight;
+        _maxUsedBlockHeight = maxUsedBlockHeight;
         return this;
     }
 
@@ -516,7 +516,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetMaxUsedBlockHash(string? maxUsedBlockHash)
     {
-        this._maxUsedBlockHash = maxUsedBlockHash;
+        _maxUsedBlockHash = maxUsedBlockHash;
         return this;
     }
 
@@ -527,7 +527,7 @@ public class MoneroTx
 
     public virtual MoneroTx SetSignatures(List<string>? signatures)
     {
-        this._signatures = signatures;
+        _signatures = signatures;
         return this;
     }
 

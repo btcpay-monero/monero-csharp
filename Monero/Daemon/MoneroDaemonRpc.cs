@@ -383,7 +383,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         MoneroJsonRpcParams parameters = [];
         parameters.Add("start_height", startHeight);
         parameters.Add("end_height", endHeight);
-        MoneroJsonRpcResponse<MoneroJsonRpcParams> respMap = await rpc.SendJsonRequest("get_block_headers_range", parameters);
+        MoneroJsonRpcResponse<MoneroJsonRpcParams> respMap =
+            await rpc.SendJsonRequest("get_block_headers_range", parameters);
         MoneroJsonRpcParams? resultMap = respMap.Result!;
         JArray rpcHeaders = (JArray)resultMap["headers"]!;
         List<MoneroBlockHeader> headers = [];
@@ -415,7 +416,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         // build blocks with transactions
         List<MoneroBlock> blocks = [];
         JArray rpcBlocks = (JArray)rpcResp["blocks"]!;
-        List<List<MoneroJsonRpcParams>> rpcTxs = ((JArray)rpcResp["txs"]!).ToObject<List<List<Dictionary<string, object?>>>>()!;
+        List<List<MoneroJsonRpcParams>> rpcTxs =
+            ((JArray)rpcResp["txs"]!).ToObject<List<List<Dictionary<string, object?>>>>()!;
         if (rpcBlocks.Count != rpcTxs.Count)
         {
             throw new MoneroError("Blocks and txs count mismatch");
@@ -474,7 +476,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
 
         if (endHeight == null)
         {
-            endHeight = (await GetHeight()) - 1;
+            endHeight = await GetHeight() - 1;
         }
 
         List<ulong> heights = [];
@@ -486,7 +488,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return await GetBlocksByHeight(heights);
     }
 
-    public override async Task<List<MoneroBlock>> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight, ulong? maxChunkSize)
+    public override async Task<List<MoneroBlock>> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight,
+        ulong? maxChunkSize)
     {
         if (startHeight == null)
         {
@@ -495,7 +498,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
 
         if (endHeight == null)
         {
-            endHeight = (await GetHeight()) - 1;
+            endHeight = await GetHeight() - 1;
         }
 
         ulong lastHeight = (ulong)startHeight - 1;
@@ -514,7 +517,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         MoneroJsonRpcParams parameters = [];
         parameters.Add("wallet_address", walletAddress);
         parameters.Add("reserve_size", reserveSize);
-        MoneroJsonRpcResponse<MoneroJsonRpcParams> respMap = await rpc.SendJsonRequest("get_block_template", parameters);
+        MoneroJsonRpcResponse<MoneroJsonRpcParams>
+            respMap = await rpc.SendJsonRequest("get_block_template", parameters);
         MoneroJsonRpcParams? resultMap = respMap.Result!;
         MoneroBlockTemplate template = ConvertRpcBlockTemplate(resultMap);
         return template;
@@ -648,7 +652,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         MoneroJsonRpcParams parameters = [];
         parameters.Add("height", height);
         parameters.Add("count", numBlocks);
-        MoneroJsonRpcResponse<MoneroJsonRpcParams> respMap = await rpc.SendJsonRequest("get_coinbase_tx_sum", parameters);
+        MoneroJsonRpcResponse<MoneroJsonRpcParams> respMap =
+            await rpc.SendJsonRequest("get_coinbase_tx_sum", parameters);
         MoneroJsonRpcParams? resultMap = respMap.Result!;
         CheckResponseStatus(resultMap);
         MoneroMinerTxSum txSum = new();
@@ -1116,7 +1121,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return [Convert.ToInt32(resp["limit_down"]), Convert.ToInt32(resp["limit_up"])];
     }
 
-    private async Task<List<MoneroBlock>> GetMaxBlocks(ulong? startHeight = null, ulong? maxHeight = null, ulong? chunkSize = null)
+    private async Task<List<MoneroBlock>> GetMaxBlocks(ulong? startHeight = null, ulong? maxHeight = null,
+        ulong? chunkSize = null)
     {
         if (startHeight == null)
         {
@@ -1125,7 +1131,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
 
         if (maxHeight == null)
         {
-            maxHeight = (await GetHeight()) - 1;
+            maxHeight = await GetHeight() - 1;
         }
 
         if (chunkSize == null)
@@ -1285,7 +1291,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
                     }
                 case "vin":
                     {
-                        List<MoneroJsonRpcParams>? rpcInputs = ((JArray)val).ToObject<List<Dictionary<string, object>>>()!;
+                        List<MoneroJsonRpcParams>? rpcInputs =
+                            ((JArray)val).ToObject<List<Dictionary<string, object>>>()!;
                         if (rpcInputs.Count != 1 || !rpcInputs[0].ContainsKey("gen"))
                         {
                             // ignore miner input TODO: why? probably needs re-enabled
@@ -1315,7 +1322,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
                     }
                 case "rct_signatures":
                     {
-                        Dictionary<string, object> rctSignaturesMap = ((JObject)val).ToObject<Dictionary<string, object?>>()!;
+                        Dictionary<string, object> rctSignaturesMap =
+                            ((JObject)val).ToObject<Dictionary<string, object?>>()!;
                         tx.SetRctSignatures(GenUtils.Reconcile(tx.GetRctSignatures(), rctSignaturesMap));
                         if (rctSignaturesMap.ContainsKey("txnFee"))
                         {
@@ -1499,7 +1507,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
                     // handled by wide_difficulty
                     break;
                 case "wide_difficulty":
-                    template.SetDifficulty(GenUtils.Reconcile(template.GetDifficulty(), PrefixedHexToUulong((string)val)));
+                    template.SetDifficulty(GenUtils.Reconcile(template.GetDifficulty(),
+                        PrefixedHexToUulong((string)val)));
                     break;
                 case "height":
                     template.SetHeight(Convert.ToUInt64(val));
@@ -1697,7 +1706,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
                             ringOutputIndices.Add(Convert.ToUInt64(bi));
                         }
 
-                        output.SetRingOutputIndices(GenUtils.Reconcile(output.GetRingOutputIndices(), ringOutputIndices));
+                        output.SetRingOutputIndices(
+                            GenUtils.Reconcile(output.GetRingOutputIndices(), ringOutputIndices));
                         break;
                     }
                 case "amount":
@@ -1936,7 +1946,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return stats;
     }
 
-    private static MoneroDaemonUpdateDownloadResult ConvertRpcUpdateDownloadResult(Dictionary<string, object?> rpcResult)
+    private static MoneroDaemonUpdateDownloadResult ConvertRpcUpdateDownloadResult(
+        Dictionary<string, object?> rpcResult)
     {
         MoneroDaemonUpdateDownloadResult result = new(ConvertRpcUpdateCheckResult(rpcResult));
         result.SetDownloadPath((string?)rpcResult["path"]);
@@ -2473,7 +2484,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
                 foreach (MoneroJsonRpcParams rpcConnection in rpcConnections)
                 {
                     syncInfo.GetPeers()!.Add(
-                        ConvertRpcConnection(((JObject)rpcConnection["info"]!).ToObject<Dictionary<string, object?>>()));
+                        ConvertRpcConnection(((JObject)rpcConnection["info"]!)
+                            .ToObject<Dictionary<string, object?>>()));
                 }
             }
             else if (key.Equals("spans"))

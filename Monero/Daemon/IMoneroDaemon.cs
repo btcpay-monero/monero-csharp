@@ -3,7 +3,7 @@ using Monero.Daemon.Common;
 
 namespace Monero.Daemon;
 
-public interface MoneroDaemon
+public interface IMoneroDaemon
 {
     void AddListener(MoneroDaemonListener listener);
     void RemoveListener(MoneroDaemonListener listener);
@@ -50,18 +50,24 @@ public interface MoneroDaemon
     Task<MoneroKeyImage.SpentStatus> GetKeyImageSpentStatus(string keyImage);
     Task<List<MoneroKeyImage.SpentStatus>> GetKeyImageSpentStatuses(List<string> keyImage);
     Task<List<MoneroOutput>> GetOutputs(List<MoneroOutput> outputs);
+
     Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts, int? minCount, int? maxCount,
         bool? isUnlocked, int? recentCutoff);
+
     Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts, int? minCount, int? maxCount,
         bool? isUnlocked);
+
     Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts, int? minCount, int? maxCount);
     Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts, int? minCount);
     Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts);
     Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram();
+
     Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
         ulong? startHeight, ulong? endHeight);
+
     Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
         ulong? startHeight);
+
     Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts, bool? isCumulative);
     Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts);
     Task<MoneroDaemonInfo> GetInfo();

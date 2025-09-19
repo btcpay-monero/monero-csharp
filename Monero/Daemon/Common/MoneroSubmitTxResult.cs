@@ -26,7 +26,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetIsGood(bool? isGood)
     {
-        this._isGood = isGood;
+        _isGood = isGood;
         return this;
     }
 
@@ -37,7 +37,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetIsRelayed(bool? isRelayed)
     {
-        this._isRelayed = isRelayed;
+        _isRelayed = isRelayed;
         return this;
     }
 
@@ -48,7 +48,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetIsDoubleSpend(bool? isDoubleSpend)
     {
-        this._isDoubleSpend = isDoubleSpend;
+        _isDoubleSpend = isDoubleSpend;
         return this;
     }
 
@@ -59,7 +59,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetIsFeeTooLow(bool? isFeeTooLow)
     {
-        this._isFeeTooLow = isFeeTooLow;
+        _isFeeTooLow = isFeeTooLow;
         return this;
     }
 
@@ -70,7 +70,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetIsMixinTooLow(bool? isMixinTooLow)
     {
-        this._isMixinTooLow = isMixinTooLow;
+        _isMixinTooLow = isMixinTooLow;
         return this;
     }
 
@@ -81,7 +81,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetHasInvalidInput(bool? hasInvalidInput)
     {
-        this._hasInvalidInput = hasInvalidInput;
+        _hasInvalidInput = hasInvalidInput;
         return this;
     }
 
@@ -92,7 +92,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetHasInvalidOutput(bool? hasInvalidOutput)
     {
-        this._hasInvalidOutput = hasInvalidOutput;
+        _hasInvalidOutput = hasInvalidOutput;
         return this;
     }
 
@@ -103,7 +103,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetHasTooFewOutputs(bool? hasTooFewOutputs)
     {
-        this._hasTooFewOutputs = hasTooFewOutputs;
+        _hasTooFewOutputs = hasTooFewOutputs;
         return this;
     }
 
@@ -114,7 +114,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetIsOverspend(bool? isOverspend)
     {
-        this._isOverspend = isOverspend;
+        _isOverspend = isOverspend;
         return this;
     }
 
@@ -125,7 +125,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetIsTooBig(bool? isTooBig)
     {
-        this._isTooBig = isTooBig;
+        _isTooBig = isTooBig;
         return this;
     }
 
@@ -136,7 +136,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetSanityCheckFailed(bool? sanityCheckFailed)
     {
-        this._sanityCheckFailed = sanityCheckFailed;
+        _sanityCheckFailed = sanityCheckFailed;
         return this;
     }
 
@@ -147,7 +147,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetReason(string? reason)
     {
-        this._reason = reason;
+        _reason = reason;
         return this;
     }
 
@@ -158,7 +158,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetCredits(ulong? credits)
     {
-        this._credits = credits;
+        _credits = credits;
         return this;
     }
 
@@ -169,7 +169,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetTopBlockHash(string? topBlockHash)
     {
-        this._topBlockHash = topBlockHash;
+        _topBlockHash = topBlockHash;
         return this;
     }
 
@@ -180,7 +180,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetIsTxExtraTooBig(bool? isTxExtraTooBig)
     {
-        this._isTxExtraTooBig = isTxExtraTooBig;
+        _isTxExtraTooBig = isTxExtraTooBig;
         return this;
     }
 
@@ -191,7 +191,7 @@ public class MoneroSubmitTxResult
 
     public MoneroSubmitTxResult SetIsNonzeroUnlockTime(bool? isNonzeroUnlockTime)
     {
-        this._isNonzeroUnlockTime = isNonzeroUnlockTime;
+        _isNonzeroUnlockTime = isNonzeroUnlockTime;
         return this;
     }
 }

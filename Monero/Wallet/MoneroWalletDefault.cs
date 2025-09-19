@@ -3,12 +3,12 @@ using Monero.Wallet.Common;
 
 namespace Monero.Wallet;
 
-public abstract class MoneroWalletDefault : MoneroWallet
+public abstract class MoneroWalletDefault : IMoneroWallet
 {
-    protected MoneroConnectionManager? _connectionManager;
-    protected MoneroConnectionManagerListener? _connectionManagerListener;
-    protected bool _isClosed;
     protected readonly List<MoneroWalletListener> _listeners = [];
+    protected MoneroConnectionManager? _connectionManager;
+    protected IMoneroConnectionManagerListener? _connectionManagerListener;
+    protected bool _isClosed;
 
     public abstract MoneroWalletType GetWalletType();
 
@@ -45,19 +45,6 @@ public abstract class MoneroWalletDefault : MoneroWallet
     }
 
     public abstract Task Close(bool save);
-
-    protected virtual void CloseInternal(bool save)
-    {
-        if (_connectionManager != null && _connectionManagerListener != null)
-        {
-            _connectionManager.RemoveListener(_connectionManagerListener);
-        }
-
-        _connectionManager = null;
-        _connectionManagerListener = null;
-        _listeners.Clear();
-        _isClosed = true;
-    }
 
     public async Task<MoneroAccount> CreateAccount()
     {
@@ -511,12 +498,12 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public virtual async Task SetConnectionManager(MoneroConnectionManager? connectionManager)
     {
-        if (this._connectionManager != null && _connectionManagerListener != null)
+        if (_connectionManager != null && _connectionManagerListener != null)
         {
-            this._connectionManager.RemoveListener(_connectionManagerListener);
+            _connectionManager.RemoveListener(_connectionManagerListener);
         }
 
-        this._connectionManager = connectionManager;
+        _connectionManager = connectionManager;
         if (connectionManager == null)
         {
             return;
@@ -571,12 +558,14 @@ public abstract class MoneroWalletDefault : MoneroWallet
         return await SignMessage(message, signatureType, 0, 0);
     }
 
-    public virtual async Task<string> SignMessage(string message, MoneroMessageSignatureType signatureType, uint accountIdx)
+    public virtual async Task<string> SignMessage(string message, MoneroMessageSignatureType signatureType,
+        uint accountIdx)
     {
         return await SignMessage(message, signatureType, accountIdx, 0);
     }
 
-    public abstract Task<string> SignMessage(string message, MoneroMessageSignatureType signatureType, uint accountIdx, uint subaddressIdx);
+    public abstract Task<string> SignMessage(string message, MoneroMessageSignatureType signatureType, uint accountIdx,
+        uint subaddressIdx);
 
     public abstract Task<MoneroMultisigSignResult> SignMultisigTxHex(string multisigTxHex);
 
@@ -630,6 +619,19 @@ public abstract class MoneroWalletDefault : MoneroWallet
 
     public abstract Task<MoneroMessageSignatureResult> VerifyMessage(string message, string address, string signature);
 
+    protected virtual void CloseInternal(bool save)
+    {
+        if (_connectionManager != null && _connectionManagerListener != null)
+        {
+            _connectionManager.RemoveListener(_connectionManagerListener);
+        }
+
+        _connectionManager = null;
+        _connectionManagerListener = null;
+        _listeners.Clear();
+        _isClosed = true;
+    }
+
     protected static MoneroTransferQuery NormalizeTransferQuery(MoneroTransferQuery? query)
     {
         if (query == null)
@@ -677,13 +679,13 @@ public abstract class MoneroWalletDefault : MoneroWallet
     }
 }
 
-internal class MoneroWalletConnectionManagerListener : MoneroConnectionManagerListener
+internal class MoneroWalletConnectionManagerListener : IMoneroConnectionManagerListener
 {
     private readonly MoneroWalletDefault _wallet;
 
     public MoneroWalletConnectionManagerListener(MoneroWalletDefault wallet)
     {
-        this._wallet = wallet;
+        _wallet = wallet;
     }
 
     public void OnConnectionChanged(MoneroRpcConnection? connection)

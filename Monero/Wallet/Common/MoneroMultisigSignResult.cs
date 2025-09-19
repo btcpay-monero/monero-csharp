@@ -48,6 +48,7 @@ public class MoneroMultisigSignResult
         {
             _txHashes = [.. txHashes];
         }
+
         return this;
     }
 

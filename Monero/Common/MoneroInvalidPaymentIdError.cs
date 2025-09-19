@@ -6,7 +6,7 @@ public class MoneroInvalidPaymentIdError : MoneroError
 
     public MoneroInvalidPaymentIdError(string paymentId) : base("Invalid payment id provided: " + paymentId)
     {
-        this._paymentId = paymentId;
+        _paymentId = paymentId;
     }
 
     public string GetPaymentId() { return _paymentId; }

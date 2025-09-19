@@ -7,7 +7,6 @@ public class MoneroDestination
 
     public MoneroDestination()
     {
-
     }
 
     public MoneroDestination(string? address)
