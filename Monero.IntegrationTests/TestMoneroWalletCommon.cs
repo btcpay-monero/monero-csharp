@@ -45,6 +45,41 @@ public abstract class TestMoneroWalletCommon
     protected abstract Task CloseWallet(MoneroWallet walletInstance, bool save);
     protected abstract Task<List<string>> GetSeedLanguages();
 
+    private async Task TestWallet(Func<Task> action, MoneroWallet moneroWallet)
+    {
+        await TestWallet(action, moneroWallet, false);
+    }
+
+    private async Task TestWallet(Func<Task> action, MoneroWallet moneroWallet, bool checkSeed)
+    {
+        Exception? e2 = null;
+        try
+        {
+            await action();
+
+            if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
+            {
+                Assert.True(MoneroWallet.DefaultLanguage == await moneroWallet.GetSeedLanguage());
+
+                if (checkSeed)
+                {
+                    MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e2 = e;
+        }
+
+        await CloseWallet(moneroWallet);
+
+        if (e2 != null)
+        {
+            throw e2;
+        }
+    }
+
     // Can create a random wallet
     [Fact]
     public async Task TestCreateWalletRandom()
@@ -56,29 +91,14 @@ public abstract class TestMoneroWalletCommon
             // create random wallet
             MoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig());
             string path = await moneroWallet.GetPath();
-            Exception? e2 = null;
-            try
+
+            await TestWallet(async () =>
             {
                 MoneroUtils.ValidateAddress(await moneroWallet.GetPrimaryAddress());
                 MoneroUtils.ValidatePrivateViewKey(await moneroWallet.GetPrivateViewKey());
                 MoneroUtils.ValidatePrivateSpendKey(await moneroWallet.GetPrivateSpendKey());
                 MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
-                if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
-                {
-                    Assert.True(MoneroWallet.DefaultLanguage ==
-                                await moneroWallet.GetSeedLanguage()); // TODO monero-wallet-rpc: get seed language
-                }
-            }
-            catch (Exception e)
-            {
-                e2 = e;
-            }
-
-            await CloseWallet(moneroWallet);
-            if (e2 != null)
-            {
-                throw e2;
-            }
+            }, moneroWallet);
 
             // attempt to create wallet at same path
             try
@@ -130,28 +150,14 @@ public abstract class TestMoneroWalletCommon
             MoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.SEED)
                 .SetRestoreHeight(TestUtils.FIRST_RECEIVE_HEIGHT));
             string path = await moneroWallet.GetPath();
-            Exception? e2 = null;
-            try
+
+            await TestWallet(async () =>
             {
                 Assert.True(primaryAddress == await moneroWallet.GetPrimaryAddress());
                 Assert.True(privateViewKey == await moneroWallet.GetPrivateViewKey());
                 Assert.True(privateSpendKey == await moneroWallet.GetPrivateSpendKey());
                 Assert.True(TestUtils.SEED == await moneroWallet.GetSeed());
-                if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
-                {
-                    Assert.True(MoneroWallet.DefaultLanguage == await moneroWallet.GetSeedLanguage());
-                }
-            }
-            catch (Exception e)
-            {
-                e2 = e;
-            }
-
-            await CloseWallet(moneroWallet);
-            if (e2 != null)
-            {
-                throw e2;
-            }
+            }, moneroWallet);
 
             // attempt to create a wallet with two missing words
             try
@@ -199,29 +205,14 @@ public abstract class TestMoneroWalletCommon
             // create a test wallet with offset
             MoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.SEED)
                 .SetRestoreHeight(TestUtils.FIRST_RECEIVE_HEIGHT).SetSeedOffset("my secret offset!"));
-            Exception? e2 = null;
-            try
+
+            await TestWallet(async () =>
             {
                 MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
                 Assert.True(TestUtils.SEED == await moneroWallet.GetSeed());
                 MoneroUtils.ValidateAddress(await moneroWallet.GetPrimaryAddress());
                 Assert.True(TestUtils.ADDRESS != await moneroWallet.GetPrimaryAddress());
-                if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
-                {
-                    Assert.True(MoneroWallet.DefaultLanguage ==
-                                await moneroWallet.GetSeedLanguage()); // TODO monero-wallet-rpc: support
-                }
-            }
-            catch (Exception e)
-            {
-                e2 = e;
-            }
-
-            await CloseWallet(moneroWallet);
-            if (e2 != null)
-            {
-                throw e2;
-            }
+            }, moneroWallet);
         }
         catch (Exception e)
         {
@@ -252,37 +243,17 @@ public abstract class TestMoneroWalletCommon
                 .SetPrivateViewKey(privateViewKey).SetPrivateSpendKey(privateSpendKey)
                 .SetRestoreHeight(await daemon.GetHeight()));
             string path = await moneroWallet.GetPath();
-            Exception? e2 = null;
-            try
+
+            Func<Task> action = async () =>
             {
                 Assert.True(primaryAddress == await moneroWallet.GetPrimaryAddress());
                 Assert.True(privateViewKey == await moneroWallet.GetPrivateViewKey());
                 Assert.True(privateSpendKey == await moneroWallet.GetPrivateSpendKey());
-                if (!await moneroWallet.IsConnectedToDaemon())
-                {
-                    MoneroUtils.Log(0,
-                        "WARNING: wallet created from keys is not connected to authenticated daemon"); // TODO monero-project: keys wallets not connected
-                }
-
                 Assert.True(await moneroWallet.IsConnectedToDaemon(),
                     "Wallet created from keys is not connected to authenticated daemon");
-                if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
-                {
-                    MoneroUtils.ValidateMnemonic(await moneroWallet
-                        .GetSeed()); // TODO monero-wallet-rpc: cannot get seed from wallet created from keys?
-                    Assert.True(MoneroWallet.DefaultLanguage == await moneroWallet.GetSeedLanguage());
-                }
-            }
-            catch (Exception e)
-            {
-                e2 = e;
-            }
+            };
 
-            await CloseWallet(moneroWallet);
-            if (e2 != null)
-            {
-                throw e2;
-            }
+            await TestWallet(action, moneroWallet, true);
 
             // recreate test wallet from spend key
             if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
@@ -290,37 +261,7 @@ public abstract class TestMoneroWalletCommon
                 // TODO monero-wallet-rpc: cannot create wallet from spend key?
                 moneroWallet = await CreateWallet(new MoneroWalletConfig().SetPrivateSpendKey(privateSpendKey)
                     .SetRestoreHeight(await daemon.GetHeight()));
-                e2 = null;
-                try
-                {
-                    Assert.True(primaryAddress == await moneroWallet.GetPrimaryAddress());
-                    Assert.True(privateViewKey == await moneroWallet.GetPrivateViewKey());
-                    Assert.True(privateSpendKey == await moneroWallet.GetPrivateSpendKey());
-                    if (!await moneroWallet.IsConnectedToDaemon())
-                    {
-                        MoneroUtils.Log(0,
-                            "WARNING: wallet created from keys is not connected to authenticated daemon"); // TODO monero-project: keys wallets not connected
-                    }
-
-                    Assert.True(await moneroWallet.IsConnectedToDaemon(),
-                        "Wallet created from keys is not connected to authenticated daemon");
-                    if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
-                    {
-                        MoneroUtils.ValidateMnemonic(await moneroWallet
-                            .GetSeed()); // TODO monero-wallet-rpc: cannot get seed from wallet created from keys?
-                        Assert.True(MoneroWallet.DefaultLanguage == await moneroWallet.GetSeedLanguage());
-                    }
-                }
-                catch (Exception e)
-                {
-                    e2 = e;
-                }
-
-                await CloseWallet(moneroWallet);
-                if (e2 != null)
-                {
-                    throw e2;
-                }
+                await TestWallet(action, moneroWallet, true);
             }
 
             // attempt to create wallet at same path

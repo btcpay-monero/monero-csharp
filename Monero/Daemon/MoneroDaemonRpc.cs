@@ -1948,7 +1948,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return result;
     }
 
-    private static MoneroPeer ConvertRpcPeer(Dictionary<string, object?>? rpcPeer)
+    private static MoneroPeer ConvertBaseRpcPeer(Dictionary<string, object?>? rpcPeer)
     {
         if (rpcPeer == null)
         {
@@ -1956,44 +1956,59 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         }
 
         MoneroPeer peer = new();
+
+        object? host = rpcPeer.GetValueOrDefault("host");
+        object? port = rpcPeer.GetValueOrDefault("port");
+        object? rpcPort = rpcPeer.GetValueOrDefault("rpc_port");
+        object? pruningSeed = rpcPeer.GetValueOrDefault("pruning_seed");
+        object? rpcCreditsPerHash = rpcPeer.GetValueOrDefault("rpc_credits_per_hash");
+
+        if (host != null)
+        {
+            peer.SetHost((string)host);
+        }
+
+        if (port != null)
+        {
+            peer.SetPort(Convert.ToInt32(port));
+        }
+
+        if (rpcPort != null)
+        {
+            peer.SetRpcPort(Convert.ToInt32(rpcPort));
+        }
+
+        if (pruningSeed != null)
+        {
+            peer.SetPruningSeed(Convert.ToInt32(pruningSeed));
+        }
+
+        if (rpcCreditsPerHash != null)
+        {
+            peer.SetRpcCreditsPerHash(Convert.ToUInt64(rpcCreditsPerHash));
+        }
+
+        return peer;
+    }
+
+    private static MoneroPeer ConvertRpcPeer(Dictionary<string, object?>? rpcPeer)
+    {
+        if (rpcPeer == null)
+        {
+            throw new MoneroError("Cannot Convert null rpc peer");
+        }
+
+        MoneroPeer peer = ConvertBaseRpcPeer(rpcPeer);
         foreach (string key in rpcPeer.Keys)
         {
             object val = rpcPeer[key]!;
-            if (key.Equals("host"))
-            {
-                peer.SetHost((string)val);
-            }
-            else if (key.Equals("id"))
+            if (key.Equals("id"))
             {
                 peer.SetId("" + val); // TODO monero-wallet-rpc: peer id is big integer but string in `get_connections`
-            }
-            else if (key.Equals("ip"))
-            {
-                // host used instead which is consistently a string
             }
             else if (key.Equals("last_seen"))
             {
                 peer.SetLastSeenTimestamp(Convert.ToUInt64(val));
-            }
-            else if (key.Equals("port"))
-            {
-                peer.SetPort(Convert.ToInt32(val));
-            }
-            else if (key.Equals("rpc_port"))
-            {
-                peer.SetRpcPort(Convert.ToInt32(val));
-            }
-            else if (key.Equals("pruning_seed"))
-            {
-                peer.SetPruningSeed(Convert.ToInt32(val));
-            }
-            else if (key.Equals("rpc_credits_per_hash"))
-            {
-                peer.SetRpcCreditsPerHash(Convert.ToUInt64(val));
-            }
-            else
-            {
-                MoneroUtils.Log(0, "ignoring unexpected field in rpc peer: " + key + ": " + val);
             }
         }
 
@@ -2091,7 +2106,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             throw new MoneroRpcError("Cannot parse peer, empty response from server");
         }
 
-        MoneroPeer peer = new();
+        MoneroPeer peer = ConvertBaseRpcPeer(rpcConnection);
         peer.SetIsOnline(true);
         foreach (string key in rpcConnection.Keys)
         {
@@ -2124,14 +2139,6 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             {
                 peer.SetHeight(Convert.ToUInt64(val));
             }
-            else if (key.Equals("host"))
-            {
-                peer.SetHost((string)val);
-            }
-            else if (key.Equals("ip"))
-            {
-                // host used instead which is consistently a string
-            }
             else if (key.Equals("incoming"))
             {
                 peer.SetIsIncoming((bool)val);
@@ -2151,14 +2158,6 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             else if (key.Equals("peer_id"))
             {
                 peer.SetId((string)val);
-            }
-            else if (key.Equals("port"))
-            {
-                peer.SetPort(Convert.ToInt32(val));
-            }
-            else if (key.Equals("rpc_port"))
-            {
-                peer.SetRpcPort(Convert.ToInt32(val));
             }
             else if (key.Equals("recv_count"))
             {
@@ -2183,14 +2182,6 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
             else if (key.Equals("support_flags"))
             {
                 peer.SetNumSupportFlags(Convert.ToInt32(val));
-            }
-            else if (key.Equals("pruning_seed"))
-            {
-                peer.SetPruningSeed(Convert.ToInt32(val));
-            }
-            else if (key.Equals("rpc_credits_per_hash"))
-            {
-                peer.SetRpcCreditsPerHash(Convert.ToUInt64(val));
             }
             else if (key.Equals("address_type"))
             {
@@ -2219,10 +2210,6 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
                 {
                     throw new MoneroError("Invalid RPC peer type, expected 0-4: " + rpcType);
                 }
-            }
-            else
-            {
-                MoneroUtils.Log(0, "ignoring unexpected field in peer: " + key + ": " + val);
             }
         }
 

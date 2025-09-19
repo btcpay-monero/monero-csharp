@@ -1,15 +1,13 @@
 namespace Monero.Daemon.Common;
 
-public class MoneroDaemonSyncInfo
+public class MoneroDaemonSyncInfo : MoneroRpcPaymentInfo
 {
-    private ulong? _credits;
     private ulong? _height;
     private uint? _nextNeededPruningSeed;
     private string? _overview;
     private List<MoneroPeer>? _peers;
     private List<MoneroConnectionSpan>? _spans;
     private ulong? _targetHeight;
-    private string? _topBlockHash;
 
     public ulong? GetHeight()
     {
@@ -71,23 +69,4 @@ public class MoneroDaemonSyncInfo
         this._overview = overview;
     }
 
-    public ulong? GetCredits()
-    {
-        return _credits;
-    }
-
-    public void SetCredits(ulong? credits)
-    {
-        this._credits = credits;
-    }
-
-    public string? GetTopBlockHash()
-    {
-        return _topBlockHash;
-    }
-
-    public void SetTopBlockHash(string? topBlockHash)
-    {
-        this._topBlockHash = topBlockHash;
-    }
 }

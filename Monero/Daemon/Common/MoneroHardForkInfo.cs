@@ -1,14 +1,12 @@
 namespace Monero.Daemon.Common;
 
-public class MoneroHardForkInfo
+public class MoneroHardForkInfo : MoneroRpcPaymentInfo
 {
-    private ulong? _credits;
     private ulong? _earliestHeight;
     private bool? _isEnabled;
     private uint? _numVotes;
     private uint? _state;
     private uint? _threshold;
-    private string? _topBlockHash;
     private uint? _version;
     private uint? _voting;
     private uint? _window;
@@ -91,25 +89,5 @@ public class MoneroHardForkInfo
     public void SetVoting(uint? voting)
     {
         this._voting = voting;
-    }
-
-    public ulong? GetCredits()
-    {
-        return _credits;
-    }
-
-    public void SetCredits(ulong? credits)
-    {
-        this._credits = credits;
-    }
-
-    public string? GetTopBlockHash()
-    {
-        return _topBlockHash;
-    }
-
-    public void SetTopBlockHash(string? topBlockHash)
-    {
-        this._topBlockHash = topBlockHash;
     }
 }
