@@ -16,6 +16,7 @@ internal abstract class TestUtils
     public static readonly string MONERO_BINS_DIR = "";
 
     // monero daemon rpc endpoint configuration (change per your configuration)
+    public static readonly bool TESTS_INCONTAINER = GetDefaultEnv("TESTS_INCONTAINER", "false") == "true";
     public static readonly string DAEMON_RPC_URI = GetDefaultEnv("XMR_DAEMON_URI", "http://127.0.0.1:18081");
     public static readonly string DAEMON_RPC_USERNAME = "";
     public static readonly string DAEMON_RPC_PASSWORD = "";
@@ -27,7 +28,8 @@ internal abstract class TestUtils
     public static readonly string WALLET_RPC_USERNAME = "";
     public static readonly string WALLET_RPC_PASSWORD = "";
     public static readonly string WALLET_RPC_ZMQ_DOMAIN = "127.0.0.1";
-    public static readonly string WALLET_RPC_URI = GetDefaultEnv("XMR_WALLET_URI", "http://127.0.0.1:18082");
+    public static readonly string WALLET_RPC_URI = GetDefaultEnv("XMR_WALLET_1_URI", "http://127.0.0.1:18082");
+    public static readonly string CREATE_WALLET_RPC_URI = GetDefaultEnv("XMR_WALLET_2_URI", "http://127.0.0.1:18083");
 
     public static readonly string WALLET_RPC_ZMQ_URI =
         "tcp://" + WALLET_RPC_ZMQ_DOMAIN + ":" + WALLET_RPC_ZMQ_PORT_START;
@@ -91,6 +93,13 @@ internal abstract class TestUtils
         return daemonRpc;
     }
 
+    public static async Task<MoneroWalletRpc> GetCreateWallet()
+    {
+        MoneroRpcConnection connection = new(CREATE_WALLET_RPC_URI);
+        await connection.CheckConnection();
+        return new MoneroWalletRpc(connection);
+    }
+
     public static async Task<MoneroWalletRpc> GetWalletRpc()
     {
         if (walletRpc == null)
@@ -131,6 +140,11 @@ internal abstract class TestUtils
 
         // return cached wallet rpc
         return walletRpc;
+    }
+
+    public static MoneroWalletRpc GetWalletRpcSync()
+    {
+        return GetWalletRpc().GetAwaiter().GetResult();
     }
 
     public static void TestUnsignedBigInteger(BigInteger? num, bool? nonZero = null)

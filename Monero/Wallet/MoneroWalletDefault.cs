@@ -141,7 +141,7 @@ public abstract class MoneroWalletDefault : IMoneroWallet
 
     public abstract Task<List<MoneroAccountTag>> GetAccountTags();
 
-    public abstract Task<string> GetAddress(uint accountIdx, uint subaddressIdx);
+    public abstract Task<string?> GetAddress(uint accountIdx, uint subaddressIdx);
 
     public virtual async Task<List<MoneroAddressBookEntry>> GetAddressBookEntries()
     {
@@ -262,7 +262,14 @@ public abstract class MoneroWalletDefault : IMoneroWallet
 
     public virtual async Task<string> GetPrimaryAddress()
     {
-        return await GetAddress(0, 0);
+        string? address = await GetAddress(0, 0);
+
+        if (address == null)
+        {
+            throw new MoneroError("Could not get primary address");
+        }
+
+        return address;
     }
 
     public abstract Task<string> GetPrivateSpendKey();

@@ -25,6 +25,29 @@ public class MoneroSubaddress
         _index = index;
     }
 
+    public bool Equals(MoneroSubaddress? other)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+
+        if (this == other)
+        {
+            return true;
+        }
+
+        return _accountIndex == other._accountIndex &&
+               _index == other._index &&
+               _address == other._address &&
+               _label == other._label &&
+               _balance == other._balance &&
+               _unlockedBalance == other._unlockedBalance &&
+               _numUnspentOutputs == other._numUnspentOutputs &&
+               _isUsed == other._isUsed &&
+               _numBlocksToUnlock == other._numBlocksToUnlock;
+    }
+
     public uint? GetAccountIndex()
     {
         return _accountIndex;

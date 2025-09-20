@@ -446,20 +446,21 @@ public class MoneroWalletRpc : MoneroWalletDefault
         return (string)result["key"]!;
     }
 
-    public override async Task<string> GetAddress(uint accountIdx, uint subaddressIdx)
+    public override async Task<string?> GetAddress(uint accountIdx, uint subaddressIdx)
     {
-        Dictionary<uint, string?>? subaddressMap = _addressCache[accountIdx];
+        Dictionary<uint, string?>? subaddressMap = _addressCache.GetValueOrDefault(accountIdx);
         if (subaddressMap == null)
         {
             await GetSubaddresses(accountIdx, null, true); // cache's all addresses at this account
             return await GetAddress(accountIdx, subaddressIdx); // uses cache
         }
 
-        string? address = subaddressMap[subaddressIdx];
+        string? address = subaddressMap.GetValueOrDefault(subaddressIdx);
         if (address == null)
         {
             await GetSubaddresses(accountIdx, null, true); // cache's all addresses at this account
-            return _addressCache[accountIdx]![subaddressIdx]!;
+            Dictionary<uint, string?>? map = _addressCache.GetValueOrDefault(accountIdx);
+            return map?.GetValueOrDefault(subaddressIdx);
         }
 
         return address;
@@ -535,7 +536,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = await _rpc.SendJsonRequest("get_height");
         MoneroJsonRpcParams result = resp.Result!;
-        return (ulong)result["height"]!;
+        return Convert.ToUInt64(result["height"]);
     }
 
     public override Task<ulong> GetDaemonHeight()
@@ -567,7 +568,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
             MoneroJsonRpcParams result = resp.Result!;
             _syncSem.Release();
 
-            return new MoneroSyncResult((ulong?)result["blocks_fetched"], (bool?)result["received_money"]);
+            return new MoneroSyncResult(Convert.ToUInt64(result["blocks_fetched"]), (bool?)result["received_money"]);
         }
         catch (MoneroError err)
         {
@@ -781,7 +782,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         MoneroJsonRpcParams result = resp.Result!;
         return result == null
             ? throw new InvalidOperationException("RPC response result was null.")
-            : new MoneroAccount((uint?)result["account_index"], (string?)result["address"], 0, 0, null);
+            : new MoneroAccount(Convert.ToUInt32(result["account_index"]), (string?)result["address"], 0, 0, null);
     }
 
     public override async Task<List<MoneroSubaddress>> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices)
@@ -850,7 +851,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         }
 
         // cache addresses
-        Dictionary<uint, string?>? subaddressMap = _addressCache[accountIdx];
+        Dictionary<uint, string?>? subaddressMap = _addressCache.GetValueOrDefault(accountIdx);
         if (subaddressMap == null)
         {
             subaddressMap = [];
@@ -859,7 +860,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
 
         foreach (MoneroSubaddress subaddress in subaddresses)
         {
-            subaddressMap.Add((uint)subaddress.GetIndex()!, subaddress.GetAddress());
+            subaddressMap[(uint)subaddress.GetIndex()!] = subaddress.GetAddress();
         }
 
         // return results
@@ -878,7 +879,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         // build subaddress object
         MoneroSubaddress subaddress = new();
         subaddress.SetAccountIndex(accountIdx);
-        subaddress.SetIndex((uint?)result["address_index"]);
+        subaddress.SetIndex(Convert.ToUInt32(result["address_index"]));
         subaddress.SetAddress((string?)result["address"]);
         subaddress.SetLabel(label);
         subaddress.SetBalance(0);
@@ -2205,7 +2206,13 @@ public class MoneroWalletRpc : MoneroWalletDefault
         _walletPoller?.SetIsPolling(_listeners.Count > 0);
     }
 
-    private Task Poll() { throw new NotImplementedException(); }
+    private async Task Poll()
+    {
+        if (_walletPoller != null && _walletPoller.IsPolling())
+        {
+            await _walletPoller.Poll();
+        }
+    }
 
     private async Task<Dictionary<uint, List<uint>?>> GetAccountIndices(bool getSubaddressIndices)
     {
@@ -2288,15 +2295,15 @@ public class MoneroWalletRpc : MoneroWalletDefault
         MoneroJsonRpcParams result = resp.Result!;
         if (subaddressIdx == null)
         {
-            return [(ulong)result["balance"]!, (ulong)result["unlocked_balance"]!];
+            return [Convert.ToUInt64(result["balance"]!), Convert.ToUInt64(result["unlocked_balance"]!)];
         }
 
         List<MoneroJsonRpcParams> rpcBalancesPerSubaddress =
             ((JArray)result["per_subaddress"]!).ToObject<List<Dictionary<string, object>>>()!;
         return
         [
-            (ulong)rpcBalancesPerSubaddress[0]["balance"]!,
-            (ulong)rpcBalancesPerSubaddress[0]["unlocked_balance"]!
+            Convert.ToUInt64(rpcBalancesPerSubaddress[0]["balance"]!),
+            Convert.ToUInt64(rpcBalancesPerSubaddress[0]["unlocked_balance"]!)
         ];
     }
 
@@ -2854,15 +2861,15 @@ public class MoneroWalletRpc : MoneroWalletDefault
             object val = rpcAccount[key]!;
             if (key.Equals("account_index"))
             {
-                account.SetIndex((uint)val);
+                account.SetIndex(Convert.ToUInt32(val));
             }
             else if (key.Equals("balance"))
             {
-                account.SetBalance((ulong)val);
+                account.SetBalance(Convert.ToUInt64(val));
             }
             else if (key.Equals("unlocked_balance"))
             {
-                account.SetUnlockedBalance((ulong)val);
+                account.SetUnlockedBalance(Convert.ToUInt64(val));
             }
             else if (key.Equals("base_address"))
             {
@@ -2894,11 +2901,11 @@ public class MoneroWalletRpc : MoneroWalletDefault
             object val = rpcSubaddress[key]!;
             if (key.Equals("account_index"))
             {
-                subaddress.SetAccountIndex((uint)val);
+                subaddress.SetAccountIndex(Convert.ToUInt32(val));
             }
             else if (key.Equals("address_index"))
             {
-                subaddress.SetIndex((uint)val);
+                subaddress.SetIndex(Convert.ToUInt32(val));
             }
             else if (key.Equals("address"))
             {
@@ -2906,15 +2913,15 @@ public class MoneroWalletRpc : MoneroWalletDefault
             }
             else if (key.Equals("balance"))
             {
-                subaddress.SetBalance((ulong)val);
+                subaddress.SetBalance(Convert.ToUInt64(val));
             }
             else if (key.Equals("unlocked_balance"))
             {
-                subaddress.SetUnlockedBalance((ulong)val);
+                subaddress.SetUnlockedBalance(Convert.ToUInt64(val));
             }
             else if (key.Equals("num_unspent_outputs"))
             {
-                subaddress.SetNumUnspentOutputs((ulong)val);
+                subaddress.SetNumUnspentOutputs(Convert.ToUInt64(val));
             }
             else if (key.Equals("label"))
             {
@@ -2929,7 +2936,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
             }
             else if (key.Equals("blocks_to_unlock"))
             {
-                subaddress.SetNumBlocksToUnlock((ulong)val);
+                subaddress.SetNumBlocksToUnlock(Convert.ToUInt64(val));
             }
             else if (key.Equals("time_to_unlock"))
             {
@@ -3655,7 +3662,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
             object val = rpcOutput[key]!;
             if (key.Equals("amount"))
             {
-                output.SetAmount((ulong)val);
+                output.SetAmount(Convert.ToUInt64(val));
             }
             else if (key.Equals("spent"))
             {
@@ -3670,7 +3677,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
             }
             else if (key.Equals("global_index"))
             {
-                output.SetIndex((ulong)val);
+                output.SetIndex(Convert.ToUInt64(val));
             }
             else if (key.Equals("tx_hash"))
             {
@@ -3696,7 +3703,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
             }
             else if (key.Equals("block_height"))
             {
-                ulong height = (ulong)val;
+                ulong height = Convert.ToUInt64(val);
                 tx.SetBlock(new MoneroBlock().SetHeight(height).SetTxs(tx));
             }
             else

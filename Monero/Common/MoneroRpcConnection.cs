@@ -498,6 +498,10 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
             return rpcResponse!;
         }
+        catch (MoneroRpcError)
+        {
+            throw;
+        }
         catch (Exception e2)
         {
             throw new MoneroError(e2);

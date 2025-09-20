@@ -56,6 +56,11 @@ internal class MoneroWalletPoller
         }
     }
 
+    public bool IsPolling()
+    {
+        return _isPolling;
+    }
+
     public void SetPeriodInMs(ulong periodInMs)
     {
         _looper.SetPeriodInMs(periodInMs);

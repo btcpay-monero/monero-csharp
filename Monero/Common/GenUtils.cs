@@ -5,6 +5,11 @@ namespace Monero.Common;
 
 public static class GenUtils
 {
+    public static string GetGuid()
+    {
+        return Guid.NewGuid().ToString();
+    }
+
     public static T? Reconcile<T>(T? val1, T? val2)
     {
         return Reconcile(val1, val2, null, null, null);

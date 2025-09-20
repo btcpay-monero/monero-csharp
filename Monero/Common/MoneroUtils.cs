@@ -231,6 +231,21 @@ public static class MoneroUtils
         }
     }
 
+    public static void ValidateAddress(string? address, MoneroNetworkType? networkType)
+    {
+        if (networkType == null)
+        {
+            throw new MoneroError("Must provide a valid network type");
+        }
+
+        MoneroDecodedAddress decodedAddress = DecodeAddress(address);
+
+        if (decodedAddress.GetNetworkType() != networkType)
+        {
+            throw new MoneroError("Invalid network type");
+        }
+    }
+
     public static void ValidateAddress(string? address)
     {
         if (address == null)

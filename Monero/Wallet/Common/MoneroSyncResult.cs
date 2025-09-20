@@ -32,7 +32,7 @@ public class MoneroSyncResult
         return this;
     }
 
-    public bool? IsReceivedMoney()
+    public bool? GetReceivedMoney()
     {
         return _receivedMoney;
     }

@@ -152,7 +152,7 @@ public interface IMoneroWallet
      * @param subaddressIdx specifies the subaddress index within the account
      * @return the receive address of the specified subaddress
      */
-    Task<string> GetAddress(uint accountIdx, uint subaddressIdx);
+    Task<string?> GetAddress(uint accountIdx, uint subaddressIdx);
 
     /**
      * Get the account and subaddress index of the given address.
