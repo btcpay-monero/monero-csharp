@@ -49,11 +49,6 @@ public class MoneroWalletRpc : MoneroWalletDefault
         return _process;
     }
 
-    public override MoneroWalletType GetWalletType()
-    {
-        return MoneroWalletType.Rpc;
-    }
-
     #region RPC Wallet Methods
 
     public async Task<MoneroWalletRpc> OpenWallet(MoneroWalletConfig config)

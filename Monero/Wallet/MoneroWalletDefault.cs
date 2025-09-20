@@ -8,8 +8,6 @@ public abstract class MoneroWalletDefault : IMoneroWallet
     protected readonly List<MoneroWalletListener> _listeners = [];
     protected bool _isClosed;
 
-    public abstract MoneroWalletType GetWalletType();
-
     public abstract Task<MoneroNetworkType> GetNetworkType();
 
     public abstract Task<int> AddAddressBookEntry(string address, string description);

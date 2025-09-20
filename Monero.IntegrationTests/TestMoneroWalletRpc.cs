@@ -105,14 +105,12 @@ public class TestMoneroWalletRpc
         {
             await action();
 
-            if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
-            {
-                Assert.True(IMoneroWallet.DefaultLanguage == await moneroWallet.GetSeedLanguage());
 
-                if (checkSeed)
-                {
-                    MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
-                }
+            Assert.True(IMoneroWallet.DefaultLanguage == await moneroWallet.GetSeedLanguage());
+
+            if (checkSeed)
+            {
+                MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
             }
         }
         catch (Exception e)
@@ -304,13 +302,9 @@ public class TestMoneroWalletRpc
             await TestWallet(action, moneroWallet, true);
 
             // recreate test wallet from spend key
-            if (moneroWallet.GetWalletType() != MoneroWalletType.Rpc)
-            {
-                // TODO monero-wallet-rpc: cannot create wallet from spend key?
-                moneroWallet = await CreateWallet(new MoneroWalletConfig().SetPrivateSpendKey(privateSpendKey)
-                    .SetRestoreHeight(await daemon.GetHeight()));
-                await TestWallet(action, moneroWallet, true);
-            }
+            moneroWallet = await CreateWallet(new MoneroWalletConfig().SetPrivateSpendKey(privateSpendKey)
+                .SetRestoreHeight(await daemon.GetHeight()));
+            await TestWallet(action, moneroWallet, true);
 
             // attempt to create wallet at same path
             try

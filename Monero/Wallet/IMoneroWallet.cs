@@ -7,8 +7,6 @@ public interface IMoneroWallet
 {
     static readonly string DefaultLanguage = "English";
 
-    MoneroWalletType GetWalletType();
-
     /**
     * Register a listener to receive wallet notifications.
     *
