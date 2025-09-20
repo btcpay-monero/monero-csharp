@@ -393,7 +393,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = await _rpc.SendJsonRequest("get_version");
         MoneroJsonRpcParams result = resp.Result!;
-        return new MoneroVersion((int?)result["version"], (bool?)result["release"]);
+        return new MoneroVersion((long?)result["version"], (bool?)result["release"]);
     }
 
     public override Task<string> GetPath()

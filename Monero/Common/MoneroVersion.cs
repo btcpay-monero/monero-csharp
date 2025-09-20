@@ -3,27 +3,27 @@ namespace Monero.Common;
 public class MoneroVersion
 {
     private bool? _isRelease;
-    private int? _number;
+    private long? _number;
 
     public MoneroVersion()
     {
     }
 
-    public MoneroVersion(int? number)
+    public MoneroVersion(long? number)
     {
         _number = number;
     }
 
-    public MoneroVersion(int? number, bool? isRelease)
+    public MoneroVersion(long? number, bool? isRelease)
     {
         _number = number;
         _isRelease = isRelease;
     }
 
-    public int? GetNumber() { return _number; }
+    public long? GetNumber() { return _number; }
     public bool? IsRelease() { return _isRelease; }
 
-    public MoneroVersion SetNumber(int? number)
+    public MoneroVersion SetNumber(long? number)
     {
         _number = number;
         return this;

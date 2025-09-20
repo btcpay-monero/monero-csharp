@@ -2,7 +2,7 @@
 set -e
 
 dotCover cover-dotnet \
-  --TargetArguments="test -c ${CONFIGURATION_NAME} --filter TestMoneroRpcConnection|TestMoneroDaemonRpc --no-build" \
+  --TargetArguments="test -c ${CONFIGURATION_NAME} --no-build" \
   --Output=/coverage/dotCover.IntegrationTests.output.dcvr \
   --filters="-:Assembly=Monero.IntegrationTests;-:Assembly=Monero.UnitTests;-:Assembly=testhost"
 
