@@ -6,7 +6,6 @@ public class MoneroWalletConfig
 {
     private int? _accountLookahead; // number of accounts to scan
     private byte[]? _cacheData;
-    private MoneroConnectionManager? _connectionManager;
     private bool? _isMultisig;
     private byte[]? _keysData;
     private string? _language;
@@ -33,7 +32,6 @@ public class MoneroWalletConfig
         _password = config.GetPassword();
         _networkType = config.GetNetworkType();
         _server = config.GetServer();
-        _connectionManager = config.GetConnectionManager();
         _seed = config.GetSeed();
         _seedOffset = config.GetSeedOffset();
         _primaryAddress = config.GetPrimaryAddress();
@@ -164,17 +162,6 @@ public class MoneroWalletConfig
             _server.SetCredentials(_serverUsername, serverPassword);
         }
 
-        return this;
-    }
-
-    public MoneroConnectionManager? GetConnectionManager()
-    {
-        return _connectionManager;
-    }
-
-    public MoneroWalletConfig SetConnectionManager(MoneroConnectionManager connectionManager)
-    {
-        _connectionManager = connectionManager;
         return this;
     }
 

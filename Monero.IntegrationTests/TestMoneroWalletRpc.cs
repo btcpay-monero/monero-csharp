@@ -40,7 +40,7 @@ public class TestMoneroWalletRpc : TestMoneroWalletCommon
             config.SetPassword(TestUtils.WALLET_PASSWORD);
         }
 
-        if (config.GetServer() == null && config.GetConnectionManager() == null)
+        if (config.GetServer() == null)
         {
             config.SetServer(daemon.GetRpcConnection());
         }

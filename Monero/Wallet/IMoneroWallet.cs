@@ -69,20 +69,6 @@ public interface IMoneroWallet
     Task<MoneroRpcConnection?> GetDaemonConnection();
 
     /**
-     * Set the wallet's daemon connection manager.
-     *
-     * @param connectionManager manages connections to monerod
-     */
-    Task SetConnectionManager(MoneroConnectionManager? connectionManager);
-
-    /**
-     * Get the wallet's daemon connection manager.
-     *
-     * @return the wallet's daemon connection manager
-     */
-    MoneroConnectionManager? GetConnectionManager();
-
-    /**
      * Set the Tor proxy to the daemon.
      *
      * @param uri the Tor proxy URI

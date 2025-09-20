@@ -6,8 +6,6 @@ namespace Monero.Wallet;
 public abstract class MoneroWalletDefault : IMoneroWallet
 {
     protected readonly List<MoneroWalletListener> _listeners = [];
-    protected MoneroConnectionManager? _connectionManager;
-    protected IMoneroConnectionManagerListener? _connectionManagerListener;
     protected bool _isClosed;
 
     public abstract MoneroWalletType GetWalletType();
@@ -169,11 +167,6 @@ public abstract class MoneroWalletDefault : IMoneroWallet
     }
 
     public abstract Task<ulong> GetBalance(uint? accountIdx, uint? subaddressIdx);
-
-    public virtual MoneroConnectionManager? GetConnectionManager()
-    {
-        return _connectionManager;
-    }
 
     public abstract Task<MoneroRpcConnection?> GetDaemonConnection();
 
@@ -496,28 +489,6 @@ public abstract class MoneroWalletDefault : IMoneroWallet
 
     public abstract Task SetAttribute(string key, string val);
 
-    public virtual async Task SetConnectionManager(MoneroConnectionManager? connectionManager)
-    {
-        if (_connectionManager != null && _connectionManagerListener != null)
-        {
-            _connectionManager.RemoveListener(_connectionManagerListener);
-        }
-
-        _connectionManager = connectionManager;
-        if (connectionManager == null)
-        {
-            return;
-        }
-
-        if (_connectionManagerListener == null)
-        {
-            _connectionManagerListener = new MoneroWalletConnectionManagerListener(this);
-        }
-
-        connectionManager.AddListener(_connectionManagerListener);
-        await SetDaemonConnection(connectionManager.GetConnection());
-    }
-
     public virtual async Task SetDaemonConnection(string uri)
     {
         await SetDaemonConnection(uri, null, null);
@@ -619,19 +590,6 @@ public abstract class MoneroWalletDefault : IMoneroWallet
 
     public abstract Task<MoneroMessageSignatureResult> VerifyMessage(string message, string address, string signature);
 
-    protected virtual void CloseInternal(bool save)
-    {
-        if (_connectionManager != null && _connectionManagerListener != null)
-        {
-            _connectionManager.RemoveListener(_connectionManagerListener);
-        }
-
-        _connectionManager = null;
-        _connectionManagerListener = null;
-        _listeners.Clear();
-        _isClosed = true;
-    }
-
     protected static MoneroTransferQuery NormalizeTransferQuery(MoneroTransferQuery? query)
     {
         if (query == null)
@@ -676,20 +634,5 @@ public abstract class MoneroWalletDefault : IMoneroWallet
         }
 
         return query;
-    }
-}
-
-internal class MoneroWalletConnectionManagerListener : IMoneroConnectionManagerListener
-{
-    private readonly MoneroWalletDefault _wallet;
-
-    public MoneroWalletConnectionManagerListener(MoneroWalletDefault wallet)
-    {
-        _wallet = wallet;
-    }
-
-    public void OnConnectionChanged(MoneroRpcConnection? connection)
-    {
-        _wallet.SetDaemonConnection(connection);
     }
 }

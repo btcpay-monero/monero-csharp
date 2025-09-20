@@ -78,17 +78,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
         Clear();
         _path = config.GetPath();
 
-        // set a connection manager or server
-        if (config.GetConnectionManager() != null)
-        {
-            if (config.GetServer() != null)
-            {
-                throw new MoneroError("Wallet can be opened with a server or connection manager but not both");
-            }
-
-            await SetConnectionManager(config.GetConnectionManager());
-        }
-        else if (config.GetServer() != null)
+        if (config.GetServer() != null)
         {
             await SetDaemonConnection(config.GetServer());
         }
@@ -126,22 +116,6 @@ public class MoneroWalletRpc : MoneroWalletDefault
                 "monero-wallet-rpc does not support creating wallets with subaddress lookahead over rpc");
         }
 
-        // Set server from connection manager if provided
-        MoneroConnectionManager? connManager = config.GetConnectionManager();
-        if (connManager != null)
-        {
-            if (config.GetServer() != null)
-            {
-                throw new MoneroError("Wallet can be created with a server or connection manager but not both");
-            }
-
-            MoneroRpcConnection? connection = connManager.GetConnection();
-            if (connection != null)
-            {
-                config.SetServer(connection);
-            }
-        }
-
         // create wallet
         if (config.GetSeed() != null)
         {
@@ -156,12 +130,7 @@ public class MoneroWalletRpc : MoneroWalletDefault
             await CreateWalletRandom(config);
         }
 
-        // set connection manager or server
-        if (config.GetConnectionManager() != null)
-        {
-            await SetConnectionManager(config.GetConnectionManager());
-        }
-        else if (config.GetServer() != null)
+        if (config.GetServer() != null)
         {
             await SetDaemonConnection(config.GetServer());
         }
@@ -2190,7 +2159,6 @@ public class MoneroWalletRpc : MoneroWalletDefault
 
     public override async Task Close(bool save)
     {
-        CloseInternal(save);
         Clear();
         MoneroJsonRpcParams parameters = [];
         parameters.Add("autosave_current", save);

@@ -427,81 +427,12 @@ public abstract class TestMoneroWalletCommon
         }
         catch (MoneroError e)
         {
-            Assert.True("Wallet is not connected to daemon" == e.Message);
+            Assert.Equal("Wallet is not connected to daemon", e.Message);
         }
         finally
         {
             await CloseWallet(moneroWallet);
         }
-    }
-
-    // Can use a connection manager
-    [Fact]
-    public async Task TestConnectionManager()
-    {
-        // create connection manager with monerod connections
-        MoneroConnectionManager connectionManager = new();
-        MoneroRpcConnection connection1 =
-            new MoneroRpcConnection(TestUtils.GetDaemonRpc().GetRpcConnection()).SetPriority(1);
-        MoneroRpcConnection connection2 = new MoneroRpcConnection("localhost:48081").SetPriority(2);
-        connectionManager.SetConnection(connection1);
-        connectionManager.AddConnection(connection2);
-
-        // create wallet with connection manager
-        IMoneroWallet moneroWallet =
-            await CreateWallet(new MoneroWalletConfig().SetServerUri("").SetConnectionManager(connectionManager));
-        Assert.True(TestUtils.GetDaemonRpc().GetRpcConnection() == await moneroWallet.GetDaemonConnection());
-        Assert.True(await moneroWallet.IsConnectedToDaemon());
-
-        // set manager's connection
-        connectionManager.SetConnection(connection2);
-        Thread.Sleep(TestUtils.AUTO_CONNECT_TIMEOUT_MS);
-        Assert.True(connection2 == await moneroWallet.GetDaemonConnection());
-
-        // reopen wallet with connection manager
-        string path = await moneroWallet.GetPath();
-        await CloseWallet(moneroWallet);
-        moneroWallet = await OpenWallet(new MoneroWalletConfig().SetServerUri("")
-            .SetConnectionManager(connectionManager)
-            .SetPath(path));
-        Assert.True(connection2 == await moneroWallet.GetDaemonConnection());
-
-        // disconnect
-        connectionManager.SetConnection((MoneroRpcConnection?)null);
-        Assert.Null(await moneroWallet.GetDaemonConnection());
-        Assert.False(await moneroWallet.IsConnectedToDaemon());
-
-        // start polling connections
-        connectionManager.StartPolling((ulong)TestUtils.SYNC_PERIOD_IN_MS);
-
-        // test that wallet auto connects
-        Thread.Sleep(TestUtils.AUTO_CONNECT_TIMEOUT_MS);
-        Assert.True(connection1.Equals(await moneroWallet.GetDaemonConnection()));
-        Assert.True(await moneroWallet.IsConnectedToDaemon());
-
-        // test override with bad connection
-        moneroWallet.AddListener(new MoneroWalletListener());
-        connectionManager.SetAutoSwitch(false);
-        connectionManager.SetConnection("http://foo.bar.xyz");
-        Assert.True("http://foo.bar.xyz" == (await moneroWallet.GetDaemonConnection())!.GetUri());
-        Assert.False(await moneroWallet.IsConnectedToDaemon());
-        Thread.Sleep(5000);
-        Assert.False(await moneroWallet.IsConnectedToDaemon());
-
-        // set to another connection manager
-        MoneroConnectionManager connectionManager2 = new();
-        connectionManager2.SetConnection(connection2);
-        await moneroWallet.SetConnectionManager(connectionManager2);
-        Assert.True(connection2 == await moneroWallet.GetDaemonConnection());
-
-        // unset connection manager
-        await moneroWallet.SetConnectionManager(null);
-        Assert.Null(moneroWallet.GetConnectionManager());
-        Assert.True(connection2 == await moneroWallet.GetDaemonConnection());
-
-        // stop polling and close
-        connectionManager.StopPolling();
-        await CloseWallet(moneroWallet);
     }
 
     // Can get the seed

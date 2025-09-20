@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Monero.Common;
 
-public class MoneroJsonRpcRequest : MoneroHttpRequest
+public class MoneroJsonRpcRequest
 {
     [JsonProperty("method", Order = 1)] public readonly string Method;
     [JsonProperty("jsonrpc", Order = 0)] public readonly string Version = "2.0";
