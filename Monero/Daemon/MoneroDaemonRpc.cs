@@ -11,7 +11,7 @@ using MoneroJsonRpcParams = System.Collections.Generic.Dictionary<string, object
 
 namespace Monero.Daemon;
 
-public class MoneroDaemonRpc : MoneroDaemonDefault
+public class MoneroDaemonRpc : IMoneroDaemon
 {
     private static readonly string DEFAULT_ID = "0000000000000000000000000000000000000000000000000000000000000000";
     private static readonly ulong MAX_REQ_SIZE = 3000000; // max request size when fetching blocks from daemon
@@ -20,6 +20,8 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
     private readonly MoneroRpcConnection rpc;
     private DaemonPoller? daemonPoller;
     private Process? process;
+    private readonly Dictionary<ulong, MoneroBlockHeader> _cachedHeaders = [];
+    private readonly List<MoneroDaemonListener> _listeners = [];
 
     public MoneroDaemonRpc(MoneroRpcConnection connection)
     {
@@ -140,6 +142,29 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         CheckConnection();
     }
 
+    public void AddListener(MoneroDaemonListener listener)
+    {
+        lock (_listeners)
+        {
+            _listeners.Add(listener);
+            RefreshListening();
+        }
+    }
+
+    public void RemoveListener(MoneroDaemonListener listener)
+    {
+        lock (_listeners)
+        {
+            _listeners.Remove(listener);
+            RefreshListening();
+        }
+    }
+
+    public List<MoneroDaemonListener> GetListeners()
+    {
+        return [.. _listeners];
+    }
+
     public async Task<bool> IsRestricted()
     {
         if (IsLocal())
@@ -213,18 +238,6 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         catch (Exception e) { throw new MoneroError(e.Message); }
     }
 
-    public override void AddListener(MoneroDaemonListener listener)
-    {
-        base.AddListener(listener);
-        RefreshListening();
-    }
-
-    public override void RemoveListener(MoneroDaemonListener listener)
-    {
-        base.RemoveListener(listener);
-        RefreshListening();
-    }
-
     public MoneroRpcConnection GetRpcConnection()
     {
         return rpc;
@@ -253,7 +266,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         }
     }
 
-    public override async Task<MoneroDaemonUpdateCheckResult> CheckForUpdate()
+    public async Task<MoneroDaemonUpdateCheckResult> CheckForUpdate()
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("command", "check");
@@ -262,7 +275,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return ConvertRpcUpdateCheckResult(respMap);
     }
 
-    public override async Task<MoneroDaemonUpdateDownloadResult> DownloadUpdate(string? path)
+    public async Task<MoneroDaemonUpdateDownloadResult> DownloadUpdate(string? path)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("command", "download");
@@ -272,7 +285,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return ConvertRpcUpdateDownloadResult(resp);
     }
 
-    public override async Task FlushTxPool(List<string> txHashes)
+    public async Task FlushTxPool(List<string> txHashes)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("txids", txHashes);
@@ -280,7 +293,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         CheckResponseStatus(resp.Result);
     }
 
-    public override async Task<List<string>> GetAltBlockHashes()
+    public async Task<List<string>> GetAltBlockHashes()
     {
         MoneroJsonRpcParams resp = await rpc.SendPathRequest("get_alt_blocks_hashes");
         CheckResponseStatus(resp);
@@ -292,7 +305,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return ((JArray)resp["blks_hashes"]!).ToObject<List<string>>()!;
     }
 
-    public override async Task<List<MoneroAltChain>> GetAltChains()
+    public async Task<List<MoneroAltChain>> GetAltChains()
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = await rpc.SendJsonRequest("get_alternate_chains");
         MoneroJsonRpcParams? result = resp.Result!;
@@ -311,7 +324,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return chains;
     }
 
-    public override async Task<MoneroBlock> GetBlockByHash(string blockHash)
+    public async Task<MoneroBlock> GetBlockByHash(string blockHash)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("hash", blockHash);
@@ -321,7 +334,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return block;
     }
 
-    public override async Task<MoneroBlock> GetBlockByHeight(ulong blockHeight)
+    public async Task<MoneroBlock> GetBlockByHeight(ulong blockHeight)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("height", blockHeight);
@@ -331,7 +344,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return block;
     }
 
-    public override async Task<string> GetBlockHash(ulong height)
+    public async Task<string> GetBlockHash(ulong height)
     {
         List<ulong> param = [height];
         MoneroJsonRpcResponse<string> respMap = await rpc.SendJsonRequest("on_get_block_hash", param);
@@ -349,12 +362,12 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return respMap.Result ?? "";
     }
 
-    public override Task<List<string>> GetBlockHashes(List<string> blockHashes, ulong startHeight)
+    public Task<List<string>> GetBlockHashes(List<string> blockHashes, ulong startHeight)
     {
         throw new NotImplementedException("MoneroDaemonRpc.getBlockHashes() not implemented.");
     }
 
-    public override async Task<MoneroBlockHeader> GetBlockHeaderByHash(string blockHash)
+    public async Task<MoneroBlockHeader> GetBlockHeaderByHash(string blockHash)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("hash", blockHash);
@@ -366,7 +379,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return header;
     }
 
-    public override async Task<MoneroBlockHeader> GetBlockHeaderByHeight(ulong blockHeight)
+    public async Task<MoneroBlockHeader> GetBlockHeaderByHeight(ulong blockHeight)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("height", blockHeight);
@@ -378,7 +391,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return header;
     }
 
-    public override async Task<List<MoneroBlockHeader>> GetBlockHeadersByRange(ulong startHeight, ulong endHeight)
+    public async Task<List<MoneroBlockHeader>> GetBlockHeadersByRange(ulong startHeight, ulong endHeight)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("start_height", startHeight);
@@ -397,12 +410,12 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return headers;
     }
 
-    public override Task<List<MoneroBlock>> GetBlocksByHash(List<string> blockHashes, ulong startHeight, bool prune)
+    public Task<List<MoneroBlock>> GetBlocksByHash(List<string> blockHashes, ulong startHeight, bool prune)
     {
         throw new NotImplementedException("MoneroDaemonRpc.getBlocksByHash(): not implemented.");
     }
 
-    public override async Task<List<MoneroBlock>> GetBlocksByHeight(List<ulong> blockHeights)
+    public async Task<List<MoneroBlock>> GetBlocksByHeight(List<ulong> blockHeights)
     {
         // fetch blocks in binary
         MoneroJsonRpcParams parameters = [];
@@ -467,7 +480,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return blocks;
     }
 
-    public override async Task<List<MoneroBlock>> GetBlocksByRange(ulong? startHeight, ulong? endHeight)
+    public async Task<List<MoneroBlock>> GetBlocksByRange(ulong? startHeight, ulong? endHeight)
     {
         if (startHeight == null)
         {
@@ -488,7 +501,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return await GetBlocksByHeight(heights);
     }
 
-    public override async Task<List<MoneroBlock>> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight,
+    public async Task<List<MoneroBlock>> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight,
         ulong? maxChunkSize)
     {
         if (startHeight == null)
@@ -512,7 +525,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return blocks;
     }
 
-    public override async Task<MoneroBlockTemplate> GetBlockTemplate(string walletAddress, int? reserveSize)
+    public async Task<MoneroBlockTemplate> GetBlockTemplate(string walletAddress, int? reserveSize)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("wallet_address", walletAddress);
@@ -524,12 +537,12 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return template;
     }
 
-    public override async Task<int> GetDownloadLimit()
+    public async Task<int> GetDownloadLimit()
     {
         return (await GetBandwidthLimits())[0];
     }
 
-    public override async Task<MoneroFeeEstimate> GetFeeEstimate(int? graceBlocks)
+    public async Task<MoneroFeeEstimate> GetFeeEstimate(int? graceBlocks)
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = await rpc.SendJsonRequest("get_fee_estimate");
         MoneroJsonRpcParams? result = resp.Result!;
@@ -551,7 +564,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return feeEstimate;
     }
 
-    public override async Task<MoneroHardForkInfo> GetHardForkInfo()
+    public async Task<MoneroHardForkInfo> GetHardForkInfo()
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = await rpc.SendJsonRequest("hard_fork_info");
         MoneroJsonRpcParams? result = resp.Result!;
@@ -559,14 +572,14 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return ConvertRpcHardForkInfo(result);
     }
 
-    public override async Task<ulong> GetHeight()
+    public async Task<ulong> GetHeight()
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> respMap = await rpc.SendJsonRequest("get_block_count");
         MoneroJsonRpcParams? resultMap = respMap.Result!;
         return Convert.ToUInt64(resultMap["count"]);
     }
 
-    public override async Task<MoneroDaemonInfo> GetInfo()
+    public async Task<MoneroDaemonInfo> GetInfo()
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = await rpc.SendJsonRequest("get_info");
         MoneroJsonRpcParams? result = resp.Result!;
@@ -574,7 +587,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return ConvertRpcInfo(result)!;
     }
 
-    public override async Task<List<MoneroKeyImage.SpentStatus>> GetKeyImageSpentStatuses(List<string> keyImages)
+    public async Task<List<MoneroKeyImage.SpentStatus>> GetKeyImageSpentStatuses(List<string> keyImages)
     {
         if (keyImages == null || keyImages.Count == 0)
         {
@@ -594,7 +607,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return statuses;
     }
 
-    public override async Task<List<MoneroPeer>> GetKnownPeers()
+    public async Task<List<MoneroPeer>> GetKnownPeers()
     {
         // send request
         MoneroJsonRpcParams respMap = await rpc.SendPathRequest("get_peer_list");
@@ -625,7 +638,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return peers;
     }
 
-    public override async Task<MoneroBlockHeader> GetLastBlockHeader()
+    public async Task<MoneroBlockHeader> GetLastBlockHeader()
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> respMap = await rpc.SendJsonRequest("get_last_block_header");
         MoneroJsonRpcParams? resultMap = respMap.Result!;
@@ -635,14 +648,14 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return header;
     }
 
-    public override async Task<MoneroMiningStatus> GetMiningStatus()
+    public async Task<MoneroMiningStatus> GetMiningStatus()
     {
         MoneroJsonRpcParams resp = await rpc.SendPathRequest("mining_status");
         CheckResponseStatus(resp);
         return ConvertRpcMiningStatus(resp);
     }
 
-    public override async Task<MoneroMinerTxSum> GetMinerTxSum(ulong height, ulong? numBlocks)
+    public async Task<MoneroMinerTxSum> GetMinerTxSum(ulong height, ulong? numBlocks)
     {
         if (numBlocks == null)
         {
@@ -662,14 +675,14 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return txSum;
     }
 
-    public override Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts,
+    public Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts,
         bool? isCumulative, ulong? startHeight, ulong? endHeight)
     {
         throw new NotImplementedException(
             "MoneroDaemonRpc.GetOutputDistribution(): not implemented (response 'distribution' field is binary)");
     }
 
-    public override async Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts,
+    public async Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts,
         int? minCount, int? maxCount, bool? isUnlocked, int? recentCutoff)
     {
         // build request params
@@ -700,7 +713,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return entries;
     }
 
-    public override async Task<List<MoneroOutput>> GetOutputs(List<MoneroOutput> outputs)
+    public async Task<List<MoneroOutput>> GetOutputs(List<MoneroOutput> outputs)
     {
         MoneroJsonRpcParams parameters = [];
         List<Dictionary<string, object?>> outs = [];
@@ -730,7 +743,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return [];
     }
 
-    public override async Task<List<MoneroBan>> GetPeerBans()
+    public async Task<List<MoneroBan>> GetPeerBans()
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = await rpc.SendJsonRequest("get_bans");
         MoneroJsonRpcParams? result = resp.Result!;
@@ -748,7 +761,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return bans;
     }
 
-    public override async Task<List<MoneroPeer>> GetPeers()
+    public async Task<List<MoneroPeer>> GetPeers()
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = await rpc.SendJsonRequest("get_connections");
         MoneroJsonRpcParams? result = resp.Result!;
@@ -767,7 +780,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return connections;
     }
 
-    public override async Task<MoneroDaemonSyncInfo> GetSyncInfo()
+    public async Task<MoneroDaemonSyncInfo> GetSyncInfo()
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = await rpc.SendJsonRequest("sync_info");
         MoneroJsonRpcParams? result = resp.Result!;
@@ -775,7 +788,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return ConvertRpcSyncInfo(result);
     }
 
-    public override async Task<List<string>> GetTxHexes(List<string> txHashes, bool prune)
+    public async Task<List<string>> GetTxHexes(List<string> txHashes, bool prune)
     {
         List<string> hexes = [];
         List<MoneroTx> txs = await GetTxs(txHashes, prune);
@@ -787,7 +800,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return hexes;
     }
 
-    public override async Task<List<MoneroTx>> GetTxPool()
+    public async Task<List<MoneroTx>> GetTxPool()
     {
         // send rpc request
         MoneroJsonRpcParams resp = await rpc.SendPathRequest("get_transaction_pool");
@@ -812,7 +825,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return txs;
     }
 
-    public override async Task<List<string>> GetTxPoolHashes()
+    public async Task<List<string>> GetTxPoolHashes()
     {
         // TODO move to binary request
         // send rpc request
@@ -824,14 +837,14 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return txHashes != null ? txHashes.ToObject<List<string>>()! : [];
     }
 
-    public override async Task<MoneroTxPoolStats> GetTxPoolStats()
+    public async Task<MoneroTxPoolStats> GetTxPoolStats()
     {
         MoneroJsonRpcParams resp = await rpc.SendPathRequest("get_transaction_pool_stats");
         CheckResponseStatus(resp);
         return ConvertRpcTxPoolStats(((JObject)resp["pool_stats"]!).ToObject<Dictionary<string, object?>>());
     }
 
-    public override async Task<List<MoneroTx>> GetTxs(List<string> txHashes, bool prune)
+    public async Task<List<MoneroTx>> GetTxs(List<string> txHashes, bool prune)
     {
         // validate input
         if (txHashes.Count == 0)
@@ -878,12 +891,12 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return txs;
     }
 
-    public override async Task<int> GetUploadLimit()
+    public async Task<int> GetUploadLimit()
     {
         return (await GetBandwidthLimits())[1];
     }
 
-    public override async Task<MoneroVersion> GetVersion()
+    public async Task<MoneroVersion> GetVersion()
     {
         MoneroJsonRpcResponse<MoneroJsonRpcParams> resp = await rpc.SendJsonRequest("get_version");
         MoneroJsonRpcParams? result = resp.Result!;
@@ -892,7 +905,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return new MoneroVersion(version, (bool?)result["release"]);
     }
 
-    public override async Task<bool> IsTrusted()
+    public async Task<bool> IsTrusted()
     {
         MoneroJsonRpcParams resp = await rpc.SendPathRequest("get_height");
         CheckResponseStatus(resp);
@@ -900,7 +913,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return untrusted == false;
     }
 
-    public override async Task<MoneroPruneResult> PruneBlockchain(bool check)
+    public async Task<MoneroPruneResult> PruneBlockchain(bool check)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("check", check);
@@ -913,7 +926,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return result;
     }
 
-    public override async Task RelayTxsByHash(List<string> txHashes)
+    public async Task RelayTxsByHash(List<string> txHashes)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("txids", txHashes);
@@ -921,17 +934,17 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         CheckResponseStatus(resp.Result);
     }
 
-    public override async Task<int> ResetDownloadLimit()
+    public async Task<int> ResetDownloadLimit()
     {
         return (await SetBandwidthLimits(-1, 0))[0];
     }
 
-    public override async Task<int> ResetUploadLimit()
+    public async Task<int> ResetUploadLimit()
     {
         return (await SetBandwidthLimits(0, -1))[1];
     }
 
-    public override async Task<int> SetDownloadLimit(int limit)
+    public async Task<int> SetDownloadLimit(int limit)
     {
         if (limit == -1)
         {
@@ -946,7 +959,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return (await SetBandwidthLimits(limit, 0))[0];
     }
 
-    public override async Task SetIncomingPeerLimit(int limit)
+    public async Task SetIncomingPeerLimit(int limit)
     {
         if (limit < 0)
         {
@@ -959,7 +972,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         CheckResponseStatus(resp);
     }
 
-    public override async Task SetOutgoingPeerLimit(int limit)
+    public async Task SetOutgoingPeerLimit(int limit)
     {
         if (limit < 0)
         {
@@ -972,7 +985,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         CheckResponseStatus(resp);
     }
 
-    public override async Task SetPeerBans(List<MoneroBan> bans)
+    public async Task SetPeerBans(List<MoneroBan> bans)
     {
         List<MoneroJsonRpcParams> rpcBans = [];
         foreach (MoneroBan ban in bans)
@@ -986,7 +999,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         CheckResponseStatus(resp.Result);
     }
 
-    public override async Task<int> SetUploadLimit(int limit)
+    public async Task<int> SetUploadLimit(int limit)
     {
         if (limit == -1)
         {
@@ -1001,7 +1014,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return (await SetBandwidthLimits(0, limit))[1];
     }
 
-    public override async Task StartMining(string? address, ulong? numThreads, bool? isBackground, bool? ignoreBattery)
+    public async Task StartMining(string? address, ulong? numThreads, bool? isBackground, bool? ignoreBattery)
     {
         if (string.IsNullOrEmpty(address))
         {
@@ -1022,18 +1035,18 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         CheckResponseStatus(resp);
     }
 
-    public override async Task Stop()
+    public async Task Stop()
     {
         CheckResponseStatus(await rpc.SendPathRequest("stop_daemon"));
     }
 
-    public override async Task StopMining()
+    public async Task StopMining()
     {
         MoneroJsonRpcParams resp = await rpc.SendPathRequest("stop_mining");
         CheckResponseStatus(resp);
     }
 
-    public override async Task SubmitBlocks(List<string> blockBlobs)
+    public async Task SubmitBlocks(List<string> blockBlobs)
     {
         if (blockBlobs.Count == 0)
         {
@@ -1044,7 +1057,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         CheckResponseStatus(resp.Result);
     }
 
-    public override async Task<MoneroSubmitTxResult> SubmitTxHex(string txHex, bool doNotRelay)
+    public async Task<MoneroSubmitTxResult> SubmitTxHex(string txHex, bool doNotRelay)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("tx_as_hex", txHex);
@@ -1067,7 +1080,7 @@ public class MoneroDaemonRpc : MoneroDaemonDefault
         return submitResult;
     }
 
-    public override Task<MoneroBlockHeader> WaitForNextBlockHeader()
+    public Task<MoneroBlockHeader> WaitForNextBlockHeader()
     {
         object syncLock = new();
         lock (syncLock)
@@ -2819,7 +2832,7 @@ internal class DaemonPoller
                 return;
             }
 
-            // fetch and compare latest block header
+            // fetch and compare the latest block header
             MoneroBlockHeader header = await daemon.GetLastBlockHeader();
             string? headerHash = header.GetHash();
             if (headerHash != null && !headerHash.Equals(lastHeader.GetHash()))

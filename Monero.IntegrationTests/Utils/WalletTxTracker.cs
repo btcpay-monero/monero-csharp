@@ -55,7 +55,7 @@ public class WalletTxTracker
 
                 if (tx.IsFailed() == true)
                 {
-                    await daemon.FlushTxPool(tx.GetHash()!); // flush tx if failed
+                    await daemon.FlushTxPool([tx.GetHash()!]); // flush tx if failed
                 }
                 else
                 {

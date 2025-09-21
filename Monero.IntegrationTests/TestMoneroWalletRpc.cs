@@ -8,9 +8,6 @@ namespace Monero.IntegrationTests;
 
 public class TestMoneroWalletRpc
 {
-    // test constants
-    private static readonly bool TestNonRelays = true;
-
     private readonly MoneroDaemonRpc daemon; // daemon instance to test
 
     // instance variables
@@ -175,11 +172,10 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestCreateWalletRandom()
     {
-        Assert.True(TestNonRelays);
         Exception? e1 = null; // emulating Java "finally" but compatible with other languages
         try
         {
-            // create random wallet
+            // create a random wallet
             IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig());
             string path = await moneroWallet.GetPath();
 
@@ -228,7 +224,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestCreateWalletFromSeed()
     {
-        Assert.True(TestNonRelays);
         Exception? e1 = null; // emulating Java "finally" but compatible with other languages
         try
         {
@@ -289,7 +284,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestCreateWalletFromSeedWithOffset()
     {
-        Assert.True(TestNonRelays);
         Exception? e1 = null; // emulating Java "finally" but compatible with other languages
         try
         {
@@ -320,7 +314,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestCreateWalletFromKeys()
     {
-        Assert.True(TestNonRelays);
         Exception? e1 = null; // emulating Java "finally" but compatible with other languages
         try
         {
@@ -350,7 +343,7 @@ public class TestMoneroWalletRpc
 
             await TestWallet(action, moneroWallet, false);
 
-            // attempt to create wallet at same path
+            // attempt to create wallet at the same path
             try
             {
                 await CreateWallet(new MoneroWalletConfig().SetPath(path));
@@ -376,7 +369,6 @@ public class TestMoneroWalletRpc
     [Fact(Skip = "monero-wallet-rpc does not support creating wallets with subaddress lookahead over rpc")]
     public async Task TestSubaddressLookahead()
     {
-        Assert.True(TestNonRelays);
         Exception? e1 = null; // emulating Java "finally" but compatible with other languages
         IMoneroWallet? receiver = null;
         try
@@ -416,7 +408,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetVersion()
     {
-        Assert.True(TestNonRelays);
         MoneroVersion version = await wallet.GetVersion();
         Assert.NotNull(version.GetNumber());
         Assert.True(version.GetNumber() > 0);
@@ -427,8 +418,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetPath()
     {
-        Assert.True(TestNonRelays);
-
         // create a random wallet
         IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig());
 
@@ -536,7 +525,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetSeed()
     {
-        Assert.True(TestNonRelays);
         string seed = await wallet.GetSeed();
         MoneroUtils.ValidateMnemonic(seed);
         Assert.True(TestUtils.SEED == seed);
@@ -546,7 +534,6 @@ public class TestMoneroWalletRpc
     [Fact(Skip = "monero-wallet-rpc does not support getting seed language")]
     public async Task TestGetSeedLanguage()
     {
-        Assert.True(TestNonRelays);
         string language = await wallet.GetSeedLanguage();
         Assert.True(IMoneroWallet.DefaultLanguage == language);
     }
@@ -555,7 +542,6 @@ public class TestMoneroWalletRpc
     [Fact(Skip = "monero-wallet-rpc does not support getting seed languages")]
     public async Task TestGetSeedLanguages()
     {
-        Assert.True(TestNonRelays);
         List<string> languages = await GetSeedLanguages();
         Assert.True(languages.Count > 0);
         foreach (string language in languages)
@@ -568,16 +554,14 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetPrivateViewKey()
     {
-        Assert.True(TestNonRelays);
         string privateViewKey = await wallet.GetPrivateViewKey();
         MoneroUtils.ValidatePrivateViewKey(privateViewKey);
     }
 
-    // Can get the private spend key
+    // Can get the private spent key
     [Fact]
     public async Task TestGetPrivateSpendKey()
     {
-        Assert.True(TestNonRelays);
         string privateSpendKey = await wallet.GetPrivateSpendKey();
         MoneroUtils.ValidatePrivateSpendKey(privateSpendKey);
     }
@@ -586,7 +570,6 @@ public class TestMoneroWalletRpc
     [Fact(Skip = "Enable after monero-project fix (https://github.com/monero-project/monero/pull/9364)")]
     public async Task TestGetPublicViewKey()
     {
-        Assert.True(TestNonRelays);
         string publicViewKey = await wallet.GetPublicViewKey();
         MoneroUtils.ValidatePrivateSpendKey(publicViewKey);
     }
@@ -595,7 +578,6 @@ public class TestMoneroWalletRpc
     [Fact(Skip = "Enable after monero-project fix (https://github.com/monero-project/monero/pull/9364)")]
     public async Task TestGetPublicSpendKey()
     {
-        Assert.True(TestNonRelays);
         string publicSpendKey = await wallet.GetPublicSpendKey();
         MoneroUtils.ValidatePrivateSpendKey(publicSpendKey);
     }
@@ -604,7 +586,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetPrimaryAddress()
     {
-        Assert.True(TestNonRelays);
         string primaryAddress = await wallet.GetPrimaryAddress();
         MoneroUtils.ValidateAddress(primaryAddress);
         Assert.True(await wallet.GetAddress(0, 0) == primaryAddress);
@@ -614,7 +595,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetSubaddressAddress()
     {
-        Assert.True(TestNonRelays);
         Assert.True(await wallet.GetPrimaryAddress() == (await wallet.GetSubaddress(0, 0)).GetAddress());
         foreach (MoneroAccount account in await wallet.GetAccounts(true))
         {
@@ -630,7 +610,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetSubaddressAddressOutOfRange()
     {
-        Assert.True(TestNonRelays);
         List<MoneroAccount> accounts = await wallet.GetAccounts(true);
         int accountIdx = accounts.Count - 1;
         MoneroAccount account = accounts[accountIdx];
@@ -651,7 +630,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetHeight()
     {
-        Assert.True(TestNonRelays);
         ulong lastHeight = await wallet.GetHeight();
 
         await daemon.WaitForNextBlockHeader();
@@ -665,7 +643,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestCreateAccountWithoutLabel()
     {
-        Assert.True(TestNonRelays);
         List<MoneroAccount> accountsBefore = await wallet.GetAccounts();
         MoneroAccount createdAccount = await wallet.CreateAccount();
         TestAccount(createdAccount);
@@ -676,9 +653,7 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestCreateAccountWithLabel()
     {
-        Assert.True(TestNonRelays);
-
-        // create account with label
+        // create an account with label
         List<MoneroAccount> accountsBefore = await wallet.GetAccounts();
         string label = Guid.NewGuid().ToString();
         MoneroAccount createdAccount = await wallet.CreateAccount(label);
@@ -698,7 +673,7 @@ public class TestMoneroWalletRpc
         createdAccount = await wallet.GetAccount((uint)createdAccountIndex);
         TestAccount(createdAccount);
 
-        // create account with same label
+        // create an account with same label
         createdAccount = await wallet.CreateAccount(label);
         TestAccount(createdAccount);
         createdAccountIndex = createdAccount.GetIndex();
@@ -719,9 +694,8 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetAccountsWithoutSubaddresses()
     {
-        Assert.True(TestNonRelays);
         List<MoneroAccount> accounts = await wallet.GetAccounts();
-        Assert.False(accounts.Count == 0);
+        Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
             TestAccount(account);
@@ -733,14 +707,13 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetAccountsWithSubaddresses()
     {
-        Assert.True(TestNonRelays);
         List<MoneroAccount> accounts = await wallet.GetAccounts(true);
-        Assert.False(accounts.Count == 0);
+        Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
             TestAccount(account);
             List<MoneroSubaddress> subaddresses = account.GetSubaddresses() ?? [];
-            Assert.False(subaddresses.Count == 0);
+            Assert.NotEmpty(subaddresses);
         }
     }
 
@@ -748,9 +721,8 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetAccount()
     {
-        Assert.True(TestNonRelays);
         List<MoneroAccount> accounts = await wallet.GetAccounts();
-        Assert.False(accounts.Count == 0);
+        Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
             TestAccount(account);
@@ -770,7 +742,7 @@ public class TestMoneroWalletRpc
             retrieved = await wallet.GetAccount((uint)accountIdx, true);
             List<MoneroSubaddress>? subaddresses = retrieved.GetSubaddresses();
             Assert.NotNull(subaddresses);
-            Assert.False(subaddresses.Count == 0);
+            Assert.NotEmpty(subaddresses);
         }
     }
 
@@ -778,7 +750,7 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestSetAccountLabel()
     {
-        // create account
+        // create an account
         if ((await wallet.GetAccounts()).Count < 2)
         {
             await wallet.CreateAccount();
@@ -794,8 +766,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestCreateSubaddress()
     {
-        Assert.True(TestNonRelays);
-
         // create subaddresses across accounts
         List<MoneroAccount> accounts = await wallet.GetAccounts();
         if (accounts.Count < 2)
@@ -831,9 +801,8 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetSubaddresses()
     {
-        Assert.True(TestNonRelays);
         List<MoneroAccount> accounts = await wallet.GetAccounts();
-        Assert.False(accounts.Count == 0);
+        Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
             uint? accountIndex = account.GetIndex();
@@ -844,7 +813,7 @@ public class TestMoneroWalletRpc
             }
 
             List<MoneroSubaddress> subaddresses = await wallet.GetSubaddresses((uint)accountIndex);
-            Assert.False(subaddresses.Count == 0);
+            Assert.NotEmpty(subaddresses);
             foreach (MoneroSubaddress subaddress in subaddresses)
             {
                 TestSubaddress(subaddress);
@@ -857,9 +826,8 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetSubaddressesByIndices()
     {
-        Assert.True(TestNonRelays);
         List<MoneroAccount> accounts = await wallet.GetAccounts();
-        Assert.False(accounts.Count == 0);
+        Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
             uint? accountIndex = account.GetIndex();
@@ -908,7 +876,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetSubaddressByIndex()
     {
-        Assert.True(TestNonRelays);
         List<MoneroAccount> accounts = await wallet.GetAccounts();
         Assert.True(accounts.Count > 0);
         foreach (MoneroAccount account in accounts)
@@ -959,7 +926,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestSyncWithoutProgress()
     {
-        Assert.True(TestNonRelays);
         ulong numBlocks = 100;
         ulong chainHeight = await daemon.GetHeight();
         Assert.True(chainHeight >= numBlocks);
@@ -972,8 +938,6 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestGetAllBalances()
     {
-        Assert.True(TestNonRelays);
-
         // fetch accounts with all info as reference
         List<MoneroAccount> accounts = await wallet.GetAccounts(true);
 
@@ -1012,9 +976,7 @@ public class TestMoneroWalletRpc
     [Fact]
     public async Task TestSaveAndClose()
     {
-        Assert.True(TestNonRelays);
-
-        // create random wallet
+        // create a random wallet
         string password = "";
         IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetPassword(password));
         string path = await moneroWallet.GetPath();
