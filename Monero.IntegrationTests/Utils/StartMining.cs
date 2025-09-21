@@ -2,13 +2,34 @@ namespace Monero.IntegrationTests.Utils;
 
 public static class StartMining
 {
-    public static void Start()
+    public static async Task Start()
     {
-        Start(1);
+        await Start(1);
     }
 
-    private static void Start(ulong numThreads)
+    public static async Task Start(string? address)
     {
-        TestUtils.GetDaemonRpc().StartMining(TestUtils.GetMiningAddress(), numThreads, false, false); // testnet
+        await Start(1, address);
+    }
+
+    public static async Task Start(ulong numThreads)
+    {
+        await Start(numThreads, null);
+    }
+
+    public static async Task<bool> IsMining()
+    {
+        return (await TestUtils.GetDaemonRpc().GetMiningStatus()).IsActive() == true;
+    }
+
+    private static async Task Start(ulong numThreads, string? address)
+    {
+        if (await IsMining())
+        {
+            return;
+        }
+
+        string miningAddress = string.IsNullOrEmpty(address) ? TestUtils.GetMiningAddress() : address;
+        await TestUtils.GetDaemonRpc().StartMining(miningAddress, numThreads, false, false); // testnet
     }
 }

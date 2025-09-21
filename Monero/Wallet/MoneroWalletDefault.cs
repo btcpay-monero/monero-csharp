@@ -254,7 +254,7 @@ public abstract class MoneroWalletDefault : IMoneroWallet
         return await GetOutputs(new MoneroOutputQuery());
     }
 
-    public abstract Task<List<MoneroOutputWallet>> GetOutputs(MoneroOutputQuery query);
+    public abstract Task<List<MoneroOutputWallet>> GetOutputs(MoneroOutputQuery? query);
 
     public abstract Task<string> GetPath();
 
@@ -337,7 +337,7 @@ public abstract class MoneroWalletDefault : IMoneroWallet
         return await GetTransfers(query);
     }
 
-    public abstract Task<List<MoneroTransfer>> GetTransfers(MoneroTransferQuery query);
+    public abstract Task<List<MoneroTransfer>> GetTransfers(MoneroTransferQuery? query);
 
     public virtual async Task<MoneroTxWallet?> GetTx(string txHash)
     {
@@ -382,12 +382,12 @@ public abstract class MoneroWalletDefault : IMoneroWallet
 
     public virtual async Task<ulong> GetUnlockedBalance()
     {
-        return await GetBalance(null);
+        return await GetUnlockedBalance(null);
     }
 
     public virtual async Task<ulong> GetUnlockedBalance(uint? accountIdx)
     {
-        return await GetBalance(accountIdx, null);
+        return await GetUnlockedBalance(accountIdx, null);
     }
 
     public abstract Task<ulong> GetUnlockedBalance(uint? accountIdx, uint? subaddressIdx);

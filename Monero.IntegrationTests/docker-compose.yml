@@ -6,6 +6,7 @@ services:
       dockerfile: Monero.IntegrationTests/Dockerfile
     environment:
       XMR_DAEMON_URI: http://node_2:18081
+      XMR_MINING_DAEMON_URI: http://node_1:18089
       XMR_WALLET_1_URI: http://xmr_wallet_1:18082
       XMR_WALLET_2_URI: http://xmr_wallet_2:18083
       TESTS_INCONTAINER: "true"
@@ -47,7 +48,7 @@ services:
       "--no-zmq",
       "--max-connections-per-ip=100",
       "--rpc-max-connections-per-private-ip=100",
-      "--start-mining=42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L",
+      "--start-mining=46FYVJUS4FwT7eBQjgYJViSwhZmziAQmDTHbCrzvMEKCSiFY9pSxBtEW4bB1nRR2XMKKEd2jgHvwoKzwUAeUY5VU8uo3nZP",
       "--mining-threads=1",
       "--non-interactive"
     ]

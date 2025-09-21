@@ -64,8 +64,13 @@ public class MoneroOutputQuery : MoneroOutputWallet
 
     public MoneroOutputQuery SetTxQuery(MoneroTxQuery? txQuery)
     {
+        return SetTxQuery(txQuery, true);
+    }
+
+    public MoneroOutputQuery SetTxQuery(MoneroTxQuery? txQuery, bool setOutputQuery)
+    {
         _txQuery = txQuery;
-        if (txQuery != null)
+        if (setOutputQuery && txQuery != null)
         {
             txQuery.SetOutputQuery(this);
         }
@@ -86,6 +91,83 @@ public class MoneroOutputQuery : MoneroOutputWallet
 
     public bool MeetsCriteria(MoneroOutputWallet? output)
     {
-        throw new NotImplementedException();
+        if (output == null)
+        {
+            return false;
+        }
+
+        // filter on output
+        if (GetAccountIndex() != null && !GetAccountIndex().Equals(output.GetAccountIndex()))
+        {
+            return false;
+        }
+
+        if (GetSubaddressIndex() != null && !GetSubaddressIndex().Equals(output.GetSubaddressIndex()))
+        {
+            return false;
+        }
+
+        if (GetAmount() != null && ((uint)GetAmount()!).CompareTo(output.GetAmount()) != 0)
+        {
+            return false;
+        }
+
+        if (IsSpent() != null && !IsSpent().Equals(output.IsSpent()))
+        {
+            return false;
+        }
+
+        if (IsFrozen() != null && !IsFrozen().Equals(output.IsFrozen()))
+        {
+            return false;
+        }
+
+        // filter on output key image
+        if (GetKeyImage() != null)
+        {
+            if (output.GetKeyImage() == null)
+            {
+                return false;
+            }
+
+            if (GetKeyImage()!.GetHex() != null && !GetKeyImage()!.GetHex()!.Equals(output.GetKeyImage()!.GetHex()))
+            {
+                return false;
+            }
+
+            if (GetKeyImage()!.GetSignature() != null &&
+                !GetKeyImage()!.GetSignature()!.Equals(output.GetKeyImage()!.GetSignature()))
+            {
+                return false;
+            }
+        }
+
+        // filter on extensions
+        if (GetSubaddressIndices() != null && !GetSubaddressIndices()!.Contains((uint)output.GetSubaddressIndex()!))
+        {
+            return false;
+        }
+
+        // filter with tx query
+        if (GetTxQuery() != null && !GetTxQuery()!.MeetsCriteria(output.GetTx()!, false))
+        {
+            return false;
+        }
+
+        // filter on remaining fields
+        if (GetMinAmount() != null &&
+            (output.GetAmount() == null || ((ulong)output.GetAmount()!).CompareTo(GetMinAmount()) < 0))
+        {
+            return false;
+        }
+
+        if (GetMaxAmount() != null &&
+            (output.GetAmount() == null || ((ulong)output.GetAmount()!).CompareTo(GetMaxAmount()) > 0))
+        {
+            return false;
+        }
+
+        // output Meets query
+        return true;
     }
 }

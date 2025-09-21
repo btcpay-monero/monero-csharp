@@ -212,7 +212,7 @@ public class MoneroTxQuery : MoneroTxWallet
         _transferQuery = transferQuery;
         if (transferQuery != null)
         {
-            transferQuery.SetTxQuery(this);
+            transferQuery.SetTxQuery(this, false);
         }
 
         return this;
@@ -228,7 +228,7 @@ public class MoneroTxQuery : MoneroTxWallet
         _inputQuery = inputQuery;
         if (inputQuery != null)
         {
-            inputQuery.SetTxQuery(this);
+            inputQuery.SetTxQuery(this, false);
         }
 
         return this;
@@ -244,21 +244,200 @@ public class MoneroTxQuery : MoneroTxWallet
         _outputQuery = outputQuery;
         if (outputQuery != null)
         {
-            outputQuery.SetTxQuery(this);
+            outputQuery.SetTxQuery(this, false);
         }
 
         return this;
     }
 
-    public bool MeetsCriteria(MoneroTx? tx)
-    {
-        throw new NotImplementedException(
-            "MoneroTxQuery.MeetsCriteria(MoneroTx tx) is not implemented yet. Please implement this method to filter transactions based on the query criteria.");
-    }
-
     public bool MeetsCriteria(MoneroTxWallet? tx)
     {
-        throw new NotImplementedException(
-            "MoneroTxQuery.MeetsCriteria(MoneroTxWallet tx) is not implemented yet. Please implement this method to filter transactions based on the query criteria.");
+        return MeetsCriteria(tx, true);
+    }
+
+    public bool MeetsCriteria(MoneroTxWallet? tx, bool queryChildren)
+    {
+        if (tx == null)
+        {
+            throw new MoneroError("No tx given to MoneroTxQuery.MeetsCriteria()");
+        }
+
+        // filter on tx
+        if (GetHash() != null && !GetHash()!.Equals(tx.GetHash()))
+        {
+            return false;
+        }
+
+        if (GetPaymentId() != null && !GetPaymentId()!.Equals(tx.GetPaymentId()))
+        {
+            return false;
+        }
+
+        if (IsConfirmed() != null && IsConfirmed() != tx.IsConfirmed())
+        {
+            return false;
+        }
+
+        if (InTxPool() != null && InTxPool() != tx.InTxPool())
+        {
+            return false;
+        }
+
+        if (GetRelay() != null && GetRelay() != tx.GetRelay())
+        {
+            return false;
+        }
+
+        if (IsRelayed() != null && IsRelayed() != tx.IsRelayed())
+        {
+            return false;
+        }
+
+        if (IsFailed() != null && IsFailed() != tx.IsFailed())
+        {
+            return false;
+        }
+
+        if (IsMinerTx() != null && IsMinerTx() != tx.IsMinerTx())
+        {
+            return false;
+        }
+
+        if (IsLocked() != null && IsLocked() != tx.IsLocked())
+        {
+            return false;
+        }
+
+        // filter on having a payment id
+        if (HasPaymentId() != null)
+        {
+            if (HasPaymentId() == true && tx.GetPaymentId() == null)
+            {
+                return false;
+            }
+
+            if (HasPaymentId() != true && tx.GetPaymentId() != null)
+            {
+                return false;
+            }
+        }
+
+        // filter on incoming
+        if (IsIncoming() != null && IsIncoming() != (tx.IsIncoming() == true))
+        {
+            return false;
+        }
+
+        // filter on outgoing
+        if (IsOutgoing() != null && IsOutgoing() != (tx.IsOutgoing() == true))
+        {
+            return false;
+        }
+
+        // filter on remaining fields
+        ulong? txHeight = tx.GetBlock() == null ? null : tx.GetBlock()!.GetHeight();
+        if (GetHashes() != null && !GetHashes()!.Contains(tx.GetHash()!))
+        {
+            return false;
+        }
+
+        if (GetPaymentIds() != null && !GetPaymentIds()!.Contains(tx.GetPaymentId()!))
+        {
+            return false;
+        }
+
+        if (GetHeight() != null && !GetHeight().Equals(txHeight))
+        {
+            return false;
+        }
+        if (GetMinHeight() != null && txHeight != null && txHeight < GetMinHeight())
+        {
+            return false; // do not filter unconfirmed
+        }
+
+        if (GetMaxHeight() != null && (txHeight == null || txHeight > GetMaxHeight()))
+        {
+            return false;
+        }
+
+        // done if not querying transfers or outputs
+        if (!queryChildren)
+        {
+            return true;
+        }
+
+        // at least one transfer must meet transfer query if defined
+        if (GetTransferQuery() != null)
+        {
+            bool matchFound = false;
+            if (tx.GetOutgoingTransfer() != null && GetTransferQuery()!.MeetsCriteria(tx.GetOutgoingTransfer(), false))
+            {
+                matchFound = true;
+            }
+            else if (tx.GetIncomingTransfers() != null)
+            {
+                foreach (MoneroIncomingTransfer incomingTransfer in tx.GetIncomingTransfers()!)
+                {
+                    if (GetTransferQuery()!.MeetsCriteria(incomingTransfer, false))
+                    {
+                        matchFound = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!matchFound)
+            {
+                return false;
+            }
+        }
+
+        // at least one input must meet input query if defined
+        if (GetInputQuery() != null)
+        {
+            if (tx.GetInputs() == null || tx.GetInputs()!.Count == 0)
+            {
+                return false;
+            }
+            bool matchFound = false;
+            foreach (MoneroOutputWallet input in tx.GetInputsWallet())
+            {
+                if (GetInputQuery()!.MeetsCriteria(input))
+                {
+                    matchFound = true;
+                    break;
+                }
+            }
+
+            if (!matchFound)
+            {
+                return false;
+            }
+        }
+
+        // at least one output must meet output query if defined
+        if (GetOutputQuery() != null)
+        {
+            if (tx.GetOutputs() == null || tx.GetOutputs()!.Count == 0)
+            {
+                return false;
+            }
+            bool matchFound = false;
+            foreach (MoneroOutputWallet output in tx.GetOutputsWallet())
+            {
+                if (GetOutputQuery()!.MeetsCriteria(output))
+                {
+                    matchFound = true;
+                    break;
+                }
+            }
+
+            if (!matchFound)
+            {
+                return false;
+            }
+        }
+
+        return true;  // transaction meets query criteria
     }
 }

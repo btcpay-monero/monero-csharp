@@ -23,6 +23,30 @@ public class MoneroTxWallet : MoneroTx
         // nothing to initialize
     }
 
+    // private helper to merge transfers
+    private static void MergeIncomingTransfer(List<MoneroIncomingTransfer>? transfers, MoneroIncomingTransfer? transfer)
+    {
+        if (transfers == null)
+        {
+            throw new MoneroError("Cannot merge from null transfers");
+        }
+
+        if (transfer == null)
+        {
+            throw new MoneroError("Cannot merge null transfer");
+        }
+
+        foreach (MoneroIncomingTransfer aTransfer in transfers)
+        {
+            if (aTransfer.GetAccountIndex() == transfer.GetAccountIndex() && aTransfer.GetSubaddressIndex() == transfer.GetSubaddressIndex())
+            {
+                aTransfer.Merge(transfer);
+                return;
+            }
+        }
+        transfers.Add(transfer);
+    }
+
     public MoneroTxWallet(MoneroTxWallet tx) : base(tx)
     {
         _txSet = tx._txSet;
@@ -55,6 +79,123 @@ public class MoneroTxWallet : MoneroTx
     public override MoneroTxWallet Clone()
     {
         return new MoneroTxWallet(this);
+    }
+
+    public bool Equals(MoneroTxWallet? other)
+    {
+        return Equals(other, true);
+    }
+
+    public bool Equals(MoneroTxWallet? other, bool checkInputs)
+    {
+        return Equals(other, checkInputs, true);
+    }
+
+    public bool Equals(MoneroTxWallet? other, bool checkInputs, bool checkOutputs)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+
+        if (!base.Equals(other, checkInputs, checkOutputs))
+        {
+            return false;
+        }
+
+        return IsIncoming() == other.IsIncoming() &&
+               IsOutgoing() == other.IsOutgoing() &&
+               GetNote() == other.GetNote() &&
+               IsLocked() == other.IsLocked() &&
+               GetInputSum() == other.GetInputSum() &&
+               GetChangeAddress() == other.GetChangeAddress() &&
+               GetChangeAmount() == other.GetChangeAmount() &&
+               GetNumDummyOutputs() == other.GetNumDummyOutputs() &&
+               GetExtraHex() == other.GetExtraHex();
+    }
+
+    public override MoneroTxWallet Merge(MoneroTx? tx)
+    {
+        if (tx != null && tx is not MoneroTxWallet)
+        {
+            throw new MoneroError("Wallet transaction must be merged with type MoneroTxWallet");
+        }
+        return Merge((MoneroTxWallet)tx!);
+    }
+
+    public MoneroTxWallet Merge(MoneroTxWallet? tx)
+    {
+        if (tx == null)
+        {
+            throw new MoneroError("Wallet transaction must be merged with type MoneroTxWallet");
+        }
+
+        if (this == tx)
+        {
+            return this;
+        }
+
+        // merge base classes
+        base.Merge(tx);
+
+        // merge tx set if they're different which comes back to merging txs
+        if (_txSet != tx.GetTxSet())
+        {
+            if (_txSet == null)
+            {
+                _txSet = new MoneroTxSet();
+                _txSet.SetTxs([this]);
+            }
+            if (tx.GetTxSet() == null)
+            {
+                tx.SetTxSet(new MoneroTxSet());
+                tx.GetTxSet()!.SetTxs([tx]);
+            }
+            _txSet.Merge(tx.GetTxSet());
+            return this;
+        }
+
+        // merge incoming transfers
+        if (tx.GetIncomingTransfers() != null)
+        {
+            if (GetIncomingTransfers() == null)
+            {
+                SetIncomingTransfers([]);
+            }
+            foreach (MoneroIncomingTransfer transfer in tx.GetIncomingTransfers()!)
+            {
+                transfer.SetTx(this);
+                MergeIncomingTransfer(GetIncomingTransfers()!, transfer);
+            }
+        }
+
+        // merge outgoing transfer
+        if (tx.GetOutgoingTransfer() != null)
+        {
+            tx.GetOutgoingTransfer()!.SetTx(this);
+            if (GetOutgoingTransfer() == null)
+            {
+                SetOutgoingTransfer(tx.GetOutgoingTransfer());
+            }
+            else
+            {
+                GetOutgoingTransfer()!.Merge(tx.GetOutgoingTransfer()!);
+            }
+        }
+
+        // merge simple extensions
+        SetIsIncoming(GenUtils.Reconcile(IsIncoming(), tx.IsIncoming(), null, true, null)); // outputs seen on confirmation
+        SetIsOutgoing(GenUtils.Reconcile(IsOutgoing(), tx.IsOutgoing()));
+        SetNote(GenUtils.Reconcile(GetNote(), tx.GetNote()));
+        SetIsLocked(GenUtils.Reconcile(IsLocked(), tx.IsLocked(), null, false, null));  // tx can become unlocked
+        SetInputSum(GenUtils.Reconcile(GetInputSum(), tx.GetInputSum()));
+        SetOutputSum(GenUtils.Reconcile(GetOutputSum(), tx.GetOutputSum()));
+        SetChangeAddress(GenUtils.Reconcile(GetChangeAddress(), tx.GetChangeAddress()));
+        SetChangeAmount(GenUtils.Reconcile(GetChangeAmount(), tx.GetChangeAmount()));
+        SetNumDummyOutputs(GenUtils.Reconcile(GetNumDummyOutputs(), tx.GetNumDummyOutputs()));
+        SetExtraHex(GenUtils.Reconcile(GetExtraHex(), tx.GetExtraHex()));
+
+        return this;  // for chaining
     }
 
     public MoneroTxSet? GetTxSet()
@@ -363,6 +504,11 @@ public class MoneroTxWallet : MoneroTx
         return this;
     }
 
+    public ulong? GetInputSum()
+    {
+        return _inputSum;
+    }
+
     public virtual MoneroTxWallet SetInputSum(ulong? inputSum)
     {
         _inputSum = inputSum;
@@ -373,6 +519,11 @@ public class MoneroTxWallet : MoneroTx
     {
         _outputSum = outputSum;
         return this;
+    }
+
+    public ulong? GetOutputSum()
+    {
+        return _outputSum;
     }
 
     public string? GetChangeAddress()
@@ -392,10 +543,20 @@ public class MoneroTxWallet : MoneroTx
         return this;
     }
 
+    public ulong? GetChangeAmount()
+    {
+        return _changeAmount;
+    }
+
     public virtual MoneroTxWallet SetNumDummyOutputs(uint? numDummyOutputs)
     {
         _numDummyOutputs = numDummyOutputs;
         return this;
+    }
+
+    public uint? GetNumDummyOutputs()
+    {
+        return _numDummyOutputs;
     }
 
     public string? GetExtraHex()

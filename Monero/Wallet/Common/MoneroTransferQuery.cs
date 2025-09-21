@@ -1,3 +1,5 @@
+using Monero.Common;
+
 namespace Monero.Wallet.Common;
 
 public class MoneroTransferQuery : MoneroTransfer
@@ -56,12 +58,21 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public MoneroTransferQuery SetTxQuery(MoneroTxQuery? txQuery)
     {
-        _txQuery = txQuery;
-        if (txQuery != null)
+        if (txQuery == null)
         {
-            txQuery.SetTransferQuery(this);
+            return SetTxQuery(null, true);
         }
 
+        return SetTxQuery(txQuery, true);
+    }
+
+    public MoneroTransferQuery SetTxQuery(MoneroTxQuery? query, bool setTransferQuery)
+    {
+        _txQuery = query;
+        if (setTransferQuery && _txQuery != null)
+        {
+            _txQuery.SetTransferQuery(this);
+        }
         return this;
     }
 
@@ -161,6 +172,128 @@ public class MoneroTransferQuery : MoneroTransfer
 
     public bool MeetsCriteria(MoneroTransfer? transfer)
     {
-        throw new NotImplementedException();
+        return MeetsCriteria(transfer, true);
+    }
+
+    public bool MeetsCriteria(MoneroTransfer? transfer, bool queryParent)
+    {
+        if (transfer == null)
+        {
+            throw new MoneroError("transfer is null");
+        }
+
+        // filter on common fields
+        if (IsIncoming() != null && IsIncoming() != transfer.IsIncoming())
+        {
+            return false;
+        }
+
+        if (IsOutgoing() != null && IsOutgoing() != transfer.IsOutgoing())
+        {
+            return false;
+        }
+
+        if (GetAmount() != null && ((ulong)GetAmount()!).CompareTo(transfer.GetAmount()) != 0)
+        {
+            return false;
+        }
+
+        if (GetAccountIndex() != null && !GetAccountIndex().Equals(transfer.GetAccountIndex()))
+        {
+            return false;
+        }
+
+        // filter on incoming fields
+        if (transfer is MoneroIncomingTransfer inTransfer)
+        {
+            if (HasDestinations() == true)
+            {
+                return false;
+            }
+
+            if (GetAddress() != null && !GetAddress()!.Equals(inTransfer.GetAddress()))
+            {
+                return false;
+            }
+
+            if (GetAddresses() != null && !GetAddresses()!.Contains(inTransfer.GetAddress()!))
+            {
+                return false;
+            }
+
+            if (GetSubaddressIndex() != null && !GetSubaddressIndex().Equals(inTransfer.GetSubaddressIndex()))
+            {
+                return false;
+            }
+
+            if (GetSubaddressIndices() != null &&
+              !GetSubaddressIndices()!.Contains((uint)inTransfer.GetSubaddressIndex()!))
+            {
+                return false;
+            }
+        }
+
+        // filter on outgoing fields
+        else if (transfer is MoneroOutgoingTransfer outTransfer)
+        {
+            // filter on addresses
+            if (GetAddress() != null && (outTransfer.GetAddresses() == null || !outTransfer.GetAddresses()!.Contains(GetAddress()!)))
+            {
+                return false;   // TODO: will filter all transfers if they don't contain addresses
+            }
+            if (GetAddresses() != null)
+            {
+                HashSet<string> intersections = new(GetAddresses()!);
+                intersections.IntersectWith(outTransfer.GetAddresses()!);
+                if (intersections.Count == 0)
+                {
+                    return false;  // must have overlapping addresses
+                }
+            }
+
+            // filter on subaddress indices
+            if (GetSubaddressIndex() != null && (outTransfer.GetSubaddressIndices() == null ||
+                                               !outTransfer.GetSubaddressIndices()!.Contains(
+                                                   (uint)GetSubaddressIndex()!)))
+            {
+                return false;
+            }
+            if (GetSubaddressIndices() != null)
+            {
+                HashSet<uint> intersections = new(GetSubaddressIndices()!);
+                intersections.IntersectWith(outTransfer.GetSubaddressIndices()!);
+                if (intersections.Count == 0)
+                {
+                    return false;  // must have overlapping subaddress indices
+                }
+            }
+
+            // filter on having destinations
+            if (HasDestinations() != null)
+            {
+                if (HasDestinations() == true && outTransfer.GetDestinations() == null)
+                {
+                    return false;
+                }
+
+                if (!HasDestinations() == true && outTransfer.GetDestinations() != null)
+                {
+                    return false;
+                }
+            }
+
+        }
+        // otherwise invalid type
+        else
+        {
+            throw new Exception("Transfer must be MoneroIncomingTransfer or MoneroOutgoingTransfer");
+        }
+
+        // filter with tx filter
+        if (queryParent && GetTxQuery() != null && !GetTxQuery()!.MeetsCriteria(transfer.GetTx()!, false))
+        {
+            return false;
+        }
+        return true;
     }
 }
