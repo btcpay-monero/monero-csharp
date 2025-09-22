@@ -614,7 +614,7 @@ public interface IMoneroWallet
      * @param query specifies attributes of transfers to get
      * @return list of wallet transfers that meet the query
      */
-    Task<List<MoneroTransfer>> GetTransfers(MoneroTransferQuery? query);
+    Task<List<MoneroTransfer>> GetTransfers(MoneroTransferQuery query);
 
     /**
      * Get all the wallet's incoming transfers.
@@ -695,7 +695,7 @@ public interface IMoneroWallet
      * @param query specifies attributes of outputs to Get
      * @return the queried outputs
      */
-    Task<List<MoneroOutputWallet>> GetOutputs(MoneroOutputQuery? query);
+    Task<List<MoneroOutputWallet>> GetOutputs(MoneroOutputQuery query);
 
 
     /**

@@ -69,6 +69,11 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         MoneroRpcConnection rpcConnection = _daemon.GetRpcConnection();
 
         Assert.True(rpcConnection.IsConnected(), "Daemon offline");
+        ulong daemonHeight = _daemon.GetHeight().GetAwaiter().GetResult();
+        if (daemonHeight == 1)
+        {
+            MineBlocks();
+        }
     }
 
     #region Notification Tests
@@ -1385,6 +1390,21 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     #endregion
 
     #region Test Helpers
+
+    private static void MineBlocks()
+    {
+        try
+        {
+            StartMining.Start();
+            GenUtils.WaitFor(10000);
+            StopMining.Stop();
+            GenUtils.WaitFor(10000);
+        }
+        catch (Exception e)
+        {
+            MoneroUtils.Log(0, e.Message);
+        }
+    }
 
     private static void TestBlockHeader(MoneroBlockHeader? header, bool isFull)
     {

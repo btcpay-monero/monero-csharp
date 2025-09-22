@@ -83,7 +83,7 @@ public class WalletTxTracker
                 {
                     try
                     {
-                        await StartMining.Start();
+                        StartMining.Start();
                         miningStarted = true;
                     }
                     catch (Exception)

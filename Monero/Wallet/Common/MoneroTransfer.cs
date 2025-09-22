@@ -1,5 +1,3 @@
-using System.Text;
-
 using Monero.Common;
 
 namespace Monero.Wallet.Common;
@@ -101,57 +99,5 @@ public abstract class MoneroTransfer
         }
 
         return this;
-    }
-
-    public bool Equals(MoneroTransfer? other)
-    {
-        if (other == null)
-        {
-            return false;
-        }
-
-        if (this == other)
-        {
-            return true;
-        }
-        if (_accountIndex == null)
-        {
-            if (other._accountIndex != null)
-            {
-                return false;
-            }
-        }
-        else if (!_accountIndex.Equals(other._accountIndex))
-        {
-            return false;
-        }
-        if (_amount == null)
-        {
-            if (other._amount != null)
-            {
-                return false;
-            }
-        }
-        else if (!_amount.Equals(other._amount))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    public override string ToString()
-    {
-        return ToString(0);
-    }
-
-    public virtual string ToString(int indent)
-    {
-        StringBuilder sb = new();
-        sb.Append(GenUtils.KvLine("Is incoming", this.IsIncoming(), indent));
-        sb.Append(GenUtils.KvLine("Amount", this.GetAmount() != null ? this.GetAmount().ToString() : null, indent));
-        sb.Append(GenUtils.KvLine("Account index", this.GetAccountIndex(), indent));
-        string str = sb.ToString();
-        return str.Length == 0 ? str : str.Substring(0, str.Length - 1);	  // strip last newline
     }
 }

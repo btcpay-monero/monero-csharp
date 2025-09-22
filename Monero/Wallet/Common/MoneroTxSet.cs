@@ -1,5 +1,3 @@
-using Monero.Common;
-
 namespace Monero.Wallet.Common;
 
 public class MoneroTxSet
@@ -50,36 +48,6 @@ public class MoneroTxSet
     public MoneroTxSet SetSignedTxHex(string? signedTxHex)
     {
         _signedTxHex = signedTxHex;
-        return this;
-    }
-
-    public MoneroTxSet Merge(MoneroTxSet? txSet)
-    {
-        if (txSet == null)
-        {
-            throw new MoneroError("Tx set is null");
-        }
-
-        if (this == txSet)
-        {
-            return this;
-        }
-
-        // merge sets
-        SetMultisigTxHex(GenUtils.Reconcile(GetMultisigTxHex(), txSet.GetMultisigTxHex()));
-        SetUnsignedTxHex(GenUtils.Reconcile(GetUnsignedTxHex(), txSet.GetUnsignedTxHex()));
-        SetSignedTxHex(GenUtils.Reconcile(GetSignedTxHex(), txSet.GetSignedTxHex()));
-
-        // merge txs
-        if (txSet.GetTxs() != null)
-        {
-            foreach (MoneroTxWallet tx in txSet.GetTxs()!)
-            {
-                tx.SetTxSet(this);
-                MoneroUtils.MergeTx(_txs!, tx);
-            }
-        }
-
         return this;
     }
 }
