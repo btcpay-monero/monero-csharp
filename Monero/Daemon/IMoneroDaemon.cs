@@ -36,10 +36,13 @@ public interface IMoneroDaemon
     Task FlushTxPool(List<string> txHashes);
     Task<List<MoneroKeyImage.SpentStatus>> GetKeyImageSpentStatuses(List<string> keyImage);
     Task<List<MoneroOutput>> GetOutputs(List<MoneroOutput> outputs);
+
     Task<List<MoneroOutputHistogramEntry>> GetOutputHistogram(List<ulong>? amounts, int? minCount, int? maxCount,
         bool? isUnlocked, int? recentCutoff);
+
     Task<List<MoneroOutputDistributionEntry>> GetOutputDistribution(List<ulong> amounts, bool? isCumulative,
         ulong? startHeight, ulong? endHeight);
+
     Task<MoneroDaemonInfo> GetInfo();
     Task<MoneroDaemonSyncInfo> GetSyncInfo();
     Task<MoneroHardForkInfo> GetHardForkInfo();

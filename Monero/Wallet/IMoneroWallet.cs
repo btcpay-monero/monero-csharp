@@ -30,34 +30,20 @@ public interface IMoneroWallet
 
     /**
      * Indicates if the wallet is view-only, meaning it does not have the private
-     * spend key and can therefore only observe incoming outputs.
+     * spent key and can therefore only observe incoming outputs.
      *
      * @return {bool} true if the wallet is view-only, false otherwise
      */
     Task<bool> IsViewOnly();
 
     /**
-     * Set the wallet's daemon connection.
+     * Sets the wallet's connection to a daemon.
      *
-     * @param uri is the daemon's URI
-     * @param username is the username to authenticate with the daemon (optional)
-     * @param password is the password to authenticate with the daemon (optional)
+     * @param connection The daemon RPC connection details (e.g., URI, credentials).
+     * @param isTrusted  Indicates whether the daemon is trusted (optional).
+     * @param sslOptions SSL options for secure connection (optional).
      */
-    Task SetDaemonConnection(string? uri, string? username, string? password);
-
-    /**
-     * Set the wallet's daemon connection.
-     *
-     * @param uri is the daemon's URI
-     */
-    Task SetDaemonConnection(string uri);
-
-    /**
-     * Set the wallet's daemon connection
-     *
-     * @param daemonConnection manages daemon connection information
-     */
-    Task SetDaemonConnection(MoneroRpcConnection? daemonConnection);
+    Task SetDaemonConnection(MoneroRpcConnection? connection, bool? isTrusted, SslOptions? sslOptions);
 
     /**
      * Get the wallet's daemon connection.
@@ -174,25 +160,6 @@ public interface IMoneroWallet
     Task<MoneroIntegratedAddress> GetIntegratedAddress(string? standardAddress, string? paymentId);
 
     /**
-     * Get an integrated address based on the given standard address and payment
-     * ID. Uses the wallet's primary address if an address is not given.
-     * Generates a random payment ID if a payment ID is not given.
-     *
-     * @param standardAddress is the standard address to generate the integrated address from (wallet's primary address if null)
-     * @return the integrated address
-     */
-    Task<MoneroIntegratedAddress> GetIntegratedAddress(string? standardAddress);
-
-    /**
-     * Get an integrated address based on the given standard address and payment
-     * ID. Uses the wallet's primary address if an address is not given.
-     * Generates a random payment ID if a payment ID is not given.
-     *
-     * @return the integrated address
-     */
-    Task<MoneroIntegratedAddress> GetIntegratedAddress();
-
-    /**
      * Decode an integrated address to Get its standard address and payment id.
      *
      * @param integratedAddress is an integrated address to decode
@@ -225,48 +192,11 @@ public interface IMoneroWallet
     Task<ulong> GetHeightByDate(int year, int month, int day);
 
     /**
-     * Synchronize the wallet with the daemon as a one-time Synchronous process.
-     *
-     * @param listener listener to receive notifications during Synchronization
-     * @return the Sync result
-     */
-    Task<MoneroSyncResult> Sync(MoneroWalletListener listener);
-
-    /**
-     * Synchronize the wallet with the daemon as a one-time Synchronous process.
-     *
-     * @param startHeight is the start height to Sync from (defaults to the last Synced block)
-     * @param listener listener to receive notifications during Synchronization
-     * @return the Sync result
-     */
-    Task<MoneroSyncResult> Sync(ulong? startHeight, MoneroWalletListener? listener);
-
-    /**
-     * Synchronize the wallet with the daemon as a one-time Synchronous process.
-     *
-     * @param startHeight is the start height to Sync from (defaults to the last Synced block)
-     * @return the Sync result
-     */
-    Task<MoneroSyncResult> Sync(ulong? startHeight);
-
-    /**
-     * Synchronize the wallet with the daemon as a one-time Synchronous process.
-     *
-     * @return the Sync result
-     */
-    Task<MoneroSyncResult> Sync();
-
-    /**
      * Start background Synchronizing with a maximum period between Syncs.
      *
      * @param SyncPeriodInMs maximum period between Syncs in milliseconds
      */
     Task StartSyncing(ulong? syncPeriodInMs);
-
-    /**
-     * Start background Synchronizing with a maximum period between Syncs.
-     */
-    Task StartSyncing();
 
     /**
      * Stop Synchronizing the wallet with the daemon.
@@ -310,132 +240,41 @@ public interface IMoneroWallet
     Task<ulong> GetBalance(uint? accountIdx, uint? subaddressIdx);
 
     /**
-     * Get account's balance.
-     *
-     * @param accountIdx index of the account to Get the balance of (default all accounts if null)
-     * @return the requested balance
-     */
-    Task<ulong> GetBalance(uint? accountIdx);
-
-    /**
-     * Get a wallet's balance.
-     *
-     * @return the requested balance
-     */
-    Task<ulong> GetBalance();
-
-    /**
-     * Get a subaddress's unlocked balance.
-     *
-     * @param accountIdx index of the subaddress to Get the unlocked balance of (default all accounts if null)
-     * @param subaddressIdx index of the subaddress to Get the unlocked balance of (default all subaddresses if null)
-     * @return the requested unlocked balance
-     */
-    Task<ulong> GetUnlockedBalance(uint? accountIdx, uint? subaddressIdx);
-
-    /**
-     * Get a account's unlocked balance.
-     *
-     * @param accountIdx index of the subaddress to Get the unlocked balance of (default all accounts if null)
-     * @return the requested unlocked balance
-     */
-    Task<ulong> GetUnlockedBalance(uint? accountIdx);
-
-    /**
-     * Get a wallet's unlocked balance.
-     *
-     * @return the requested unlocked balance
-     */
-    Task<ulong> GetUnlockedBalance();
-
-    /**
      * Get accounts with a given tag.
      *
+     * @param includeSubaddresses specifies if subaddresses should be included
+     * @param skipBalances skips balances if true
      * @param tag is the tag for filtering accounts, all accounts if null
      * @return all accounts with the given tag
      */
-    Task<List<MoneroAccount>> GetAccounts(string tag);
-
-    /**
-     * Get accounts with a given tag.
-     *
-     * @param includeSubaddresses specifies if subaddresses should be included
-     * @param tag is the tag for filtering accounts, all accounts if null
-     * @return all accounts with the given tag
-     */
-    Task<List<MoneroAccount>> GetAccounts(bool includeSubaddresses, string? tag);
-
-    /**
-     * Get accounts with a given tag.
-     *
-     * @param includeSubaddresses specifies if subaddresses should be included
-     * @return all accounts with the given tag
-     */
-    Task<List<MoneroAccount>> GetAccounts(bool includeSubaddresses);
-
-    /**
-     * Get accounts with a given tag.
-     *
-     * @return all accounts with the given tag
-     */
-    Task<List<MoneroAccount>> GetAccounts();
-
-    /**
-     * Get an account.
-     *
-     * @param accountIdx specifies the account to Get
-     * @param includeSubaddresses specifies if subaddresses should be included
-     * @return the retrieved account
-     */
-    Task<MoneroAccount> GetAccount(uint accountIdx, bool includeSubaddresses);
-
-    /**
-     * Get an account.
-     *
-     * @param accountIdx specifies the account to Get
-     * @return the retrieved account
-     */
-    Task<MoneroAccount> GetAccount(uint accountIdx);
+    Task<List<MoneroAccount>> GetAccounts(bool includeSubaddresses, bool skipBalances, string? tag);
 
     /**
      * Create a new account with a label for the first subaddress.
      *
-     * @param label specifies the label for account's first subaddress (optional)
+     * @param label specifies the label for the account's first subaddress (optional)
      * @return the created account
      */
     Task<MoneroAccount> CreateAccount(string? label);
 
     /**
-     * Create a new account.
-     *
-     * @return the created account
-     */
-    Task<MoneroAccount> CreateAccount();
-
-    /**
      * Set an account label.
      *
-     * @param accountIdx index of the account to set the label for
-     * @param label the label to set
+     * @param accountIdx Index of the account to set the label for
+     * @param subaddressIdx Index of the subaddress to set the label for
+     * @param label The label to set
      */
-    Task SetAccountLabel(uint accountIdx, string label);
+    Task SetAccountLabel(uint accountIdx, uint subaddressIdx, string label);
 
     /**
      * Get subaddresses in an account.
      *
      * @param accountIdx specifies the account to Get subaddresses within
+     * @param skipBalances skip balances if true, else get balances
      * @param subaddressIndices are specific subaddresses to Get (optional)
      * @return the retrieved subaddresses
      */
-    Task<List<MoneroSubaddress>> GetSubaddresses(uint accountIdx, List<uint>? subaddressIndices);
-
-    /**
-     * Get subaddresses in an account.
-     *
-     * @param accountIdx specifies the account to Get subaddresses within
-     * @return the retrieved subaddresses
-     */
-    Task<List<MoneroSubaddress>> GetSubaddresses(uint accountIdx);
+    Task<List<MoneroSubaddress>> GetSubaddresses(uint accountIdx, bool skipBalances, List<uint>? subaddressIndices);
 
     /**
      * Get a subaddress.
@@ -454,48 +293,6 @@ public interface IMoneroWallet
      * @return the created subaddress
      */
     Task<MoneroSubaddress> CreateSubaddress(uint accountIdx, string? label);
-
-    /**
-     * Create a subaddress within an account.
-     *
-     * @param accountIdx specifies the index of the account to Create the subaddress within
-     * @return the created subaddress
-     */
-    Task<MoneroSubaddress> CreateSubaddress(uint accountIdx);
-
-
-    /**
-     * Set a subaddress label.
-     *
-     * @param accountIdx index of the account to set the label for
-     * @param subaddressIdx index of the subaddress to set the label for
-     * @param label the label to set
-     */
-    Task SetSubaddressLabel(uint accountIdx, uint subaddressIdx, string label);
-
-    /**
-     * Get a wallet transaction by hash.
-     *
-     * @param txHash is the hash of a transaction to Get
-     * @return the identified transaction or null if not found
-     */
-    Task<MoneroTxWallet?> GetTx(string txHash);
-
-    /**
-     * Get all wallet transactions.  Wallet transactions contain one or more
-     * transfers that are either incoming or outgoing to the wallet.
-     *
-     * @return all wallet transactions
-     */
-    Task<List<MoneroTxWallet>> GetTxs();
-
-    /**
-     * Get wallet transactions by hash.
-     *
-     * @param txHashes are hashes of transactions to Get
-     * @return the found transactions
-     */
-    Task<List<MoneroTxWallet>> GetTxs(List<string> txHashes);
 
     /**
      * Retrieves wallet transactions that meet the criteria defined in a {@link MoneroTxQuery} object.
@@ -535,45 +332,6 @@ public interface IMoneroWallet
      * @return a list of wallet transactions matching the query
      */
     Task<List<MoneroTxWallet>> GetTxs(MoneroTxQuery? query);
-
-    /**
-     * Get all incoming and outgoing transfers to and from this wallet.  An
-     * outgoing transfer represents a total amount sent from one or more
-     * subaddresses within an account to individual destination addresses, each
-     * with their own amount.  An incoming transfer represents a total amount
-     * received into a subaddress within an account.  Transfers belong to
-     * transactions which are stored on the blockchain.
-     *
-     * @return all wallet transfers
-     */
-    Task<List<MoneroTransfer>> GetTransfers();
-
-    /**
-     * Get incoming and outgoing transfers to and from an account.  An outgoing
-     * transfer represents a total amount sent from one or more subaddresses
-     * within an account to individual destination addresses, each with their
-     * own amount.  An incoming transfer represents a total amount received into
-     * a subaddress within an account.  Transfers belong to transactions which
-     * are stored on the blockchain.
-     *
-     * @param accountIdx is the index of the account to Get transfers from
-     * @return transfers to/from the account
-     */
-    Task<List<MoneroTransfer>> GetTransfers(uint accountIdx);
-
-    /**
-     * Get incoming and outgoing transfers to and from a subaddress.  An outgoing
-     * transfer represents a total amount sent from one or more subaddresses
-     * within an account to individual destination addresses, each with their
-     * own amount.  An incoming transfer represents a total amount received into
-     * a subaddress within an account.  Transfers belong to transactions which
-     * are stored on the blockchain.
-     *
-     * @param accountIdx is the index of the account to Get transfers from
-     * @param subaddressIdx is the index of the subaddress to Get transfers from
-     * @return transfers to/from the subaddress
-     */
-    Task<List<MoneroTransfer>> GetTransfers(uint accountIdx, uint subaddressIdx);
 
     /**
      * Gets transfers that meet the criteria defined in a query object.
@@ -617,64 +375,6 @@ public interface IMoneroWallet
     Task<List<MoneroTransfer>> GetTransfers(MoneroTransferQuery query);
 
     /**
-     * Get all the wallet's incoming transfers.
-     *
-     * @return the wallet's incoming transfers
-     */
-    Task<List<MoneroIncomingTransfer>> GetIncomingTransfers();
-
-    /**
-     * <p>Get incoming transfers that meet a query.</p>
-     * <p>
-     *     All supported query criteria:<br />
-     *     address - Get incoming transfers to a specific address in the wallet (optional)<br />
-     *     accountIndex - Get incoming transfers to a specific account index (optional)<br />
-     *     subaddressIndex - Get incoming transfers to a specific subaddress index (optional)<br />
-     *     subaddressIndices - Get transfers destined for specific subaddress indices (optional)<br />
-     *     amount - amount being transferred (optional)<br />
-     *     txQuery - Get transfers whose transaction meets this query (optional)<br />
-     * </p>
-     * @param query specifies which incoming transfers to Get
-     * @return incoming transfers that meet the query
-     */
-    Task<List<MoneroIncomingTransfer>> GetIncomingTransfers(MoneroTransferQuery query);
-
-    /**
-     * Get all the wallet's outgoing transfers.
-     *
-     * @return the wallet's outgoing transfers
-     */
-    Task<List<MoneroOutgoingTransfer>> GetOutgoingTransfers();
-
-    /**
-     * Get outgoing transfers that meet a query.
-     *
-     * All supported query criteria:
-     * - address - Get outgoing transfers from a specific address in the wallet (optional)
-     * - accountIndex - Get outgoing transfers from a specific account index (optional)
-     * - subaddressIndex - Get outgoing transfers from a specific subaddress index (optional)
-     * - subaddressIndices - Get outgoing transfers from specific subaddress indices (optional)
-     * - amount - amount being transferred (optional)
-     * - destinations - individual destinations of an outgoing transfer, which is local
-     * wallet data and NOT recoverable from the blockchain (optional)
-     * - hasDestinations - Get transfers that have destinations or not (optional)
-     * - txQuery - Get transfers whose transaction meets this query (optional)
-     *
-     * @param query specifies which outgoing transfers to Get
-     * @return outgoing transfers that meet the query
-     */
-    Task<List<MoneroOutgoingTransfer>> GetOutgoingTransfers(MoneroTransferQuery query);
-
-    /**
-     * Get outputs Created from previous transactions that belong to the wallet
-     * (i.e., that the wallet can spend one time).  Outputs are part of
-     * transactions which are stored in blocks on the blockchain.
-     *
-     * @return all wallet outputs
-     */
-    Task<List<MoneroOutputWallet>> GetOutputs();
-
-    /**
      * Get outputs which meet the criteria defined in a query object.
      *
      * Outputs must meet every criteria defined in the query in order to be
@@ -707,13 +407,6 @@ public interface IMoneroWallet
     Task<string> ExportOutputs(bool all);
 
     /**
-     * Export outputs in hex format.
-     *
-     * @return outputs in hex format
-     */
-    Task<string> ExportOutputs();
-
-    /**
      * Import outputs in hex format.
      *
      * @param outputsHex are outputs in hex format
@@ -730,26 +423,12 @@ public interface IMoneroWallet
     Task<List<MoneroKeyImage>> ExportKeyImages(bool all);
 
     /**
-     * Export signed key images.
-     *
-     * @return signed key images
-     */
-    Task<List<MoneroKeyImage>> ExportKeyImages();
-
-    /**
      * Import signed key images and verify their spent status.
      *
      * @param keyImages are key images to import and verify (requires hex and signature)
      * @return results of the import
      */
     Task<MoneroKeyImageImportResult> ImportKeyImages(List<MoneroKeyImage> keyImages);
-
-    /**
-     * Get new key images from the last imported outputs.
-     *
-     * @return the key images from the last imported outputs
-     */
-    Task<List<MoneroKeyImage>> GetNewKeyImagesFromLastImport();
 
     /**
      * Freeze an output.
@@ -889,47 +568,7 @@ public interface IMoneroWallet
     Task<string> RelayTx(string txMetadata);
 
     /**
-     * Relay a previously Created transaction.
-     *
-     * @param tx is the transaction to relay
-     * @return the hash of the relayed tx
-     */
-    Task<string> RelayTx(MoneroTxWallet tx);
-
-    /**
-     * Relay previously Created transactions.
-     *
-     * @param txMetadatas are transaction metadata previously Created without relaying
-     * @return the hashes of the relayed txs
-     */
-    Task<List<string>> RelayTxs(List<string> txMetadatas);
-
-    /**
-     * Relay previously Created transactions.
-     *
-     * @param txs are the transactions to relay
-     * @return the hashes of the relayed txs
-     */
-    Task<List<string>> RelayTxs(List<MoneroTxWallet> txs);
-
-    /**
-     * Describe a tx set from unsigned tx hex.
-     *
-     * @param unsignedTxHex unsigned tx hex
-     * @return the tx set containing structured transactions
-     */
-    Task<MoneroTxSet> DescribeUnsignedTxSet(string unsignedTxHex);
-
-    /**
-     * Describe a tx set from multisig tx hex.
-     *
-     * @param multisigTxHex multisig tx hex
-     * @return the tx set containing structured transactions
-     */
-    Task<MoneroTxSet> DescribeMultisigTxSet(string multisigTxHex);
-
-    /**
-     * Describe a tx set containing unsigned or multisig tx hex to a new tx set containing structured transactions.
+     * Describe an tx set containing unsigned or multisig tx hex to a new tx set containing structured transactions.
      *
      * @param txSet is a tx set containing unsigned or multisig tx hex
      * @return the tx set containing structured transactions
@@ -956,41 +595,13 @@ public interface IMoneroWallet
      * Sign a message.
      *
      * @param message the message to sign
-     * @param signatureType sign with spend key or view key
+     * @param signatureType sign with spent key or view key
      * @param accountIdx the account index of the message signature (default 0)
      * @param subaddressIdx the subaddress index of the message signature (default 0)
      * @return the signature
      */
     Task<string> SignMessage(string message, MoneroMessageSignatureType signatureType, uint accountIdx,
         uint subaddressIdx);
-
-    /**
-     * Sign a message.
-     *
-     * @param message the message to sign
-     * @param signatureType sign with spend key or view key
-     * @param accountIdx the account index of the message signature (default 0)
-     * @return the signature
-     */
-    Task<string> SignMessage(string message, MoneroMessageSignatureType signatureType, uint accountIdx);
-
-    /**
-     * Sign a message.
-     *
-     * @param message the message to sign
-     * @param signatureType sign with spend key or view key
-     * @return the signature
-     */
-    Task<string> SignMessage(string message, MoneroMessageSignatureType signatureType);
-
-    /**
-     * Sign a message.
-     *
-     * @param message the message to sign
-     * @param signatureType sign with spend key or view key
-     * @return the signature
-     */
-    Task<string> SignMessage(string message);
 
     /**
      * Verify a signature on a message.
@@ -1031,15 +642,6 @@ public interface IMoneroWallet
     Task<string> GetTxProof(string txHash, string address, string? message);
 
     /**
-     * Get a transaction signature to prove it.
-     *
-     * @param txHash specifies the transaction to prove
-     * @param address is the destination public address of the transaction
-     * @return the transaction signature
-     */
-    Task<string> GetTxProof(string txHash, string address);
-
-    /**
      * Prove a transaction by checking its signature.
      *
      * @param txHash specifies the transaction to prove
@@ -1058,14 +660,6 @@ public interface IMoneroWallet
      * @return the transaction signature
      */
     Task<string> GetSpendProof(string txHash, string? message);
-
-    /**
-     * Generate a signature to prove a spend. Unlike proving a transaction, it does not require the destination public address.
-     *
-     * @param txHash specifies the transaction to prove
-     * @return the transaction signature
-     */
-    Task<string> GetSpendProof(string txHash);
 
     /**
      * Prove a spend using a signature. Unlike proving a transaction, it does not require the destination public address.
@@ -1106,14 +700,6 @@ public interface IMoneroWallet
     Task<MoneroCheckReserve> CheckReserveProof(string address, string message, string signature);
 
     /**
-     * Get a transaction note.
-     *
-     * @param txHash specifies the transaction to Get the note of
-     * @return the tx note
-     */
-    Task<string?> GetTxNote(string txHash);
-
-    /**
      * Get notes for multiple transactions.
      *
      * @param txHashes identify the transactions to Get notes for
@@ -1122,27 +708,12 @@ public interface IMoneroWallet
     Task<List<string>> GetTxNotes(List<string> txHashes);
 
     /**
-     * Set a note for a specific transaction.
-     *
-     * @param txHash specifies the transaction
-     * @param note specifies the note
-     */
-    Task SetTxNote(string txHash, string note);
-
-    /**
      * Set notes for multiple transactions.
      *
      * @param txHashes specify the transactions to set notes for
      * @param notes are the notes to set for the transactions
      */
     Task SetTxNotes(List<string> txHashes, List<string> notes);
-
-    /**
-     * Get all address book entries.
-     *
-     * @return the address book entries
-     */
-    Task<List<MoneroAddressBookEntry>> GetAddressBookEntries();
 
     /**
      * Get address book entries.
@@ -1356,11 +927,6 @@ public interface IMoneroWallet
      * @param save specifies if the wallet should be saved before being closed (default false)
      */
     Task Close(bool save);
-
-    /**
-     * Close the wallet without saving.
-     */
-    Task Close();
 
     /**
      * Indicates if this wallet is closed or not.

@@ -20,12 +20,4 @@
         <ProjectReference Include="..\Monero\Monero.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Using Include="Xunit"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="TestResults\"/>
-    </ItemGroup>
-
 </Project>

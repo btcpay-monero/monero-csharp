@@ -24,8 +24,7 @@ public class WalletTxTracker
         {
             if (!clearedWallets.Contains(moneroWallet))
             {
-                await moneroWallet.Sync();
-                foreach (MoneroTxWallet tx in await moneroWallet.GetTxs())
+                foreach (MoneroTxWallet tx in await moneroWallet.GetTxs(null))
                 {
                     string? txHash = tx.GetHash();
                     if (txHash == null)
@@ -107,7 +106,6 @@ public class WalletTxTracker
         // sync wallets with the pool
         foreach (IMoneroWallet moneroWallet in wallets)
         {
-            await moneroWallet.Sync();
             clearedWallets.Add(moneroWallet);
         }
     }

@@ -1,6 +1,8 @@
 using Monero.Common;
 using Monero.IntegrationTests.Utils;
 
+using Xunit;
+
 namespace Monero.IntegrationTests;
 
 public class TestMoneroRpcConnection

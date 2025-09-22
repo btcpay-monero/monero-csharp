@@ -5,6 +5,8 @@ using Monero.Daemon;
 using Monero.Wallet;
 using Monero.Wallet.Common;
 
+using Xunit;
+
 namespace Monero.IntegrationTests.Utils;
 
 internal abstract class TestUtils
@@ -63,10 +65,6 @@ internal abstract class TestUtils
         FIRST_RECEIVE_HEIGHT = 171; // NOTE: this value must be the height of the wallet's first tx for tests
 
     public static readonly int SYNC_PERIOD_IN_MS = 5000; // period between wallet syncs in milliseconds
-
-    public static readonly string
-        OFFLINE_SERVER_URI =
-            "offline_server_uri"; // fake server uri to remain offline because wallet2 connects to default if not given
 
     public static readonly int AUTO_CONNECT_TIMEOUT_MS = 3000;
 
@@ -134,7 +132,7 @@ internal abstract class TestUtils
         Assert.Equal(ADDRESS, await walletRpc.GetPrimaryAddress());
 
         // sync and save wallet
-        await walletRpc.Sync();
+        await walletRpc.Sync(null, null);
         await walletRpc.Save();
         await walletRpc.StartSyncing((ulong)SYNC_PERIOD_IN_MS);
 

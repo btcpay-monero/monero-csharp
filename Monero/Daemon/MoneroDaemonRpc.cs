@@ -16,12 +16,12 @@ public class MoneroDaemonRpc : IMoneroDaemon
     private static readonly string DEFAULT_ID = "0000000000000000000000000000000000000000000000000000000000000000";
     private static readonly ulong MAX_REQ_SIZE = 3000000; // max request size when fetching blocks from daemon
     private static readonly uint NUM_HEADERS_PER_REQ = 750;
+    private readonly Dictionary<ulong, MoneroBlockHeader> _cachedHeaders = [];
+    private readonly List<MoneroDaemonListener> _listeners = [];
     private readonly Thread? outputThread;
     private readonly MoneroRpcConnection rpc;
     private DaemonPoller? daemonPoller;
     private Process? process;
-    private readonly Dictionary<ulong, MoneroBlockHeader> _cachedHeaders = [];
-    private readonly List<MoneroDaemonListener> _listeners = [];
 
     public MoneroDaemonRpc(MoneroRpcConnection connection)
     {
@@ -163,107 +163,6 @@ public class MoneroDaemonRpc : IMoneroDaemon
     public List<MoneroDaemonListener> GetListeners()
     {
         return [.. _listeners];
-    }
-
-    public async Task<bool> IsRestricted()
-    {
-        if (IsLocal())
-        {
-            return false;
-        }
-
-        MoneroDaemonInfo info = await GetInfo();
-        return info.IsRestricted() == true;
-    }
-
-    private void CheckConnection()
-    {
-        if (rpc.IsConnected() == true || rpc.GetUri() == null || rpc.GetUri()!.Length == 0)
-        {
-            return;
-        }
-
-        rpc.CheckConnection().GetAwaiter().GetResult();
-    }
-
-    private bool IsLocal()
-    {
-        MoneroRpcConnection connection = GetRpcConnection();
-
-        string? uri = connection.GetUri();
-
-        if (uri == null)
-        {
-            return false;
-        }
-
-        return uri.Contains("127.0.0.1") || uri.Contains("localhost");
-    }
-
-    public Process? GetProcess()
-    {
-        return process;
-    }
-
-    public int StopProcess(bool force = false)
-    {
-        if (process == null)
-        {
-            throw new MoneroError("MoneroDaemonRpc instance not created from new process");
-        }
-
-        _listeners.Clear();
-        RefreshListening();
-        if (force)
-        {
-            process.Kill(true);
-        }
-        else
-        {
-            process.Close();
-        }
-
-        try
-        {
-            process.WaitForExit();
-            if (outputThread != null)
-            {
-                outputThread.Join();
-            }
-
-            int exitCode = process.ExitCode;
-            process = null;
-            return exitCode;
-        }
-        catch (Exception e) { throw new MoneroError(e.Message); }
-    }
-
-    public MoneroRpcConnection GetRpcConnection()
-    {
-        return rpc;
-    }
-
-    public void SetProxyUri(string? uri)
-    {
-        rpc.SetProxyUri(uri);
-    }
-
-    public string? GetProxyUri()
-    {
-        return rpc.GetProxyUri();
-    }
-
-    public async Task<bool> IsConnected()
-    {
-        try
-        {
-            await GetVersion();
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
     }
 
     public async Task<MoneroDaemonUpdateCheckResult> CheckForUpdate()
@@ -1102,6 +1001,107 @@ public class MoneroDaemonRpc : IMoneroDaemon
             }
 
             return Task.FromResult(listener.GetLastBlockHeader() ?? throw new MoneroError("No block header received"));
+        }
+    }
+
+    public async Task<bool> IsRestricted()
+    {
+        if (IsLocal())
+        {
+            return false;
+        }
+
+        MoneroDaemonInfo info = await GetInfo();
+        return info.IsRestricted() == true;
+    }
+
+    private void CheckConnection()
+    {
+        if (rpc.IsConnected() == true || rpc.GetUri() == null || rpc.GetUri()!.Length == 0)
+        {
+            return;
+        }
+
+        rpc.CheckConnection().GetAwaiter().GetResult();
+    }
+
+    private bool IsLocal()
+    {
+        MoneroRpcConnection connection = GetRpcConnection();
+
+        string? uri = connection.GetUri();
+
+        if (uri == null)
+        {
+            return false;
+        }
+
+        return uri.Contains("127.0.0.1") || uri.Contains("localhost");
+    }
+
+    public Process? GetProcess()
+    {
+        return process;
+    }
+
+    public int StopProcess(bool force = false)
+    {
+        if (process == null)
+        {
+            throw new MoneroError("MoneroDaemonRpc instance not created from new process");
+        }
+
+        _listeners.Clear();
+        RefreshListening();
+        if (force)
+        {
+            process.Kill(true);
+        }
+        else
+        {
+            process.Close();
+        }
+
+        try
+        {
+            process.WaitForExit();
+            if (outputThread != null)
+            {
+                outputThread.Join();
+            }
+
+            int exitCode = process.ExitCode;
+            process = null;
+            return exitCode;
+        }
+        catch (Exception e) { throw new MoneroError(e.Message); }
+    }
+
+    public MoneroRpcConnection GetRpcConnection()
+    {
+        return rpc;
+    }
+
+    public void SetProxyUri(string? uri)
+    {
+        rpc.SetProxyUri(uri);
+    }
+
+    public string? GetProxyUri()
+    {
+        return rpc.GetProxyUri();
+    }
+
+    public async Task<bool> IsConnected()
+    {
+        try
+        {
+            await GetVersion();
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 

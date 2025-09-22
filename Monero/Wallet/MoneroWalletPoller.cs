@@ -14,14 +14,14 @@ internal class MoneroWalletPoller
     private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     private readonly ulong _syncPeriodInMs; // default sync period in ms
-    private readonly MoneroWalletDefault _wallet;
+    private readonly MoneroWalletRpc _wallet;
     private bool _isPolling;
     private int _numPolling;
     private List<ulong> _prevBalances = [];
     private ulong _prevHeight;
     private List<MoneroTxWallet> _prevLockedTxs = [];
 
-    public MoneroWalletPoller(MoneroWalletDefault wallet, ulong syncPeriodInMs)
+    public MoneroWalletPoller(MoneroWalletRpc wallet, ulong syncPeriodInMs)
     {
         _wallet = wallet;
         _looper = new TaskLooper(() => Poll());
@@ -31,8 +31,8 @@ internal class MoneroWalletPoller
     // TODO: factor to common wallet rpc listener
     private async Task CheckForChangedBalances()
     {
-        ulong balance = await _wallet.GetBalance();
-        ulong unlockedBalance = await _wallet.GetUnlockedBalance();
+        ulong balance = await _wallet.GetBalance(null, null);
+        ulong unlockedBalance = await _wallet.GetUnlockedBalance(null, null);
         List<ulong> balances = [balance, unlockedBalance];
         if (balances[0] == _prevBalances[0] && balances[1] == _prevBalances[1])
         {
@@ -68,7 +68,7 @@ internal class MoneroWalletPoller
 
     public async Task Poll()
     {
-        // skip if next poll is queued
+        // skip if the next poll is queued
         if (_numPolling > 1)
         {
             return;

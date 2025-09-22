@@ -5,6 +5,8 @@ using Monero.IntegrationTests.Utils;
 using Monero.Wallet;
 using Monero.Wallet.Common;
 
+using Xunit;
+
 namespace Monero.IntegrationTests;
 
 public class MoneroDaemonRpcFixture : IDisposable
@@ -493,7 +495,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
         // clear txs from pool
         await _daemon.FlushTxPool(txHashes);
-        await _wallet.Sync();
+        await _wallet.Sync(null, null);
     }
 
     // Can get a transaction hex by hash with and without pruning
@@ -508,8 +510,8 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         List<string> hexesPruned = [];
         if (txHashes.Count > 0)
         {
-            hexes.AddRange((await _daemon.GetTxHexes(txHashes, false)));
-            hexesPruned.AddRange((await _daemon.GetTxHexes(txHashes, true)));
+            hexes.AddRange(await _daemon.GetTxHexes(txHashes, false));
+            hexesPruned.AddRange(await _daemon.GetTxHexes(txHashes, true));
         }
 
         // test results
@@ -605,7 +607,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
         // flush the tx from the pool, gg
         await _daemon.FlushTxPool([tx.GetHash()!]);
-        await _wallet.Sync();
+        await _wallet.Sync(null, null);
     }
 
     // Can get hashes of transactions in the transaction pool (binary)
@@ -658,7 +660,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
         // flush tx pool
         await _daemon.FlushTxPool([]);
-        Assert.Empty((await _daemon.GetTxPool()));
+        Assert.Empty(await _daemon.GetTxPool());
 
         // re-submit original transactions
         foreach (MoneroTx tx in txPoolBefore)
@@ -671,7 +673,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         Assert.True(txPoolBefore.Count == (await _daemon.GetTxPool()).Count);
 
         // sync wallet for next test
-        await _wallet.Sync();
+        await _wallet.Sync(null, null);
     }
 
     // Can flush a transaction from the pool by hash
@@ -702,7 +704,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         Assert.True(txPoolBefore.Count == (await _daemon.GetTxPool()).Count);
 
         // sync wallet for next test
-        await _wallet.Sync();
+        await _wallet.Sync(null, null);
     }
 
     // Can flush transactions from the pool by hashes
@@ -725,7 +727,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
         // the pool is back to original state
         Assert.True(txPoolBefore.Count == (await _daemon.GetTxPool()).Count);
-        await _wallet.Sync();
+        await _wallet.Sync(null, null);
     }
 
     // Can get the spent status of key images
@@ -1267,11 +1269,13 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
         Assert.True(found, "Tx1 was not found after being submitted to the daemon's tx pool");
 
-        // tx1 is recognized by the wallet
-        await _wallet.Sync();
-        await _wallet.GetTx(tx1.GetHash()!);
+        // the wallet recognizes tx1
+        await _wallet.Sync(null, null);
+        MoneroTxQuery query = new();
+        query.SetHashes([tx1.GetHash()!]);
+        await _wallet.GetTxs(query);
 
-        // submit and relay tx2 hex which double spends tx1
+        // submit and relay tx2 hex which doubly spends tx1
         result = await _daemon.SubmitTxHex(tx2.GetFullHex()!, false);
         Assert.True(result.IsRelayed());
         TestSubmitTxResultDoubleSpend(result);
@@ -2254,7 +2258,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
 
             // fetch tx by hash and ensure not relayed
             List<MoneroTx> fetchedTxs = await _daemon.GetTxs([tx.GetHash()!], false);
-            foreach (var fetchedTx in fetchedTxs)
+            foreach (MoneroTx fetchedTx in fetchedTxs)
             {
                 Assert.False(fetchedTx.IsRelayed());
             }
