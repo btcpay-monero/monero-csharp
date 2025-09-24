@@ -140,11 +140,6 @@ internal abstract class TestUtils
         return walletRpc;
     }
 
-    public static MoneroWalletRpc GetWalletRpcSync()
-    {
-        return GetWalletRpc().GetAwaiter().GetResult();
-    }
-
     public static void TestUnsignedBigInteger(BigInteger? num, bool? nonZero = null)
     {
         if (num == null)

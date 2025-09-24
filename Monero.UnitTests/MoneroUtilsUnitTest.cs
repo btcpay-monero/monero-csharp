@@ -9,7 +9,7 @@ using static Xunit.Assert;
 
 namespace Monero.UnitTests;
 
-public class TestMoneroUtils
+public class MoneroUtilsUnitTest
 {
     // Can get integrated addresses
     [Fact(Skip = "MoneroUtils.GetIntegratedAddress(): not implemented")]

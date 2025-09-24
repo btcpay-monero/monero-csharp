@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Monero.IntegrationTests;
 
-public class TestMoneroRpcConnection
+public class MoneroRpcConnectionIntegrationTest
 {
     // Can copy connection
     [Fact]
@@ -53,7 +53,7 @@ public class TestMoneroRpcConnection
         await TestConnection(connection, "", false);
     }
 
-    // Can send request to RPC
+    // Can send a request to RPC
     [Fact]
     public async Task TestSendRequest()
     {

@@ -9,61 +9,14 @@ using Xunit;
 
 namespace Monero.IntegrationTests;
 
-public class MoneroDaemonRpcFixture : IDisposable
+public class MoneroDaemonRpcIntegrationTest
 {
-    public readonly TestContext BINARY_BLOCK_CTX = new();
+    private readonly MoneroDaemonRpc _daemon = TestUtils.GetDaemonRpc(); // daemon instance to test
+    private readonly MoneroWalletRpc _wallet = new(""); // wallet instance to test
+    private static readonly TestContext BinaryBlockCtx = new();
 
-    public MoneroDaemonRpc Daemon;
-    public bool IsRestricted;
-    public MoneroWalletRpc Wallet = new("");
-
-    public MoneroDaemonRpcFixture()
+    public MoneroDaemonRpcIntegrationTest()
     {
-        Daemon = TestUtils.GetDaemonRpc();
-        IsRestricted = Daemon.IsRestricted().GetAwaiter().GetResult();
-
-        BINARY_BLOCK_CTX.HasHex = false;
-        BINARY_BLOCK_CTX.HeaderIsFull = false;
-        BINARY_BLOCK_CTX.HasTxs = true;
-        BINARY_BLOCK_CTX.TxContext = new TestContext();
-        BINARY_BLOCK_CTX.TxContext.IsPruned = false;
-        BINARY_BLOCK_CTX.TxContext.IsConfirmed = true;
-        BINARY_BLOCK_CTX.TxContext.FromGetTxPool = false;
-        BINARY_BLOCK_CTX.TxContext.HasOutputIndices = false;
-        BINARY_BLOCK_CTX.TxContext.FromBinaryBlock = true;
-
-        TestUtils.WALLET_TX_TRACKER.Reset(); // all wallets need to wait for txs to confirm to reliably sync
-
-        // Wait for some blocks to mine
-        GenUtils.WaitFor(10000);
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-    }
-}
-
-public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
-{
-    private static bool RESTRICTED_RPC;
-
-    private static TestContext BINARY_BLOCK_CTX = new();
-    private readonly MoneroDaemonRpc _daemon;
-    private readonly MoneroWalletRpc _wallet;
-
-    private readonly MoneroDaemonRpcFixture fixture;
-
-    public TestMoneroDaemonRpc(MoneroDaemonRpcFixture fixture)
-    {
-        BINARY_BLOCK_CTX = fixture.BINARY_BLOCK_CTX;
-
-        _daemon = fixture.Daemon;
-        _wallet = fixture.Wallet;
-
-        RESTRICTED_RPC = fixture.IsRestricted;
-
-        this.fixture = fixture;
         MoneroRpcConnection rpcConnection = _daemon.GetRpcConnection();
 
         Assert.True(rpcConnection.IsConnected(), "Daemon offline");
@@ -316,7 +269,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
                 txFound = true;
             }
 
-            TestBlock(block, BINARY_BLOCK_CTX);
+            TestBlock(block, BinaryBlockCtx);
             Assert.True(block.GetHeight() == heights[i]);
         }
 
@@ -560,7 +513,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Not supported by regtest daemon")]
     public async Task TestGetMinerTxSum()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         MoneroMinerTxSum sum = await _daemon.GetMinerTxSum(0, Math.Min(50000, await _daemon.GetHeight()));
         TestMinerTxSum(sum);
     }
@@ -634,7 +586,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         try
         {
             // submit txs to the pool but don't relay
-            List<string> txIds = await SubmitTxHashesToPool(true, true);
+            await SubmitTxHashesToPool(true, true);
         }
         catch (Exception e)
         {
@@ -646,7 +598,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Needs monero-wallet-rpc")]
     public async Task TestFlushTxsFromPool()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
 
         // preserve original transactions in the pool
@@ -680,7 +631,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Needs monero-wallet-rpc")]
     public async Task TestFlushTxFromPoolByHash()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
 
         // preserve original transactions in the pool
@@ -711,7 +661,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Needs monero wallet rpc")]
     public async Task TestFlushTxsFromPoolByHashes()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
 
         // preserve original transactions in the pool
@@ -851,7 +800,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact]
     public async Task TestGetSyncInformation()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         MoneroDaemonSyncInfo syncInfo = await _daemon.GetSyncInfo();
         TestSyncInfo(syncInfo);
     }
@@ -891,7 +839,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact]
     public async Task TestSetDownloadBandwidth()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         int initVal = await _daemon.GetDownloadLimit();
         Assert.True(initVal > 0);
         int setVal = initVal * 2;
@@ -918,7 +865,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact]
     public async Task TestSetUploadBandwidth()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         int initVal = await _daemon.GetUploadLimit();
         Assert.True(initVal > 0);
         int setVal = initVal * 2;
@@ -945,7 +891,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact]
     public async Task TestGetPeers()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         List<MoneroPeer> peers = await _daemon.GetPeers();
         Assert.True(peers.Count > 0, "Daemon has no incoming or outgoing peers to test");
         foreach (MoneroPeer peer in peers)
@@ -958,7 +903,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Daemon has no known peers to test")]
     public async Task TestGetKnownPeers()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         List<MoneroPeer> peers = await _daemon.GetKnownPeers();
         Assert.True(peers.Count > 0, "Daemon has no known peers to test");
         foreach (MoneroPeer peer in peers)
@@ -971,7 +915,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact]
     public async Task TestSetOutgoingPeerLimit()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         await _daemon.SetOutgoingPeerLimit(0);
         await _daemon.SetOutgoingPeerLimit(8);
         await _daemon.SetOutgoingPeerLimit(10);
@@ -981,7 +924,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact]
     public async Task TestSetIncomingPeerLimit()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         await _daemon.SetIncomingPeerLimit(0);
         await _daemon.SetIncomingPeerLimit(8);
         await _daemon.SetIncomingPeerLimit(10);
@@ -991,8 +933,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact]
     public async Task TestBanPeer()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-
         // set ban
         MoneroBan ban = new();
         ban.SetHost("192.168.1.51");
@@ -1019,8 +959,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact]
     public async Task TestBanPeers()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-
         // set bans
         MoneroBan ban1 = new();
         ban1.SetHost("192.168.1.52");
@@ -1061,8 +999,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Fails on github CI")]
     public async Task TestMining()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-
         // stop mining at the beginning of the test
         try { await _daemon.StopMining(); }
         catch (MoneroError)
@@ -1087,8 +1023,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Fails on github CI")]
     public async Task TestGetMiningStatus()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-
         try
         {
             // stop mining at the beginning of the test
@@ -1156,7 +1090,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Not supported by regtest daemon")]
     public async Task TestPruneBlockchain()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         MoneroPruneResult result = await _daemon.PruneBlockchain(true);
         if (result.IsPruned() == true)
         {
@@ -1172,7 +1105,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Unstable update call")]
     public async Task TestCheckForUpdate()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
         MoneroDaemonUpdateCheckResult result = await _daemon.CheckForUpdate();
         TestUpdateCheckResult(result);
     }
@@ -1181,8 +1113,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Non supported by regtest daemon")]
     public async Task TestDownloadUpdate()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-
         // download to a default path
         MoneroDaemonUpdateDownloadResult result = await _daemon.DownloadUpdate("");
         TestUpdateDownloadResult(result, null);
@@ -1212,8 +1142,6 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
     [Fact(Skip = "Disabled")]
     public async Task TestStop()
     {
-        Assert.False(RESTRICTED_RPC, "Daemon RPC is restricted");
-
         // stop the daemon
         await _daemon.Stop();
 
@@ -1243,7 +1171,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         // TODO monero-project: update from pool does not prevent creating double spend tx
         await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
 
-        // create 2 txs, the second will doubly spend outputs of first
+        // create 2 txs, the second will doubly spend outputs of the first
         MoneroTx
             tx1 = await GetUnrelayedTx(_wallet,
                 2); // TODO: this test requires tx to be from/to different accounts else the occlusion issue (#4500) causes the tx to not be recognized by the wallet at all
@@ -1410,7 +1338,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
         for (int i = 0; i < blocks.Count; i++)
         {
             Assert.True(realStartHeight + (ulong)i == (ulong)blocks[i].GetHeight()!);
-            TestBlock(blocks[i], BINARY_BLOCK_CTX);
+            TestBlock(blocks[i], BinaryBlockCtx);
         }
     }
 
@@ -1484,7 +1412,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             Assert.NotNull(ctx.TxContext);
             foreach (MoneroTx tx in block.GetTxs()!)
             {
-                Assert.True(block == tx.GetBlock());
+                Assert.True(block.Equals(tx.GetBlock()));
                 TestTx(tx, ctx.TxContext);
             }
         }
@@ -1639,7 +1567,8 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             }
         }
 
-        // test failed  // TODO: what else to test associated with failed
+        // test failed
+        // TODO: what else to test associated with failed
         if (tx.IsFailed() == true)
         {
             Assert.True(tx.GetReceivedTimestamp() > 0);
@@ -2304,7 +2233,7 @@ public class TestMoneroDaemonRpc : IClassFixture<MoneroDaemonRpcFixture>
             Assert.True(found, "Tx was not found after being submitted to the daemon's tx pool");
         }
 
-        // wallets will need to wait for tx to confirm in order to properly sync
+        // wallets will need to wait for tx to confirm to properly sync
         TestUtils.WALLET_TX_TRACKER.Reset();
     }
 

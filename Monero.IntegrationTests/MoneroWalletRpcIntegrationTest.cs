@@ -8,12 +8,11 @@ using Xunit;
 
 namespace Monero.IntegrationTests;
 
-public class TestMoneroWalletRpc
+public class MoneroWalletRpcIntegrationTest
 {
     private readonly MoneroDaemonRpc _daemon = TestUtils.GetDaemonRpc(); // daemon instance to test
 
-    // instance variables
-    private readonly MoneroWalletRpc _wallet = TestUtils.GetWalletRpcSync(); // wallet instance to test
+    private readonly MoneroWalletRpc _wallet = TestUtils.GetWalletRpc().Result; // wallet instance to test
 
     private async Task<IMoneroWallet> OpenWallet(MoneroWalletConfig? config)
     {
@@ -191,7 +190,7 @@ public class TestMoneroWalletRpc
                 MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
             }, moneroWallet);
 
-            // attempt to create wallet at the same path
+            // attempt to create a wallet at the same path
             try
             {
                 await CreateWallet(new MoneroWalletConfig().SetPath(path));
@@ -210,7 +209,7 @@ public class TestMoneroWalletRpc
             }
             catch (Exception e)
             {
-                Assert.True("Unknown language: english" == e.Message);
+                Assert.Equal("Unknown language: english", e.Message);
             }
         }
         catch (Exception e)
@@ -259,7 +258,7 @@ public class TestMoneroWalletRpc
             }
             catch (Exception e)
             {
-                Assert.True("Invalid mnemonic" == e.Message);
+                Assert.Equal("Invalid mnemonic", e.Message);
             }
 
             // attempt to create a wallet at the same path
@@ -654,7 +653,7 @@ public class TestMoneroWalletRpc
             // get subaddresses
             List<MoneroSubaddress> subaddresses = await _wallet.GetSubaddresses((uint)accountIndex, true, null);
             Assert.True(subaddresses.Count > 0);
-            // remove a subaddress for query if possible
+            // remove a subaddress for a query if possible
             if (subaddresses.Count > 1)
             {
                 subaddresses.RemoveAt(0);
