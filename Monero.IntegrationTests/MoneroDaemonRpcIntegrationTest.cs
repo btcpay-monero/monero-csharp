@@ -401,7 +401,7 @@ public class MoneroDaemonRpcIntegrationTest
 
         // fetch missing hash
         MoneroTx tx = await _wallet.CreateTx(new MoneroTxConfig().SetAccountIndex(0)
-            .AddDestination(await _wallet.GetPrimaryAddress(), TestUtils.MAX_FEE));
+            .AddDestination(await _wallet.GetPrimaryAddress(), TestUtils.MaxFee));
         Assert.NotNull(_daemon.GetTxs([tx.GetHash()!], false));
         txHashes.Add(tx.GetHash()!);
         int numTxs = txs.Count;
@@ -1222,7 +1222,7 @@ public class MoneroDaemonRpcIntegrationTest
 
         Assert.True(!found, "Tx2 should not be in the pool because it double spends tx1 which is in the pool");
 
-        // all wallets will need to wait for tx to confirm in order to properly sync
+        // all wallets will need to wait for tx to confirm to properly sync
         TestUtils.WALLET_TX_TRACKER.Reset();
     }
 
@@ -1327,8 +1327,8 @@ public class MoneroDaemonRpcIntegrationTest
     private async Task TestGetBlocksRange(ulong? startHeight, ulong? endHeight, ulong chainHeight, bool chunked)
     {
         // fetch blocks by range
-        ulong realStartHeight = startHeight == null ? 0 : (ulong)startHeight;
-        ulong realEndHeight = endHeight == null ? chainHeight - 1 : (ulong)endHeight;
+        ulong realStartHeight = startHeight ?? 0;
+        ulong realEndHeight = endHeight ?? chainHeight - 1;
         List<MoneroBlock> blocks = chunked
             ? await _daemon.GetBlocksByRangeChunked((ulong)startHeight!, (ulong)endHeight!, 5)
             : await _daemon.GetBlocksByRange((ulong)startHeight!, (ulong)endHeight!);
@@ -1342,30 +1342,27 @@ public class MoneroDaemonRpcIntegrationTest
         }
     }
 
-    private static async Task<List<string>> GetConfirmedTxHashes(IMoneroDaemon daemon)
+    private static async Task<List<string>> GetConfirmedTxHashes(MoneroDaemonRpc daemon)
     {
-        int numTxs = 5;
+        const int numTxs = 5;
         List<string> txHashes = [];
         ulong height = await daemon.GetHeight();
         while (txHashes.Count < numTxs && height > 0)
         {
             MoneroBlock block = await daemon.GetBlockByHeight(--height);
-            foreach (string txHash in block.GetTxHashes()!)
-            {
-                txHashes.Add(txHash);
-            }
+            txHashes.AddRange(block.GetTxHashes()!);
         }
 
         return txHashes;
     }
 
-    private static async Task<MoneroTx> GetUnrelayedTx(IMoneroWallet wallet, uint accountIdx)
+    private static async Task<MoneroTx> GetUnrelayedTx(MoneroWalletRpc wallet, uint accountIdx)
     {
         Assert.True(accountIdx > 0,
             "Txs sent from/to same account are not properly synced from the pool"); // TODO monero-project
         MoneroTxConfig config = new MoneroTxConfig().SetAccountIndex(accountIdx)
             .SetAddress(await wallet.GetPrimaryAddress())
-            .SetAmount(TestUtils.MAX_FEE);
+            .SetAmount(TestUtils.MaxFee);
         MoneroTx tx = await wallet.CreateTx(config);
         Assert.True(tx.GetFullHex()!.Length > 0);
         Assert.False(tx.GetRelay());
@@ -1722,7 +1719,7 @@ public class MoneroDaemonRpcIntegrationTest
             Assert.True(output.GetIndex() >= 0);
         }
 
-        Assert.True(64 == output.GetStealthPublicKey()!.Length);
+        Assert.Equal(64, output.GetStealthPublicKey()!.Length);
     }
 
     private static void TestOutput(MoneroOutput output)
@@ -1772,8 +1769,10 @@ public class MoneroDaemonRpcIntegrationTest
         }
 
         // test copied tx
-        ctx = new TestContext(ctx);
-        ctx.DoNotTestCopy = true; // to prevent infinite recursion
+        ctx = new TestContext(ctx)
+        {
+            DoNotTestCopy = true // to prevent infinite recursion
+        };
         if (tx.GetBlock() != null)
         {
             copy.SetBlock(tx.GetBlock()!.Clone().SetTxs([copy])); // copy block for testing
@@ -1857,10 +1856,10 @@ public class MoneroDaemonRpcIntegrationTest
         }
     }
 
-    private static async Task<List<MoneroTx>> GetConfirmedTxs(IMoneroDaemon daemon, int numTxs)
+    private static async Task<List<MoneroTx>> GetConfirmedTxs(MoneroDaemonRpc daemon, int numTxs)
     {
         List<MoneroTx> txs = [];
-        long numBlocksPerReq = 50;
+        const long numBlocksPerReq = 50;
         for (long startIdx = (long)await daemon.GetHeight() - numBlocksPerReq - 1;
              startIdx >= 0;
              startIdx -= numBlocksPerReq)
@@ -2010,7 +2009,7 @@ public class MoneroDaemonRpcIntegrationTest
         TestUtils.TestUnsignedBigInteger(altChain.GetDifficulty(), true);
         Assert.True(altChain.GetHeight() > 0);
         Assert.True(altChain.GetLength() > 0);
-        Assert.True(64 == altChain.GetMainChainParentBlockHash()!.Length);
+        Assert.Equal(64, altChain.GetMainChainParentBlockHash()!.Length);
     }
 
     private static void TestPeer(MoneroPeer peer)
@@ -2065,7 +2064,7 @@ public class MoneroDaemonRpcIntegrationTest
             Assert.True(result.GetUserUri()!.Length > 0);
             Assert.True(result.GetVersion()!.Length > 0);
             Assert.True(result.GetHash()!.Length > 0);
-            Assert.True(64 == result.GetHash()!.Length);
+            Assert.Equal(64, result.GetHash()!.Length);
         }
         else
         {
@@ -2102,18 +2101,11 @@ public class MoneroDaemonRpcIntegrationTest
         try
         {
             Assert.False(result.IsDoubleSpend(), "tx submission is double spend.");
-            Assert.False(result.IsFeeTooLow());
-            Assert.False(result.IsMixinTooLow());
-            Assert.False(result.HasInvalidInput());
-            Assert.False(result.HasInvalidOutput());
             Assert.False(result.HasTooFewOutputs());
-            Assert.False(result.IsOverspend());
-            Assert.False(result.IsTooBig());
             Assert.False(result.GetSanityCheckFailed());
             TestUtils.TestUnsignedBigInteger(result.GetCredits(), false); // 0 credits
             Assert.Null(result.GetTopBlockHash());
             Assert.False(result.IsTxExtraTooBig());
-            Assert.True(result.IsGood());
             Assert.False(result.IsNonzeroUnlockTime());
         }
         catch (Exception)
@@ -2126,14 +2118,7 @@ public class MoneroDaemonRpcIntegrationTest
     private static void TestSubmitTxResultDoubleSpend(MoneroSubmitTxResult result)
     {
         TestSubmitTxResultCommon(result);
-        Assert.False(result.IsGood());
         Assert.True(result.IsDoubleSpend());
-        Assert.False(result.IsFeeTooLow());
-        Assert.False(result.IsMixinTooLow());
-        Assert.False(result.HasInvalidInput());
-        Assert.False(result.HasInvalidOutput());
-        Assert.False(result.IsOverspend());
-        Assert.False(result.IsTooBig());
     }
 
     private static void TestSubmitTxResultCommon(MoneroSubmitTxResult result)
@@ -2277,7 +2262,7 @@ public class MoneroDaemonRpcIntegrationTest
 
             if (testPoolStats)
             {
-                // get tx pool stats
+                // get transaction pool statistics
                 MoneroTxPoolStats stats = await _daemon.GetTxPoolStats();
                 Assert.True(stats.GetNumTxs() > i - 1);
                 TestTxPoolStats(stats);

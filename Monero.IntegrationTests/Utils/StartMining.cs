@@ -9,6 +9,13 @@ public static class StartMining
 
     private static void Start(ulong numThreads)
     {
-        TestUtils.GetDaemonRpc().StartMining(TestUtils.GetMiningAddress(), numThreads, false, false); // testnet
+        TestUtils
+            .GetDaemonRpc()
+            .StartMining(
+                "42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L",
+                numThreads,
+                false,
+                false
+            );
     }
 }

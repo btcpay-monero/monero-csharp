@@ -16,7 +16,6 @@ public class MoneroWalletRpcIntegrationTest
 
     private async Task<IMoneroWallet> OpenWallet(MoneroWalletConfig? config)
     {
-        MoneroWalletRpc ret;
         // assign defaults
         if (config == null)
         {
@@ -25,7 +24,7 @@ public class MoneroWalletRpcIntegrationTest
 
         if (config.GetPassword() == null)
         {
-            config.SetPassword(TestUtils.WALLET_PASSWORD);
+            config.SetPassword(TestUtils.WalletPassword);
         }
 
         if (config.GetServer() == null)
@@ -37,27 +36,14 @@ public class MoneroWalletRpcIntegrationTest
         MoneroWalletRpc moneroWalletRpc = await TestUtils.GetCreateWallet();
 
         // open wallet
-        try
+        await moneroWalletRpc.OpenWallet(config);
+        await moneroWalletRpc.SetDaemonConnection(await moneroWalletRpc.GetDaemonConnection(), true, null);
+        if (await moneroWalletRpc.IsConnectedToDaemon())
         {
-            await moneroWalletRpc.OpenWallet(config);
-            await moneroWalletRpc.SetDaemonConnection(await moneroWalletRpc.GetDaemonConnection(), true,
-                null); // set daemon as trusted
-            if (await moneroWalletRpc.IsConnectedToDaemon())
-            {
-                await moneroWalletRpc.StartSyncing((ulong)TestUtils.SYNC_PERIOD_IN_MS);
-            }
-
-            ret = moneroWalletRpc;
-        }
-        catch (MoneroError)
-        {
-            try { TestUtils.StopWalletRpcProcess(moneroWalletRpc); }
-            catch (Exception e2) { throw new Exception(e2.Message); }
-
-            throw;
+            await moneroWalletRpc.StartSyncing((ulong)TestUtils.SYNC_PERIOD_IN_MS);
         }
 
-        return ret;
+        return moneroWalletRpc;
     }
 
     private async Task<IMoneroWallet> CreateWallet(MoneroWalletConfig? config)
@@ -77,7 +63,7 @@ public class MoneroWalletRpcIntegrationTest
 
         if (config.GetPassword() == null)
         {
-            config.SetPassword(TestUtils.WALLET_PASSWORD);
+            config.SetPassword(TestUtils.WalletPassword);
         }
 
         if (config.GetRestoreHeight() == null && !random)
@@ -121,9 +107,9 @@ public class MoneroWalletRpcIntegrationTest
         }
     }
 
-    private async Task CloseWallet(IMoneroWallet walletInstance) { await CloseWallet(walletInstance, false); }
+    private static async Task CloseWallet(IMoneroWallet walletInstance) { await CloseWallet(walletInstance, false); }
 
-    private async Task CloseWallet(IMoneroWallet walletInstance, bool save)
+    private static async Task CloseWallet(IMoneroWallet walletInstance, bool save)
     {
         MoneroWalletRpc walletRpc = (MoneroWalletRpc)walletInstance;
         string walletPath = await walletRpc.GetPath();
@@ -136,38 +122,18 @@ public class MoneroWalletRpcIntegrationTest
         await walletRpc.Close(save);
     }
 
-    private Task<List<string>> GetSeedLanguages()
-    {
-        throw new NotImplementedException();
-    }
-
     private async Task TestWallet(Func<Task> action, IMoneroWallet moneroWallet)
     {
         await TestWallet(action, moneroWallet, false);
     }
 
-    private async Task TestWallet(Func<Task> action, IMoneroWallet moneroWallet, bool checkSeed)
+    private static async Task TestWallet(Func<Task> action, IMoneroWallet moneroWallet, bool checkSeed)
     {
-        Exception? e2 = null;
-        try
-        {
-            await action();
+        await action();
 
-            if (checkSeed)
-            {
-                MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
-            }
-        }
-        catch (Exception e)
+        if (checkSeed)
         {
-            e2 = e;
-        }
-
-        await CloseWallet(moneroWallet);
-
-        if (e2 != null)
-        {
-            throw e2;
+            MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
         }
     }
 
@@ -175,7 +141,6 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestCreateWalletRandom()
     {
-        Exception? e1 = null; // emulating Java "finally" but compatible with other languages
         try
         {
             // create a random wallet
@@ -214,12 +179,7 @@ public class MoneroWalletRpcIntegrationTest
         }
         catch (Exception e)
         {
-            e1 = e;
-        }
-
-        if (e1 != null)
-        {
-            throw new Exception(e1.Message);
+            throw new Exception(e.Message);
         }
     }
 
@@ -227,7 +187,6 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestCreateWalletFromSeed()
     {
-        Exception? e1 = null; // emulating Java "finally" but compatible with other languages
         try
         {
             // save for comparison
@@ -261,25 +220,24 @@ public class MoneroWalletRpcIntegrationTest
                 Assert.Equal("Invalid mnemonic", e.Message);
             }
 
-            // attempt to create a wallet at the same path
-            try
-            {
-                await CreateWallet(new MoneroWalletConfig().SetPath(path));
-                throw new Exception("Should have thrown error");
-            }
-            catch (Exception e)
-            {
-                Assert.True("Wallet already exists: " + path == e.Message);
-            }
+            await AttemptToCreateWalletAtSamePath(path);
         }
         catch (Exception e)
         {
-            e1 = e;
+            throw new Exception(e.Message);
         }
+    }
 
-        if (e1 != null)
+    private async Task AttemptToCreateWalletAtSamePath(string path)
+    {
+        try
         {
-            throw new Exception(e1.Message);
+            await CreateWallet(new MoneroWalletConfig().SetPath(path));
+            throw new Exception("Should have thrown error");
+        }
+        catch (Exception e)
+        {
+            Assert.True("Wallet already exists: " + path == e.Message);
         }
     }
 
@@ -287,7 +245,6 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestCreateWalletFromSeedWithOffset()
     {
-        Exception? e1 = null; // emulating Java "finally" but compatible with other languages
         try
         {
             // create a test wallet with offset
@@ -304,12 +261,7 @@ public class MoneroWalletRpcIntegrationTest
         }
         catch (Exception e)
         {
-            e1 = e;
-        }
-
-        if (e1 != null)
-        {
-            throw new Exception(e1.Message);
+            throw new Exception(e.Message);
         }
     }
 
@@ -317,7 +269,6 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestCreateWalletFromKeys()
     {
-        Exception? e1 = null; // emulating Java "finally" but compatible with other languages
         try
         {
             // save for comparison
@@ -345,25 +296,11 @@ public class MoneroWalletRpcIntegrationTest
 
             await TestWallet(action, moneroWallet, false);
 
-            // attempt to create a wallet at the same path
-            try
-            {
-                await CreateWallet(new MoneroWalletConfig().SetPath(path));
-                throw new Exception("Should have thrown error");
-            }
-            catch (Exception e)
-            {
-                Assert.True("Wallet already exists: " + path == e.Message);
-            }
+            await AttemptToCreateWalletAtSamePath(path);
         }
         catch (Exception e)
         {
-            e1 = e;
-        }
-
-        if (e1 != null)
-        {
-            throw new Exception(e1.Message);
+            throw new Exception(e.Message);
         }
     }
 
@@ -415,18 +352,6 @@ public class MoneroWalletRpcIntegrationTest
     {
         string language = await _wallet.GetSeedLanguage();
         Assert.True(IMoneroWallet.DefaultLanguage == language);
-    }
-
-    // Can get a list of supported languages for the seed
-    [Fact(Skip = "monero-wallet-rpc does not support getting seed languages")]
-    public async Task TestGetSeedLanguages()
-    {
-        List<string> languages = await GetSeedLanguages();
-        Assert.True(languages.Count > 0);
-        foreach (string language in languages)
-        {
-            Assert.True(language.Length > 0);
-        }
     }
 
     // Can get the private view key
@@ -801,7 +726,7 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestSaveAndClose()
     {
         // create a random wallet
-        string password = "";
+        const string password = "";
         IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetPassword(password));
         string path = await moneroWallet.GetPath();
 
@@ -855,7 +780,7 @@ public class MoneroWalletRpcIntegrationTest
         Assert.NotNull(account);
         uint? accountIndex = account.GetIndex();
         Assert.NotNull(accountIndex);
-        MoneroUtils.ValidateAddress(account.GetPrimaryAddress(), TestUtils.NETWORK_TYPE);
+        MoneroUtils.ValidateAddress(account.GetPrimaryAddress(), TestUtils.NetworkType);
         TestUtils.TestUnsignedBigInteger(account.GetBalance());
         TestUtils.TestUnsignedBigInteger(account.GetUnlockedBalance());
 

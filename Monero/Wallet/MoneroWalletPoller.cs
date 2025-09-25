@@ -24,7 +24,7 @@ internal class MoneroWalletPoller
     public MoneroWalletPoller(MoneroWalletRpc wallet, ulong syncPeriodInMs)
     {
         _wallet = wallet;
-        _looper = new TaskLooper(() => Poll());
+        _looper = new TaskLooper(Poll);
         _syncPeriodInMs = syncPeriodInMs;
     }
 

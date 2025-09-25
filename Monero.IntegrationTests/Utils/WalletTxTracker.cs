@@ -8,11 +8,11 @@ namespace Monero.IntegrationTests.Utils;
 
 public class WalletTxTracker
 {
-    private readonly List<IMoneroWallet> clearedWallets = [];
+    private readonly List<IMoneroWallet> _clearedWallets = [];
 
     public void Reset()
     {
-        clearedWallets.Clear();
+        _clearedWallets.Clear();
     }
 
     public async Task WaitForWalletTxsToClearPool(IMoneroWallet wallet)
@@ -22,7 +22,7 @@ public class WalletTxTracker
         List<string> txHashesWallet = [];
         foreach (IMoneroWallet moneroWallet in wallets)
         {
-            if (!clearedWallets.Contains(moneroWallet))
+            if (!_clearedWallets.Contains(moneroWallet))
             {
                 foreach (MoneroTxWallet tx in await moneroWallet.GetTxs(null))
                 {
@@ -106,7 +106,7 @@ public class WalletTxTracker
         // sync wallets with the pool
         foreach (IMoneroWallet moneroWallet in wallets)
         {
-            clearedWallets.Add(moneroWallet);
+            _clearedWallets.Add(moneroWallet);
         }
     }
 }

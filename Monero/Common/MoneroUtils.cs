@@ -2,8 +2,6 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using Monero.Wallet.Common;
-
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Utilities.Encoders;
 
@@ -13,14 +11,11 @@ public static class MoneroUtils
 {
     private const int FullBlockSize = 8;
     private const int FullEncodedBlockSize = 11;
-    private static readonly ulong XmrAuMultiplier = 1000000000000;
+    private const ulong XmrAuMultiplier = 1000000000000;
 
-    public static readonly uint RingSize = 16;
-    private static int s_logLevel;
-    private static readonly int NumMnemonicWords = 25;
-    private static readonly int ViewKeyLength = 64;
-    private static readonly string Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-    private static readonly char[] Chars = Alphabet.ToCharArray();
+    public const uint RingSize = 16;
+    private const int NumMnemonicWords = 25;
+    private const string Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
     private static readonly int AlphabetSize = Alphabet.Length;
 
     private static readonly Dictionary<int, int> EncodedBlockSize = new()
@@ -36,25 +31,11 @@ public static class MoneroUtils
         { 11, 8 }
     };
 
-    private static readonly ulong Uint64Max = ulong.MaxValue;
+    private const ulong Uint64Max = ulong.MaxValue;
 
     private static readonly Regex StandardAddressPattern = new("^[" + Alphabet + "]{95}$", RegexOptions.Compiled);
     private static readonly Regex IntegratedAddressPattern = new("^[" + Alphabet + "]{106}$", RegexOptions.Compiled);
 
-    public static string GetVersion()
-    {
-        return "0.0.1";
-    }
-
-    public static bool WalletExists(string? path)
-    {
-        if (string.IsNullOrEmpty(path))
-        {
-            throw new ArgumentException("Path cannot be null or empty.", nameof(path));
-        }
-
-        return File.Exists(path);
-    }
 
     private static bool IsHex(string? str)
     {
@@ -63,17 +44,12 @@ public static class MoneroUtils
             return false;
         }
 
-        return Regex.IsMatch(str, @"^-?[0-9a-fA-F]+$");
+        return Regex.IsMatch(str, "^-?[0-9a-fA-F]+$");
     }
 
     private static bool IsHex64(string? str)
     {
         return str != null && str.Length == 64 && IsHex(str);
-    }
-
-    public static void ValidateLanguage(string? language)
-    {
-        throw new NotImplementedException();
     }
 
     public static void ValidateMnemonic(string? mnemonic)
@@ -92,45 +68,6 @@ public static class MoneroUtils
         if (words.Length != NumMnemonicWords)
         {
             throw new MoneroError("Mnemonic phrase is " + words.Length + " words but must be " + NumMnemonicWords);
-        }
-    }
-
-    public static void ValidateViewKey(string viewKey)
-    {
-        if (viewKey == null)
-        {
-            throw new MoneroError("View key is null");
-        }
-
-        if (viewKey.Length != ViewKeyLength)
-        {
-            throw new MoneroError("View key is " + viewKey.Length + " characters but must be " + ViewKeyLength);
-        }
-    }
-
-    public static bool IsValidLanguage(string? language)
-    {
-        try
-        {
-            ValidateLanguage(language);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    public static bool IsValidViewKey(string viewKey)
-    {
-        try
-        {
-            ValidateViewKey(viewKey);
-            return true;
-        }
-        catch
-        {
-            return false;
         }
     }
 
@@ -256,34 +193,6 @@ public static class MoneroUtils
         DecodeAddress(address);
     }
 
-    public static void ValidatePaymentId(string? paymentId)
-    {
-        if (paymentId == null)
-        {
-            throw new MoneroInvalidPaymentIdError("null");
-        }
-
-        bool result = paymentId.Length == 16 || paymentId.Length == 64;
-
-        if (!result)
-        {
-            throw new MoneroInvalidPaymentIdError(paymentId);
-        }
-    }
-
-    public static bool IsValidPaymentId(string? paymentId)
-    {
-        try
-        {
-            ValidatePaymentId(paymentId);
-            return false;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
     public static void ValidateHex(string? str)
     {
         if (str == null)
@@ -291,7 +200,7 @@ public static class MoneroUtils
             throw new MoneroError("Invalid hex: null");
         }
 
-        if (!Regex.IsMatch(str, @"^([0-9A-Fa-f]{2})+$"))
+        if (!Regex.IsMatch(str, "^([0-9A-Fa-f]{2})+$"))
         {
             throw new MoneroError("Invalid hex: " + str);
         }
@@ -310,35 +219,6 @@ public static class MoneroUtils
         }
     }
 
-    public static void ValidateBase58(string? standardAddress)
-    {
-        if (standardAddress == null)
-        {
-            throw new MoneroError("Invalid Base58 null");
-        }
-
-        foreach (char c in standardAddress)
-        {
-            if (!Chars.Contains(c))
-            {
-                throw new MoneroError("Invalid Base58 " + standardAddress);
-            }
-        }
-    }
-
-    public static bool IsValidBase58(string? standardAddress)
-    {
-        try
-        {
-            ValidateBase58(standardAddress);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
     public static void Log(int level, string message)
     {
         if (level < 0)
@@ -346,22 +226,7 @@ public static class MoneroUtils
             throw new MoneroError("Log level must be an integer >= 0");
         }
 
-        if (s_logLevel >= level)
-        {
-            Console.WriteLine(message);
-        }
-    }
-
-    public static int GetLogLevel() { return s_logLevel; }
-
-    public static void SetLogLevel(int level)
-    {
-        if (level < 0)
-        {
-            throw new MoneroError("Log level must be an integer >= 0");
-        }
-
-        s_logLevel = level;
+        Console.WriteLine(message);
     }
 
     public static ulong XmrToAtomicUnits(double amountXmr)
@@ -385,7 +250,7 @@ public static class MoneroUtils
             throw new MoneroError("Address is null");
         }
 
-        // determine if address has integrated address pattern
+        // determine if an address has an integrated address pattern
         bool isIntegrated = false;
         if (!StandardAddressPattern.IsMatch(address))
         {
@@ -472,23 +337,6 @@ public static class MoneroUtils
         string? paymentId)
     {
         throw new NotImplementedException("MoneroUtils.GetIntegratedAddress(): not implemented.");
-    }
-
-    public static Uri ParseUri(string uri)
-    {
-        if (!string.IsNullOrEmpty(uri) && !Regex.IsMatch(uri.ToLower(), @"^\w+://.+"))
-        {
-            uri = "http://" + uri; // assume http if protocol not given
-        }
-
-        try
-        {
-            return new Uri(uri);
-        }
-        catch (Exception e)
-        {
-            throw new MoneroError(e);
-        }
     }
 
     private static bool IsValidAddressHash(string decodedAddrStr)
@@ -642,33 +490,5 @@ public static class MoneroUtils
     public static Dictionary<string, object?> BinaryBlocksToMap(byte[] blocks)
     {
         throw new NotImplementedException("MoneroUtils.BinaryBlocksToMap(): not implemented");
-    }
-
-    public static void MergeTx(List<MoneroTx> txs, MoneroTx tx)
-    {
-        foreach (MoneroTx aTx in txs)
-        {
-            if (aTx.GetHash()!.Equals(tx.GetHash()))
-            {
-                aTx.Merge(tx);
-                return;
-            }
-        }
-
-        txs.Add(tx);
-    }
-
-    public static void MergeTx(List<MoneroTxWallet> txs, MoneroTxWallet tx)
-    {
-        foreach (MoneroTx aTx in txs)
-        {
-            if (aTx.GetHash()!.Equals(tx.GetHash()))
-            {
-                aTx.Merge(tx);
-                return;
-            }
-        }
-
-        txs.Add(tx);
     }
 }

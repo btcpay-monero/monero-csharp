@@ -12,7 +12,7 @@ public class TaskLooper
         _task = task ?? throw new ArgumentNullException(nameof(task));
     }
 
-    public bool IsStarted
+    private bool IsStarted
     {
         get
         {
@@ -24,11 +24,6 @@ public class TaskLooper
     }
 
     public void Start(ulong periodInMs)
-    {
-        Start(periodInMs, false);
-    }
-
-    public void Start(ulong periodInMs, bool targetFixedPeriod)
     {
         if (periodInMs <= 0)
         {
@@ -45,11 +40,11 @@ public class TaskLooper
             _periodInMs = periodInMs;
             _cts = new CancellationTokenSource();
 
-            _ = RunLoopAsync(_cts.Token, targetFixedPeriod);
+            _ = RunLoopAsync(false, _cts.Token);
         }
     }
 
-    private async Task RunLoopAsync(CancellationToken token, bool targetFixedPeriod)
+    private async Task RunLoopAsync(bool targetFixedPeriod, CancellationToken token)
     {
         while (!token.IsCancellationRequested)
         {

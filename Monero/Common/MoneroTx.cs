@@ -2,7 +2,7 @@ namespace Monero.Common;
 
 public class MoneroTx
 {
-    public static readonly string DefaultPaymentId = "0000000000000000";
+    public const string DefaultPaymentId = "0000000000000000";
 
     private MoneroBlock? _block;
     private byte[]? _extra; // TODO: switch to string for consistency with MoneroTxWallet?
@@ -47,7 +47,7 @@ public class MoneroTx
         // nothing to build
     }
 
-    public MoneroTx(MoneroTx tx)
+    protected MoneroTx(MoneroTx tx)
     {
         _hash = tx._hash;
         _version = tx._version;

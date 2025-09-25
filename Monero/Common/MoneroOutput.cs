@@ -114,32 +114,18 @@ public class MoneroOutput
             return this;
         }
 
-        // merge txs if they're different which comes back to merging outputs
-        if (GetTx() != output.GetTx())
+        // merge txs if they're different, which comes back to merging outputs
+        if (GetTx() == output.GetTx())
         {
-            if (GetTx() == null)
-            {
-                throw new MoneroError("Cannot merge from null tx");
-            }
-
-            GetTx()!.Merge(output.GetTx());
+            return this;
         }
 
-        // otherwise merge output fields
-        else
+        if (GetTx() == null)
         {
-            if (GetKeyImage() == null)
-            {
-                SetKeyImage(output.GetKeyImage());
-            }
-            else if (output.GetKeyImage() != null)
-            {
-                GetKeyImage()!.Merge(output.GetKeyImage());
-            }
-
-            SetAmount(GenUtils.Reconcile(GetAmount(), output.GetAmount()));
-            SetIndex(GenUtils.Reconcile(GetIndex(), output.GetIndex()));
+            throw new MoneroError("Cannot merge from null tx");
         }
+
+        GetTx()!.Merge(output.GetTx());
 
         return this;
     }

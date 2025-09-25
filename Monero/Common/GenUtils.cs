@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Text;
 
 namespace Monero.Common;
 
@@ -13,11 +12,6 @@ public static class GenUtils
     public static T? Reconcile<T>(T? val1, T? val2)
     {
         return Reconcile(val1, val2, null, null, null);
-    }
-
-    public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined)
-    {
-        return Reconcile(val1, val2, resolveDefined, null, null);
     }
 
     public static T? Reconcile<T>(T? val1, T? val2, bool? resolveDefined, bool? resolveTrue)
@@ -183,52 +177,15 @@ public static class GenUtils
         return subarray;
     }
 
-    public static void WaitFor(ulong durationMs)
-    {
-        WaitFor((int)durationMs);
-    }
-
     public static void WaitFor(int durationMs)
     {
         try
         {
-            // brutto, non mi piace
             Thread.Sleep(durationMs);
         }
         catch (ThreadInterruptedException)
         {
             throw new Exception("Thread was interrupted while sleeping");
         }
-    }
-
-    public static string KvLine(object? key, object? value, int indent)
-    {
-        return KvLine(key, value, indent, true, true);
-    }
-
-    public static string KvLine(object? key, object? value, int indent, bool newline)
-    {
-        return KvLine(key, value, indent, newline, true);
-    }
-
-    public static string KvLine(object? key, object? value, int indent, bool newline, bool ignoreUndefined)
-    {
-        if (value == null && ignoreUndefined)
-        {
-            return "";
-        }
-
-        return GetIndent(indent) + key + ": " + value + (newline ? '\n' : "");
-    }
-
-    public static string GetIndent(int length)
-    {
-        StringBuilder sb = new();
-        for (int i = 0; i < length; i++)
-        {
-            sb.Append("  "); // two spaces
-        }
-
-        return sb.ToString();
     }
 }

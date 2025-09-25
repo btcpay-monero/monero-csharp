@@ -10,7 +10,7 @@ public class MoneroKeyImage
     }
 
     private string? _hex;
-    private string? _signature;
+    private readonly string? _signature;
 
     public MoneroKeyImage()
     {
@@ -27,7 +27,7 @@ public class MoneroKeyImage
         _signature = signature;
     }
 
-    public MoneroKeyImage(MoneroKeyImage keyImage)
+    private MoneroKeyImage(MoneroKeyImage keyImage)
     {
         _hex = keyImage._hex;
         _signature = keyImage._signature;
@@ -36,26 +36,6 @@ public class MoneroKeyImage
     public MoneroKeyImage Clone()
     {
         return new MoneroKeyImage(this);
-    }
-
-    public static SpentStatus ParseStatus(int status)
-    {
-        if (status == 1)
-        {
-            return SpentStatus.NotSpent;
-        }
-
-        if (status == 2)
-        {
-            return SpentStatus.Confirmed;
-        }
-
-        if (status == 3)
-        {
-            return SpentStatus.TxPool;
-        }
-
-        throw new MoneroError("Invalid integer value for spent status: " + status);
     }
 
     public string? GetHex()
@@ -72,16 +52,5 @@ public class MoneroKeyImage
     public string? GetSignature()
     {
         return _signature;
-    }
-
-    public MoneroKeyImage SetSignature(string? signature)
-    {
-        _signature = signature;
-        return this;
-    }
-
-    public MoneroKeyImage Merge(MoneroKeyImage? keyImage)
-    {
-        throw new NotImplementedException("MoneroKeyImage.Merge(): not implemented");
     }
 }

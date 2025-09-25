@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-
 using Monero.Common;
 using Monero.Daemon.Common;
 
@@ -18,127 +15,12 @@ public class MoneroDaemonRpc : IMoneroDaemon
     private static readonly uint NUM_HEADERS_PER_REQ = 750;
     private readonly Dictionary<ulong, MoneroBlockHeader> _cachedHeaders = [];
     private readonly List<MoneroDaemonListener> _listeners = [];
-    private readonly Thread? outputThread;
     private readonly MoneroRpcConnection rpc;
     private DaemonPoller? daemonPoller;
-    private Process? process;
 
     public MoneroDaemonRpc(MoneroRpcConnection connection)
     {
         rpc = connection;
-        CheckConnection();
-    }
-
-    public MoneroDaemonRpc(string uri, string? username = null, string? password = null)
-    {
-        rpc = new MoneroRpcConnection(uri, username, password);
-        CheckConnection();
-    }
-
-    public MoneroDaemonRpc(List<string> cmd)
-    {
-        if (cmd == null || cmd.Count == 0)
-        {
-            throw new ArgumentException("Command list cannot be empty");
-        }
-
-        ProcessStartInfo startInfo = new()
-        {
-            FileName = cmd[0],
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        for (int i = 1; i < cmd.Count; i++)
-        {
-            startInfo.ArgumentList.Add(cmd[i]);
-        }
-
-        startInfo.Environment["LANG"] = "en_US.UTF-8";
-
-        process = new Process { StartInfo = startInfo };
-        process.Start();
-
-        StreamReader reader = process.StandardOutput;
-        string? line;
-        bool started = false;
-        List<string> capturedOutput = [];
-        string uri = "";
-        string zmqUri = "";
-        string username = "";
-        string password = "";
-
-        while ((line = reader.ReadLine()) != null)
-        {
-            Console.WriteLine("[monerod] " + line);
-            capturedOutput.Add(line);
-
-            Match match = Regex.Match(line, @"Binding on ([\d.]+).*:(\d+)");
-            if (match.Success)
-            {
-                string host = match.Groups[1].Value;
-                string port = match.Groups[2].Value;
-                bool ssl = false;
-
-                int sslIndex = cmd.IndexOf("--rpc-ssl");
-                if (sslIndex >= 0 && sslIndex + 1 < cmd.Count)
-                {
-                    ssl = cmd[sslIndex + 1].ToLower() == "enabled";
-                }
-
-                uri = (ssl ? "https://" : "http://") + host + ":" + port;
-            }
-
-            if (line.Contains("Starting wallet RPC server"))
-            {
-                outputThread = new Thread(() =>
-                {
-                    string? bgLine;
-                    try
-                    {
-                        while ((bgLine = reader.ReadLine()) != null)
-                        {
-                            Console.WriteLine("[monerod] " + bgLine);
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        // ignore
-                    }
-                });
-                outputThread.Start();
-
-                started = true;
-                break;
-            }
-        }
-
-        if (!started)
-        {
-            process.Kill();
-            throw new Exception("Failed to start monerod:\n" + string.Join("\n", capturedOutput));
-        }
-
-        int loginIndex = cmd.IndexOf("--rpc-login");
-        if (loginIndex >= 0 && loginIndex + 1 < cmd.Count)
-        {
-            string[] parts = cmd[loginIndex + 1].Split(':');
-            if (parts.Length == 2)
-            {
-                username = parts[0];
-                password = parts[1];
-            }
-        }
-
-        int zmqIndex = cmd.IndexOf("--zmq-pub");
-        if (zmqIndex >= 0 && zmqIndex + 1 < cmd.Count)
-        {
-            zmqUri = cmd[zmqIndex + 1];
-        }
-
-        rpc = new MoneroRpcConnection(uri, username, password, zmqUri);
         CheckConnection();
     }
 
@@ -1039,70 +921,9 @@ public class MoneroDaemonRpc : IMoneroDaemon
         return uri.Contains("127.0.0.1") || uri.Contains("localhost");
     }
 
-    public Process? GetProcess()
-    {
-        return process;
-    }
-
-    public int StopProcess(bool force = false)
-    {
-        if (process == null)
-        {
-            throw new MoneroError("MoneroDaemonRpc instance not created from new process");
-        }
-
-        _listeners.Clear();
-        RefreshListening();
-        if (force)
-        {
-            process.Kill(true);
-        }
-        else
-        {
-            process.Close();
-        }
-
-        try
-        {
-            process.WaitForExit();
-            if (outputThread != null)
-            {
-                outputThread.Join();
-            }
-
-            int exitCode = process.ExitCode;
-            process = null;
-            return exitCode;
-        }
-        catch (Exception e) { throw new MoneroError(e.Message); }
-    }
-
     public MoneroRpcConnection GetRpcConnection()
     {
         return rpc;
-    }
-
-    public void SetProxyUri(string? uri)
-    {
-        rpc.SetProxyUri(uri);
-    }
-
-    public string? GetProxyUri()
-    {
-        return rpc.GetProxyUri();
-    }
-
-    public async Task<bool> IsConnected()
-    {
-        try
-        {
-            await GetVersion();
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
     }
 
     #region Private Methods
@@ -1157,7 +978,7 @@ public class MoneroDaemonRpc : IMoneroDaemon
         ulong endHeight = (ulong)startHeight - 1;
         while (reqSize < chunkSize && endHeight < maxHeight)
         {
-            // get header of next block
+            // get header of the next block
             MoneroBlockHeader header = await GetBlockHeaderByHeightCached(endHeight + 1, (ulong)maxHeight);
 
             // block cannot be bigger than max request size
@@ -1166,7 +987,7 @@ public class MoneroDaemonRpc : IMoneroDaemon
                 throw new MoneroError("Block exceeds maximum request size: " + header.GetSize());
             }
 
-            // done iterating if fetching block would exceed max request size
+            // done iterating if fetching block exceeds max request size
             if (reqSize + header.GetSize() > chunkSize)
             {
                 break;

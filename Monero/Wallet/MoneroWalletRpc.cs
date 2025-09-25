@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 using Monero.Common;
 using Monero.Wallet.Common;
 
@@ -23,7 +21,6 @@ public class MoneroWalletRpc : IMoneroWallet
 
     private readonly List<MoneroWalletListener> _listeners = [];
 
-    private readonly Process? _process = null; // process running monero-wallet-rpc if applicable
     private readonly MoneroRpcConnection _rpc; // rpc connection to monero-wallet-rpc
 
     // instance variables
@@ -51,14 +48,9 @@ public class MoneroWalletRpc : IMoneroWallet
         return [.. _listeners];
     }
 
-    public Process? GetProcess()
-    {
-        return _process;
-    }
-
     #region RPC Wallet Methods
 
-    public async Task<MoneroWalletRpc> OpenWallet(MoneroWalletConfig config)
+    public async Task OpenWallet(MoneroWalletConfig config)
     {
         // validate config
         if (config == null)
@@ -84,16 +76,14 @@ public class MoneroWalletRpc : IMoneroWallet
         {
             await SetDaemonConnection(config.GetServer(), true, null);
         }
-
-        return this;
     }
 
-    public async Task<MoneroWalletRpc> OpenWallet(string path, string? password = null)
+    public async Task OpenWallet(string path, string? password = null)
     {
-        return await OpenWallet(new MoneroWalletConfig().SetPath(path).SetPassword(password));
+        await OpenWallet(new MoneroWalletConfig().SetPath(path).SetPassword(password));
     }
 
-    public async Task<MoneroWalletRpc> CreateWallet(MoneroWalletConfig config)
+    public async Task CreateWallet(MoneroWalletConfig config)
     {
         // validate config
         if (config == null)
@@ -136,11 +126,9 @@ public class MoneroWalletRpc : IMoneroWallet
         {
             await SetDaemonConnection(config.GetServer(), true, null);
         }
-
-        return this;
     }
 
-    private async Task<MoneroWalletRpc> CreateWalletRandom(MoneroWalletConfig? config)
+    private async Task CreateWalletRandom(MoneroWalletConfig? config)
     {
         if (config == null)
         {
@@ -169,39 +157,36 @@ public class MoneroWalletRpc : IMoneroWallet
             throw new MoneroError("Wallet name is not initialized");
         }
 
+        MoneroJsonRpcParams parameters = PrepareWalletCreationParameters(config);
+        try { await _rpc.SendJsonRequest("create_wallet", parameters); }
+        catch (MoneroRpcError e) { HandleCreateWalletError(config.GetPath(), e); }
+
+        Clear();
+        _path = config.GetPath();
+    }
+
+    private static MoneroJsonRpcParams PrepareWalletCreationParameters(MoneroWalletConfig config)
+    {
         if (string.IsNullOrEmpty(config.GetLanguage()))
         {
             config.SetLanguage(IMoneroWallet.DefaultLanguage);
         }
 
         // send request
-        Dictionary<string, object?> parameters = [];
+        MoneroJsonRpcParams parameters = [];
         parameters.Add("filename", config.GetPath());
         parameters.Add("password", config.GetPassword());
         parameters.Add("language", config.GetLanguage());
-        try { await _rpc.SendJsonRequest("create_wallet", parameters); }
-        catch (MoneroRpcError e) { HandleCreateWalletError(config.GetPath(), e); }
-
-        Clear();
-        _path = config.GetPath();
-        return this;
+        return parameters;
     }
 
     private async Task CreateWalletFromSeed(MoneroWalletConfig config)
     {
         config = config.Clone();
-        if (string.IsNullOrEmpty(config.GetLanguage()))
-        {
-            config.SetLanguage(IMoneroWallet.DefaultLanguage);
-        }
-
-        Dictionary<string, object?> parameters = [];
-        parameters.Add("filename", config.GetPath());
-        parameters.Add("password", config.GetPassword());
+        MoneroJsonRpcParams parameters = PrepareWalletCreationParameters(config);
         parameters.Add("seed", config.GetSeed());
         parameters.Add("seed_offset", config.GetSeedOffset());
         parameters.Add("restore_height", config.GetRestoreHeight());
-        parameters.Add("language", config.GetLanguage());
         parameters.Add("autosave_current", config.GetSaveCurrent());
         parameters.Add("enable_multisig_experimental", config.IsMultisig());
 
@@ -225,7 +210,7 @@ public class MoneroWalletRpc : IMoneroWallet
             config.SetRestoreHeight(0);
         }
 
-        Dictionary<string, object?> parameters = [];
+        MoneroJsonRpcParams parameters = [];
 
         parameters.Add("filename", config.GetPath());
         parameters.Add("password", config.GetPassword());
@@ -278,8 +263,6 @@ public class MoneroWalletRpc : IMoneroWallet
 
         throw new MoneroRpcError(e);
     }
-
-    public MoneroRpcConnection GetRpcConnection() { return _rpc; }
 
     private void CheckRpcConnection()
     {
@@ -464,14 +447,14 @@ public class MoneroWalletRpc : IMoneroWallet
         Dictionary<uint, string?>? subaddressMap = _addressCache.GetValueOrDefault(accountIdx);
         if (subaddressMap == null)
         {
-            await GetSubaddresses(accountIdx, true, null); // cache's all addresses at this account
+            await GetSubaddresses(accountIdx, true, null); // cache all addresses at this account
             return await GetAddress(accountIdx, subaddressIdx); // uses cache
         }
 
         string? address = subaddressMap.GetValueOrDefault(subaddressIdx);
         if (address == null)
         {
-            await GetSubaddresses(accountIdx, true, null); // cache's all addresses at this account
+            await GetSubaddresses(accountIdx, true, null); // cache all addresses at this account
             Dictionary<uint, string?>? map = _addressCache.GetValueOrDefault(accountIdx);
             return map?.GetValueOrDefault(subaddressIdx);
         }
@@ -599,7 +582,7 @@ public class MoneroWalletRpc : IMoneroWallet
     public async Task StartSyncing(ulong? syncPeriodInMs)
     {
         // convert ms to seconds for rpc parameter
-        ulong syncPeriodInSeconds = (syncPeriodInMs == null ? DefaultSyncPeriodInMs : (ulong)syncPeriodInMs) / 1000;
+        ulong syncPeriodInSeconds = (syncPeriodInMs ?? DefaultSyncPeriodInMs) / 1000;
 
         // send rpc request
         MoneroJsonRpcParams parameters = [];
