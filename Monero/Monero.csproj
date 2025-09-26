@@ -9,15 +9,38 @@
 
     <!-- Specific properties -->
     <PropertyGroup>
-        <Product>Monero CSharp bindings library</Product>
-        <Description>This library provides C# bindings for interacting with the Monero, enabling seamless payment integration.</Description>
-        <Version>0.0.1</Version>
+        <Product>Monero CSharp library</Product>
+        <PackageId>MoneroNet</PackageId>
+        <Description>The C# Monero library</Description>
+        <!-- version is taken from git tag when releasing -->
+        <Version Condition=" '$(Version)' == '' ">1.0.0</Version>
+        <Authors>The Btcpay-Monero Team</Authors>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+        <PackageProjectUrl>https://btcpay-monero.github.io/monero-csharp/</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/btcpay-monero/monero-csharp</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>monero</PackageTags>
+        <Company>btcpay-monero</Company>
+        <PackageIcon>logo.png</PackageIcon>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReleaseNotes>
+            Release Notes v1.0.0
+            - Initial release to support btcpay-monero plugin functionality
+            - Native Json RPC serialization
+            - Unit / Integration tests support
+            - Code coverage support added
+            - CI / CD creation
+        </PackageReleaseNotes>
     </PropertyGroup>
 
+    <!-- Package logo -->
     <ItemGroup>
-        <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.1"/>
+        <None Include="..\logo.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2"/>
     </ItemGroup>
 
     <!-- Workaround for https://github.com/dotnet/roslyn/issues/41640 -->

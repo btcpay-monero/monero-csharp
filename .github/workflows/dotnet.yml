@@ -3,6 +3,8 @@ name: Build and Test
 on:
   push:
     branches: [ "master" ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ "master" ]
   workflow_dispatch:
@@ -26,14 +28,24 @@ jobs:
       - name: Clean project
         run: dotnet clean
 
+      - name: Set package version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+          else
+            echo "No tag found, using default package version"
+            echo "VERSION=1.0.0" >> $GITHUB_ENV
+          fi
+
       - name: Build
-        run: dotnet build -c Release --no-restore
+        run: dotnet build -c Release /p:Version=${{ env.VERSION }} --no-restore
 
       - name: Deterministic build check
         run: |
           dotnet tool install --global dotnet-validate --version 0.0.1-preview.537
-          dotnet pack Monero/Monero.csproj -c Release /p:PackageVersion=1 --no-build -o nuget-packages
-          dotnet validate package local nuget-packages/Monero.1.0.0.nupkg
+          dotnet pack Monero/Monero.csproj -c Release /p:PackageVersion=${{ env.VERSION }} --no-build -o nuget-packages
+          dotnet validate package local nuget-packages/MoneroNet.${{ env.VERSION }}.nupkg
 
       - name: Run unit tests
         run: |
@@ -57,4 +69,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nuget-package-${{ github.sha }}
-          path: nuget-packages/Monero.1.0.0.nupkg
+          path: nuget-packages/MoneroNet.${{ env.VERSION }}.nupkg
