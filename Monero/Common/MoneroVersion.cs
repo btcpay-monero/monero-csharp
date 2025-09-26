@@ -1,9 +1,17 @@
+using System.Text.Json.Serialization;
+
+using Monero.Daemon.Common;
+
 namespace Monero.Common;
 
-public class MoneroVersion
+public class MoneroVersion : MoneroRpcResponse
 {
-    private bool? _isRelease;
-    private long? _number;
+    [JsonPropertyName("release")]
+    [JsonInclude]
+    private bool? _isRelease { get; set; }
+    [JsonPropertyName("version")]
+    [JsonInclude]
+    private long? _number { get; set; }
 
     public MoneroVersion()
     {

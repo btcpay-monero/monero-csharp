@@ -1,103 +1,44 @@
-using Monero.Common;
+using System.Text.Json.Serialization;
+
 
 namespace Monero.Wallet.Common;
 
 public abstract class MoneroTransfer
 {
-    protected uint? _accountIndex;
-    protected ulong? _amount;
-    protected MoneroTxWallet? _tx;
-
-    protected MoneroTransfer() { }
-
-    protected MoneroTransfer(MoneroTransfer transfer)
-    {
-        _tx = transfer._tx;
-        _amount = transfer._amount;
-        _accountIndex = transfer._accountIndex;
-    }
-
-    public abstract MoneroTransfer Clone();
-
-    public MoneroTxWallet? GetTx()
-    {
-        return _tx;
-    }
-
-    public virtual MoneroTransfer SetTx(MoneroTxWallet tx)
-    {
-        _tx = tx;
-        return this;
-    }
-
-    public abstract bool? IsIncoming();
-
-    public virtual bool? IsOutgoing()
-    {
-        return !IsIncoming();
-    }
-
-    public ulong? GetAmount()
-    {
-        return _amount;
-    }
-
-    public virtual MoneroTransfer SetAmount(ulong? amount)
-    {
-        _amount = amount;
-        return this;
-    }
-
-    public uint? GetAccountIndex()
-    {
-        return _accountIndex;
-    }
-
-    public virtual MoneroTransfer SetAccountIndex(uint? accountIndex)
-    {
-        _accountIndex = accountIndex;
-        return this;
-    }
-
-    public MoneroTransfer Merge(MoneroTransfer? transfer)
-    {
-        if (transfer == null)
-        {
-            throw new MoneroError("Cannot merge null transfer");
-        }
-
-        if (this == transfer)
-        {
-            return this;
-        }
-
-        // merge txs if they're different which comes back to merging transfers
-        MoneroTxWallet? tx = GetTx();
-        if (tx != transfer.GetTx())
-        {
-            if (tx == null)
-            {
-                throw new MoneroError("Cannot merge null tx");
-            }
-
-            tx.Merge(transfer.GetTx());
-            return this;
-        }
-
-        // otherwise merge transfer fields
-        SetAccountIndex(GenUtils.Reconcile(GetAccountIndex(), transfer.GetAccountIndex()));
-
-        // TODO monero-project: failed tx in pool (after testUpdateLockedDifferentAccounts()) causes non-originating saved wallets to return duplicate incoming transfers but one has amount of 0
-        if ((GetAmount() != null && transfer.GetAmount() != null &&
-             !GetAmount().Equals(transfer.GetAmount()) && 0 == GetAmount()) || 0 == transfer.GetAmount())
-        {
-            MoneroUtils.Log(0, "WARNING: monero-project returning transfers with 0 amount/numSuggestedConfirmations");
-        }
-        else
-        {
-            SetAmount(GenUtils.Reconcile(GetAmount(), transfer.GetAmount()));
-        }
-
-        return this;
-    }
+    [JsonPropertyName("address")]
+    public required string Address { get; set; }
+    [JsonPropertyName("amount")]
+    public ulong Amount { get; set; }
+    [JsonPropertyName("amounts")]
+    public List<ulong> Amounts { get; set; } = [];
+    [JsonPropertyName("destinations")]
+    public List<MoneroDestination> Destinations { get; set; } = [];
+    [JsonPropertyName("confirmations")]
+    public ulong Confirmations { get; set; }
+    [JsonPropertyName("fee")]
+    public ulong Fee { get; set; }
+    [JsonPropertyName("double_spend_seen")]
+    public bool IsDoubleSpendSeen { get; set; }
+    [JsonPropertyName("height")]
+    public ulong Height { get; set; }
+    [JsonPropertyName("locked")]
+    public bool IsLocked { get; set; }
+    [JsonPropertyName("note")]
+    public required string Note { get; set; }
+    [JsonPropertyName("payment_id")]
+    public required string PaymentID { get; set; }
+    [JsonPropertyName("subaddr_index")]
+    public required MoneroSubaddress SubaddressIndex { get; set; }
+    [JsonPropertyName("subaddr_indices")]
+    public List<MoneroSubaddress> SubaddressIndices { get; set; } = [];
+    [JsonPropertyName("suggested_confirmations_threshold")]
+    public ulong SuggestedConfirmationsThreshold { get; set; }
+    [JsonPropertyName("timestamp")]
+    public ulong Timestamp { get; set; }
+    [JsonPropertyName("txid")]
+    public required string TransactionID { get; set; }
+    [JsonPropertyName("type")]
+    public required string Type { get; set; }
+    [JsonPropertyName("unlock_time")]
+    public ulong UnlockTime { get; set; }
 }

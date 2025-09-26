@@ -1,9 +1,15 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Wallet.Common;
 
 public class MoneroSyncResult
 {
-    private ulong? _numBlocksFetched;
-    private bool? _receivedMoney;
+    [JsonPropertyName("blocks_fetched")]
+    [JsonInclude]
+    private ulong? _numBlocksFetched { get; set; }
+    [JsonPropertyName("received_money")]
+    [JsonInclude]
+    private bool? _receivedMoney { get; set; }
 
     public MoneroSyncResult()
     {

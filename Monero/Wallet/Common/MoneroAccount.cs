@@ -1,13 +1,25 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Wallet.Common;
 
 public class MoneroAccount
 {
-    private ulong _balance;
-    private uint? _index;
-    private string? _primaryAddress;
+    [JsonPropertyName("balance")]
+    [JsonInclude]
+    private ulong _balance { get; set; }
+    [JsonPropertyName("account_index")]
+    [JsonInclude]
+    private uint? _index { get; set; }
+    [JsonPropertyName("base_address")]
+    [JsonInclude]
+    private string? _primaryAddress { get; set; }
     private List<MoneroSubaddress>? _subaddresses;
-    private string? _tag;
-    private ulong _unlockedBalance;
+    [JsonPropertyName("tag")]
+    [JsonInclude]
+    private string? _tag { get; set; }
+    [JsonPropertyName("unlocked_balance")]
+    [JsonInclude]
+    private ulong _unlockedBalance { get; set; }
 
     public MoneroAccount()
     {

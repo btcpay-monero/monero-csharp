@@ -1,15 +1,33 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
 public class MoneroHardForkInfo : MoneroRpcPaymentInfo
 {
-    private ulong? _earliestHeight;
-    private bool? _isEnabled;
-    private uint? _numVotes;
-    private uint? _state;
-    private uint? _threshold;
-    private uint? _version;
-    private uint? _voting;
-    private uint? _window;
+    [JsonPropertyName("earliest_height")]
+    [JsonInclude]
+    private ulong? _earliestHeight { get; set; }
+    [JsonPropertyName("enabled")]
+    [JsonInclude]
+    private bool? _isEnabled { get; set; }
+    [JsonPropertyName("votes")]
+    [JsonInclude]
+    private uint? _numVotes { get; set; }
+    [JsonPropertyName("state")]
+    [JsonInclude]
+    private uint? _state { get; set; }
+    [JsonPropertyName("threshold")]
+    [JsonInclude]
+    private uint? _threshold { get; set; }
+    [JsonPropertyName("version")]
+    [JsonInclude]
+    private uint? _version { get; set; }
+    [JsonPropertyName("voting")]
+    [JsonInclude]
+    private uint? _voting { get; set; }
+    [JsonPropertyName("window")]
+    [JsonInclude]
+    private uint? _window { get; set; }
 
     public ulong? GetEarliestHeight()
     {

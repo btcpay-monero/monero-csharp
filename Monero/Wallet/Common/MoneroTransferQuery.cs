@@ -1,7 +1,17 @@
+using Monero.Common;
+
 namespace Monero.Wallet.Common;
 
-public class MoneroTransferQuery : MoneroTransfer
+public class MoneroTransferQuery : MoneroTx
 {
+    private bool? _isLocked;
+    private List<string>? _hashes;
+    private ulong? _unlockTime;
+    private ulong? _height;
+    private bool? _includeOutputs;
+    private ulong? _maxHeight;
+    private ulong? _minHeight;
+    private uint? _accountIndex;
     private string? _address;
     private List<string>? _addresses;
     private List<MoneroDestination>? _destinations;
@@ -9,13 +19,13 @@ public class MoneroTransferQuery : MoneroTransfer
     private bool? _isIncoming;
     private uint? _subaddressIndex;
     private List<uint>? _subaddressIndices;
-    protected MoneroTxQuery? _txQuery;
+    private string? _hash;
 
     public MoneroTransferQuery()
     {
     }
 
-    public MoneroTransferQuery(MoneroTransferQuery query) : base(query)
+    public MoneroTransferQuery(MoneroTransferQuery query)
     {
         _isIncoming = query._isIncoming;
         _address = query._address;
@@ -40,8 +50,6 @@ public class MoneroTransferQuery : MoneroTransfer
         }
 
         _hasDestinations = query._hasDestinations;
-        _txQuery =
-            query._txQuery; // to reference original by default, MoneroTxQuery's deep copy will Set this to itself
     }
 
     public override MoneroTransferQuery Clone()
@@ -49,23 +57,7 @@ public class MoneroTransferQuery : MoneroTransfer
         return new MoneroTransferQuery(this);
     }
 
-    public MoneroTxQuery? GetTxQuery()
-    {
-        return _txQuery;
-    }
-
-    public MoneroTransferQuery SetTxQuery(MoneroTxQuery? txQuery)
-    {
-        _txQuery = txQuery;
-        if (txQuery != null)
-        {
-            txQuery.SetTransferQuery(this);
-        }
-
-        return this;
-    }
-
-    public override bool? IsIncoming()
+    public bool? IsIncoming()
     {
         return _isIncoming;
     }
@@ -76,7 +68,18 @@ public class MoneroTransferQuery : MoneroTransfer
         return this;
     }
 
-    public override bool? IsOutgoing()
+    public MoneroTransferQuery SetIsLocked(bool? locked)
+    {
+        _isLocked = locked;
+        return this;
+    }
+
+    public bool? IsLocked()
+    {
+        return _isLocked;
+    }
+
+    public bool? IsOutgoing()
     {
         return _isIncoming == null ? null : !_isIncoming;
     }
@@ -109,9 +112,14 @@ public class MoneroTransferQuery : MoneroTransfer
         return this;
     }
 
-    public override MoneroTransferQuery SetAccountIndex(uint? subaddressIdx)
+    public ulong? GetAccountIndex()
     {
-        base.SetAccountIndex(subaddressIdx);
+        return _accountIndex;
+    }
+
+    public MoneroTransferQuery SetAccountIndex(uint? subaddressIdx)
+    {
+        _accountIndex = subaddressIdx;
         return this;
     }
 
@@ -162,5 +170,78 @@ public class MoneroTransferQuery : MoneroTransfer
     public bool MeetsCriteria(MoneroTransfer? transfer)
     {
         throw new NotImplementedException();
+    }
+
+    public override MoneroTransferQuery SetHash(string? hash)
+    {
+        _hash = hash;
+
+        return this;
+    }
+
+    public override string? GetHash()
+    {
+        return _hash;
+    }
+
+    public override ulong? GetHeight()
+    {
+        return _height;
+    }
+
+    public MoneroTransferQuery SetHeight(ulong? height)
+    {
+        _height = height;
+        return this;
+    }
+
+    public ulong? GetMinHeight()
+    {
+        return _minHeight;
+    }
+
+    public MoneroTransferQuery SetMinHeight(ulong? minHeight)
+    {
+        _minHeight = minHeight;
+        return this;
+    }
+
+    public ulong? GetMaxHeight()
+    {
+        return _maxHeight;
+    }
+
+    public MoneroTransferQuery SetMaxHeight(ulong? maxHeight)
+    {
+        _maxHeight = maxHeight;
+        return this;
+    }
+
+    public override MoneroTransferQuery SetUnlockTime(ulong? unlockTime)
+    {
+        _unlockTime = unlockTime;
+        return this;
+    }
+
+    public bool? GetIncludeOutputs()
+    {
+        return _includeOutputs;
+    }
+
+    public MoneroTransferQuery SetIncludeOutputs(bool? includeOutputs)
+    {
+        _includeOutputs = includeOutputs;
+        return this;
+    }
+
+    public List<string>? GetHashes()
+    {
+        return _hashes;
+    }
+
+    public MoneroTransferQuery SetHashes(List<string>? hashes)
+    {
+        _hashes = hashes;
+        return this;
     }
 }

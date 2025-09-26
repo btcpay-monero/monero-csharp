@@ -1,14 +1,30 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
 public class MoneroConnectionSpan
 {
-    private string? _connectionId;
-    private ulong? _numBlocks;
-    private ulong? _rate;
-    private string? _remoteAddress;
-    private ulong? _size;
-    private ulong? _speed;
-    private ulong? _startHeight;
+    [JsonPropertyName("connection_id")]
+    [JsonInclude]
+    private string? _connectionId { get; set; }
+    [JsonPropertyName("nblocks")]
+    [JsonInclude]
+    private ulong? _numBlocks { get; set; }
+    [JsonPropertyName("rate")]
+    [JsonInclude]
+    private ulong? _rate { get; set; }
+    [JsonPropertyName("remote_address")]
+    [JsonInclude]
+    private string? _remoteAddress { get; set; }
+    [JsonPropertyName("size")]
+    [JsonInclude]
+    private ulong? _size { get; set; }
+    [JsonPropertyName("speed")]
+    [JsonInclude]
+    private ulong? _speed { get; set; }
+    [JsonPropertyName("start_block_height")]
+    [JsonInclude]
+    private ulong? _startHeight { get; set; }
 
     public string? GetConnectionId()
     {

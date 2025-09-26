@@ -26,19 +26,7 @@ public class MoneroOutputWallet : MoneroOutput
         return new MoneroOutputWallet(this);
     }
 
-    public override MoneroTxWallet? GetTx()
-    {
-        return base.GetTx() as MoneroTxWallet;
-    }
-
-
     public override MoneroOutputWallet SetTx(MoneroTx? tx)
-    {
-        base.SetTx(tx);
-        return this;
-    }
-
-    public MoneroOutputWallet SetTx(MoneroTxWallet tx)
     {
         base.SetTx(tx);
         return this;
@@ -94,15 +82,4 @@ public class MoneroOutputWallet : MoneroOutput
         return this;
     }
 
-
-    public bool? IsLocked()
-    {
-        MoneroTxWallet? tx = GetTx();
-        if (tx == null)
-        {
-            return null;
-        }
-
-        return tx.IsLocked();
-    }
 }

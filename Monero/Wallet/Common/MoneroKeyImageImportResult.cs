@@ -1,9 +1,14 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Wallet.Common;
 
 public class MoneroKeyImageImportResult
 {
+    [JsonPropertyName("height")]
     private ulong? _height;
+    [JsonPropertyName("spent")]
     private ulong? _spentAmount;
+    [JsonPropertyName("unspent")]
     private ulong? _unspentAmount;
 
     public MoneroKeyImageImportResult()

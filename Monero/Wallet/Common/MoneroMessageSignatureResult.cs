@@ -1,10 +1,16 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Wallet.Common;
 
 public class MoneroMessageSignatureResult
 {
+    [JsonPropertyName("good")]
     private bool _isGood;
+    [JsonPropertyName("old")]
     private bool? _isOld;
-    private MoneroMessageSignatureType? _signatureType;
+    [JsonPropertyName("signature_type")]
+    private string? _signatureType;
+    [JsonPropertyName("version")]
     private int? _version;
 
     public MoneroMessageSignatureResult()
@@ -24,7 +30,7 @@ public class MoneroMessageSignatureResult
     }
 
     public MoneroMessageSignatureResult(bool isGood, bool? isOld,
-        MoneroMessageSignatureType? signatureType)
+        string? signatureType)
     {
         _isGood = isGood;
         _isOld = isOld;
@@ -32,7 +38,7 @@ public class MoneroMessageSignatureResult
     }
 
     public MoneroMessageSignatureResult(bool isGood, bool? isOld,
-        MoneroMessageSignatureType? signatureType, int? version)
+        string? signatureType, int? version)
     {
         _isGood = isGood;
         _isOld = isOld;
@@ -70,12 +76,12 @@ public class MoneroMessageSignatureResult
         return this;
     }
 
-    public MoneroMessageSignatureType? GetSignatureType()
+    public string? GetSignatureType()
     {
         return _signatureType;
     }
 
-    public MoneroMessageSignatureResult SetSignatureType(MoneroMessageSignatureType? signatureType)
+    public MoneroMessageSignatureResult SetSignatureType(string? signatureType)
     {
         _signatureType = signatureType;
         return this;

@@ -295,45 +295,6 @@ public interface IMoneroWallet
     Task<MoneroSubaddress> CreateSubaddress(uint accountIdx, string? label);
 
     /**
-     * Retrieves wallet transactions that meet the criteria defined in a {@link MoneroTxQuery} object.
-     * <p>
-     *     Transactions must satisfy all criteria specified in the query object. If a criterion is not defined, it is ignored.
-     *     No filtering is applied for undefined criteria.
-     * </p>
-     * <p>
-     *     Supported query criteria:
-     *     <ul>
-     *         <li><b>isConfirmed</b> - Get confirmed or unconfirmed transactions (optional)</li>
-     *         <li><b>inTxPool</b> - Get transactions that are in the transaction pool (optional)</li>
-     *         <li><b>isRelayed</b> - Get transactions that are relayed or not (optional)</li>
-     *         <li><b>isFailed</b> - Get failed transactions (optional)</li>
-     *         <li><b>isMinerTx</b> - Get miner transactions (optional)</li>
-     *         <li><b>hash</b> - Get a transaction by its hash (optional)</li>
-     *         <li><b>hashes</b> - Get transactions by their hashes (optional)</li>
-     *         <li><b>paymentId</b> - Get transactions with the specified payment ID (optional)</li>
-     *         <li><b>paymentIds</b> - Get transactions with the specified payment IDs (optional)</li>
-     *         <li><b>hasPaymentId</b> - Get transactions with or without a payment ID (optional)</li>
-     *         <li><b>minHeight</b> - Minimum block height of transactions (optional)</li>
-     *         <li><b>maxHeight</b> - Maximum block height of transactions (optional)</li>
-     *         <li><b>isOutgoing</b> - Get outgoing transactions (optional)</li>
-     *         <li><b>isIncoming</b> - Get incoming transactions (optional)</li>
-     *         <li><b>transferQuery</b> - Filter transactions with transfers that match this query (optional)</li>
-     *         <li><b>includeOutputs</b> - Include transaction outputs in the results (optional)</li>
-     *         <li><b>networkType</b> - Network type (MAINNET, TESTNET, STAGENET) (optional)</li>
-     *         <li><b>serverUri</b> - URI of the wallet's daemon (optional)</li>
-     *         <li><b>serverUsername</b> - Username for daemon authentication (optional)</li>
-     *         <li><b>serverPassword</b> - Password for daemon authentication (optional)</li>
-     *         <li><b>server</b> - {@link MoneroRpcConnection} to a Monero daemon (optional)</li>
-     *         <li><b>path</b> - Path to the wallet file (optional)</li>
-     *         <li><b>password</b> - Password to open the wallet (optional)</li>
-     *     </ul>
-     * </p>
-     * @param query specifies the criteria used to retrieve transactions
-     * @return a list of wallet transactions matching the query
-     */
-    Task<List<MoneroTxWallet>> GetTxs(MoneroTxQuery? query);
-
-    /**
      * Gets transfers that meet the criteria defined in a query object.
      * <p>
      *     Transfers must meet <strong>every</strong> criterion defined in the query in order to be returned.
@@ -373,29 +334,6 @@ public interface IMoneroWallet
      * @return list of wallet transfers that meet the query
      */
     Task<List<MoneroTransfer>> GetTransfers(MoneroTransferQuery query);
-
-    /**
-     * Get outputs which meet the criteria defined in a query object.
-     *
-     * Outputs must meet every criteria defined in the query in order to be
-     * returned. All criteria are optional and no filtering is applied when not
-     * defined.
-     *
-     * All supported query criteria:
-     * - accountIndex - Get outputs associated with a specific account index (optional)
-     * - subaddressIndex - Get outputs associated with a specific subaddress index (optional)
-     * - subaddressIndices - Get outputs associated with specific subaddress indices (optional)
-     * - amount - Get outputs with a specific amount (optional)
-     * - minAmount - Get outputs greater than or equal to a minimum amount (optional)
-     * - maxAmount - Get outputs less than or equal to a maximum amount (optional)
-     * - isSpent - Get outputs that are spent or not (optional)
-     * - keyImage - Get outputs that match the fields defined in the given key image (optional)
-     * - txQuery - Get outputs whose transaction meets this filter (optional)
-     *
-     * @param query specifies attributes of outputs to Get
-     * @return the queried outputs
-     */
-    Task<List<MoneroOutputWallet>> GetOutputs(MoneroOutputQuery query);
 
 
     /**
@@ -460,128 +398,12 @@ public interface IMoneroWallet
     Task<MoneroTxPriority> GetDefaultFeePriority();
 
     /**
-     * Create a transaction to transfer funds from this wallet.
-     *
-     * Supported configuration parameters in {@code MoneroTxConfig}:
-     * <ul>
-     *     <li><b>address</b> - Single destination address (required unless {@code destinations} is provided)</li>
-     *     <li><b>amount</b> - Amount to send to the address (required unless {@code destinations} is provided)</li>
-     *     <li><b>accountIndex</b> - Source account index to transfer funds from (required)</li>
-     *     <li><b>subaddressIndex</b> - Specific subaddress index to transfer funds from (optional)</li>
-     *     <li><b>subaddressIndices</b> - List of subaddress indices to transfer funds from (optional)</li>
-     *     <li><b>relay</b> - Whether to relay the transaction to peers and commit to the blockchain (default: false)</li>
-     *     <li><b>priority</b> - Transaction priority (default: {@code MoneroTxPriority.NORMAL})</li>
-     *     <li>
-     *         <b>destinations</b> - List of destination addresses and amounts (required unless {@code address} and {@code
-     *         amount} are provided)
-     *     </li>
-     *     <li><b>subtractFeeFrom</b> - List of destination indices from which to subtract the transaction fee (optional)</li>
-     *     <li><b>paymentId</b> - Payment ID for the transaction (optional)</li>
-     *     <li><b>unlockTime</b> - Minimum height or timestamp for the transaction to unlock (default: 0)</li>
-     * </ul>
-     * @param config Configuration for the transaction to create
-     * @return The created transaction
-     */
-    Task<MoneroTxWallet> CreateTx(MoneroTxConfig config);
-
-    /**
-     * Create one or more transactions to transfer funds from this wallet.
-     * <p>
-     *     <b>All supported configuration options:</b>
-     * </p>
-     * <ul>
-     *     <li><b>address</b> – single destination address (required unless <code>destinations</code> is provided)</li>
-     *     <li>
-     *         <b>amount</b> – amount to send to the single destination (required unless <code>destinations</code> is
-     *         provided)
-     *     </li>
-     *     <li><b>accountIndex</b> – source account index to transfer funds from (required)</li>
-     *     <li><b>subaddressIndex</b> – source subaddress index (optional)</li>
-     *     <li><b>subaddressIndices</b> – list of source subaddress indices (optional)</li>
-     *     <li><b>relay</b> – whether to relay the transactions to peers and commit to the blockchain (default: false)</li>
-     *     <li><b>priority</b> – transaction priority (default: <code>MoneroTxPriority.NORMAL</code>)</li>
-     *     <li>
-     *         <b>destinations</b> – list of destination addresses and amounts (required unless <code>address</code> and
-     *         <code>amount</code> are provided)
-     *     </li>
-     *     <li><b>paymentId</b> – transaction payment ID (optional)</li>
-     *     <li><b>unlockTime</b> – minimum block height or timestamp for the transaction to unlock (default: 0)</li>
-     *     <li><b>canSplit</b> – allow the wallet to split funds into multiple transactions if needed (default: true)</li>
-     * </ul>
-     * @param config configures the transactions to create
-     * @return the created transactions
-     */
-    Task<List<MoneroTxWallet>> CreateTxs(MoneroTxConfig config);
-
-    /**
-     * Sweep an output with a given key image.
-     * <p>All supported configuration options:</p>
-     * <ul>
-     *     <li><b>address</b> - single destination address (required)</li>
-     *     <li><b>keyImage</b> - key image to sweep (required)</li>
-     *     <li><b>relay</b> - relay the transaction to peers to commit to the blockchain (default: false)</li>
-     *     <li><b>unlockTime</b> - minimum height or timestamp for the transaction to unlock (default: 0)</li>
-     *     <li><b>priority</b> - transaction priority (default: MoneroTxPriority.NORMAL)</li>
-     * </ul>
-     * @param config configures the sweep transaction
-     * @return the created transaction
-     */
-    Task<MoneroTxWallet> SweepOutput(MoneroTxConfig config);
-
-
-    /**
-     * Sweep all unlocked funds according to the given config.
-     * <p>
-     *     Supported configuration options:
-     *     <ul>
-     *         <li><b>address</b> – single destination address (required)</li>
-     *         <li><b>accountIndex</b> – source account index to sweep from (optional, defaults to all accounts)</li>
-     *         <li><b>subaddressIndex</b> – source subaddress index to sweep from (optional, defaults to all subaddresses)</li>
-     *         <li><b>subaddressIndices</b> – source subaddress indices to sweep from (optional)</li>
-     *         <li><b>relay</b> – relay the transactions to peers to commit to the blockchain (default: false)</li>
-     *         <li><b>priority</b> – transaction priority (default: MoneroTxPriority.NORMAL)</li>
-     *         <li><b>unlockTime</b> – minimum height or timestamp for the transactions to unlock (default: 0)</li>
-     *         <li><b>sweepEachSubaddress</b> – sweep each subaddress individually if true (default: false)</li>
-     *     </ul>
-     * </p>
-     * @param config the sweep configuration
-     * @return the created transactions
-     */
-    Task<List<MoneroTxWallet>> SweepUnlocked(MoneroTxConfig config);
-
-    /**
-     * Sweep all unmixable dust outputs back to the wallet to make them easier to spend and mix.
-     *
-     * NOTE: Dust only exists pre RCT, so this method will throw "no dust to sweep" on new wallets.
-     *
-     * @param relay specifies if the resulting transaction should be relayed (defaults to false i.e. not relayed)
-     * @return the created transactions
-     */
-    Task<List<MoneroTxWallet>> SweepDust(bool relay);
-
-    /**
      * Relay a previously Created transaction.
      *
      * @param txMetadata is transaction metadata previously Created without relaying
      * @return the hash of the relayed tx
      */
     Task<string> RelayTx(string txMetadata);
-
-    /**
-     * Describe an tx set containing unsigned or multisig tx hex to a new tx set containing structured transactions.
-     *
-     * @param txSet is a tx set containing unsigned or multisig tx hex
-     * @return the tx set containing structured transactions
-     */
-    Task<MoneroTxSet> DescribeTxSet(MoneroTxSet txSet);
-
-    /**
-     * Sign unsigned transactions from a view-only wallet.
-     *
-     * @param unsignedTxHex is unsigned transaction hex from when the transactions were Created
-     * @return the signed transaction set
-     */
-    Task<MoneroTxSet> SignTxs(string unsignedTxHex);
 
     /**
      * Submit signed transactions from a view-only wallet.

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Common;
 
 public class MoneroKeyImage
@@ -9,8 +11,12 @@ public class MoneroKeyImage
         TxPool
     }
 
-    private string? _hex;
-    private readonly string? _signature;
+    [JsonPropertyName("key_image")]
+    [JsonInclude]
+    private string? _hex { get; set; }
+    [JsonPropertyName("signature")]
+    [JsonInclude]
+    private string? _signature { get; set; }
 
     public MoneroKeyImage()
     {

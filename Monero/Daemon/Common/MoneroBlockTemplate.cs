@@ -1,17 +1,39 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
 public class MoneroBlockTemplate
 {
-    private string? _blockHashingBlob;
-    private string? _blockTemplateBlob;
-    private ulong? _difficulty;
-    private ulong? _expectedReward;
-    private ulong? _height;
-    private string? _nextSeedHash;
-    private string? _prevHash;
-    private ulong? _reservedOffset;
-    private string? _seedHash;
-    private ulong? _seedHeight;
+    [JsonPropertyName("blockhashing_blob")]
+    [JsonInclude]
+    private string? _blockHashingBlob { get; set; }
+    [JsonPropertyName("blocktemplate_blob")]
+    [JsonInclude]
+    private string? _blockTemplateBlob { get; set; }
+    [JsonPropertyName("difficulty")]
+    [JsonInclude]
+    private ulong? _difficulty { get; set; }
+    [JsonPropertyName("expected_reward")]
+    [JsonInclude]
+    private ulong? _expectedReward { get; set; }
+    [JsonPropertyName("height")]
+    [JsonInclude]
+    private ulong? _height { get; set; }
+    [JsonPropertyName("next_seed_hash")]
+    [JsonInclude]
+    private string? _nextSeedHash { get; set; }
+    [JsonPropertyName("prev_hash")]
+    [JsonInclude]
+    private string? _prevHash { get; set; }
+    [JsonPropertyName("reserved_offset")]
+    [JsonInclude]
+    private ulong? _reservedOffset { get; set; }
+    [JsonPropertyName("seed_hash")]
+    [JsonInclude]
+    private string? _seedHash { get; set; }
+    [JsonPropertyName("seed_height")]
+    [JsonInclude]
+    private ulong? _seedHeight { get; set; }
 
     public string? GetBlockTemplateBlob()
     {

@@ -1,42 +1,108 @@
+using System.Text.Json.Serialization;
+
 using Monero.Common;
 
 namespace Monero.Daemon.Common;
 
-public class MoneroDaemonInfo
+public class MoneroDaemonInfo : MoneroRpcResponse
 {
-    private ulong? _adjustedTimestamp;
-    private ulong? _blockSizeLimit;
-    private ulong? _blockSizeMedian;
-    private ulong? _blockWeightLimit;
-    private ulong? _blockWeightMedian;
-    private string? _bootstrapDaemonAddress;
-    private ulong? _credits;
-    private ulong? _cumulativeDifficulty;
-    private ulong? _databaseSize;
-    private ulong? _difficulty;
-    private ulong? _freeSpace;
-    private ulong? _height;
-    private ulong? _heightWithoutBootstrap;
-    private bool? _isBusySyncing;
-    private bool? _isOffline;
-    private bool? _isRestricted;
-    private bool? _isSynchronized;
+    [JsonPropertyName("adjusted_time")]
+    [JsonInclude]
+    private ulong? _adjustedTimestamp { get; set; }
+    [JsonPropertyName("block_size_limit")]
+    [JsonInclude]
+    private ulong? _blockSizeLimit { get; set; }
+    [JsonPropertyName("block_size_median")]
+    [JsonInclude]
+    private ulong? _blockSizeMedian { get; set; }
+    [JsonPropertyName("block_weight_limit")]
+    [JsonInclude]
+    private ulong? _blockWeightLimit { get; set; }
+    [JsonPropertyName("block_weight_median")]
+    [JsonInclude]
+    private ulong? _blockWeightMedian { get; set; }
+    [JsonPropertyName("bootstrap_daemon_address")]
+    [JsonInclude]
+    private string? _bootstrapDaemonAddress { get; set; }
+    [JsonPropertyName("credits")]
+    [JsonInclude]
+    private ulong? _credits { get; set; }
+    [JsonPropertyName("cumulative_difficulty")]
+    [JsonInclude]
+    private ulong? _cumulativeDifficulty { get; set; }
+    [JsonPropertyName("database_size")]
+    [JsonInclude]
+    private ulong? _databaseSize { get; set; }
+    [JsonPropertyName("difficulty")]
+    [JsonInclude]
+    private ulong? _difficulty { get; set; }
+    [JsonPropertyName("free_space")]
+    [JsonInclude]
+    private ulong? _freeSpace { get; set; }
+    [JsonPropertyName("height")]
+    [JsonInclude]
+    private ulong? _height { get; set; }
+    [JsonPropertyName("height_without_bootstrap")]
+    [JsonInclude]
+    private ulong? _heightWithoutBootstrap { get; set; }
+    [JsonPropertyName("busy_syncing")]
+    [JsonInclude]
+    private bool? _isBusySyncing { get; set; }
+    [JsonPropertyName("offline")]
+    [JsonInclude]
+    private bool? _isOffline { get; set; }
+    [JsonPropertyName("restricted")]
+    [JsonInclude]
+    private bool? _isRestricted { get; set; }
+    [JsonPropertyName("synchronized")]
+    [JsonInclude]
+    private bool? _isSynchronized { get; set; }
     private MoneroNetworkType? _networkType;
-    private ulong? _numAltBlocks;
-    private uint? _numIncomingConnections;
-    private uint? _numOfflinePeers;
-    private uint? _numOnlinePeers;
-    private uint? _numOutgoingConnections;
-    private uint? _numRpcConnections;
-    private uint? _numTxs;
-    private uint? _numTxsPool;
-    private ulong? _startTimestamp;
-    private ulong? _target;
-    private ulong? _targetHeight;
-    private string? _topBlockHash;
-    private bool? _updateAvailable;
-    private string? _version;
-    private bool? _wasBootstrapEverUsed;
+    [JsonPropertyName("alt_blocks_count")]
+    [JsonInclude]
+    private ulong? _numAltBlocks { get; set; }
+    [JsonPropertyName("incoming_connections_count")]
+    [JsonInclude]
+    private uint? _numIncomingConnections { get; set; }
+    [JsonPropertyName("grey_peerlist_size")]
+    [JsonInclude]
+    private uint? _numOfflinePeers { get; set; }
+    [JsonPropertyName("white_peerlist_size")]
+    [JsonInclude]
+    private uint? _numOnlinePeers { get; set; }
+    [JsonPropertyName("outgoing_connections_count")]
+    [JsonInclude]
+    private uint? _numOutgoingConnections { get; set; }
+    [JsonPropertyName("rpc_connections_count")]
+    [JsonInclude]
+    private uint? _numRpcConnections { get; set; }
+    [JsonPropertyName("tx_count")]
+    [JsonInclude]
+    private uint? _numTxs { get; set; }
+    [JsonPropertyName("tx_pool_size")]
+    [JsonInclude]
+    private uint? _numTxsPool { get; set; }
+    [JsonPropertyName("start_time")]
+    [JsonInclude]
+    private ulong? _startTimestamp { get; set; }
+    [JsonPropertyName("target")]
+    [JsonInclude]
+    private ulong? _target { get; set; }
+    [JsonPropertyName("target_height")]
+    [JsonInclude]
+    private ulong? _targetHeight { get; set; }
+    [JsonPropertyName("top_block_hash")]
+    [JsonInclude]
+    private string? _topBlockHash { get; set; }
+    [JsonPropertyName("update_available")]
+    [JsonInclude]
+    private bool? _updateAvailable { get; set; }
+    [JsonPropertyName("version")]
+    [JsonInclude]
+    private string? _version { get; set; }
+    [JsonPropertyName("was_bootstrap_ever_used")]
+    [JsonInclude]
+    private bool? _wasBootstrapEverUsed { get; set; }
 
     public string? GetVersion()
     {

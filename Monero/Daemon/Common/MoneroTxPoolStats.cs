@@ -1,20 +1,48 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
-public class MoneroTxPoolStats
+public class MoneroTxPoolStats : MoneroRpcResponse
 {
-    private ulong? _bytesMax;
-    private ulong? _bytesMed;
-    private ulong? _bytesMin;
-    private ulong? _bytesTotal;
-    private ulong? _feeTotal;
-    private Dictionary<ulong, int>? _histo;
-    private ulong? _histo98Pc;
-    private int? _num10M;
-    private int? _numDoubleSpends;
-    private int? _numFailing;
-    private int? _numNotRelayed;
-    private int? _numTxs;
-    private ulong? _oldestTimestamp;
+    [JsonPropertyName("bytes_max")]
+    [JsonInclude]
+    private ulong? _bytesMax { get; set; }
+    [JsonPropertyName("bytes_med")]
+    [JsonInclude]
+    private ulong? _bytesMed { get; set; }
+    [JsonPropertyName("bytes_min")]
+    [JsonInclude]
+    private ulong? _bytesMin { get; set; }
+    [JsonPropertyName("bytes_total")]
+    [JsonInclude]
+    private ulong? _bytesTotal { get; set; }
+    [JsonPropertyName("fee_total")]
+    [JsonInclude]
+    private ulong? _feeTotal { get; set; }
+    [JsonPropertyName("histo")]
+    [JsonInclude]
+    private Dictionary<ulong, int>? _histo { get; set; }
+    [JsonPropertyName("histo_98pc")]
+    [JsonInclude]
+    private ulong? _histo98Pc { get; set; }
+    [JsonPropertyName("num_10m")]
+    [JsonInclude]
+    private int? _num10M { get; set; }
+    [JsonPropertyName("num_double_spends")]
+    [JsonInclude]
+    private int? _numDoubleSpends { get; set; }
+    [JsonPropertyName("num_failing")]
+    [JsonInclude]
+    private int? _numFailing { get; set; }
+    [JsonPropertyName("num_not_relayed")]
+    [JsonInclude]
+    private int? _numNotRelayed { get; set; }
+    [JsonPropertyName("txs_total")]
+    [JsonInclude]
+    private int? _numTxs { get; set; }
+    [JsonPropertyName("oldest")]
+    [JsonInclude]
+    private ulong? _oldestTimestamp { get; set; }
 
     public int? GetNumTxs()
     {

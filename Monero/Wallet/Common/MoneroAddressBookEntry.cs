@@ -1,10 +1,16 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Wallet.Common;
 
 public class MoneroAddressBookEntry
 {
+    [JsonPropertyName("address")]
     private string? _address;
+    [JsonPropertyName("description")]
     private string? _description;
+    [JsonPropertyName("index")]
     private uint? _index;
+    [JsonPropertyName("payment_id")]
     private string? _paymentId;
 
     public MoneroAddressBookEntry()

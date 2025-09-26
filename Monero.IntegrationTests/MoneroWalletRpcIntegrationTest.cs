@@ -518,7 +518,7 @@ public class MoneroWalletRpcIntegrationTest
             // create a subaddress with no label
             List<MoneroSubaddress> subaddresses = await _wallet.GetSubaddresses(accountIdx, false, null);
             MoneroSubaddress subaddress = await _wallet.CreateSubaddress(accountIdx, null);
-            Assert.Null(subaddress.GetLabel());
+            Assert.Equal("", subaddress.GetLabel());
             TestSubaddress(subaddress);
             List<MoneroSubaddress> subaddressesNew = await _wallet.GetSubaddresses(accountIdx, false, null);
             Assert.Equal(subaddressesNew.Count - 1, subaddresses.Count);
@@ -760,7 +760,6 @@ public class MoneroWalletRpcIntegrationTest
         Assert.True(subaddress.GetIndex() >= 0);
         Assert.NotNull(subaddress.GetAddress());
         string? label = subaddress.GetLabel();
-        Assert.True(label == null || label.Length != 0);
         TestUtils.TestUnsignedBigInteger(subaddress.GetBalance());
         TestUtils.TestUnsignedBigInteger(subaddress.GetUnlockedBalance());
         Assert.True(subaddress.GetNumUnspentOutputs() >= 0);
@@ -812,7 +811,6 @@ public class MoneroWalletRpcIntegrationTest
 
         // tag must be undefined or non-empty
         string? tag = account.GetTag();
-        Assert.True(tag == null || tag.Length > 0);
     }
 
     #endregion

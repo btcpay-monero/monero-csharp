@@ -1,4 +1,5 @@
 using Monero.Common;
+using Monero.Daemon.Common;
 using Monero.IntegrationTests.Utils;
 
 using Xunit;
@@ -65,7 +66,7 @@ public class MoneroRpcConnectionIntegrationTest
 
         // Test monerod JSON request
 
-        MoneroJsonRpcResponse<Dictionary<string, object?>> jsonResponse = await connection.SendJsonRequest("get_info");
+        MoneroJsonRpcResponse<MoneroDaemonInfo> jsonResponse = await connection.SendJsonRequest<MoneroDaemonInfo>("get_info");
 
         Assert.NotNull(jsonResponse);
         Assert.Null(jsonResponse.Error);
@@ -73,10 +74,10 @@ public class MoneroRpcConnectionIntegrationTest
 
         // Test monerod PATH request
 
-        Dictionary<string, object?> pathResponse = await connection.SendPathRequest("get_info");
+        MoneroDaemonInfo pathResponse = await connection.SendPathRequest<MoneroDaemonInfo>("get_info");
 
         Assert.NotNull(pathResponse);
-        Assert.False(pathResponse.TryGetValue("error", out object? _));
+        Assert.Null(pathResponse.Error);
 
         // TODO implement MoneroRpcConnection.SendBinaryRequest()
     }

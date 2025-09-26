@@ -1,35 +1,88 @@
-using Monero.Common;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Monero.Daemon.Common;
 
 public class MoneroPeer
 {
-    private string? _address;
-    private ulong? _avgDownload;
-    private ulong? _avgUpload;
-    private ulong? _currentDownload;
-    private ulong? _currentUpload;
-    private string? _hash;
-    private ulong? _height;
-    private string? _host;
-    private string? _id;
-    private bool _isIncoming;
-    private bool _isLocalHost;
-    private bool _isLocalIp;
-    private bool _isOnline;
-    private ulong? _lastSeenTimestamp;
-    private ulong? _liveTime;
-    private int? _numReceives;
-    private int? _numSends;
-    private int? _numSupportFlags;
-    private int? _port;
-    private int? _pruningSeed;
-    private ulong? _receiveIdleTime;
-    private ulong? _rpcCreditsPerHash;
-    private int? _rpcPort;
-    private ulong? _sendIdleTime;
-    private string? _state;
-    private MoneroConnectionType? _type;
+    [JsonPropertyName("address")]
+    [JsonInclude]
+    private string? _address { get; set; }
+    [JsonPropertyName("avg_download")]
+    [JsonInclude]
+    private ulong? _avgDownload { get; set; }
+    [JsonPropertyName("avg_upload")]
+    [JsonInclude]
+    private ulong? _avgUpload { get; set; }
+    [JsonPropertyName("current_download")]
+    [JsonInclude]
+    private ulong? _currentDownload { get; set; }
+    [JsonPropertyName("current_upload")]
+    [JsonInclude]
+    private ulong? _currentUpload { get; set; }
+    [JsonPropertyName("connection_id")]
+    [JsonInclude]
+    private string? _hash { get; set; }
+    [JsonPropertyName("height")]
+    [JsonInclude]
+    private ulong? _height { get; set; }
+    [JsonPropertyName("host")]
+    [JsonInclude]
+    private string? _host { get; set; }
+    [JsonPropertyName("id")]
+    [JsonInclude]
+    private string? _id { get; set; }
+    [JsonPropertyName("peer_id")]
+    [JsonInclude]
+    private string? _peerId { get; set; }
+    [JsonPropertyName("incoming")]
+    [JsonInclude]
+    private bool _isIncoming { get; set; }
+    [JsonPropertyName("localhost")]
+    [JsonInclude]
+    private bool _isLocalHost { get; set; }
+    [JsonPropertyName("local_ip")]
+    [JsonInclude]
+    private bool _isLocalIp { get; set; }
+    [JsonPropertyName("online")]
+    [JsonInclude]
+    private bool _isOnline { get; set; }
+    [JsonPropertyName("last_seen")]
+    [JsonInclude]
+    private ulong? _lastSeenTimestamp { get; set; }
+    [JsonPropertyName("live_time")]
+    [JsonInclude]
+    private ulong? _liveTime { get; set; }
+    [JsonPropertyName("recv_count")]
+    [JsonInclude]
+    private int? _numReceives { get; set; }
+    [JsonPropertyName("send_count")]
+    [JsonInclude]
+    private int? _numSends { get; set; }
+    [JsonPropertyName("support_flags")]
+    [JsonInclude]
+    private int? _numSupportFlags { get; set; }
+    [JsonPropertyName("port")]
+    [JsonInclude]
+    private object? _port { get; set; }
+    [JsonPropertyName("pruning_seed")]
+    [JsonInclude]
+    private int? _pruningSeed { get; set; }
+    [JsonPropertyName("recv_idle_time")]
+    [JsonInclude]
+    private ulong? _receiveIdleTime { get; set; }
+    [JsonPropertyName("rpc_credits_per_hash")]
+    [JsonInclude]
+    private ulong? _rpcCreditsPerHash { get; set; }
+    [JsonPropertyName("rpc_port")]
+    [JsonInclude]
+    private int? _rpcPort { get; set; }
+    [JsonPropertyName("send_idle_time")]
+    [JsonInclude]
+    private ulong? _sendIdleTime { get; set; }
+    [JsonPropertyName("state")]
+    [JsonInclude]
+    private string? _state { get; set; }
 
     public string? GetId()
     {
@@ -40,6 +93,17 @@ public class MoneroPeer
     {
         _id = id;
         return this;
+    }
+
+    public MoneroPeer SetPeerId(string? id)
+    {
+        _peerId = id;
+        return this;
+    }
+
+    public string? GetPeerId()
+    {
+        return _peerId;
     }
 
     public string? GetAddress()
@@ -66,7 +130,15 @@ public class MoneroPeer
 
     public int? GetPort()
     {
-        return _port;
+        if (_port is string p)
+        {
+            return Convert.ToInt32(_port);
+        }
+        if (_port is JsonElement r)
+        {
+            return Convert.ToInt32(_port.ToString());
+        }
+        return (int?)_port;
     }
 
     public MoneroPeer SetPort(int? port)
@@ -290,13 +362,4 @@ public class MoneroPeer
         _numSupportFlags = numSupportFlags;
     }
 
-    public MoneroConnectionType? GetConnectionType()
-    {
-        return _type;
-    }
-
-    public void SetConnectionType(MoneroConnectionType? type)
-    {
-        _type = type;
-    }
 }

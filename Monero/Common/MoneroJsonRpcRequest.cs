@@ -1,14 +1,19 @@
-using Newtonsoft.Json;
+
+using System.Text.Json.Serialization;
+
+using Monero.Daemon.Common;
 
 namespace Monero.Common;
 
 public class MoneroJsonRpcRequest
 {
-    [JsonProperty("method", Order = 1)] public readonly string Method;
-    [JsonProperty("jsonrpc", Order = 0)] public readonly string Version = "2.0";
+    [JsonPropertyName("method")]
+    public string Method { get; set; }
+    [JsonPropertyName("jsonrpc")]
+    public string Version { get; set; } = "2.0";
 
-    [JsonProperty("params", Order = 2, NullValueHandling = NullValueHandling.Ignore)]
-    public object? Params;
+    [JsonPropertyName("params")]
+    public object? Params { get; set; }
 
     public MoneroJsonRpcRequest(string method)
     {
@@ -24,7 +29,9 @@ public class MoneroJsonRpcRequest
 
 public class MoneroJsonRpcResponse<T>
 {
-    [JsonProperty("error")] public Dictionary<string, object>? Error;
+    [JsonPropertyName("error")]
+    public MoneroRpcResponseError? Error { get; set; }
 
-    [JsonProperty("result")] public T? Result;
+    [JsonPropertyName("result")]
+    public T? Result { get; set; }
 }

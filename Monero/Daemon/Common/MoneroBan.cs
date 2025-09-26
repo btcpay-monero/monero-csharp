@@ -1,11 +1,21 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
 public class MoneroBan
 {
-    private string? _host; // e.g. 192.168.1.100
-    private uint? _ip; // integer formatted IP
-    private bool? _isBanned;
-    private ulong? _seconds;
+    [JsonPropertyName("host")]
+    [JsonInclude]
+    private string? _host { get; set; }
+    [JsonPropertyName("ip")]
+    [JsonInclude]
+    private uint? _ip { get; set; } // integer formatted IP
+    [JsonPropertyName("ban")]
+    [JsonInclude]
+    private bool? _isBanned { get; set; }
+    [JsonPropertyName("seconds")]
+    [JsonInclude]
+    private ulong? _seconds { get; set; }
 
     public string? GetHost()
     {

@@ -1,10 +1,14 @@
+using System.Text.Json.Serialization;
+
 using Monero.Common;
 
 namespace Monero.Wallet.Common;
 
 public class MoneroCheckReserve : MoneroCheck
 {
+    [JsonPropertyName("total")]
     private ulong? _totalAmount;
+    [JsonPropertyName("spent")]
     private ulong? _unconfirmedSpentAmount;
 
     public MoneroCheckReserve()

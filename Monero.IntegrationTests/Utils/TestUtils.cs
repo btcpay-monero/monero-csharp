@@ -49,8 +49,6 @@ internal abstract class TestUtils
 
     public static readonly int SYNC_PERIOD_IN_MS = 5000; // period between wallet syncs in milliseconds
 
-    public static readonly WalletTxTracker WALLET_TX_TRACKER = new();
-
     public static MoneroDaemonRpc GetDaemonRpc()
     {
         if (daemonRpc == null)

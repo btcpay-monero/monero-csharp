@@ -1,8 +1,12 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Wallet.Common;
 
 public class MoneroDestination
 {
+    [JsonPropertyName("address")]
     private string? _address;
+    [JsonPropertyName("amount")]
     private ulong? _amount;
 
     public MoneroDestination()

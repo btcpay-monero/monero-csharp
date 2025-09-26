@@ -1,11 +1,21 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
 public class MoneroOutputHistogramEntry
 {
-    private ulong? _amount;
-    private ulong? _numInstances;
-    private ulong? _numRecentInstances;
-    private ulong? _numUnlockedInstances;
+    [JsonPropertyName("amount")]
+    [JsonInclude]
+    private ulong? _amount { get; set; }
+    [JsonPropertyName("total_instances")]
+    [JsonInclude]
+    private ulong? _numInstances { get; set; }
+    [JsonPropertyName("recent_instances")]
+    [JsonInclude]
+    private ulong? _numRecentInstances { get; set; }
+    [JsonPropertyName("unlocked_instances")]
+    [JsonInclude]
+    private ulong? _numUnlockedInstances { get; set; }
 
     public ulong? GetAmount()
     {

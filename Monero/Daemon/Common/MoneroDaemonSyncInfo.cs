@@ -1,13 +1,30 @@
+using System.Text.Json.Serialization;
+
+using Monero.Daemon.Rpc;
+
 namespace Monero.Daemon.Common;
 
 public class MoneroDaemonSyncInfo : MoneroRpcPaymentInfo
 {
-    private ulong? _height;
-    private uint? _nextNeededPruningSeed;
-    private string? _overview;
-    private List<MoneroPeer>? _peers;
-    private List<MoneroConnectionSpan>? _spans;
-    private ulong? _targetHeight;
+    [JsonPropertyName("height")]
+    [JsonInclude]
+    private ulong? _height { get; set; }
+    [JsonPropertyName("next_needed_pruning_seed")]
+    [JsonInclude]
+    private uint? _nextNeededPruningSeed { get; set; }
+
+    [JsonPropertyName("overview")]
+    [JsonInclude]
+    private string? _overview { get; set; } = "";
+    [JsonPropertyName("peers")]
+    [JsonInclude]
+    private List<MoneroPeerInfo>? _peers { get; set; }
+    [JsonPropertyName("spans")]
+    [JsonInclude]
+    private List<MoneroConnectionSpan>? _spans { get; set; }
+    [JsonPropertyName("target_height")]
+    [JsonInclude]
+    private ulong? _targetHeight { get; set; }
 
     public ulong? GetHeight()
     {
@@ -19,12 +36,12 @@ public class MoneroDaemonSyncInfo : MoneroRpcPaymentInfo
         _height = height;
     }
 
-    public List<MoneroPeer>? GetPeers()
+    public List<MoneroPeerInfo>? GetPeers()
     {
         return _peers;
     }
 
-    public void SetPeers(List<MoneroPeer>? peers)
+    public void SetPeers(List<MoneroPeerInfo>? peers)
     {
         _peers = peers;
     }

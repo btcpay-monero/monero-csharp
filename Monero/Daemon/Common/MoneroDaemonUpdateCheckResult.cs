@@ -1,12 +1,24 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
-public class MoneroDaemonUpdateCheckResult
+public class MoneroDaemonUpdateCheckResult : MoneroRpcResponse
 {
-    private string? _autoUri;
-    private string? _hash;
-    private bool? _isUpdateAvailable;
-    private string? _userUri;
-    private string? _version;
+    [JsonPropertyName("auto_uri")]
+    [JsonInclude]
+    private string? _autoUri { get; set; }
+    [JsonPropertyName("hash")]
+    [JsonInclude]
+    private string? _hash { get; set; }
+    [JsonPropertyName("update")]
+    [JsonInclude]
+    private bool? _isUpdateAvailable { get; set; }
+    [JsonPropertyName("user_uri")]
+    [JsonInclude]
+    private string? _userUri { get; set; }
+    [JsonInclude]
+    [JsonPropertyName("version")]
+    private string? _version { get; set; }
 
     public MoneroDaemonUpdateCheckResult()
     {

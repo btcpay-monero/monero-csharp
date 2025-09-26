@@ -1,9 +1,14 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Wallet.Common;
 
 public class MoneroAccountTag
 {
+    [JsonPropertyName("accounts")]
     private List<uint>? _accountIndices;
+    [JsonPropertyName("label")]
     private string? _label;
+    [JsonPropertyName("tag")]
     private string? _tag;
 
     public MoneroAccountTag()

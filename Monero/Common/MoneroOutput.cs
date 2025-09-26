@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Common;
 
 public class MoneroOutput
@@ -6,7 +8,9 @@ public class MoneroOutput
     private ulong? _index;
     private MoneroKeyImage? _keyImage;
     private List<ulong>? _ringOutputIndices;
-    private string? _stealthPublicKey;
+    [JsonPropertyName("key")]
+    [JsonInclude]
+    private string? _stealthPublicKey { get; set; }
     private MoneroTx? _tx;
 
     public MoneroOutput()

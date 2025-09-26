@@ -1,9 +1,8 @@
 using Monero.Common;
 using Monero.Daemon;
 using Monero.Daemon.Common;
+using Monero.Daemon.Rpc;
 using Monero.IntegrationTests.Utils;
-using Monero.Wallet;
-using Monero.Wallet.Common;
 
 using Xunit;
 
@@ -12,8 +11,6 @@ namespace Monero.IntegrationTests;
 public class MoneroDaemonRpcIntegrationTest
 {
     private readonly MoneroDaemonRpc _daemon = TestUtils.GetDaemonRpc(); // daemon instance to test
-    private readonly MoneroWalletRpc _wallet = new(""); // wallet instance to test
-    private static readonly TestContext BinaryBlockCtx = new();
 
     public MoneroDaemonRpcIntegrationTest()
     {
@@ -234,100 +231,6 @@ public class MoneroDaemonRpcIntegrationTest
         Assert.True(lastHeader.GetHeight() - 1 == (ulong)block.GetHeight()!);
     }
 
-    // Can get blocks by height which includes transactions (binary)
-    [Fact(Skip = "Binary request not implemented")]
-    public async Task TestGetBlocksByHeightBinary()
-    {
-        // set a number of blocks to test
-        int numBlocks = 100;
-
-        // select random heights  // TODO: this is horribly inefficient way of computing last 100 blocks if not shuffling
-        ulong currentHeight = await _daemon.GetHeight();
-        List<ulong> allHeights = [];
-        for (ulong i = 0; i < currentHeight - 1; i++)
-        {
-            allHeights.Add(i);
-        }
-
-        List<ulong> heights = [];
-        for (int i = allHeights.Count - numBlocks; i < allHeights.Count; i++)
-        {
-            heights.Add(allHeights[i]);
-        }
-
-        // fetch blocks
-        List<MoneroBlock> blocks = await _daemon.GetBlocksByHeight(heights);
-
-        // test blocks
-        bool txFound = false;
-        Assert.True(numBlocks == blocks.Count);
-        for (int i = 0; i < heights.Count; i++)
-        {
-            MoneroBlock block = blocks[i];
-            if (block.GetTxs()!.Count > 0)
-            {
-                txFound = true;
-            }
-
-            TestBlock(block, BinaryBlockCtx);
-            Assert.True(block.GetHeight() == heights[i]);
-        }
-
-        Assert.True(txFound, "No transactions found to test");
-    }
-
-    // Can get blocks by range in a single request
-    [Fact(Skip = "Binary request not implemented")]
-    public async Task TestGetBlocksByRange()
-    {
-        // get height range
-        ulong numBlocks = 100;
-        ulong numBlocksAgo = 190;
-        ulong height = await _daemon.GetHeight();
-        Assert.True(height - numBlocksAgo + numBlocks - 1 < height);
-        ulong startHeight = height - numBlocksAgo;
-        ulong endHeight = height - numBlocksAgo + numBlocks - 1;
-
-        // test known start and end heights
-        await TestGetBlocksRange(startHeight, endHeight, height, false);
-
-        // test unspecified start
-        await TestGetBlocksRange(null, numBlocks - 1, height, false);
-
-        // test unspecified end
-        await TestGetBlocksRange(height - numBlocks - 1, null, height, false);
-    }
-
-    // Can get blocks by range using chunked requests
-    [Fact(Skip = "Binary request not implemented")]
-    public async Task TestGetBlocksByRangeChunked()
-    {
-        // get ulong height range
-        ulong numBlocks = Math.Min(await _daemon.GetHeight() - 2, 1440); // test up to ~2 days of blocks
-        Assert.True(numBlocks > 0);
-        ulong height = await _daemon.GetHeight();
-        Assert.True(height - numBlocks - 1 < height);
-        ulong startHeight = height - numBlocks;
-        ulong endHeight = height - 1;
-
-        // test known start and end heights
-        await TestGetBlocksRange(startHeight, endHeight, height, true);
-
-        // test unspecified start
-        await TestGetBlocksRange(null, numBlocks - 1, height, true);
-
-        // test unspecified end
-        await TestGetBlocksRange(endHeight - numBlocks - 1, null, height, true);
-    }
-
-    // Can get block hashes (binary)
-    [Fact(Skip = "Binary request not implemented")]
-    public Task TestGetBlockIdsBinary()
-    {
-        //get_hashes.bin
-        throw new MoneroError("Not implemented");
-    }
-
     // Can get a transaction by hash with and without pruning
     [Fact]
     public async Task TestGetTxByHash()
@@ -369,86 +272,6 @@ public class MoneroDaemonRpcIntegrationTest
         {
             Assert.Equal("Invalid transaction hash", e.Message);
         }
-    }
-
-    // Can get transactions by hashes with and without pruning
-    [Fact(Skip = "Needs monero-wallet-rpc")]
-    public async Task TestGetTxsByHashes()
-    {
-        // fetch transaction hashes to test
-        List<string> txHashes = await GetConfirmedTxHashes(_daemon);
-        Assert.True(txHashes.Count > 0);
-
-        // context for testing txs
-        TestContext ctx = new() { IsPruned = false, IsConfirmed = true, FromGetTxPool = false };
-
-        // fetch txs by hash without pruning
-        List<MoneroTx> txs = await _daemon.GetTxs(txHashes, false);
-        Assert.True(txHashes.Count == txs.Count);
-        foreach (MoneroTx _tx in txs)
-        {
-            TestTx(_tx, ctx);
-        }
-
-        // fetch txs by hash with pruning
-        txs = await _daemon.GetTxs(txHashes, true);
-        ctx.IsPruned = true;
-        Assert.True(txHashes.Count == txs.Count);
-        foreach (MoneroTx _tx in txs)
-        {
-            TestTx(_tx, ctx);
-        }
-
-        // fetch missing hash
-        MoneroTx tx = await _wallet.CreateTx(new MoneroTxConfig().SetAccountIndex(0)
-            .AddDestination(await _wallet.GetPrimaryAddress(), TestUtils.MaxFee));
-        Assert.NotNull(_daemon.GetTxs([tx.GetHash()!], false));
-        txHashes.Add(tx.GetHash()!);
-        int numTxs = txs.Count;
-        txs = await _daemon.GetTxs(txHashes, false);
-        Assert.True(numTxs == txs.Count);
-
-        // fetch invalid hash
-        txHashes.Add("invalid tx hash");
-        try
-        {
-            await _daemon.GetTxs(txHashes, false);
-            throw new MoneroError("fail");
-        }
-        catch (MoneroError e)
-        {
-            Assert.Equal("Invalid transaction hash", e.Message);
-        }
-    }
-
-    // Can get transactions by hashes that are in the transaction pool
-    [Fact(Skip = "Needs monero-wallet-rpc")]
-    public async Task TestGetTxsByHashesInPool()
-    {
-        await TestUtils.WALLET_TX_TRACKER
-            .WaitForWalletTxsToClearPool(_wallet); // wait for wallet's txs in the pool to clear to ensure reliable sync
-
-        // submit txs to the pool but don't relay
-        List<string> txHashes = await SubmitTxHashesToPool(false);
-
-        // fetch txs by hash
-        MoneroUtils.Log(0, "Fetching txs...");
-        List<MoneroTx> txs = await _daemon.GetTxs(txHashes, false);
-        MoneroUtils.Log(0, "done");
-
-        // context for testing tx
-        TestContext ctx = new() { IsPruned = false, IsConfirmed = false, FromGetTxPool = false };
-
-        // test fetched txs
-        Assert.True(txHashes.Count == txs.Count);
-        foreach (MoneroTx tx in txs)
-        {
-            TestTx(tx, ctx);
-        }
-
-        // clear txs from pool
-        await _daemon.FlushTxPool(txHashes);
-        await _wallet.Sync(null, null);
     }
 
     // Can get a transaction hex by hash with and without pruning
@@ -532,36 +355,6 @@ public class MoneroDaemonRpcIntegrationTest
         TestUtils.TestUnsignedBigInteger(feeEstimate.GetQuantizationMask(), true);
     }
 
-    // Can get all transactions in the transaction pool
-    [Fact(Skip = "Needs monero-wallet-rpc")]
-    public async Task TestGetTxsInPool()
-    {
-        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
-
-        // submit tx to pool but don't relay
-        MoneroTx tx = await GetUnrelayedTx(_wallet, 1);
-        MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
-        TestSubmitTxResultGood(result);
-        Assert.False(result.IsRelayed());
-
-        // fetch txs in pool
-        List<MoneroTx> txs = await _daemon.GetTxPool();
-
-        // context for testing tx
-        TestContext ctx = new() { IsPruned = false, IsConfirmed = false, FromGetTxPool = true };
-
-        // test txs
-        Assert.True(txs.Count > 0, "Test requires an unconfirmed tx in the tx pool");
-        foreach (MoneroTx aTx in txs)
-        {
-            TestTx(aTx, ctx);
-        }
-
-        // flush the tx from the pool, gg
-        await _daemon.FlushTxPool([tx.GetHash()!]);
-        await _wallet.Sync(null, null);
-    }
-
     // Can get hashes of transactions in the transaction pool (binary)
     [Fact(Skip = "Binary request not implemented")]
     public Task TestGetIdsOfTxsInPoolBin()
@@ -576,169 +369,6 @@ public class MoneroDaemonRpcIntegrationTest
     {
         // TODO: get_txpool_backlog
         throw new MoneroError("Not implemented");
-    }
-
-    // Can get transaction pool statistics
-    [Fact(Skip = "Needs monero-wallet-rpc")]
-    public async Task TestGetTxPoolStatistics()
-    {
-        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
-        try
-        {
-            // submit txs to the pool but don't relay
-            await SubmitTxHashesToPool(true, true);
-        }
-        catch (Exception e)
-        {
-            throw new MoneroError(e.Message);
-        }
-    }
-
-    // Can flush all transactions from the pool
-    [Fact(Skip = "Needs monero-wallet-rpc")]
-    public async Task TestFlushTxsFromPool()
-    {
-        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
-
-        // preserve original transactions in the pool
-        List<MoneroTx> txPoolBefore = await _daemon.GetTxPool();
-
-        // submit txs to the pool but don't relay
-
-        await SubmitTxsToPool();
-
-        Assert.True(txPoolBefore.Count + 2 == (await _daemon.GetTxPool()).Count);
-
-        // flush tx pool
-        await _daemon.FlushTxPool([]);
-        Assert.Empty(await _daemon.GetTxPool());
-
-        // re-submit original transactions
-        foreach (MoneroTx tx in txPoolBefore)
-        {
-            MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, tx.IsRelayed() == true);
-            TestSubmitTxResultGood(result);
-        }
-
-        // the pool is back to original state
-        Assert.True(txPoolBefore.Count == (await _daemon.GetTxPool()).Count);
-
-        // sync wallet for next test
-        await _wallet.Sync(null, null);
-    }
-
-    // Can flush a transaction from the pool by hash
-    [Fact(Skip = "Needs monero-wallet-rpc")]
-    public async Task TestFlushTxFromPoolByHash()
-    {
-        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
-
-        // preserve original transactions in the pool
-        List<MoneroTx> txPoolBefore = await _daemon.GetTxPool();
-
-        // submit txs to the pool but don't relay
-        List<MoneroTx> txs = await SubmitTxsToPool();
-
-        // remove each tx from the pool by hash and test
-        for (int i = 0; i < txs.Count; i++)
-        {
-            // flush tx from a pool
-            await _daemon.FlushTxPool([txs[i].GetHash()!]);
-
-            // test tx pool
-            List<MoneroTx> poolTxs = await _daemon.GetTxPool();
-            Assert.True(txs.Count - i - 1 == poolTxs.Count);
-        }
-
-        // the pool is back to original state
-        Assert.True(txPoolBefore.Count == (await _daemon.GetTxPool()).Count);
-
-        // sync wallet for next test
-        await _wallet.Sync(null, null);
-    }
-
-    // Can flush transactions from the pool by hashes
-    [Fact(Skip = "Needs monero wallet rpc")]
-    public async Task TestFlushTxsFromPoolByHashes()
-    {
-        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
-
-        // preserve original transactions in the pool
-        List<MoneroTx> txPoolBefore = await _daemon.GetTxPool();
-
-        // submit txs to the pool but don't relay
-        List<string> txHashes = await SubmitTxHashesToPool();
-
-        Assert.True(txPoolBefore.Count + txHashes.Count == (await _daemon.GetTxPool()).Count);
-
-        // remove all txs by hashes
-        await _daemon.FlushTxPool(txHashes);
-
-        // the pool is back to original state
-        Assert.True(txPoolBefore.Count == (await _daemon.GetTxPool()).Count);
-        await _wallet.Sync(null, null);
-    }
-
-    // Can get the spent status of key images
-    [Fact(Skip = "Needs monero-wallet-rpc")]
-    public async Task TestGetSpentStatusOfKeyImages()
-    {
-        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
-
-        // submit txs to the pool to collect key images then flush them
-        List<MoneroTx> txs = [];
-        for (uint i = 1; i < 3; i++)
-        {
-            MoneroTx tx = await GetUnrelayedTx(_wallet, i);
-            await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
-            txs.Add(tx);
-        }
-
-        List<string> keyImages = [];
-        List<string> txHashes = [];
-        foreach (MoneroTx tx in txs)
-        {
-            txHashes.Add(tx.GetHash()!);
-        }
-
-        foreach (MoneroTx tx in await _daemon.GetTxs(txHashes, false))
-        {
-            foreach (MoneroOutput input in tx.GetInputs()!)
-            {
-                keyImages.Add(input.GetKeyImage()!.GetHex()!);
-            }
-        }
-
-        await _daemon.FlushTxPool(txHashes);
-
-        // key images are not spent
-        await TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.NotSpent);
-
-        // submit txs to the pool but don't relay
-        foreach (MoneroTx tx in txs)
-        {
-            await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
-        }
-
-        // key images are in the tx pool
-        await TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.TxPool);
-
-        // collect key images of confirmed txs
-        keyImages = [];
-        txs = await GetConfirmedTxs(_daemon, 10);
-        foreach (MoneroTx tx in txs)
-        {
-            foreach (MoneroOutput input in tx.GetInputs()!)
-            {
-                keyImages.Add(input.GetKeyImage()!.GetHex()!);
-            }
-        }
-
-        // key images are all spent
-        await TestSpentStatuses(keyImages, MoneroKeyImage.SpentStatus.Confirmed);
-
-        // flush this test's txs from pool
-        await _daemon.FlushTxPool(txHashes);
     }
 
     // Can get output indices given a list of transaction hashes (binary)
@@ -1161,94 +791,6 @@ public class MoneroDaemonRpcIntegrationTest
 
     #endregion
 
-    #region Relay Tests
-
-    // Can submit a tx in hex format to the pool and relay in one call
-    [Fact(Skip = "Needs monero-wallet-rpc")]
-    public async Task TestSubmitAndRelayTxHex()
-    {
-        // wait one time for wallet txs in the pool to clear
-        // TODO monero-project: update from pool does not prevent creating double spend tx
-        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
-
-        // create 2 txs, the second will doubly spend outputs of the first
-        MoneroTx
-            tx1 = await GetUnrelayedTx(_wallet,
-                2); // TODO: this test requires tx to be from/to different accounts else the occlusion issue (#4500) causes the tx to not be recognized by the wallet at all
-        MoneroTx tx2 = await GetUnrelayedTx(_wallet, 2);
-
-        // submit and relay tx1
-        MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx1.GetFullHex()!, false);
-        Assert.True(result.IsRelayed());
-        TestSubmitTxResultGood(result);
-
-        // tx1 is in the pool
-        List<MoneroTx> txs = await _daemon.GetTxPool();
-        bool found = false;
-        foreach (MoneroTx aTx in txs)
-        {
-            if (aTx.GetHash()!.Equals(tx1.GetHash()))
-            {
-                Assert.True(aTx.IsRelayed());
-                found = true;
-                break;
-            }
-        }
-
-        Assert.True(found, "Tx1 was not found after being submitted to the daemon's tx pool");
-
-        // the wallet recognizes tx1
-        await _wallet.Sync(null, null);
-        MoneroTxQuery query = new();
-        query.SetHashes([tx1.GetHash()!]);
-        await _wallet.GetTxs(query);
-
-        // submit and relay tx2 hex which doubly spends tx1
-        result = await _daemon.SubmitTxHex(tx2.GetFullHex()!, false);
-        Assert.True(result.IsRelayed());
-        TestSubmitTxResultDoubleSpend(result);
-
-        // tx2 is in not the pool
-        txs = await _daemon.GetTxPool();
-        found = false;
-        foreach (MoneroTx aTx in txs)
-        {
-            if (aTx.GetHash()!.Equals(tx2.GetHash()))
-            {
-                found = true;
-                break;
-            }
-        }
-
-        Assert.True(!found, "Tx2 should not be in the pool because it double spends tx1 which is in the pool");
-
-        // all wallets will need to wait for tx to confirm to properly sync
-        TestUtils.WALLET_TX_TRACKER.Reset();
-    }
-
-    // Can submit a tx in hex format to the pool then relay
-    [Fact(Skip = "Needs monero-wallet-rpc")]
-    public async Task TestSubmitThenRelayTxHex()
-    {
-        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
-        MoneroTx tx = await GetUnrelayedTx(_wallet, 1);
-        await TestSubmitThenRelay([tx]);
-    }
-
-    // Can submit txs in hex format to the pool then relay
-    [Fact(Skip = "Needs monero-wallet-rpc")]
-    public async Task TestSubmitThenRelayTxHexes()
-    {
-        await TestUtils.WALLET_TX_TRACKER.WaitForWalletTxsToClearPool(_wallet);
-        List<MoneroTx> txs = [];
-        txs.Add(await GetUnrelayedTx(_wallet, 1));
-        txs.Add(await GetUnrelayedTx(_wallet,
-            2)); // TODO: accounts cannot be re-used across send tests else isRelayed is true; wallet needs to update?
-        await TestSubmitThenRelay(txs);
-    }
-
-    #endregion
-
     #region Test Helpers
 
     private static void MineBlocks()
@@ -1294,7 +836,7 @@ public class MoneroDaemonRpcIntegrationTest
             Assert.True(header.GetNonce() > 0);
         }
 
-        Assert.Null(header.GetPowHash()); // never seen defined
+        Assert.NotNull(header.GetPowHash()); // never seen defined
         if (isFull)
         {
             Assert.True(header.GetSize() > 0);
@@ -1324,25 +866,7 @@ public class MoneroDaemonRpcIntegrationTest
         }
     }
 
-    private async Task TestGetBlocksRange(ulong? startHeight, ulong? endHeight, ulong chainHeight, bool chunked)
-    {
-        // fetch blocks by range
-        ulong realStartHeight = startHeight ?? 0;
-        ulong realEndHeight = endHeight ?? chainHeight - 1;
-        List<MoneroBlock> blocks = chunked
-            ? await _daemon.GetBlocksByRangeChunked((ulong)startHeight!, (ulong)endHeight!, 5)
-            : await _daemon.GetBlocksByRange((ulong)startHeight!, (ulong)endHeight!);
-        Assert.True(realEndHeight - realStartHeight + 1 == (ulong)blocks.Count);
-
-        // test each block
-        for (int i = 0; i < blocks.Count; i++)
-        {
-            Assert.True(realStartHeight + (ulong)i == (ulong)blocks[i].GetHeight()!);
-            TestBlock(blocks[i], BinaryBlockCtx);
-        }
-    }
-
-    private static async Task<List<string>> GetConfirmedTxHashes(MoneroDaemonRpc daemon)
+    private static async Task<List<string>> GetConfirmedTxHashes(IMoneroDaemon daemon)
     {
         const int numTxs = 5;
         List<string> txHashes = [];
@@ -1354,19 +878,6 @@ public class MoneroDaemonRpcIntegrationTest
         }
 
         return txHashes;
-    }
-
-    private static async Task<MoneroTx> GetUnrelayedTx(MoneroWalletRpc wallet, uint accountIdx)
-    {
-        Assert.True(accountIdx > 0,
-            "Txs sent from/to same account are not properly synced from the pool"); // TODO monero-project
-        MoneroTxConfig config = new MoneroTxConfig().SetAccountIndex(accountIdx)
-            .SetAddress(await wallet.GetPrimaryAddress())
-            .SetAmount(TestUtils.MaxFee);
-        MoneroTx tx = await wallet.CreateTx(config);
-        Assert.True(tx.GetFullHex()!.Length > 0);
-        Assert.False(tx.GetRelay());
-        return tx;
     }
 
     private static void TestBlockTemplate(MoneroBlockTemplate template)
@@ -1391,7 +902,6 @@ public class MoneroDaemonRpcIntegrationTest
     {
         // test required fields
         Assert.NotNull(block);
-        TestMinerTx(block.GetMinerTx()); // TODO: miner tx doesn't have as much stuff, can't call TestTx?
         TestBlockHeader(block, ctx.HeaderIsFull == true);
 
         if (ctx.HasHex == true)
@@ -1787,106 +1297,6 @@ public class MoneroDaemonRpcIntegrationTest
         TestUtils.TestUnsignedBigInteger(txSum.GetFeeSum(), true);
     }
 
-    private static void TestTxPoolStats(MoneroTxPoolStats? stats)
-    {
-        Assert.NotNull(stats);
-        Assert.True(stats.GetNumTxs() >= 0);
-        if (stats.GetNumTxs() > 0)
-        {
-            if (stats.GetNumTxs() == 1)
-            {
-                Assert.Null(stats.GetHisto());
-            }
-            else
-            {
-                Dictionary<ulong, int>? histo = stats.GetHisto();
-                Assert.NotNull(histo);
-                Assert.True(histo.Count > 0);
-                foreach (KeyValuePair<ulong, int> kv in histo)
-                {
-                    Assert.True(kv.Value >= 0);
-                }
-            }
-
-            Assert.True(stats.GetBytesMax() > 0);
-            Assert.True(stats.GetBytesMed() > 0);
-            Assert.True(stats.GetBytesMin() > 0);
-            Assert.True(stats.GetBytesTotal() > 0);
-            Assert.True(stats.GetHisto98Pc() == null || stats.GetHisto98Pc() > 0);
-            Assert.True(stats.GetOldestTimestamp() > 0);
-            Assert.True(stats.GetNum10M() >= 0);
-            Assert.True(stats.GetNumDoubleSpends() >= 0);
-            Assert.True(stats.GetNumFailing() >= 0);
-            Assert.True(stats.GetNumNotRelayed() >= 0);
-        }
-        else
-        {
-            Assert.Null(stats.GetBytesMax());
-            Assert.Null(stats.GetBytesMed());
-            Assert.Null(stats.GetBytesMin());
-            Assert.True(0 == (long)stats.GetBytesTotal()!);
-            Assert.Null(stats.GetHisto98Pc());
-            Assert.Null(stats.GetOldestTimestamp());
-            Assert.True(0 == (int)stats.GetNum10M()!);
-            Assert.True(0 == (int)stats.GetNumDoubleSpends()!);
-            Assert.True(0 == (int)stats.GetNumFailing()!);
-            Assert.True(0 == (int)stats.GetNumNotRelayed()!);
-            Assert.Null(stats.GetHisto());
-        }
-    }
-
-    // helper function to check the spent status of a key image or array of key images
-    private async Task TestSpentStatuses(List<string> keyImages,
-        MoneroKeyImage.SpentStatus expectedStatus)
-    {
-        List<MoneroKeyImage.SpentStatus> keyImageSpentStatuses = await _daemon.GetKeyImageSpentStatuses(keyImages);
-        // test image
-        foreach (MoneroKeyImage.SpentStatus status in keyImageSpentStatuses)
-        {
-            Assert.True(expectedStatus == status);
-        }
-
-        // test array of images
-        List<MoneroKeyImage.SpentStatus> statuses =
-            keyImages.Count == 0 ? [] : await _daemon.GetKeyImageSpentStatuses(keyImages);
-        Assert.True(keyImages.Count == statuses.Count);
-        foreach (MoneroKeyImage.SpentStatus status in statuses)
-        {
-            Assert.True(expectedStatus == status);
-        }
-    }
-
-    private static async Task<List<MoneroTx>> GetConfirmedTxs(MoneroDaemonRpc daemon, int numTxs)
-    {
-        List<MoneroTx> txs = [];
-        const long numBlocksPerReq = 50;
-        for (long startIdx = (long)await daemon.GetHeight() - numBlocksPerReq - 1;
-             startIdx >= 0;
-             startIdx -= numBlocksPerReq)
-        {
-            List<MoneroBlock> blocks = await
-                daemon.GetBlocksByRange((ulong)startIdx, (ulong)(startIdx + numBlocksPerReq));
-            foreach (MoneroBlock block in blocks)
-            {
-                if (block.GetTxs() == null)
-                {
-                    continue;
-                }
-
-                foreach (MoneroTx tx in block.GetTxs()!)
-                {
-                    txs.Add(tx);
-                    if (txs.Count == numTxs)
-                    {
-                        return txs;
-                    }
-                }
-            }
-        }
-
-        throw new MoneroError("Could not get " + numTxs + " confirmed txs");
-    }
-
     private static void TestOutputDistributionEntry(MoneroOutputDistributionEntry entry)
     {
         TestUtils.TestUnsignedBigInteger(entry.GetAmount());
@@ -1901,14 +1311,12 @@ public class MoneroDaemonRpcIntegrationTest
         Assert.True(info.GetNumAltBlocks() >= 0);
         Assert.True(info.GetBlockSizeLimit() > 0);
         Assert.True(info.GetBlockSizeMedian() > 0);
-        Assert.True(info.GetBootstrapDaemonAddress() == null || info.GetBootstrapDaemonAddress()!.Length > 0);
         TestUtils.TestUnsignedBigInteger(info.GetCumulativeDifficulty());
         TestUtils.TestUnsignedBigInteger(info.GetFreeSpace());
         Assert.True(info.GetNumOfflinePeers() >= 0);
         Assert.True(info.GetNumOnlinePeers() >= 0);
         Assert.True(info.GetHeight() >= 0);
         Assert.True(info.GetNumIncomingConnections() >= 0);
-        Assert.NotNull(info.GetNetworkType());
         Assert.NotNull(info.IsOffline());
         Assert.True(info.GetNumOutgoingConnections() >= 0);
         Assert.True(info.GetNumRpcConnections() >= 0);
@@ -1946,9 +1354,9 @@ public class MoneroDaemonRpcIntegrationTest
         if (syncInfo.GetPeers() != null)
         {
             Assert.True(syncInfo.GetPeers()!.Count > 0);
-            foreach (MoneroPeer connection in syncInfo.GetPeers()!)
+            foreach (MoneroPeerInfo connection in syncInfo.GetPeers()!)
             {
-                TestPeer(connection);
+                TestPeer(connection.Info!);
             }
         }
 
@@ -1963,7 +1371,7 @@ public class MoneroDaemonRpcIntegrationTest
         }
 
         Assert.True(syncInfo.GetNextNeededPruningSeed() >= 0);
-        Assert.Null(syncInfo.GetOverview());
+        Assert.NotNull(syncInfo.GetOverview());
         TestUtils.TestUnsignedBigInteger(syncInfo.GetCredits(), false); // 0 credits
         Assert.Null(syncInfo.GetTopBlockHash());
     }
@@ -2028,14 +1436,11 @@ public class MoneroDaemonRpcIntegrationTest
         Assert.True(peer.GetSendIdleTime() >= 0);
         Assert.NotNull(peer.GetState());
         Assert.True(peer.GetNumSupportFlags() >= 0);
-        Assert.NotNull(peer.GetConnectionType());
     }
 
     private static void TestKnownPeer(MoneroPeer peer, bool fromConnection)
     {
         Assert.NotNull(peer);
-        Assert.True(peer.GetId()!.Length > 0);
-        Assert.True(peer.GetHost()!.Length > 0);
         Assert.True(peer.GetPort() > 0);
         Assert.True(peer.GetRpcPort() == null || peer.GetRpcPort() >= 0);
         if (fromConnection)
@@ -2095,131 +1500,12 @@ public class MoneroDaemonRpcIntegrationTest
         }
     }
 
-    private static void TestSubmitTxResultGood(MoneroSubmitTxResult result)
-    {
-        TestSubmitTxResultCommon(result);
-        try
-        {
-            Assert.False(result.IsDoubleSpend(), "tx submission is double spend.");
-            Assert.False(result.HasTooFewOutputs());
-            Assert.False(result.GetSanityCheckFailed());
-            TestUtils.TestUnsignedBigInteger(result.GetCredits(), false); // 0 credits
-            Assert.Null(result.GetTopBlockHash());
-            Assert.False(result.IsTxExtraTooBig());
-            Assert.False(result.IsNonzeroUnlockTime());
-        }
-        catch (Exception)
-        {
-            MoneroUtils.Log(0, "Submit result is not good");
-            throw;
-        }
-    }
-
-    private static void TestSubmitTxResultDoubleSpend(MoneroSubmitTxResult result)
-    {
-        TestSubmitTxResultCommon(result);
-        Assert.True(result.IsDoubleSpend());
-    }
-
-    private static void TestSubmitTxResultCommon(MoneroSubmitTxResult result)
-    {
-        Assert.NotNull(result.IsGood());
-        Assert.NotNull(result.IsRelayed());
-        Assert.NotNull(result.IsDoubleSpend());
-        Assert.NotNull(result.IsFeeTooLow());
-        Assert.NotNull(result.IsMixinTooLow());
-        Assert.NotNull(result.HasInvalidInput());
-        Assert.NotNull(result.HasInvalidOutput());
-        Assert.NotNull(result.IsOverspend());
-        Assert.NotNull(result.IsTooBig());
-        Assert.NotNull(result.GetSanityCheckFailed());
-        Assert.True(result.GetReason() == null || result.GetReason()!.Length > 0);
-    }
-
     private static void TestOutputHistogramEntry(MoneroOutputHistogramEntry entry)
     {
         TestUtils.TestUnsignedBigInteger(entry.GetAmount());
         Assert.True(entry.GetNumInstances() >= 0);
         Assert.True(entry.GetNumUnlockedInstances() >= 0);
         Assert.True(entry.GetNumRecentInstances() >= 0);
-    }
-
-    private async Task TestSubmitThenRelay(List<MoneroTx> txs)
-    {
-        // submit txs hex but don't relay
-        List<string> txHashes = [];
-        foreach (MoneroTx tx in txs)
-        {
-            txHashes.Add(tx.GetHash()!);
-            MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
-            TestSubmitTxResultGood(result);
-            Assert.False(result.IsRelayed());
-
-            // ensure tx is in a pool
-            List<MoneroTx> _poolTxs = await _daemon.GetTxPool();
-            bool found = false;
-            foreach (MoneroTx aTx in _poolTxs)
-            {
-                if (aTx.GetHash()!.Equals(tx.GetHash()))
-                {
-                    Assert.False(aTx.IsRelayed());
-                    found = true;
-                    break;
-                }
-            }
-
-            Assert.True(found, "Tx was not found after being submitted to the daemon's tx pool");
-
-            // fetch tx by hash and ensure not relayed
-            List<MoneroTx> fetchedTxs = await _daemon.GetTxs([tx.GetHash()!], false);
-            foreach (MoneroTx fetchedTx in fetchedTxs)
-            {
-                Assert.False(fetchedTx.IsRelayed());
-            }
-        }
-
-        // relay the txs
-        try
-        {
-            if (txHashes.Count == 1)
-            {
-                await _daemon.RelayTxsByHash([txHashes[0]]);
-            }
-            else
-            {
-                await _daemon.RelayTxsByHash(txHashes);
-            }
-        }
-        catch (Exception)
-        {
-            await _daemon.FlushTxPool(txHashes); // flush txs when relay fails to prevent double spends in other tests
-            throw;
-        }
-
-        // wait for txs to be relayed // TODO (monero-project): all txs should be relayed: https://github.com/monero-project/monero/issues/8523
-        try { Thread.Sleep(1000); }
-        catch (Exception e) { throw new Exception(e.Message); }
-
-        // ensure txs are relayed
-        List<MoneroTx> poolTxs = await _daemon.GetTxPool();
-        foreach (MoneroTx tx in txs)
-        {
-            bool found = false;
-            foreach (MoneroTx aTx in poolTxs)
-            {
-                if (aTx.GetHash()!.Equals(tx.GetHash()))
-                {
-                    Assert.True(aTx.IsRelayed());
-                    found = true;
-                    break;
-                }
-            }
-
-            Assert.True(found, "Tx was not found after being submitted to the daemon's tx pool");
-        }
-
-        // wallets will need to wait for tx to confirm to properly sync
-        TestUtils.WALLET_TX_TRACKER.Reset();
     }
 
     private static void TestTxHexes(List<string> hexes, List<string> hexesPruned, List<string> txHashes)
@@ -2233,75 +1519,6 @@ public class MoneroDaemonRpcIntegrationTest
             Assert.True(hexesPruned.Count > 0);
             Assert.True(hexes[i].Length > hexesPruned[i].Length); // pruned hex is shorter
         }
-    }
-
-    private async Task<List<MoneroTx>> SubmitTxsToPool()
-    {
-        return await SubmitTxsToPool(true);
-    }
-
-    private async Task<List<MoneroTx>> SubmitTxsToPool(bool isRelayed)
-    {
-        return await SubmitTxsToPool(isRelayed, false);
-    }
-
-    private async Task<List<MoneroTx>> SubmitTxsToPool(bool isRelayed, bool testPoolStats)
-    {
-        List<MoneroTx> txs = [];
-
-        for (uint i = 0; i < 3; i++)
-        {
-            MoneroTx tx = await GetUnrelayedTx(_wallet, i);
-            MoneroSubmitTxResult result = await _daemon.SubmitTxHex(tx.GetFullHex()!, true);
-            TestSubmitTxResultGood(result);
-
-            if (!isRelayed)
-            {
-                Assert.False(result.IsRelayed());
-            }
-
-            if (testPoolStats)
-            {
-                // get transaction pool statistics
-                MoneroTxPoolStats stats = await _daemon.GetTxPoolStats();
-                Assert.True(stats.GetNumTxs() > i - 1);
-                TestTxPoolStats(stats);
-            }
-
-            txs.Add(tx);
-        }
-
-        return txs;
-    }
-
-    private async Task<List<string>> SubmitTxHashesToPool()
-    {
-        return await SubmitTxHashesToPool(true);
-    }
-
-    private async Task<List<string>> SubmitTxHashesToPool(bool isRelayed)
-    {
-        return await SubmitTxHashesToPool(isRelayed, false);
-    }
-
-    private async Task<List<string>> SubmitTxHashesToPool(bool isRelayed, bool testPoolStats)
-    {
-        List<MoneroTx> txs = await SubmitTxsToPool(isRelayed, testPoolStats);
-        List<string> hashes = [];
-
-        foreach (MoneroTx tx in txs)
-        {
-            string? hash = tx.GetHash();
-
-            if (hash == null)
-            {
-                throw new MoneroError("Tx hash is null");
-            }
-
-            hashes.Add(hash);
-        }
-
-        return hashes;
     }
 
     #endregion

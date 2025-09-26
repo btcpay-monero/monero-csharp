@@ -1,12 +1,24 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
-public class MoneroMiningStatus
+public class MoneroMiningStatus : MoneroRpcResponse
 {
-    private string? _address;
-    private bool? _isActive;
-    private bool? _isBackground;
-    private uint? _numThreads;
-    private ulong? _speed;
+    [JsonPropertyName("address")]
+    [JsonInclude]
+    private string? _address { get; set; }
+    [JsonPropertyName("active")]
+    [JsonInclude]
+    private bool? _isActive { get; set; }
+    [JsonPropertyName("is_background_mining_enabled")]
+    [JsonInclude]
+    private bool? _isBackground { get; set; }
+    [JsonPropertyName("threads_count")]
+    [JsonInclude]
+    private uint? _numThreads { get; set; }
+    [JsonPropertyName("speed")]
+    [JsonInclude]
+    private ulong? _speed { get; set; }
 
     public bool? IsActive()
     {

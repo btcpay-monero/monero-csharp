@@ -1,12 +1,19 @@
 using System.Net;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
-using Newtonsoft.Json;
+using Monero.Daemon.Common;
+
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Monero.Common;
 
 public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnection>
 {
+    private readonly JsonSerializerOptions defaultSerializationOptions = new()
+    { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private HttpClient? _httpClient;
     private bool? _isAuthenticated;
@@ -80,15 +87,12 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
         }
     }
 
-    private void HandleRpcError(Dictionary<string, object>? error, string method, object? parameters)
+    private void HandleRpcError(MoneroRpcResponseError? error, string method, object? parameters)
     {
         if (error != null)
         {
-            string? message = error.TryGetValue("message", out object? value) ? value.ToString() : "";
-            int code = error.TryGetValue("code", out object? value1
-            )
-                ? Convert.ToInt32(value1)
-                : -1;
+            string? message = error.Message;
+            int code = error.Code;
 
             if (string.IsNullOrEmpty(message))
             {
@@ -109,16 +113,22 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
         HandleRpcError(rpcResponse.Error, method, parameters);
     }
 
-    private void ValidateRpcResponse(Dictionary<string, object>? rpcResponse, string method, object? parameters)
+    private void ValidateRpcResponse<T>(T? rpcResponse, string method, object? parameters)
     {
         if (rpcResponse == null)
         {
             throw new MoneroRpcInvalidResponseError(method, _uri, parameters);
         }
 
-        Dictionary<string, object>? error = (Dictionary<string, object>?)rpcResponse.GetValueOrDefault("error");
+        if (rpcResponse is MoneroRpcResponse resp)
+        {
+            HandleRpcError(resp.Error, method, parameters);
 
-        HandleRpcError(error, method, parameters);
+        }
+        else
+        {
+            throw new MoneroError("Invalid rpc response");
+        }
     }
 
     private async Task<T?> SendRequest<T>(string path, object? parameters, ulong? timeoutMs)
@@ -134,7 +144,7 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
             if (parameters != null)
             {
-                jsonBody = JsonConvert.SerializeObject(parameters);
+                jsonBody = JsonSerializer.Serialize(parameters, defaultSerializationOptions);
             }
 
             if (_printStackTrace)
@@ -160,13 +170,20 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
             ValidateHttpResponse(httpResponse);
 
             string respStr = await httpResponse.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<T>(respStr);
+            CancellationToken cts2 = new();
+            using Stream ms = await ByteArrayToMemoryStream(httpResponse).ConfigureAwait(false);
+            return await JsonSerializer.DeserializeAsync<T>(ms, defaultSerializationOptions, cts2);
         }
         catch (Exception e2)
         {
             throw new MoneroError(e2);
         }
+    }
+
+    private static async Task<Stream> ByteArrayToMemoryStream(HttpResponseMessage response)
+    {
+        var responseBody = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+        return new MemoryStream(responseBody);
     }
 
     #endregion
@@ -433,36 +450,24 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
     #region Json Request
 
-    public async Task<MoneroJsonRpcResponse<Dictionary<string, object?>>> SendJsonRequest(string method)
-    {
-        Dictionary<string, object?>? parameters = null;
-        return await SendJsonRequest(method, parameters);
-    }
-
-    public async Task<MoneroJsonRpcResponse<Dictionary<string, object?>>> SendJsonRequest(string method,
-        Dictionary<string, object?>? parameters)
-    {
-        return await SendJsonRequest(method, parameters, 20000);
-    }
-
-    public async Task<MoneroJsonRpcResponse<Dictionary<string, object?>>> SendJsonRequest(string method,
+    public async Task<MoneroJsonRpcResponse<T>> SendJsonRequest<T>(string method,
         Dictionary<string, object?>? parameters, ulong timeoutMs)
     {
-        return await SendJsonRequest<Dictionary<string, object?>>(new MoneroJsonRpcRequest(method, parameters),
+        return await SendJsonRequest<T>(new MoneroJsonRpcRequest(method, parameters),
             timeoutMs);
     }
 
-    public async Task<MoneroJsonRpcResponse<Dictionary<string, object?>>> SendJsonRequest(string method,
+    public async Task<MoneroJsonRpcResponse<T>> SendJsonRequest<T>(string method,
         List<string> parameters)
     {
-        return await SendJsonRequest(method, parameters, 20000);
+        return await SendJsonRequest<T>(method, parameters, 20000);
     }
 
-    public async Task<MoneroJsonRpcResponse<Dictionary<string, object?>>> SendJsonRequest(string method,
+    public async Task<MoneroJsonRpcResponse<T>> SendJsonRequest<T>(string method,
         List<string> parameters,
         ulong timeoutMs)
     {
-        return await SendJsonRequest<Dictionary<string, object?>>(new MoneroJsonRpcRequest(method, parameters),
+        return await SendJsonRequest<T>(new MoneroJsonRpcRequest(method, parameters),
             timeoutMs);
     }
 
@@ -475,6 +480,17 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
         ulong timeoutMs)
     {
         return await SendJsonRequest<string>(new MoneroJsonRpcRequest(method, parameters), timeoutMs);
+    }
+
+    public async Task<MoneroJsonRpcResponse<T>> SendJsonRequest<T>(string method)
+    {
+        return await SendJsonRequest<T>(new MoneroJsonRpcRequest(method, null));
+    }
+
+    public async Task<MoneroJsonRpcResponse<T>> SendJsonRequest<T>(string method,
+        Dictionary<string, object?>? parameters)
+    {
+        return await SendJsonRequest<T>(new MoneroJsonRpcRequest(method, parameters));
     }
 
     public async Task<MoneroJsonRpcResponse<T>> SendJsonRequest<T>(MoneroJsonRpcRequest rpcRequest)
@@ -512,17 +528,17 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
     #region Path Request
 
-    public async Task<Dictionary<string, object?>> SendPathRequest(string path)
+    public async Task<T> SendPathRequest<T>(string path)
     {
-        return await SendPathRequest(path, null);
+        return await SendPathRequest<T>(path, null);
     }
 
-    public async Task<Dictionary<string, object?>> SendPathRequest(string path, Dictionary<string, object?>? parameters)
+    public async Task<T> SendPathRequest<T>(string path, Dictionary<string, object?>? parameters)
     {
-        return await SendPathRequest(path, parameters, null);
+        return await SendPathRequest<T>(path, parameters, null);
     }
 
-    public async Task<Dictionary<string, object?>> SendPathRequest(string path, Dictionary<string, object?>? parameters,
+    public async Task<T> SendPathRequest<T>(string path, Dictionary<string, object?>? parameters,
         ulong? timeoutMs)
     {
         if (_httpClient == null)
@@ -532,8 +548,8 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
         try
         {
-            Dictionary<string, object>? respMap =
-                await SendRequest<Dictionary<string, object>>(path, parameters, timeoutMs);
+            T? respMap =
+                await SendRequest<T>(path, parameters, timeoutMs);
 
             ValidateRpcResponse(respMap, path, parameters);
             return respMap!;

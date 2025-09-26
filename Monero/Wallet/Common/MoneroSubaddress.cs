@@ -1,13 +1,17 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Wallet.Common;
 
 public class MoneroSubaddress
 {
+    [JsonPropertyName("major")]
     private uint? _accountIndex;
     private string? _address;
     private ulong? _balance;
+    [JsonPropertyName("minor")]
     private uint? _index;
     private bool? _isUsed;
-    private string? _label;
+    private string? _label = "";
     private ulong? _numBlocksToUnlock;
     private ulong? _numUnspentOutputs;
     private ulong? _unlockedBalance;

@@ -1,25 +1,63 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Common;
 
 public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 {
-    private ulong? _cumulativeDifficulty;
-    private ulong? _depth;
-    private ulong? _difficulty;
-    private string? _hash;
-    private ulong? _height;
-    private ulong? _longTermWeight;
-    private uint? _majorVersion;
-    private string? _minerTxHash;
-    private uint? _minorVersion;
-    private ulong? _nonce;
-    private uint? _numTxs;
-    private bool? _orphanStatus;
-    private string? _powHash;
-    private string? _prevHash;
-    private ulong? _reward;
-    private ulong? _size;
-    private ulong? _timestamp;
-    private ulong? _weight;
+    [JsonPropertyName("cumulative_difficulty")]
+    [JsonInclude]
+    private ulong? _cumulativeDifficulty { get; set; }
+    [JsonPropertyName("depth")]
+    [JsonInclude]
+    private ulong? _depth { get; set; }
+    [JsonPropertyName("difficulty")]
+    [JsonInclude]
+    private ulong? _difficulty { get; set; }
+    [JsonPropertyName("hash")]
+    [JsonInclude]
+    private string? _hash { get; set; }
+    [JsonPropertyName("height")]
+    [JsonInclude]
+    private ulong? _height { get; set; }
+    [JsonPropertyName("long_term_weight")]
+    [JsonInclude]
+    private ulong? _longTermWeight { get; set; }
+    [JsonPropertyName("major_version")]
+    [JsonInclude]
+    private uint? _majorVersion { get; set; }
+    [JsonPropertyName("miner_tx_hash")]
+    [JsonInclude]
+    private string? _minerTxHash { get; set; }
+    [JsonPropertyName("minor_version")]
+    [JsonInclude]
+    private uint? _minorVersion { get; set; }
+    [JsonPropertyName("nonce")]
+    [JsonInclude]
+    private ulong? _nonce { get; set; }
+    [JsonPropertyName("num_txes")]
+    [JsonInclude]
+    private uint? _numTxs { get; set; }
+    [JsonPropertyName("orphan_status")]
+    [JsonInclude]
+    private bool? _orphanStatus { get; set; }
+    [JsonPropertyName("pow_hash")]
+    [JsonInclude]
+    private string? _powHash { get; set; }
+    [JsonPropertyName("prev_hash")]
+    [JsonInclude]
+    private string? _prevHash { get; set; }
+    [JsonPropertyName("reward")]
+    [JsonInclude]
+    private ulong? _reward { get; set; }
+    [JsonPropertyName("block_size")]
+    [JsonInclude]
+    private ulong? _size { get; set; }
+    [JsonPropertyName("timestamp")]
+    [JsonInclude]
+    private ulong? _timestamp { get; set; }
+    [JsonPropertyName("block_weight")]
+    [JsonInclude]
+    private ulong? _weight { get; set; }
 
     public MoneroBlockHeader() { }
 

@@ -1,10 +1,18 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
-public class MoneroFeeEstimate
+public class MoneroFeeEstimate : MoneroRpcResponse
 {
-    private ulong? _fee;
-    private List<ulong> _fees;
-    private ulong? _quantizationMask;
+    [JsonPropertyName("fee")]
+    [JsonInclude]
+    private ulong? _fee { get; set; }
+    [JsonPropertyName("fees")]
+    [JsonInclude]
+    private List<ulong> _fees { get; set; }
+    [JsonPropertyName("quantization_mask")]
+    [JsonInclude]
+    private ulong? _quantizationMask { get; set; }
 
     public MoneroFeeEstimate()
     {

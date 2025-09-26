@@ -1,9 +1,15 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
-public class MoneroRpcPaymentInfo
+public class MoneroRpcPaymentInfo : MoneroRpcResponse
 {
-    protected ulong? _credits;
-    protected string? _topBlockHash;
+    [JsonPropertyName("credits")]
+    [JsonInclude]
+    protected ulong? _credits { get; set; }
+    [JsonPropertyName("top_block_hash")]
+    [JsonInclude]
+    protected string? _topBlockHash { get; set; }
 
     public ulong? GetCredits()
     {

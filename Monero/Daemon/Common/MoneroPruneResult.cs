@@ -1,9 +1,15 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
-public class MoneroPruneResult
+public class MoneroPruneResult : MoneroRpcResponse
 {
-    private bool? _isPruned;
-    private int? _pruningSeed;
+    [JsonPropertyName("pruned")]
+    [JsonInclude]
+    private bool? _isPruned { get; set; }
+    [JsonPropertyName("pruning_seed")]
+    [JsonInclude]
+    private int? _pruningSeed { get; set; }
 
     public bool? IsPruned()
     {

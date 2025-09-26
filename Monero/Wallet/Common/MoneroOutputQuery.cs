@@ -5,7 +5,6 @@ public class MoneroOutputQuery : MoneroOutputWallet
     private ulong? _maxAmount;
     private ulong? _minAmount;
     private List<uint>? _subaddressIndices;
-    protected MoneroTxQuery? _txQuery;
 
     public MoneroOutputQuery() { }
 
@@ -25,9 +24,6 @@ public class MoneroOutputQuery : MoneroOutputWallet
         {
             _subaddressIndices = query._subaddressIndices;
         }
-
-        _txQuery =
-            query._txQuery; // to reference original by default, MoneroTxQuery's deep copy will Set this to itself
     }
 
     public override MoneroOutputQuery Clone()
@@ -54,22 +50,6 @@ public class MoneroOutputQuery : MoneroOutputWallet
     public MoneroOutputQuery SetMaxAmount(ulong maxAmount)
     {
         _maxAmount = maxAmount;
-        return this;
-    }
-
-    public MoneroTxQuery? GetTxQuery()
-    {
-        return _txQuery;
-    }
-
-    public MoneroOutputQuery SetTxQuery(MoneroTxQuery? txQuery)
-    {
-        _txQuery = txQuery;
-        if (txQuery != null)
-        {
-            txQuery.SetOutputQuery(this);
-        }
-
         return this;
     }
 

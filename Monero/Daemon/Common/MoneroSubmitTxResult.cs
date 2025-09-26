@@ -1,23 +1,38 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
-public class MoneroSubmitTxResult
+public class MoneroSubmitTxResult : MoneroRpcPaymentInfo
 {
-    private ulong? _credits;
+    [JsonPropertyName("invalid_input")]
     private bool? _hasInvalidInput;
+    [JsonPropertyName("invalid_output")]
     private bool? _hasInvalidOutput;
+    [JsonPropertyName("too_few_outputs")]
     private bool? _hasTooFewOutputs;
+    [JsonPropertyName("double_spend")]
     private bool? _isDoubleSpend;
+    [JsonPropertyName("fee_too_low")]
     private bool? _isFeeTooLow;
     private bool? _isGood;
+    [JsonPropertyName("low_mixin")]
     private bool? _isMixinTooLow;
+    [JsonPropertyName("nonzero_unlock_time")]
     private bool? _isNonzeroUnlockTime;
+    [JsonPropertyName("overspend")]
     private bool? _isOverspend;
-    private bool? _isRelayed;
+    [JsonPropertyName("not_relayed")]
+    private bool? _notRelayed;
+    [JsonPropertyName("too_big")]
     private bool? _isTooBig;
+    [JsonPropertyName("tx_extra_too_big")]
     private bool? _isTxExtraTooBig;
+    [JsonPropertyName("reason")]
     private string? _reason;
+    [JsonPropertyName("sanity_check_failed")]
     private bool? _sanityCheckFailed;
-    private string? _topBlockHash;
+    [JsonPropertyName("top_hash")]
+    private new string? _topBlockHash;
 
     public bool? IsGood()
     {
@@ -32,12 +47,20 @@ public class MoneroSubmitTxResult
 
     public bool? IsRelayed()
     {
-        return _isRelayed;
+        return !_notRelayed;
     }
 
     public MoneroSubmitTxResult SetIsRelayed(bool? isRelayed)
     {
-        _isRelayed = isRelayed;
+        if (isRelayed != null)
+        {
+            _notRelayed = !isRelayed;
+        }
+        else
+        {
+            _notRelayed = null;
+        }
+
         return this;
     }
 
@@ -151,23 +174,23 @@ public class MoneroSubmitTxResult
         return this;
     }
 
-    public ulong? GetCredits()
+    public new ulong? GetCredits()
     {
         return _credits;
     }
 
-    public MoneroSubmitTxResult SetCredits(ulong? credits)
+    public new MoneroSubmitTxResult SetCredits(ulong? credits)
     {
         _credits = credits;
         return this;
     }
 
-    public string? GetTopBlockHash()
+    public new string? GetTopBlockHash()
     {
         return _topBlockHash;
     }
 
-    public MoneroSubmitTxResult SetTopBlockHash(string? topBlockHash)
+    public new MoneroSubmitTxResult SetTopBlockHash(string? topBlockHash)
     {
         _topBlockHash = topBlockHash;
         return this;

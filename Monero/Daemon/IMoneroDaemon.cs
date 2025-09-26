@@ -20,9 +20,6 @@ public interface IMoneroDaemon
     Task<MoneroBlock> GetBlockByHash(string blockHash);
     Task<List<MoneroBlock>> GetBlocksByHash(List<string> blockHashes, ulong startHeight, bool prune);
     Task<MoneroBlock> GetBlockByHeight(ulong blockHeight);
-    Task<List<MoneroBlock>> GetBlocksByHeight(List<ulong> blockHeights);
-    Task<List<MoneroBlock>> GetBlocksByRange(ulong? startHeight, ulong? endHeight);
-    Task<List<MoneroBlock>> GetBlocksByRangeChunked(ulong? startHeight, ulong? endHeight, ulong? maxChunkSize);
     Task<List<string>> GetBlockHashes(List<string> blockHashes, ulong startHeight);
     Task<List<MoneroTx>> GetTxs(List<string> txHashes, bool prune);
     Task<List<string>> GetTxHexes(List<string> txHashes, bool prune);

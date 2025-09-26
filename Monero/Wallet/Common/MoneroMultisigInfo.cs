@@ -1,10 +1,16 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Wallet.Common;
 
 public class MoneroMultisigInfo
 {
+    [JsonPropertyName("multisig")]
     private bool? _isMultisig;
+    [JsonPropertyName("ready")]
     private bool? _isReady;
+    [JsonPropertyName("total")]
     private int? _numParticipants;
+    [JsonPropertyName("threshold")]
     private int? _threshold;
 
     public MoneroMultisigInfo()

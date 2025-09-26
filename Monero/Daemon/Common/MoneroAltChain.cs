@@ -1,12 +1,24 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
 public class MoneroAltChain
 {
-    private List<string>? _blockHashes;
-    private ulong? _difficulty;
-    private ulong? _height;
-    private ulong? _length;
-    private string? _mainChainParentBlockHash;
+    [JsonPropertyName("block_hashes")]
+    [JsonInclude]
+    private List<string>? _blockHashes { get; set; }
+    [JsonPropertyName("difficulty")]
+    [JsonInclude]
+    private ulong? _difficulty { get; set; }
+    [JsonPropertyName("height")]
+    [JsonInclude]
+    private ulong? _height { get; set; }
+    [JsonPropertyName("length")]
+    [JsonInclude]
+    private ulong? _length { get; set; }
+    [JsonPropertyName("main_chain_parent_block")]
+    [JsonInclude]
+    private string? _mainChainParentBlockHash { get; set; }
 
     public List<string>? GetBlockHashes()
     {

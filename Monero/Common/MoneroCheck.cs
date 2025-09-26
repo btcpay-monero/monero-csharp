@@ -1,8 +1,12 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Common;
 
 public class MoneroCheck
 {
-    protected bool _isGood;
+    [JsonPropertyName("good")]
+    [JsonInclude]
+    protected bool _isGood { get; set; }
 
     public MoneroCheck()
     {

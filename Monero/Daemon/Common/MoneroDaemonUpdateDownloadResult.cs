@@ -1,8 +1,12 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
 public class MoneroDaemonUpdateDownloadResult : MoneroDaemonUpdateCheckResult
 {
-    private string? _downloadPath;
+    [JsonPropertyName("name")]
+    [JsonInclude]
+    private string? _downloadPath { get; set; }
 
     public MoneroDaemonUpdateDownloadResult(MoneroDaemonUpdateCheckResult checkResult) : base(checkResult)
     {

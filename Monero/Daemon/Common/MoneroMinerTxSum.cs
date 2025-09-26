@@ -1,9 +1,15 @@
+using System.Text.Json.Serialization;
+
 namespace Monero.Daemon.Common;
 
-public class MoneroMinerTxSum
+public class MoneroMinerTxSum : MoneroRpcResponse
 {
-    private ulong? _emissionSum;
-    private ulong? _feeSum;
+    [JsonPropertyName("emission_amount")]
+    [JsonInclude]
+    private ulong? _emissionSum { get; set; }
+    [JsonPropertyName("fee_amount")]
+    [JsonInclude]
+    private ulong? _feeSum { get; set; }
 
     public ulong? GetEmissionSum()
     {

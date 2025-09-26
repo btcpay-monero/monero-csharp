@@ -1,11 +1,31 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace Monero.Common;
+
+internal class MoneroBlockJson
+{
+    [JsonPropertyName("tx_hashes")]
+    public List<string> TxHashes { get; set; } = [];
+}
 
 public class MoneroBlock : MoneroBlockHeader
 {
-    private string? _hex;
-    private MoneroTx? _minerTx;
-    private List<string>? _txHashes;
+    [JsonPropertyName("block_header")]
+    [JsonInclude]
+    public MoneroBlockHeader? BlockHeader { get; set; }
+    [JsonPropertyName("blob")]
+    [JsonInclude]
+    private string? _hex { get; set; }
+    [JsonPropertyName("miner_tx")]
+    [JsonInclude]
+    private MoneroTx? _minerTx { get; set; }
+    private List<string>? _txHashes { get; set; }
     private List<MoneroTx>? _txs;
+
+    [JsonPropertyName("json")]
+    [JsonInclude]
+    private string? json { get; set; }
 
     public MoneroBlock()
     {
@@ -40,6 +60,11 @@ public class MoneroBlock : MoneroBlockHeader
         {
             _txHashes = block.GetTxHashes()!;
         }
+    }
+
+    public void Init()
+    {
+        Merge(BlockHeader);
     }
 
     public string? GetHex()
@@ -111,6 +136,11 @@ public class MoneroBlock : MoneroBlockHeader
 
     public List<string>? GetTxHashes()
     {
+        if (_txHashes == null)
+        {
+            MoneroBlockJson jsonStr = JsonSerializer.Deserialize<MoneroBlockJson>(this.json ?? "{}")!;
+            _txHashes = jsonStr.TxHashes;
+        }
         return _txHashes;
     }
 
