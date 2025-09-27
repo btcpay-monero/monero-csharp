@@ -57,4 +57,4 @@ jobs:
           user: ${{ secrets.NUGET_USER }}
 
       - name: Push package
-        run: dotnet nuget push nuget-packages/MoneroNet.${{ env.VERSION }}.nupkg --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key ${{ steps.login.outputs.token }}
+        run: dotnet nuget push nuget-packages/MoneroNet.${{ env.VERSION }}.nupkg --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key ${{ steps.login.outputs.NUGET_API_KEY }}
