@@ -30,7 +30,9 @@ jobs:
         run: dotnet clean
 
       - name: Get package version
-        run: VERSION="${GITHUB_REF#refs/tags/v}"
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build
         run: dotnet build -c Release /p:Version=${{ env.VERSION }} --no-restore
