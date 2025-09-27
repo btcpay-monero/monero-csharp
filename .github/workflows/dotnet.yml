@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
 
       - name: Initialize
@@ -70,3 +72,10 @@ jobs:
         with:
           name: nuget-package-${{ github.sha }}
           path: nuget-packages/MoneroNet.${{ env.VERSION }}.nupkg
+
+      - name: Trigger the release workflow when git tag pushed
+        if: startsWith( github.ref, 'refs/tags/v' )
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          event-type: release-event
+          client-payload: '{"sha": "${{ github.sha }}"}'

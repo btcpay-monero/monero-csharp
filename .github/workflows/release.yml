@@ -1,25 +1,22 @@
-name: Publish NuGet package
+name: Release NuGet package
 
 on:
-  workflow_run:
-    workflows:
-      - Build and Test
-    types:
-      - completed
+  repository_dispatch:
+    types: [release-event]
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'refs/heads/v') && github.repository == 'btcpay-monero/monero-csharp'
+    if: github.repository == 'btcpay-monero/monero-csharp'
     steps:
       - name: Download NuGet package
         uses: actions/download-artifact@v4
         with:
-          name: nuget-package-${{ github.sha }}
+          name: nuget-package-${{ github.event.client_payload.sha }}
           path: ./nupkg
 
       # Get a short-lived NuGet API key
