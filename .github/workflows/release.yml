@@ -1,8 +1,9 @@
 name: Release NuGet package
 
 on:
-  repository_dispatch:
-    types: [release-event]
+  push:
+    tags:
+      - 'v*'
 
 permissions:
   id-token: write
@@ -10,14 +11,41 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
     if: github.repository == 'btcpay-monero/monero-csharp'
+    runs-on: ubuntu-latest
     steps:
-      - name: Download NuGet package
-        uses: actions/download-artifact@v4
+
+      - name: Initialize
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
         with:
-          name: nuget-package-${{ github.event.client_payload.sha }}
-          path: ./nupkg
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Clean project
+        run: dotnet clean
+
+      - name: Get package version
+        run: VERSION="${GITHUB_REF#refs/tags/v}"
+
+      - name: Build
+        run: dotnet build -c Release /p:Version=${{ env.VERSION }} --no-restore
+
+      - name: Deterministic build check and package creation
+        run: |
+          dotnet tool install --global dotnet-validate --version 0.0.1-preview.537
+          dotnet pack Monero/Monero.csproj -c Release /p:PackageVersion=${{ env.VERSION }} --no-build -o nuget-packages
+          dotnet validate package local nuget-packages/MoneroNet.${{ env.VERSION }}.nupkg
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package-${{ github.sha }}
+          path: nuget-packages/MoneroNet.${{ env.VERSION }}.nupkg
 
       # Get a short-lived NuGet API key
       - name: NuGet Login
@@ -27,4 +55,4 @@ jobs:
           user: ${{ secrets.NUGET_USER }}
 
       - name: Push package
-        run: dotnet nuget push ./nupkg/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.login.outputs.token }}
+        run: dotnet nuget push nuget-packages/MoneroNet.${{ env.VERSION }}.nupkg --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key ${{ steps.login.outputs.token }}
