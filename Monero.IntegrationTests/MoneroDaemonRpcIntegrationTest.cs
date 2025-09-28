@@ -930,18 +930,6 @@ public class MoneroDaemonRpcIntegrationTest
         }
     }
 
-    private static void TestMinerTx(MoneroTx? minerTx)
-    {
-        Assert.NotNull(minerTx);
-        Assert.NotNull(minerTx.IsMinerTx());
-        Assert.True(minerTx.GetVersion() >= 0);
-        Assert.NotNull(minerTx.GetExtra());
-        Assert.True(minerTx.GetExtra()!.Length > 0);
-        Assert.True(minerTx.GetUnlockTime() >= 0);
-
-        // TODO: miner tx does not have hashes in binary requests so this will fail, need to derive using prunable data
-    }
-
     private static void TestTx(MoneroTx? tx, TestContext? ctx)
     {
         // check inputs

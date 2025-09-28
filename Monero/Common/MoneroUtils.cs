@@ -13,7 +13,6 @@ public static class MoneroUtils
     private const int FullEncodedBlockSize = 11;
     private const ulong XmrAuMultiplier = 1000000000000;
 
-    public const uint RingSize = 16;
     private const int NumMnemonicWords = 25;
     private const string Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
     private static readonly int AlphabetSize = Alphabet.Length;

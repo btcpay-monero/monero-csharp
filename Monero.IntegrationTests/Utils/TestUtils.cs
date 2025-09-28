@@ -35,7 +35,6 @@ internal abstract class TestUtils
     public const string WalletPassword = "supersecretpassword123";
 
     // test wallet constants
-    public const ulong MaxFee = 75000000000;
     public const MoneroNetworkType NetworkType = MoneroNetworkType.Mainnet;
 
     public static readonly string SEED =

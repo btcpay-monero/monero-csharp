@@ -11,7 +11,7 @@ namespace Monero.Common;
 
 public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnection>
 {
-    private readonly JsonSerializerOptions defaultSerializationOptions = new()
+    private readonly JsonSerializerOptions _defaultSerializationOptions = new()
     { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
 
     private readonly SemaphoreSlim _semaphore = new(1, 1);
@@ -144,7 +144,7 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
             if (parameters != null)
             {
-                jsonBody = JsonSerializer.Serialize(parameters, defaultSerializationOptions);
+                jsonBody = JsonSerializer.Serialize(parameters, _defaultSerializationOptions);
             }
 
             if (_printStackTrace)
@@ -169,14 +169,13 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
 
             ValidateHttpResponse(httpResponse);
 
-            string respStr = await httpResponse.Content.ReadAsStringAsync();
-            CancellationToken cts2 = new();
-            using Stream ms = await ByteArrayToMemoryStream(httpResponse).ConfigureAwait(false);
-            return await JsonSerializer.DeserializeAsync<T>(ms, defaultSerializationOptions, cts2);
+            await httpResponse.Content.ReadAsStringAsync(cts.Token);
+            await using Stream ms = await ByteArrayToMemoryStream(httpResponse).ConfigureAwait(false);
+            return await JsonSerializer.DeserializeAsync<T>(ms, _defaultSerializationOptions, CancellationToken.None);
         }
-        catch (Exception e2)
+        catch (Exception e)
         {
-            throw new MoneroError(e2);
+            throw new MoneroError(e);
         }
     }
 
@@ -448,6 +447,8 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
         _printStackTrace = printStackTrace;
     }
 
+    #endregion
+
     #region Json Request
 
     public async Task<MoneroJsonRpcResponse<T>> SendJsonRequest<T>(string method,
@@ -583,8 +584,6 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
     {
         throw new NotImplementedException();
     }
-
-    #endregion
 
     #endregion
 }

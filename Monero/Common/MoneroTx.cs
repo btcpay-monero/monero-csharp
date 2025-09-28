@@ -2,8 +2,6 @@ namespace Monero.Common;
 
 public class MoneroTx
 {
-    public const string DefaultPaymentId = "0000000000000000";
-
     private MoneroBlock? _block;
     private byte[]? _extra; // TODO: switch to string for consistency with MoneroTxWallet?
     private ulong? _fee;

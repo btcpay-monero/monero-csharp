@@ -1565,7 +1565,7 @@ public class MoneroWalletRpc : IMoneroWallet
         ];
     }
 
-    public async Task<List<MoneroTransfer>> GetTransfers(MoneroTransferQuery? query)
+    public async Task<GetTransfersResult> GetTransfers(MoneroTransferQuery? query)
     {
         // copy and normalize query up to block
         if (query == null)
@@ -1652,18 +1652,16 @@ public class MoneroWalletRpc : IMoneroWallet
 
         // build txs using `get_transfers`
         MoneroJsonRpcResponse<GetTransfersResult> resp = await _rpc.SendJsonRequest<GetTransfersResult>("get_transfers", parameters);
-        GetTransfersResult result = resp.Result!;
+        return resp.Result!;
+    }
 
-        // filter and return transfers
-        List<MoneroTransfer> transfers = [];
-
-        transfers.AddRange(result.IncomingTransfers);
-        transfers.AddRange(result.OutgoingTransfers);
-        transfers.AddRange(result.PendingTransfers);
-        transfers.AddRange(result.PooledTransfers);
-        transfers.AddRange(result.FailedTransfers);
-
-        return transfers;
+    public async Task<GetTransferByTxIdResult> GetTransferByTxId(string txId, int? accountIndex)
+    {
+        MoneroJsonRpcParams parameters = [];
+        parameters.Add("txid", txId);
+        parameters.Add("account_index", accountIndex);
+        MoneroJsonRpcResponse<GetTransferByTxIdResult> response = await _rpc.SendJsonRequest<GetTransferByTxIdResult>("get_transfer_by_txid", parameters);
+        return response.Result!;
     }
 
     #endregion

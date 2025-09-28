@@ -4,6 +4,7 @@
   [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ec5951b790c647db8961ec228c48b739)](https://app.codacy.com/gh/btcpay-monero/monero-csharp/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
   [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/ec5951b790c647db8961ec228c48b739)](https://app.codacy.com/gh/btcpay-monero/monero-csharp/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
   [![Matrix rooms](https://img.shields.io/badge/%F0%9F%92%AC%20Matrix-%23btcpay--monero-blue)](https://matrix.to/#/#btcpay-monero:matrix.org)
+  [![Nuget](https://img.shields.io/nuget/v/MoneroNet.svg)](https://www.nuget.org/packages/MoneroNet)
 </div>
 
 # Monero C# Bindings
