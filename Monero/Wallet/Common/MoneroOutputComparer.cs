@@ -125,8 +125,8 @@ internal class MoneroOutputComparer : Comparer<MoneroOutput>
             return 1; // output 2 has no key image
         }
 
-        string? ow1KeyImageHex = ow1KeyImage.GetHex();
-        string? ow2KeyImageHex = ow2KeyImage.GetHex();
+        string? ow1KeyImageHex = ow1KeyImage.Hex;
+        string? ow2KeyImageHex = ow2KeyImage.Hex;
 
         if (ow1KeyImageHex == null && ow2KeyImageHex == null)
         {

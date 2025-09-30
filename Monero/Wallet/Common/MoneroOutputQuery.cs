@@ -6,8 +6,6 @@ public class MoneroOutputQuery : MoneroOutputWallet
     private ulong? _minAmount;
     private List<uint>? _subaddressIndices;
 
-    public MoneroOutputQuery() { }
-
     public MoneroOutputQuery(MoneroOutputQuery query) : base(query)
     {
         if (query.GetMinAmount() != null)

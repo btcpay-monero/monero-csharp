@@ -12,7 +12,9 @@ namespace Monero.Common;
 public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnection>
 {
     private readonly JsonSerializerOptions _defaultSerializationOptions = new()
-    { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
 
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private HttpClient? _httpClient;
@@ -123,7 +125,6 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
         if (rpcResponse is MoneroRpcResponse resp)
         {
             HandleRpcError(resp.Error, method, parameters);
-
         }
         else
         {
@@ -506,23 +507,12 @@ public class MoneroRpcConnection : MoneroConnection, IEquatable<MoneroRpcConnect
             throw new MoneroError("Http client is null");
         }
 
-        try
-        {
-            MoneroJsonRpcResponse<T>? rpcResponse =
-                await SendRequest<MoneroJsonRpcResponse<T>>("json_rpc", rpcRequest, timeoutMs);
+        MoneroJsonRpcResponse<T>? rpcResponse =
+            await SendRequest<MoneroJsonRpcResponse<T>>("json_rpc", rpcRequest, timeoutMs);
 
-            ValidateRpcResponse(rpcResponse, rpcRequest.Method, rpcRequest.Params);
+        ValidateRpcResponse(rpcResponse, rpcRequest.Method, rpcRequest.Params);
 
-            return rpcResponse!;
-        }
-        catch (MoneroRpcError)
-        {
-            throw;
-        }
-        catch (Exception e2)
-        {
-            throw new MoneroError(e2);
-        }
+        return rpcResponse!;
     }
 
     #endregion

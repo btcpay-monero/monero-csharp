@@ -614,7 +614,7 @@ public class MoneroTx
                         continue;
                     }
 
-                    if (mergeeKeyImage.GetHex() == mergerKeyImage.GetHex())
+                    if (mergeeKeyImage.Hex == mergerKeyImage.Hex)
                     {
                         mergee.Merge(merger);
                         merged = true;
@@ -654,7 +654,7 @@ public class MoneroTx
                         MoneroKeyImage? mergerKeyImage = merger.GetKeyImage();
 
                         if ((mergerKeyImage != null && mergeeKeyImage != null &&
-                             mergeeKeyImage.GetHex() == mergerKeyImage.GetHex()) ||
+                             mergeeKeyImage.Hex == mergerKeyImage.Hex) ||
                             (merger.GetStealthPublicKey() != null && mergee.GetStealthPublicKey() != null &&
                              mergee.GetStealthPublicKey() == merger.GetStealthPublicKey()))
                         {

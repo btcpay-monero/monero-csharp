@@ -677,7 +677,7 @@ public class MoneroWalletRpc : IMoneroWallet
         {
             foreach (MoneroAccount account in accounts)
             {
-                account.SetSubaddresses(await GetSubaddresses((uint)account.GetIndex()!, true, null));
+                account.Subaddresses = await GetSubaddresses((uint)account.Index!, true, null);
             }
         }
 
@@ -686,7 +686,7 @@ public class MoneroWalletRpc : IMoneroWallet
             // these fields are not initialized if the subaddress is unused and therefore not returned from `get_balance`
             foreach (MoneroAccount account in accounts)
             {
-                foreach (MoneroSubaddress subaddress in account.GetSubaddresses()!)
+                foreach (MoneroSubaddress subaddress in account.Subaddresses!)
                 {
                     subaddress.SetBalance(0);
                     subaddress.SetUnlockedBalance(0);
@@ -706,14 +706,14 @@ public class MoneroWalletRpc : IMoneroWallet
                 MoneroSubaddress subaddress = ConvertRpcSubaddress(rpcSubaddress);
 
                 // merge info
-                MoneroAccount account = accounts[(int)subaddress.GetAccountIndex()!];
-                if (account.GetIndex() != subaddress.GetAccountIndex())
+                MoneroAccount account = accounts[(int)subaddress.AccountIndex!];
+                if (account.Index != subaddress.AccountIndex)
                 {
                     throw new MoneroError("RPC accounts are out of order"); // would need to switch lookup to loop
                 }
 
-                MoneroSubaddress tgtSubaddress = account.GetSubaddresses()![(int)subaddress.GetIndex()!];
-                if (tgtSubaddress.GetIndex() != subaddress.GetIndex())
+                MoneroSubaddress tgtSubaddress = account.Subaddresses![(int)subaddress.Index!];
+                if (tgtSubaddress.Index != subaddress.Index)
                 {
                     throw new MoneroError("RPC subaddresses are out of order");
                 }
@@ -757,7 +757,7 @@ public class MoneroWalletRpc : IMoneroWallet
         foreach (RpcBalanceInfo rpcSubaddress in result.Addresses)
         {
             MoneroSubaddress subaddress = ConvertRpcSubaddress(rpcSubaddress);
-            subaddress.SetAccountIndex(accountIdx);
+            subaddress.AccountIndex = accountIdx;
             subaddresses.Add(subaddress);
         }
 
@@ -781,10 +781,10 @@ public class MoneroWalletRpc : IMoneroWallet
             {
                 MoneroSubaddress subaddress = ConvertRpcSubaddress(rpcSubaddress);
 
-                // transfer info to existing subaddress object
+                // transfer info to an existing subaddress object
                 foreach (MoneroSubaddress tgtSubaddress in subaddresses)
                 {
-                    if (tgtSubaddress.GetIndex() != subaddress.GetIndex())
+                    if (tgtSubaddress.Index != subaddress.Index)
                     {
                         continue; // skip to subaddress with same index
                     }
@@ -804,7 +804,7 @@ public class MoneroWalletRpc : IMoneroWallet
 
         foreach (MoneroSubaddress subaddress in subaddresses)
         {
-            subaddressMap[(uint)subaddress.GetIndex()!] = subaddress.GetAddress();
+            subaddressMap[(uint)subaddress.Index!] = subaddress.GetAddress();
         }
 
         // return results
@@ -821,9 +821,11 @@ public class MoneroWalletRpc : IMoneroWallet
         CreateAddressResult result = resp.Result!;
 
         // build subaddress object
-        MoneroSubaddress subaddress = new();
-        subaddress.SetAccountIndex(accountIdx);
-        subaddress.SetIndex(Convert.ToUInt32(result.Index));
+        MoneroSubaddress subaddress = new()
+        {
+            AccountIndex = accountIdx,
+            Index = Convert.ToUInt32(result.Index)
+        };
         subaddress.SetAddress((string?)result.Address);
         subaddress.SetLabel(string.IsNullOrEmpty(label) ? "" : label);
         subaddress.SetBalance(0);
@@ -879,8 +881,8 @@ public class MoneroWalletRpc : IMoneroWallet
         foreach (MoneroKeyImage keyImage in keyImages)
         {
             Dictionary<string, object?> rpcKeyImage = [];
-            rpcKeyImage.Add("key_image", keyImage.GetHex());
-            rpcKeyImage.Add("signature", keyImage.GetSignature());
+            rpcKeyImage.Add("key_image", keyImage.Hex);
+            rpcKeyImage.Add("signature", keyImage.Signature);
             rpcKeyImages.Add(rpcKeyImage);
         }
 
@@ -1248,10 +1250,10 @@ public class MoneroWalletRpc : IMoneroWallet
         }
 
         MoneroJsonRpcParams parameters = [];
-        parameters.Add("address", config.GetDestinations()![0].GetAddress());
+        parameters.Add("address", config.GetDestinations()![0].Address);
         parameters.Add("amount",
-            config.GetDestinations()![0].GetAmount() != null
-                ? config.GetDestinations()![0].GetAmount().ToString()
+            config.GetDestinations()![0].Amount != null
+                ? config.GetDestinations()![0].Amount.ToString()
                 : null);
         parameters.Add("payment_id", config.GetPaymentId());
         parameters.Add("recipient_name", config.GetRecipientName());
@@ -1278,9 +1280,9 @@ public class MoneroWalletRpc : IMoneroWallet
         config.SetPaymentId(rpcUri.PaymentId);
         config.SetRecipientName(rpcUri.RecipientName);
         config.SetNote(rpcUri.TxDescription);
-        if ("".Equals(config.GetDestinations()![0].GetAddress()))
+        if ("".Equals(config.GetDestinations()![0].Address))
         {
-            config.GetDestinations()![0].SetAddress(null);
+            config.GetDestinations()![0].Address = null;
         }
 
         if ("".Equals(config.GetPaymentId()))
@@ -1389,17 +1391,19 @@ public class MoneroWalletRpc : IMoneroWallet
             await _rpc.SendJsonRequest<MultisigInfoResult>("exchange_multisig_keys", parameters);
         _addressCache.Clear();
         MultisigInfoResult result = resp.Result!;
-        MoneroMultisigInitResult msResult = new();
-        msResult.SetAddress(result.Address);
-        msResult.SetMultisigHex(result.Info);
-        if (string.IsNullOrEmpty(msResult.GetAddress()))
+        MoneroMultisigInitResult msResult = new()
         {
-            msResult.SetAddress(null);
+            Address = result.Address,
+            MultisigHex = result.Info
+        };
+        if (string.IsNullOrEmpty(msResult.Address))
+        {
+            msResult.Address = null;
         }
 
-        if (string.IsNullOrEmpty(msResult.GetMultisigHex()))
+        if (string.IsNullOrEmpty(msResult.MultisigHex))
         {
-            msResult.SetMultisigHex(null);
+            msResult.MultisigHex = null;
         }
 
         return msResult;
@@ -1435,8 +1439,8 @@ public class MoneroWalletRpc : IMoneroWallet
         }
 
         MoneroMultisigSignResult signResult = new();
-        signResult.SetSignedMultisigTxHex(result.TxDataHex);
-        signResult.SetTxHashes(result.TxHashList);
+        signResult.SignedMultisigTxHex = result.TxDataHex;
+        signResult.TxHashes = result.TxHashList;
         return signResult;
     }
 
@@ -1540,8 +1544,8 @@ public class MoneroWalletRpc : IMoneroWallet
             ulong unlockedBalance = 0;
             foreach (MoneroAccount account in await GetAccounts(false, false, null))
             {
-                balance += account.GetBalance();
-                unlockedBalance += account.GetUnlockedBalance();
+                balance += account.Balance;
+                unlockedBalance += account.UnlockedBalance;
             }
 
             return [balance, unlockedBalance];
@@ -1670,10 +1674,12 @@ public class MoneroWalletRpc : IMoneroWallet
 
     private static MoneroSubaddress ConvertRpcSubaddress(RpcBalanceInfo rpcSubaddress)
     {
-        MoneroSubaddress subaddress = new();
+        MoneroSubaddress subaddress = new()
+        {
+            AccountIndex = rpcSubaddress.AccountIndex,
+            Index = rpcSubaddress.AddressIndex
+        };
 
-        subaddress.SetAccountIndex(rpcSubaddress.AccountIndex);
-        subaddress.SetIndex(rpcSubaddress.AddressIndex);
         subaddress.SetAddress(rpcSubaddress.Address);
         subaddress.SetBalance(rpcSubaddress.Balance);
         subaddress.SetUnlockedBalance(rpcSubaddress.UnlockedBalance);
@@ -1700,7 +1706,7 @@ public class MoneroWalletRpc : IMoneroWallet
     public async Task<bool> IsMultisig()
     {
         MoneroMultisigInfo info = await GetMultisigInfo();
-        return info.IsMultisig() == true;
+        return info.IsMultisig == true;
     }
 
     public Task<MoneroNetworkType> GetNetworkType()

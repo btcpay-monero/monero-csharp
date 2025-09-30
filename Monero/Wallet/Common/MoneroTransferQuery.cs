@@ -45,7 +45,7 @@ public class MoneroTransferQuery : MoneroTx
             _destinations = [];
             foreach (MoneroDestination destination in query._destinations)
             {
-                _destinations.Add(destination.Clone());
+                _destinations.Add(destination);
             }
         }
 

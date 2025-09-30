@@ -9,22 +9,11 @@ public class MoneroOutput
     private MoneroKeyImage? _keyImage;
     private List<ulong>? _ringOutputIndices;
     [JsonPropertyName("key")]
-    [JsonInclude]
-    private string? _stealthPublicKey { get; set; }
+    public string? StealthPublicKey { get; set; }
     private MoneroTx? _tx;
-
-    public MoneroOutput()
-    {
-        // nothing to build
-    }
 
     protected MoneroOutput(MoneroOutput output)
     {
-        if (output._keyImage != null)
-        {
-            _keyImage = output._keyImage.Clone();
-        }
-
         _amount = output._amount;
         _index = output._index;
         if (output._ringOutputIndices != null)
@@ -32,7 +21,7 @@ public class MoneroOutput
             _ringOutputIndices = output._ringOutputIndices;
         }
 
-        _stealthPublicKey = output._stealthPublicKey;
+        StealthPublicKey = output.StealthPublicKey;
     }
 
     public virtual MoneroOutput Clone()
@@ -97,12 +86,12 @@ public class MoneroOutput
 
     public string? GetStealthPublicKey()
     {
-        return _stealthPublicKey;
+        return StealthPublicKey;
     }
 
     public virtual MoneroOutput SetStealthPublicKey(string? stealthPublicKey)
     {
-        _stealthPublicKey = stealthPublicKey;
+        StealthPublicKey = stealthPublicKey;
         return this;
     }
 

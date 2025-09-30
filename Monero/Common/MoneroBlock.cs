@@ -1,269 +1,33 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Monero.Common;
 
-internal class MoneroBlockJson
-{
-    [JsonPropertyName("tx_hashes")]
-    public List<string> TxHashes { get; set; } = [];
-}
-
 public class MoneroBlock : MoneroBlockHeader
 {
     [JsonPropertyName("block_header")]
-    [JsonInclude]
     public MoneroBlockHeader? BlockHeader { get; set; }
-    [JsonPropertyName("blob")]
-    [JsonInclude]
-    private string? _hex { get; set; }
-    [JsonPropertyName("miner_tx")]
-    [JsonInclude]
-    private MoneroTx? _minerTx { get; set; }
-    private List<string>? _txHashes { get; set; }
-    private List<MoneroTx>? _txs;
 
-    [JsonPropertyName("json")]
-    [JsonInclude]
-    private string? json { get; set; }
+    [JsonPropertyName("blob")]
+    public string? Hex { get; set; }
+
+    [JsonPropertyName("miner_tx")]
+    public MoneroTx? MinerTx { get; set; }
+
+    [JsonPropertyName("tx_hashes")]
+    public List<string> TxHashes { get; set; }
+
+    public List<MoneroTx>? Txs;
 
     public MoneroBlock()
     {
+        TxHashes = [];
     }
 
-    public MoneroBlock(MoneroBlockHeader header) : base(header)
-    {
-        _hex = null;
-        _minerTx = null;
-        _txs = [];
-        _txHashes = [];
-    }
-
-    public MoneroBlock(MoneroBlock block) : base(block)
-    {
-        _hex = block.GetHex();
-        if (block._minerTx != null)
-        {
-            _minerTx = block._minerTx.Clone().SetBlock(this);
-        }
-
-        if (block._txs != null)
-        {
-            _txs = [];
-            foreach (MoneroTx tx in block._txs)
-            {
-                _txs.Add(tx.Clone().SetBlock(this));
-            }
-        }
-
-        if (block.GetTxHashes() != null)
-        {
-            _txHashes = block.GetTxHashes()!;
-        }
-    }
+    [JsonPropertyName("json")]
+    public string? Json { get; set; }
 
     public void Init()
     {
         Merge(BlockHeader);
     }
-
-    public string? GetHex()
-    {
-        return _hex;
-    }
-
-    public MoneroBlock SetHex(string? hex)
-    {
-        _hex = hex;
-        return this;
-    }
-
-    public MoneroTx? GetMinerTx()
-    {
-        return _minerTx;
-    }
-
-    public MoneroBlock SetMinerTx(MoneroTx? minerTx)
-    {
-        _minerTx = minerTx;
-        return this;
-    }
-
-    public List<MoneroTx>? GetTxs()
-    {
-        return _txs;
-    }
-
-    public MoneroBlock SetTxs(List<MoneroTx>? txs)
-    {
-        _txs = txs;
-        if (txs != null)
-        {
-            foreach (MoneroTx tx in txs)
-            {
-                tx.SetBlock(this);
-            }
-        }
-
-        return this;
-    }
-
-    public MoneroBlock SetTxs(MoneroTx? tx)
-    {
-        if (tx == null)
-        {
-            throw new ArgumentNullException(nameof(tx), "Transaction cannot be null");
-        }
-
-        return SetTxs([tx]);
-    }
-
-    public MoneroBlock AddTx(MoneroTx? tx)
-    {
-        if (tx == null)
-        {
-            throw new ArgumentNullException(nameof(tx), "Transaction cannot be null");
-        }
-
-        if (_txs == null)
-        {
-            _txs = [];
-        }
-
-        _txs.Add(tx.SetBlock(this));
-        return this;
-    }
-
-    public List<string>? GetTxHashes()
-    {
-        if (_txHashes == null)
-        {
-            MoneroBlockJson jsonStr = JsonSerializer.Deserialize<MoneroBlockJson>(this.json ?? "{}")!;
-            _txHashes = jsonStr.TxHashes;
-        }
-        return _txHashes;
-    }
-
-    public MoneroBlock SetTxHashes(List<string>? txHashes)
-    {
-        _txHashes = txHashes;
-        return this;
-    }
-
-    public MoneroBlock Clone()
-    {
-        return new MoneroBlock(this);
-    }
-
-    #region Override Base Methods
-
-    public override MoneroBlock SetHash(string? hash)
-    {
-        base.SetHash(hash);
-        return this;
-    }
-
-    public override MoneroBlock SetHeight(ulong? height)
-    {
-        base.SetHeight(height);
-        return this;
-    }
-
-    public override MoneroBlock SetTimestamp(ulong? timestamp)
-    {
-        base.SetTimestamp(timestamp);
-        return this;
-    }
-
-    public override MoneroBlock SetSize(ulong? size)
-    {
-        base.SetSize(size);
-        return this;
-    }
-
-    public override MoneroBlock SetWeight(ulong? weight)
-    {
-        base.SetWeight(weight);
-        return this;
-    }
-
-    public override MoneroBlock SetLongTermWeight(ulong? longTermWeight)
-    {
-        base.SetLongTermWeight(longTermWeight);
-        return this;
-    }
-
-    public override MoneroBlock SetDepth(ulong? depth)
-    {
-        base.SetDepth(depth);
-        return this;
-    }
-
-    public override MoneroBlock SetDifficulty(ulong? difficulty)
-    {
-        base.SetDifficulty(difficulty);
-        return this;
-    }
-
-    public override MoneroBlock SetCumulativeDifficulty(ulong? cumulativeDifficulty)
-    {
-        base.SetCumulativeDifficulty(cumulativeDifficulty);
-        return this;
-    }
-
-    public override MoneroBlock SetMajorVersion(uint? majorVersion)
-    {
-        base.SetMajorVersion(majorVersion);
-        return this;
-    }
-
-    public override MoneroBlock SetMinorVersion(uint? minorVersion)
-    {
-        base.SetMinorVersion(minorVersion);
-        return this;
-    }
-
-    public override MoneroBlock SetNonce(ulong? nonce)
-    {
-        base.SetNonce(nonce);
-        return this;
-    }
-
-    public override MoneroBlock SetMinerTxHash(string? minerTxHash)
-    {
-        base.SetMinerTxHash(minerTxHash);
-        return this;
-    }
-
-    public override MoneroBlock SetNumTxs(uint? numTxs)
-    {
-        base.SetNumTxs(numTxs);
-        return this;
-    }
-
-    public override MoneroBlock SetOrphanStatus(bool? orphanStatus)
-    {
-        base.SetOrphanStatus(orphanStatus);
-        return this;
-    }
-
-    public override MoneroBlock SetPrevHash(string? prevHash)
-    {
-        base.SetPrevHash(prevHash);
-        return this;
-    }
-
-    public override MoneroBlock SetReward(ulong? reward)
-    {
-        base.SetReward(reward);
-        return this;
-    }
-
-    public override MoneroBlock SetPowHash(string? powHash)
-    {
-        base.SetPowHash(powHash);
-        return this;
-    }
-
-    #endregion
 }

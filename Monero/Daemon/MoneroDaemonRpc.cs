@@ -599,12 +599,12 @@ public class MoneroDaemonRpc : IMoneroDaemon
         try
         {
             CheckResponseStatus(resp);
-            resp.SetIsGood(true);
+            resp.IsGood = true;
         }
         catch (MoneroError e)
         {
             MoneroUtils.Log(1, e.Message);
-            resp.SetIsGood(false);
+            resp.IsGood = false;
         }
 
         return resp;
@@ -635,17 +635,6 @@ public class MoneroDaemonRpc : IMoneroDaemon
         }
     }
 
-    public async Task<bool> IsRestricted()
-    {
-        if (IsLocal())
-        {
-            return false;
-        }
-
-        MoneroDaemonInfo info = await GetInfo();
-        return info.IsRestricted() == true;
-    }
-
     private void CheckConnection()
     {
         if (rpc.IsConnected() == true || rpc.GetUri() == null || rpc.GetUri()!.Length == 0)
@@ -654,20 +643,6 @@ public class MoneroDaemonRpc : IMoneroDaemon
         }
 
         rpc.CheckConnection().GetAwaiter().GetResult();
-    }
-
-    private bool IsLocal()
-    {
-        MoneroRpcConnection connection = GetRpcConnection();
-
-        string? uri = connection.GetUri();
-
-        if (uri == null)
-        {
-            return false;
-        }
-
-        return uri.Contains("127.0.0.1") || uri.Contains("localhost");
     }
 
     public MoneroRpcConnection GetRpcConnection()
@@ -721,16 +696,6 @@ public class MoneroDaemonRpc : IMoneroDaemon
         {
             throw new MoneroRpcError(status);
         }
-    }
-
-    public static ulong? PrefixedHexToUulong(string hex)
-    {
-        if (!hex.StartsWith("0x"))
-        {
-            throw new ArgumentException("Given hex does not start with \"0x\": " + hex);
-        }
-
-        return Convert.ToUInt64(hex.Substring(2), 16);
     }
 
     private void RefreshListening()

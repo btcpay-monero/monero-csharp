@@ -63,8 +63,8 @@ internal class MoneroTxHeightComparer : Comparer<MoneroTx>
             return -1;
         }
 
-        List<MoneroTx> txs1 = block1.GetTxs() ?? [];
-        List<MoneroTx> txs2 = block2.GetTxs() ?? [];
+        List<MoneroTx> txs1 = block1.Txs ?? [];
+        List<MoneroTx> txs2 = block2.Txs ?? [];
 
         return txs1.IndexOf(tx1) -
                txs2.IndexOf(tx2); // txs are in the same block so retain their original order

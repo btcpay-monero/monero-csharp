@@ -5,81 +5,80 @@ namespace Monero.Common;
 public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
 {
     [JsonPropertyName("cumulative_difficulty")]
-    [JsonInclude]
-    private ulong? _cumulativeDifficulty { get; set; }
+    public ulong? CumulativeDifficulty { get; set; }
+
     [JsonPropertyName("depth")]
-    [JsonInclude]
-    private ulong? _depth { get; set; }
+    public ulong? Depth { get; set; }
+
     [JsonPropertyName("difficulty")]
-    [JsonInclude]
-    private ulong? _difficulty { get; set; }
+    public ulong? Difficulty { get; set; }
+
     [JsonPropertyName("hash")]
-    [JsonInclude]
-    private string? _hash { get; set; }
+    public string? Hash { get; set; }
+
     [JsonPropertyName("height")]
-    [JsonInclude]
-    private ulong? _height { get; set; }
+    public ulong? Height { get; set; }
+
     [JsonPropertyName("long_term_weight")]
-    [JsonInclude]
-    private ulong? _longTermWeight { get; set; }
+    public ulong? LongTermWeight { get; set; }
+
     [JsonPropertyName("major_version")]
-    [JsonInclude]
-    private uint? _majorVersion { get; set; }
+    public uint? MajorVersion { get; set; }
+
     [JsonPropertyName("miner_tx_hash")]
-    [JsonInclude]
-    private string? _minerTxHash { get; set; }
+    public string? MinerTxHash { get; set; }
+
     [JsonPropertyName("minor_version")]
-    [JsonInclude]
-    private uint? _minorVersion { get; set; }
+    public uint? MinorVersion { get; set; }
+
     [JsonPropertyName("nonce")]
-    [JsonInclude]
-    private ulong? _nonce { get; set; }
+    public ulong? Nonce { get; set; }
+
     [JsonPropertyName("num_txes")]
-    [JsonInclude]
-    private uint? _numTxs { get; set; }
+    public uint? NumTxs { get; set; }
+
     [JsonPropertyName("orphan_status")]
-    [JsonInclude]
-    private bool? _orphanStatus { get; set; }
+    public bool? OrphanStatus { get; set; }
+
     [JsonPropertyName("pow_hash")]
-    [JsonInclude]
-    private string? _powHash { get; set; }
+    public string? PowHash { get; set; }
+
     [JsonPropertyName("prev_hash")]
-    [JsonInclude]
-    private string? _prevHash { get; set; }
+    public string? PrevHash { get; set; }
+
     [JsonPropertyName("reward")]
-    [JsonInclude]
-    private ulong? _reward { get; set; }
+    public ulong? Reward { get; set; }
+
     [JsonPropertyName("block_size")]
-    [JsonInclude]
-    private ulong? _size { get; set; }
+    public ulong? Size { get; set; }
+
     [JsonPropertyName("timestamp")]
-    [JsonInclude]
-    private ulong? _timestamp { get; set; }
+    public ulong? Timestamp { get; set; }
+
     [JsonPropertyName("block_weight")]
-    [JsonInclude]
-    private ulong? _weight { get; set; }
+    public ulong? Weight { get; set; }
 
     public MoneroBlockHeader() { }
 
     public MoneroBlockHeader(MoneroBlockHeader header)
     {
-        _hash = header._hash;
-        _height = header._height;
-        _timestamp = header._timestamp;
-        _size = header._size;
-        _weight = header._weight;
-        _longTermWeight = header._longTermWeight;
-        _depth = header._depth;
-        _difficulty = header._difficulty;
-        _cumulativeDifficulty = header._cumulativeDifficulty;
-        _majorVersion = header._majorVersion;
-        _minorVersion = header._minorVersion;
-        _nonce = header._nonce;
-        _numTxs = header._numTxs;
-        _orphanStatus = header._orphanStatus;
-        _prevHash = header._prevHash;
-        _reward = header._reward;
-        _powHash = header._powHash;
+        Hash = header.Hash;
+        Height = header.Height;
+        Timestamp = header.Timestamp;
+        Size = header.Size;
+        Weight = header.Weight;
+        LongTermWeight = header.LongTermWeight;
+        Depth = header.Depth;
+        Difficulty = header.Difficulty;
+        CumulativeDifficulty = header.CumulativeDifficulty;
+        MajorVersion = header.MajorVersion;
+        MinorVersion = header.MinorVersion;
+        Nonce = header.Nonce;
+        NumTxs = header.NumTxs;
+        OrphanStatus = header.OrphanStatus;
+        PrevHash = header.PrevHash;
+        Reward = header.Reward;
+        PowHash = header.PowHash;
     }
 
     public virtual bool Equals(MoneroBlockHeader? other)
@@ -94,221 +93,221 @@ public class MoneroBlockHeader : IEquatable<MoneroBlockHeader>
             return true;
         }
 
-        return _hash == other._hash &&
-               _height == other._height &&
-               _timestamp == other._timestamp &&
-               _size == other._size &&
-               _weight == other._weight &&
-               _longTermWeight == other._longTermWeight &&
-               _depth == other._depth &&
-               _difficulty == other._difficulty &&
-               _cumulativeDifficulty == other._cumulativeDifficulty &&
-               _majorVersion == other._majorVersion &&
-               _minorVersion == other._minorVersion &&
-               _nonce == other._nonce &&
-               _minerTxHash == other._minerTxHash &&
-               _numTxs == other._numTxs &&
-               _orphanStatus == other._orphanStatus &&
-               _prevHash == other._prevHash &&
-               _reward == other._reward &&
-               _powHash == other._powHash;
+        return Hash == other.Hash &&
+               Height == other.Height &&
+               Timestamp == other.Timestamp &&
+               Size == other.Size &&
+               Weight == other.Weight &&
+               LongTermWeight == other.LongTermWeight &&
+               Depth == other.Depth &&
+               Difficulty == other.Difficulty &&
+               CumulativeDifficulty == other.CumulativeDifficulty &&
+               MajorVersion == other.MajorVersion &&
+               MinorVersion == other.MinorVersion &&
+               Nonce == other.Nonce &&
+               MinerTxHash == other.MinerTxHash &&
+               NumTxs == other.NumTxs &&
+               OrphanStatus == other.OrphanStatus &&
+               PrevHash == other.PrevHash &&
+               Reward == other.Reward &&
+               PowHash == other.PowHash;
     }
 
     public string? GetHash()
     {
-        return _hash;
+        return Hash;
     }
 
     public virtual MoneroBlockHeader SetHash(string? hash)
     {
-        _hash = hash;
+        Hash = hash;
         return this;
     }
 
     public ulong? GetHeight()
     {
-        return _height;
+        return Height;
     }
 
     public virtual MoneroBlockHeader SetHeight(ulong? height)
     {
-        _height = height;
+        Height = height;
         return this;
     }
 
     public ulong? GetTimestamp()
     {
-        return _timestamp;
+        return Timestamp;
     }
 
     public virtual MoneroBlockHeader SetTimestamp(ulong? timestamp)
     {
-        _timestamp = timestamp;
+        Timestamp = timestamp;
         return this;
     }
 
     public ulong? GetSize()
     {
-        return _size;
+        return Size;
     }
 
     public virtual MoneroBlockHeader SetSize(ulong? size)
     {
-        _size = size;
+        Size = size;
         return this;
     }
 
     public ulong? GetWeight()
     {
-        return _weight;
+        return Weight;
     }
 
     public virtual MoneroBlockHeader SetWeight(ulong? weight)
     {
-        _weight = weight;
+        Weight = weight;
         return this;
     }
 
     public ulong? GetLongTermWeight()
     {
-        return _longTermWeight;
+        return LongTermWeight;
     }
 
     public virtual MoneroBlockHeader SetLongTermWeight(ulong? longTermWeight)
     {
-        _longTermWeight = longTermWeight;
+        LongTermWeight = longTermWeight;
         return this;
     }
 
     public ulong? GetDepth()
     {
-        return _depth;
+        return Depth;
     }
 
     public virtual MoneroBlockHeader SetDepth(ulong? depth)
     {
-        _depth = depth;
+        Depth = depth;
         return this;
     }
 
     public ulong? GetDifficulty()
     {
-        return _difficulty;
+        return Difficulty;
     }
 
     public virtual MoneroBlockHeader SetDifficulty(ulong? difficulty)
     {
-        _difficulty = difficulty;
+        Difficulty = difficulty;
         return this;
     }
 
     public ulong? GetCumulativeDifficulty()
     {
-        return _cumulativeDifficulty;
+        return CumulativeDifficulty;
     }
 
     public virtual MoneroBlockHeader SetCumulativeDifficulty(ulong? cumulativeDifficulty)
     {
-        _cumulativeDifficulty = cumulativeDifficulty;
+        CumulativeDifficulty = cumulativeDifficulty;
         return this;
     }
 
     public uint? GetMajorVersion()
     {
-        return _majorVersion;
+        return MajorVersion;
     }
 
     public virtual MoneroBlockHeader SetMajorVersion(uint? majorVersion)
     {
-        _majorVersion = majorVersion;
+        MajorVersion = majorVersion;
         return this;
     }
 
     public uint? GetMinorVersion()
     {
-        return _minorVersion;
+        return MinorVersion;
     }
 
     public virtual MoneroBlockHeader SetMinorVersion(uint? minorVersion)
     {
-        _minorVersion = minorVersion;
+        MinorVersion = minorVersion;
         return this;
     }
 
     public ulong? GetNonce()
     {
-        return _nonce;
+        return Nonce;
     }
 
     public virtual MoneroBlockHeader SetNonce(ulong? nonce)
     {
-        _nonce = nonce;
+        Nonce = nonce;
         return this;
     }
 
     public string? GetMinerTxHash()
     {
-        return _minerTxHash;
+        return MinerTxHash;
     }
 
     public virtual MoneroBlockHeader SetMinerTxHash(string? minerTxHash)
     {
-        _minerTxHash = minerTxHash;
+        MinerTxHash = minerTxHash;
         return this;
     }
 
     public uint? GetNumTxs()
     {
-        return _numTxs;
+        return NumTxs;
     }
 
     public virtual MoneroBlockHeader SetNumTxs(uint? numTxs)
     {
-        _numTxs = numTxs;
+        NumTxs = numTxs;
         return this;
     }
 
     public bool? GetOrphanStatus()
     {
-        return _orphanStatus;
+        return OrphanStatus;
     }
 
     public virtual MoneroBlockHeader SetOrphanStatus(bool? orphanStatus)
     {
-        _orphanStatus = orphanStatus;
+        OrphanStatus = orphanStatus;
         return this;
     }
 
     public string? GetPrevHash()
     {
-        return _prevHash;
+        return PrevHash;
     }
 
     public virtual MoneroBlockHeader SetPrevHash(string? prevHash)
     {
-        _prevHash = prevHash;
+        PrevHash = prevHash;
         return this;
     }
 
     public ulong? GetReward()
     {
-        return _reward;
+        return Reward;
     }
 
     public virtual MoneroBlockHeader SetReward(ulong? reward)
     {
-        _reward = reward;
+        Reward = reward;
         return this;
     }
 
     public string? GetPowHash()
     {
-        return _powHash;
+        return PowHash;
     }
 
     public virtual MoneroBlockHeader SetPowHash(string? powHash)
     {
-        _powHash = powHash;
+        PowHash = powHash;
         return this;
     }
 

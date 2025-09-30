@@ -5,29 +5,18 @@ namespace Monero.Wallet.Common;
 public class MoneroSubaddress
 {
     [JsonPropertyName("major")]
-    private uint? _accountIndex;
+    public uint? AccountIndex { get; set; }
+
+    [JsonPropertyName("minor")]
+    public uint? Index { get; set; }
+
     private string? _address;
     private ulong? _balance;
-    [JsonPropertyName("minor")]
-    private uint? _index;
     private bool? _isUsed;
     private string? _label = "";
     private ulong? _numBlocksToUnlock;
     private ulong? _numUnspentOutputs;
     private ulong? _unlockedBalance;
-
-    public MoneroSubaddress() { }
-
-    public MoneroSubaddress(string address)
-    {
-        _address = address;
-    }
-
-    public MoneroSubaddress(uint accountIndex, uint index)
-    {
-        _accountIndex = accountIndex;
-        _index = index;
-    }
 
     public bool Equals(MoneroSubaddress? other)
     {
@@ -41,8 +30,8 @@ public class MoneroSubaddress
             return true;
         }
 
-        return _accountIndex == other._accountIndex &&
-               _index == other._index &&
+        return AccountIndex == other.AccountIndex &&
+               Index == other.Index &&
                _address == other._address &&
                _label == other._label &&
                _balance == other._balance &&
@@ -50,28 +39,6 @@ public class MoneroSubaddress
                _numUnspentOutputs == other._numUnspentOutputs &&
                _isUsed == other._isUsed &&
                _numBlocksToUnlock == other._numBlocksToUnlock;
-    }
-
-    public uint? GetAccountIndex()
-    {
-        return _accountIndex;
-    }
-
-    public MoneroSubaddress SetAccountIndex(uint? accountIndex)
-    {
-        _accountIndex = accountIndex;
-        return this;
-    }
-
-    public uint? GetIndex()
-    {
-        return _index;
-    }
-
-    public MoneroSubaddress SetIndex(uint? index)
-    {
-        _index = index;
-        return this;
     }
 
     public string? GetAddress()

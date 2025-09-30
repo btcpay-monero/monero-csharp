@@ -7,41 +7,8 @@ namespace Monero.Wallet.Common;
 public class MoneroCheckReserve : MoneroCheck
 {
     [JsonPropertyName("total")]
-    private ulong? _totalAmount;
+    public ulong? TotalAmount { get; set; }
+
     [JsonPropertyName("spent")]
-    private ulong? _unconfirmedSpentAmount;
-
-    public MoneroCheckReserve()
-        : base(false)
-    {
-    }
-
-    public MoneroCheckReserve(bool isGood, ulong? totalAmount, ulong? unconfirmedSpentAmount)
-        : base(isGood)
-    {
-        _totalAmount = totalAmount;
-        _unconfirmedSpentAmount = unconfirmedSpentAmount;
-    }
-
-    public ulong? GetTotalAmount()
-    {
-        return _totalAmount;
-    }
-
-    public MoneroCheckReserve SetTotalAmount(ulong? totalAmount)
-    {
-        _totalAmount = totalAmount;
-        return this;
-    }
-
-    public ulong? GetUnconfirmedSpentAmount()
-    {
-        return _unconfirmedSpentAmount;
-    }
-
-    public MoneroCheckReserve SetUnconfirmedSpentAmount(ulong? unconfirmedSpentAmount)
-    {
-        _unconfirmedSpentAmount = unconfirmedSpentAmount;
-        return this;
-    }
+    public ulong? UnconfirmedSpentAmount { get; set; }
 }

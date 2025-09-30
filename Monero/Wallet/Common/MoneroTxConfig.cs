@@ -100,7 +100,7 @@ public class MoneroTxConfig
         string paramStr = paramSb.ToString();
         if (paramStr.Length > 0)
         {
-            paramStr = "?" + paramStr.Substring(1); // Replace first '&' with '?'
+            paramStr = "?" + paramStr.Substring(1); // Replace the first '&' with '?'
         }
 
         return sb + paramStr;
@@ -125,7 +125,7 @@ public class MoneroTxConfig
         }
 
         _destinations.Clear();
-        _destinations.Add(new MoneroDestination(address, 0));
+        _destinations.Add(new MoneroDestination { Address = address, Amount = 0 });
         return this;
     }
 
@@ -136,7 +136,7 @@ public class MoneroTxConfig
             throw new MoneroError("Cannot Get address because MoneroTxConfig does not have exactly one destination");
         }
 
-        return _destinations[0].GetAddress();
+        return _destinations[0].Address;
     }
 
     public MoneroTxConfig SetAmount(ulong? amount)
@@ -148,11 +148,11 @@ public class MoneroTxConfig
 
         if (_destinations == null || _destinations.Count == 0)
         {
-            AddDestination(new MoneroDestination(null, amount));
+            AddDestination(new MoneroDestination { Address = null, Amount = amount });
         }
         else
         {
-            _destinations[0].SetAmount(amount);
+            _destinations[0].Amount = amount;
         }
 
         return this;
@@ -171,12 +171,12 @@ public class MoneroTxConfig
             throw new MoneroError("Cannot Get amount because MoneroTxConfig does not have exactly one destination");
         }
 
-        return _destinations[0].GetAmount();
+        return _destinations[0].Amount;
     }
 
     public MoneroTxConfig AddDestination(string address, ulong amount)
     {
-        return AddDestination(new MoneroDestination(address, amount));
+        return AddDestination(new MoneroDestination { Address = address, Amount = amount });
     }
 
     public MoneroTxConfig AddDestination(MoneroDestination destination)

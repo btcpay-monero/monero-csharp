@@ -72,9 +72,9 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestGetVersion()
     {
         MoneroVersion version = await _daemon.GetVersion();
-        Assert.NotNull(version.GetNumber());
-        Assert.True(version.GetNumber() > 0);
-        Assert.NotNull(version.IsRelease());
+        Assert.NotNull(version.Number);
+        Assert.True(version.Number > 0);
+        Assert.NotNull(version.IsRelease);
     }
 
     [Fact]
@@ -192,14 +192,14 @@ public class MoneroDaemonRpcIntegrationTest
         MoneroBlock block = await _daemon.GetBlockByHash(hash);
         TestBlock(block, ctx);
         Assert.True((await _daemon.GetBlockByHeight((ulong)block.GetHeight()!)).Equals(block));
-        Assert.Null(block.GetTxs());
+        Assert.Null(block.Txs);
 
         // retrieve by hash of previous to last block
         hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()! - 1);
         block = await _daemon.GetBlockByHash(hash);
         TestBlock(block, ctx);
         Assert.True((await _daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()! - 1)).Equals(block));
-        Assert.Null(block.GetTxs());
+        Assert.Null(block.Txs);
     }
 
     // Can get blocks by hash which includes transactions (binary)
@@ -345,14 +345,14 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestGetFeeEstimate()
     {
         MoneroFeeEstimate feeEstimate = await _daemon.GetFeeEstimate(null);
-        TestUtils.TestUnsignedBigInteger(feeEstimate.GetFee(), true);
-        Assert.Equal(4, feeEstimate.GetFees().Count); // slow, normal, fast, fastest
+        TestUtils.TestUnsignedBigInteger(feeEstimate.Fee, true);
+        Assert.Equal(4, feeEstimate.Fees?.Count); // slow, normal, fast, fastest
         for (int i = 0; i < 4; i++)
         {
-            TestUtils.TestUnsignedBigInteger(feeEstimate.GetFees()[i], true);
+            TestUtils.TestUnsignedBigInteger(feeEstimate?.Fees?[i], true);
         }
 
-        TestUtils.TestUnsignedBigInteger(feeEstimate.GetQuantizationMask(), true);
+        TestUtils.TestUnsignedBigInteger(feeEstimate?.QuantizationMask, true);
     }
 
     // Can get hashes of transactions in the transaction pool (binary)
@@ -564,10 +564,12 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestBanPeer()
     {
         // set ban
-        MoneroBan ban = new();
-        ban.SetHost("192.168.1.51");
-        ban.SetIsBanned(true);
-        ban.SetSeconds(60);
+        MoneroBan ban = new()
+        {
+            Host = "192.168.1.51",
+            IsBanned = true,
+            Seconds = 60
+        };
         await _daemon.SetPeerBans([ban]);
 
         // test ban
@@ -576,7 +578,7 @@ public class MoneroDaemonRpcIntegrationTest
         foreach (MoneroBan aBan in bans)
         {
             TestMoneroBan(aBan);
-            if ("192.168.1.51".Equals(aBan.GetHost()))
+            if ("192.168.1.51".Equals(aBan.Host))
             {
                 found = true;
             }
@@ -591,13 +593,13 @@ public class MoneroDaemonRpcIntegrationTest
     {
         // set bans
         MoneroBan ban1 = new();
-        ban1.SetHost("192.168.1.52");
-        ban1.SetIsBanned(true);
-        ban1.SetSeconds(60);
+        ban1.Host = "192.168.1.52";
+        ban1.IsBanned = true;
+        ban1.Seconds = 60;
         MoneroBan ban2 = new();
-        ban2.SetHost("192.168.1.53");
-        ban2.SetIsBanned(true);
-        ban2.SetSeconds(60);
+        ban2.Host = "192.168.1.53";
+        ban2.IsBanned = true;
+        ban2.Seconds = 60;
         List<MoneroBan> bans = [];
         bans.Add(ban1);
         bans.Add(ban2);
@@ -610,12 +612,12 @@ public class MoneroDaemonRpcIntegrationTest
         foreach (MoneroBan aBan in bans)
         {
             TestMoneroBan(aBan);
-            if ("192.168.1.52".Equals(aBan.GetHost()))
+            if ("192.168.1.52".Equals(aBan.Host))
             {
                 found1 = true;
             }
 
-            if ("192.168.1.53".Equals(aBan.GetHost()))
+            if ("192.168.1.53".Equals(aBan.Host))
             {
                 found2 = true;
             }
@@ -664,11 +666,11 @@ public class MoneroDaemonRpcIntegrationTest
 
             // test status without mining
             MoneroMiningStatus status = await _daemon.GetMiningStatus();
-            Assert.False(status.IsActive());
-            Assert.Null(status.GetAddress());
-            Assert.Equal(0, (long)status.GetSpeed()!);
-            Assert.Equal(0, (int)status.GetNumThreads()!);
-            Assert.Null(status.IsBackground());
+            Assert.False(status.IsActive);
+            Assert.Null(status.Address);
+            Assert.Equal(0, (long)status.Speed!);
+            Assert.Equal(0, (int)status.NumThreads!);
+            Assert.Null(status.IsBackground);
 
             // test status with mining
             // TODO use wallet rpc address
@@ -677,11 +679,11 @@ public class MoneroDaemonRpcIntegrationTest
             bool isBackground = false;
             await _daemon.StartMining(address, threadCount, isBackground, true);
             status = await _daemon.GetMiningStatus();
-            Assert.True(status.IsActive());
-            Assert.True(address == status.GetAddress());
-            Assert.True(status.GetSpeed() >= 0);
-            Assert.True(threadCount == status.GetNumThreads());
-            Assert.True(isBackground == status.IsBackground());
+            Assert.True(status.IsActive);
+            Assert.True(address == status.Address);
+            Assert.True(status.Speed >= 0);
+            Assert.True(threadCount == status.NumThreads);
+            Assert.True(isBackground == status.IsBackground);
         }
         finally
         {
@@ -706,7 +708,7 @@ public class MoneroDaemonRpcIntegrationTest
         // try to submit a block hashing blob without nonce
         try
         {
-            await _daemon.SubmitBlocks([template.GetBlockTemplateBlob()!]);
+            await _daemon.SubmitBlocks([template.BlockTemplateBlob!]);
             throw new Exception("Should have thrown error");
         }
         catch (MoneroRpcError e)
@@ -721,13 +723,13 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestPruneBlockchain()
     {
         MoneroPruneResult result = await _daemon.PruneBlockchain(true);
-        if (result.IsPruned() == true)
+        if (result.IsPruned == true)
         {
-            Assert.True(result.GetPruningSeed() > 0);
+            Assert.True(result.PruningSeed > 0);
         }
         else
         {
-            Assert.True(0 == result.GetPruningSeed());
+            Assert.True(0 == result.PruningSeed);
         }
     }
 
@@ -753,7 +755,7 @@ public class MoneroDaemonRpcIntegrationTest
         TestUpdateDownloadResult(result, path);
 
         // test invalid path
-        if (result.IsUpdateAvailable() == true)
+        if (result.IsUpdateAvailable == true)
         {
             try
             {
@@ -874,7 +876,7 @@ public class MoneroDaemonRpcIntegrationTest
         while (txHashes.Count < numTxs && height > 0)
         {
             MoneroBlock block = await daemon.GetBlockByHeight(--height);
-            txHashes.AddRange(block.GetTxHashes()!);
+            txHashes.AddRange(block.TxHashes);
         }
 
         return txHashes;
@@ -883,17 +885,17 @@ public class MoneroDaemonRpcIntegrationTest
     private static void TestBlockTemplate(MoneroBlockTemplate template)
     {
         Assert.NotNull(template);
-        Assert.NotNull(template.GetBlockTemplateBlob());
-        Assert.NotNull(template.GetBlockHashingBlob());
-        Assert.NotNull(template.GetDifficulty());
-        Assert.NotNull(template.GetExpectedReward());
-        Assert.NotNull(template.GetHeight());
-        Assert.NotNull(template.GetPrevHash());
-        Assert.NotNull(template.GetReservedOffset());
-        Assert.NotNull(template.GetSeedHeight());
+        Assert.NotNull(template.BlockTemplateBlob);
+        Assert.NotNull(template.BlockHashingBlob);
+        Assert.NotNull(template.Difficulty);
+        Assert.NotNull(template.ExpectedReward);
+        Assert.NotNull(template.Height);
+        Assert.NotNull(template.PrevHash);
+        Assert.NotNull(template.ReservedOffset);
+        Assert.NotNull(template.SeedHeight);
         // regtest daemon has seed height equal to zero
-        Assert.NotNull(template.GetSeedHash());
-        Assert.True(template.GetSeedHash()!.Length > 0);
+        Assert.NotNull(template.SeedHash);
+        Assert.True(template.SeedHash.Length > 0);
         // next seed hash can be null or initialized  // TODO: test circumstances for each
     }
 
@@ -906,18 +908,18 @@ public class MoneroDaemonRpcIntegrationTest
 
         if (ctx.HasHex == true)
         {
-            Assert.NotNull(block.GetHex());
-            Assert.True(block.GetHex()!.Length > 1);
+            Assert.NotNull(block.Hex);
+            Assert.True(block.Hex!.Length > 1);
         }
         else
         {
-            Assert.NotNull(block.GetHex());
+            Assert.NotNull(block.Hex);
         }
 
         if (ctx.HasTxs == true)
         {
             Assert.NotNull(ctx.TxContext);
-            foreach (MoneroTx tx in block.GetTxs()!)
+            foreach (MoneroTx tx in block.Txs!)
             {
                 Assert.True(block.Equals(tx.GetBlock()));
                 TestTx(tx, ctx.TxContext);
@@ -926,7 +928,7 @@ public class MoneroDaemonRpcIntegrationTest
         else
         {
             Assert.Null(ctx.TxContext);
-            Assert.Null(block.GetTxs());
+            Assert.Null(block.Txs);
         }
     }
 
@@ -997,9 +999,9 @@ public class MoneroDaemonRpcIntegrationTest
         if (tx.IsConfirmed() == true)
         {
             Assert.NotNull(tx.GetBlock());
-            Assert.Contains(tx, tx.GetBlock()!.GetTxs()!);
+            Assert.Contains(tx, tx.GetBlock()!.Txs!);
             Assert.True(tx.GetBlock()!.GetHeight() > 0);
-            Assert.Contains(tx, tx.GetBlock()!.GetTxs()!);
+            Assert.Contains(tx, tx.GetBlock()!.Txs!);
             Assert.True(tx.GetBlock()!.GetHeight() > 0);
             Assert.True(tx.GetBlock()!.GetTimestamp() > 0);
             Assert.True(tx.GetRelay());
@@ -1197,11 +1199,11 @@ public class MoneroDaemonRpcIntegrationTest
 
     private static void TestKeyImage(MoneroKeyImage image)
     {
-        Assert.True(image.GetHex()!.Length > 0);
-        if (image.GetSignature() != null)
+        Assert.True(image.Hex!.Length > 0);
+        if (image.Signature != null)
         {
-            Assert.NotNull(image.GetSignature());
-            Assert.True(image.GetSignature()!.Length > 0);
+            Assert.NotNull(image.Signature);
+            Assert.True(image.Signature!.Length > 0);
         }
     }
 
@@ -1230,10 +1232,6 @@ public class MoneroDaemonRpcIntegrationTest
         // copy tx and assert deep equality
         MoneroTx copy = tx.Clone();
         Assert.Null(copy.GetBlock());
-        if (tx.GetBlock() != null)
-        {
-            copy.SetBlock(tx.GetBlock()!.Clone().SetTxs([copy]));
-        }
 
         Assert.True(tx.ToString() == copy.ToString());
         Assert.True(copy != tx);
@@ -1271,65 +1269,60 @@ public class MoneroDaemonRpcIntegrationTest
         {
             DoNotTestCopy = true // to prevent infinite recursion
         };
-        if (tx.GetBlock() != null)
-        {
-            copy.SetBlock(tx.GetBlock()!.Clone().SetTxs([copy])); // copy block for testing
-        }
 
         TestTx(copy, ctx);
     }
 
     private static void TestMinerTxSum(MoneroMinerTxSum txSum)
     {
-        TestUtils.TestUnsignedBigInteger(txSum.GetEmissionSum(), true);
-        TestUtils.TestUnsignedBigInteger(txSum.GetFeeSum(), true);
+        TestUtils.TestUnsignedBigInteger(txSum.EmissionSum, true);
+        TestUtils.TestUnsignedBigInteger(txSum.FeeSum, true);
     }
 
     private static void TestOutputDistributionEntry(MoneroOutputDistributionEntry entry)
     {
-        TestUtils.TestUnsignedBigInteger(entry.GetAmount());
-        Assert.True(entry.GetBase() >= 0);
-        Assert.True(entry.GetDistribution()!.Count > 0);
-        Assert.True(entry.GetStartHeight() >= 0);
+        TestUtils.TestUnsignedBigInteger(entry.Amount);
+        Assert.True(entry.Base >= 0);
+        Assert.True(entry.Distribution!.Count > 0);
+        Assert.True(entry.StartHeight >= 0);
     }
 
     private static void TestInfo(MoneroDaemonInfo info)
     {
-        Assert.NotNull(info.GetVersion());
-        Assert.True(info.GetNumAltBlocks() >= 0);
-        Assert.True(info.GetBlockSizeLimit() > 0);
-        Assert.True(info.GetBlockSizeMedian() > 0);
-        TestUtils.TestUnsignedBigInteger(info.GetCumulativeDifficulty());
-        TestUtils.TestUnsignedBigInteger(info.GetFreeSpace());
-        Assert.True(info.GetNumOfflinePeers() >= 0);
-        Assert.True(info.GetNumOnlinePeers() >= 0);
-        Assert.True(info.GetHeight() >= 0);
-        Assert.True(info.GetNumIncomingConnections() >= 0);
-        Assert.NotNull(info.IsOffline());
-        Assert.True(info.GetNumOutgoingConnections() >= 0);
-        Assert.True(info.GetNumRpcConnections() >= 0);
-        Assert.True(info.GetAdjustedTimestamp() > 0);
-        Assert.True(info.GetTarget() > 0);
-        Assert.True(info.GetTargetHeight() >= 0);
-        Assert.True(info.GetNumTxs() >= 0);
-        Assert.True(info.GetNumTxsPool() >= 0);
-        Assert.NotNull(info.GetWasBootstrapEverUsed());
-        Assert.True(info.GetBlockWeightLimit() > 0);
-        Assert.True(info.GetBlockWeightMedian() > 0);
-        Assert.True(info.GetDatabaseSize() > 0);
-        Assert.NotNull(info.GetUpdateAvailable());
-        TestUtils.TestUnsignedBigInteger(info.GetCredits(), false); // 0 credits
-        string? topBlockHash = info.GetTopBlockHash();
+        Assert.NotNull(info.Version);
+        Assert.True(info.NumAltBlocks >= 0);
+        Assert.True(info.BlockSizeLimit > 0);
+        Assert.True(info.BlockSizeMedian > 0);
+        TestUtils.TestUnsignedBigInteger(info.CumulativeDifficulty);
+        TestUtils.TestUnsignedBigInteger(info.FreeSpace);
+        Assert.True(info.NumOfflinePeers >= 0);
+        Assert.True(info.NumOnlinePeers >= 0);
+        Assert.True(info.Height >= 0);
+        Assert.True(info.NumIncomingConnections >= 0);
+        Assert.True(info.NumOutgoingConnections >= 0);
+        Assert.True(info.NumRpcConnections >= 0);
+        Assert.True(info.AdjustedTimestamp > 0);
+        Assert.True(info.Target > 0);
+        Assert.True(info.TargetHeight >= 0);
+        Assert.True(info.NumTxs >= 0);
+        Assert.True(info.NumTxsPool >= 0);
+        Assert.NotNull(info.WasBootstrapEverUsed);
+        Assert.True(info.BlockWeightLimit > 0);
+        Assert.True(info.BlockWeightMedian > 0);
+        Assert.True(info.DatabaseSize > 0);
+        Assert.NotNull(info.UpdateAvailable);
+        TestUtils.TestUnsignedBigInteger(info.Credits, false); // 0 credits
+        string? topBlockHash = info.TopBlockHash;
         Assert.NotNull(topBlockHash);
         Assert.True(topBlockHash.Length > 0);
-        Assert.NotNull(info.IsBusySyncing());
-        Assert.NotNull(info.IsSynchronized());
 
-        if (info.IsRestricted() == false)
+        if (info.IsRestricted)
         {
-            Assert.True(info.GetHeightWithoutBootstrap() > 0);
-            Assert.True(info.GetStartTimestamp() > 0);
+            return;
         }
+
+        Assert.True(info.HeightWithoutBootstrap > 0);
+        Assert.True(info.StartTimestamp > 0);
     }
 
     private static void TestSyncInfo(MoneroDaemonSyncInfo syncInfo)
@@ -1338,162 +1331,162 @@ public class MoneroDaemonRpcIntegrationTest
         MoneroDaemonSyncInfo testObj = new();
 
         Assert.True(testObj.GetType().IsInstanceOfType(syncInfo));
-        Assert.True(syncInfo.GetHeight() >= 0);
-        if (syncInfo.GetPeers() != null)
+        Assert.True(syncInfo.Height >= 0);
+        if (syncInfo.Peers != null)
         {
-            Assert.True(syncInfo.GetPeers()!.Count > 0);
-            foreach (MoneroPeerInfo connection in syncInfo.GetPeers()!)
+            Assert.True(syncInfo.Peers!.Count > 0);
+            foreach (MoneroPeerInfo connection in syncInfo.Peers!)
             {
                 TestPeer(connection.Info!);
             }
         }
 
-        if (syncInfo.GetSpans() != null)
+        if (syncInfo.Spans != null)
         {
             // TODO: test that this is being hit, so far not used
-            Assert.True(syncInfo.GetSpans()!.Count > 0);
-            foreach (MoneroConnectionSpan span in syncInfo.GetSpans()!)
+            Assert.True(syncInfo.Spans!.Count > 0);
+            foreach (MoneroConnectionSpan span in syncInfo.Spans!)
             {
                 TestConnectionSpan(span);
             }
         }
 
-        Assert.True(syncInfo.GetNextNeededPruningSeed() >= 0);
-        Assert.NotNull(syncInfo.GetOverview());
-        TestUtils.TestUnsignedBigInteger(syncInfo.GetCredits(), false); // 0 credits
-        Assert.Null(syncInfo.GetTopBlockHash());
+        Assert.True(syncInfo.NextNeededPruningSeed >= 0);
+        Assert.NotNull(syncInfo.Overview);
+        TestUtils.TestUnsignedBigInteger(syncInfo.Credits, false); // 0 credits
+        Assert.Null(syncInfo.TopBlockHash);
     }
 
     private static void TestConnectionSpan(MoneroConnectionSpan? span)
     {
         Assert.NotNull(span);
-        Assert.NotNull(span.GetConnectionId());
-        Assert.True(span.GetConnectionId()!.Length > 0);
-        Assert.True(span.GetStartHeight() > 0);
-        Assert.True(span.GetNumBlocks() > 0);
-        Assert.True(span.GetRemoteAddress() == null || span.GetRemoteAddress()!.Length > 0);
-        Assert.True(span.GetRate() > 0);
-        Assert.True(span.GetSpeed() >= 0);
-        Assert.True(span.GetSize() > 0);
+        Assert.NotNull(span.ConnectionId);
+        Assert.True(span.ConnectionId!.Length > 0);
+        Assert.True(span.StartHeight > 0);
+        Assert.True(span.NumBlocks > 0);
+        Assert.True(span.RemoteAddress == null || span.RemoteAddress!.Length > 0);
+        Assert.True(span.Rate > 0);
+        Assert.True(span.Speed >= 0);
+        Assert.True(span.Size > 0);
     }
 
     private static void TestHardForkInfo(MoneroHardForkInfo hardForkInfo)
     {
-        Assert.NotNull(hardForkInfo.GetEarliestHeight());
-        Assert.NotNull(hardForkInfo.IsEnabled());
-        Assert.NotNull(hardForkInfo.GetState());
-        Assert.NotNull(hardForkInfo.GetThreshold());
-        Assert.NotNull(hardForkInfo.GetVersion());
-        Assert.NotNull(hardForkInfo.GetNumVotes());
-        Assert.NotNull(hardForkInfo.GetVoting());
-        Assert.NotNull(hardForkInfo.GetWindow());
-        TestUtils.TestUnsignedBigInteger(hardForkInfo.GetCredits(), false); // 0 credits
-        Assert.Null(hardForkInfo.GetTopBlockHash());
+        Assert.NotNull(hardForkInfo.EarliestHeight);
+        Assert.NotNull(hardForkInfo.IsEnabled);
+        Assert.NotNull(hardForkInfo.State);
+        Assert.NotNull(hardForkInfo.Threshold);
+        Assert.NotNull(hardForkInfo.Version);
+        Assert.NotNull(hardForkInfo.NumVotes);
+        Assert.NotNull(hardForkInfo.Voting);
+        Assert.NotNull(hardForkInfo.Window);
+        TestUtils.TestUnsignedBigInteger(hardForkInfo.Credits, false); // 0 credits
+        Assert.Null(hardForkInfo.TopBlockHash);
     }
 
     private static void TestMoneroBan(MoneroBan ban)
     {
-        Assert.NotNull(ban.GetHost());
-        Assert.NotNull(ban.GetIp());
-        Assert.NotNull(ban.GetSeconds());
+        Assert.NotNull(ban.Host);
+        Assert.NotNull(ban.Ip);
+        Assert.NotNull(ban.Seconds);
     }
 
     private static void TestAltChain(MoneroAltChain altChain)
     {
         Assert.NotNull(altChain);
-        Assert.True(altChain.GetBlockHashes()!.Count > 0);
-        TestUtils.TestUnsignedBigInteger(altChain.GetDifficulty(), true);
-        Assert.True(altChain.GetHeight() > 0);
-        Assert.True(altChain.GetLength() > 0);
-        Assert.Equal(64, altChain.GetMainChainParentBlockHash()!.Length);
+        Assert.True(altChain.BlockHashes!.Count > 0);
+        TestUtils.TestUnsignedBigInteger(altChain.Difficulty, true);
+        Assert.True(altChain.Height > 0);
+        Assert.True(altChain.Length > 0);
+        Assert.Equal(64, altChain.MainChainParentBlockHash!.Length);
     }
 
     private static void TestPeer(MoneroPeer peer)
     {
         TestKnownPeer(peer, true);
-        Assert.True(peer.GetHash()!.Length > 0);
-        Assert.True(peer.GetAvgDownload() >= 0);
-        Assert.True(peer.GetAvgUpload() >= 0);
-        Assert.True(peer.GetCurrentDownload() >= 0);
-        Assert.True(peer.GetCurrentUpload() >= 0);
-        Assert.True(peer.GetHeight() >= 0);
-        Assert.True(peer.GetLiveTime() >= 0);
-        Assert.True(peer.GetNumReceives() >= 0);
-        Assert.True(peer.GetReceiveIdleTime() >= 0);
-        Assert.True(peer.GetNumSends() >= 0);
-        Assert.True(peer.GetSendIdleTime() >= 0);
-        Assert.NotNull(peer.GetState());
-        Assert.True(peer.GetNumSupportFlags() >= 0);
+        Assert.True(peer.Hash!.Length > 0);
+        Assert.True(peer.AvgDownload >= 0);
+        Assert.True(peer.AvgUpload >= 0);
+        Assert.True(peer.CurrentDownload >= 0);
+        Assert.True(peer.CurrentUpload >= 0);
+        Assert.True(peer.Height >= 0);
+        Assert.True(peer.LiveTime >= 0);
+        Assert.True(peer.NumReceives >= 0);
+        Assert.True(peer.ReceiveIdleTime >= 0);
+        Assert.True(peer.NumSends >= 0);
+        Assert.True(peer.SendIdleTime >= 0);
+        Assert.NotNull(peer.State);
+        Assert.True(peer.NumSupportFlags >= 0);
     }
 
     private static void TestKnownPeer(MoneroPeer peer, bool fromConnection)
     {
         Assert.NotNull(peer);
-        Assert.True(peer.GetPort() > 0);
-        Assert.True(peer.GetRpcPort() == null || peer.GetRpcPort() >= 0);
+        Assert.True(peer.Port != null && int.Parse(peer.Port) > 0);
+        Assert.True(peer.RpcPort is null or >= 0);
         if (fromConnection)
         {
-            Assert.Null(peer.GetLastSeenTimestamp());
+            Assert.Null(peer.LastSeenTimestamp);
         }
         else
         {
-            if (peer.GetLastSeenTimestamp() < 0)
+            if (peer.LastSeenTimestamp < 0)
             {
-                MoneroUtils.Log(0, "Last seen timestamp is invalid: " + peer.GetLastSeenTimestamp());
+                MoneroUtils.Log(0, "Last seen timestamp is invalid: " + peer.LastSeenTimestamp);
             }
 
-            Assert.True(peer.GetLastSeenTimestamp() >= 0);
+            Assert.True(peer.LastSeenTimestamp >= 0);
         }
 
-        Assert.True(peer.GetPruningSeed() == null || peer.GetPruningSeed() >= 0);
+        Assert.True(peer.PruningSeed == null || peer.PruningSeed >= 0);
     }
 
     private static void TestUpdateCheckResult(MoneroDaemonUpdateCheckResult result)
     {
-        Assert.NotNull(result.IsUpdateAvailable());
-        if (result.IsUpdateAvailable() == true)
+        Assert.NotNull(result.IsUpdateAvailable);
+        if (result.IsUpdateAvailable == true)
         {
-            Assert.True(result.GetAutoUri()!.Length > 0, "No auto uri; is daemon online?");
-            Assert.True(result.GetUserUri()!.Length > 0);
-            Assert.True(result.GetVersion()!.Length > 0);
-            Assert.True(result.GetHash()!.Length > 0);
-            Assert.Equal(64, result.GetHash()!.Length);
+            Assert.True(result.AutoUri!.Length > 0, "No auto uri; is daemon online?");
+            Assert.True(result.UserUri!.Length > 0);
+            Assert.True(result.Version!.Length > 0);
+            Assert.True(result.Hash!.Length > 0);
+            Assert.Equal(64, result.Hash!.Length);
         }
         else
         {
-            Assert.Null(result.GetAutoUri());
-            Assert.Null(result.GetUserUri());
-            Assert.Null(result.GetVersion());
-            Assert.Null(result.GetHash());
+            Assert.Null(result.AutoUri);
+            Assert.Null(result.UserUri);
+            Assert.Null(result.Version);
+            Assert.Null(result.Hash);
         }
     }
 
     private static void TestUpdateDownloadResult(MoneroDaemonUpdateDownloadResult result, string? path)
     {
         TestUpdateCheckResult(result);
-        if (result.IsUpdateAvailable() == true)
+        if (result.IsUpdateAvailable == true)
         {
             if (path != null)
             {
-                Assert.True(path == result.GetDownloadPath());
+                Assert.True(path == result.DownloadPath);
             }
             else
             {
-                Assert.NotNull(result.GetDownloadPath());
+                Assert.NotNull(result.DownloadPath);
             }
         }
         else
         {
-            Assert.Null(result.GetDownloadPath());
+            Assert.Null(result.DownloadPath);
         }
     }
 
     private static void TestOutputHistogramEntry(MoneroOutputHistogramEntry entry)
     {
-        TestUtils.TestUnsignedBigInteger(entry.GetAmount());
-        Assert.True(entry.GetNumInstances() >= 0);
-        Assert.True(entry.GetNumUnlockedInstances() >= 0);
-        Assert.True(entry.GetNumRecentInstances() >= 0);
+        TestUtils.TestUnsignedBigInteger(entry.Amount);
+        Assert.True(entry.NumInstances >= 0);
+        Assert.True(entry.NumUnlockedInstances >= 0);
+        Assert.True(entry.NumRecentInstances >= 0);
     }
 
     private static void TestTxHexes(List<string> hexes, List<string> hexesPruned, List<string> txHashes)

@@ -9,10 +9,6 @@ public class MoneroOutputWallet : MoneroOutput
     private bool? _isSpent;
     private uint? _subaddressIndex;
 
-    public MoneroOutputWallet()
-    {
-    }
-
     public MoneroOutputWallet(MoneroOutputWallet output) : base(output)
     {
         _accountIndex = output._accountIndex;
