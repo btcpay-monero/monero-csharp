@@ -8,50 +8,23 @@ namespace Monero.IntegrationTests;
 
 public class MoneroRpcConnectionIntegrationTest
 {
-    // Can copy connection
-    [Fact]
-    public async Task TestClone()
-    {
-        MoneroRpcConnection connection = new("test", "user", "pass123", "test_zmq", 2);
-
-        MoneroRpcConnection copy = connection.Clone();
-
-        Assert.True(connection.Equals(copy));
-
-        connection = new MoneroRpcConnection(TestUtils.DAEMON_RPC_URI);
-
-        await TestConnection(connection, TestUtils.DAEMON_RPC_URI, true);
-
-        copy = connection.Clone();
-
-        Assert.True(connection.Equals(copy));
-    }
 
     // Can connect to node
     [Fact]
     public async Task TestNodeRpcConnection()
     {
-        MoneroRpcConnection connection = new(TestUtils.DAEMON_RPC_URI);
+        MoneroRpcConnection connection = new(TestUtils.DaemonRpcUri, TestUtils.DaemonRpcUsername, TestUtils.DaemonRpcPassword);
 
-        await TestConnection(connection, TestUtils.DAEMON_RPC_URI, true);
+        await TestConnection(connection, TestUtils.DaemonRpcUri.AbsoluteUri);
     }
 
     // Can connect to wallet
     [Fact]
     public async Task TestWalletRpcConnection()
     {
-        MoneroRpcConnection connection = new(TestUtils.WALLET_RPC_URI);
+        MoneroRpcConnection connection = new(TestUtils.PrimaryWalletRpcUri, TestUtils.WalletRpcUsername, TestUtils.WalletRpcPassword);
 
-        await TestConnection(connection, TestUtils.WALLET_RPC_URI, true);
-    }
-
-    // Test invalid url
-    [Fact]
-    public async Task TestInvalidConnection()
-    {
-        MoneroRpcConnection connection = new("");
-
-        await TestConnection(connection, "", false);
+        await TestConnection(connection, TestUtils.PrimaryWalletRpcUri.AbsoluteUri);
     }
 
     // Can send a request to RPC
@@ -60,55 +33,32 @@ public class MoneroRpcConnectionIntegrationTest
     {
         // Setup connection
 
-        MoneroRpcConnection connection = new(TestUtils.DAEMON_RPC_URI);
+        MoneroRpcConnection connection = new(TestUtils.DaemonRpcUri, TestUtils.DaemonRpcUsername, TestUtils.DaemonRpcPassword);
 
-        await TestConnection(connection, TestUtils.DAEMON_RPC_URI, true);
+        await TestConnection(connection, TestUtils.DaemonRpcUri.AbsoluteUri);
 
         // Test monerod JSON request
 
-        MoneroJsonRpcResponse<MoneroDaemonInfo> jsonResponse = await connection.SendJsonRequest<MoneroDaemonInfo>("get_info");
+        var jsonResponse = await connection.SendCommandAsync<NoRequestModel, MoneroDaemonInfo>("get_info", NoRequestModel.Instance);
 
         Assert.NotNull(jsonResponse);
         Assert.Null(jsonResponse.Error);
-        Assert.NotNull(jsonResponse.Result);
 
         // Test monerod PATH request
 
-        MoneroDaemonInfo pathResponse = await connection.SendPathRequest<MoneroDaemonInfo>("get_info");
+        MoneroDaemonInfo pathResponse = await connection.SendPathRequest<MoneroDaemonInfo>("get_info", []);
 
         Assert.NotNull(pathResponse);
         Assert.Null(pathResponse.Error);
-
-        // TODO implement MoneroRpcConnection.SendBinaryRequest()
     }
 
-    private static async Task TestConnection(MoneroRpcConnection? connection, string? uri, bool online)
+    private static Task TestConnection(MoneroRpcConnection? connection, string? uri)
     {
         Assert.NotNull(connection);
+        Assert.NotNull(uri);
+        Assert.NotEmpty(uri);
+        Assert.Equal(uri, connection.GetUri());
 
-        if (online)
-        {
-            Assert.NotNull(uri);
-            Assert.NotEmpty(uri);
-            Assert.Equal(uri, connection.GetUri());
-            Assert.True(connection.IsClearnet());
-            Assert.False(connection.IsOnion());
-            Assert.False(connection.IsI2P());
-            Assert.True(await connection.CheckConnection());
-            Assert.True(connection.IsOnline());
-            Assert.True(connection.IsAuthenticated());
-            Assert.True(connection.IsConnected());
-        }
-        else
-        {
-            Assert.Equal(uri, connection.GetUri());
-            Assert.False(connection.IsClearnet());
-            Assert.False(connection.IsOnion());
-            Assert.False(connection.IsI2P());
-            Assert.True(await connection.CheckConnection());
-            Assert.False(connection.IsOnline());
-            Assert.Null(connection.IsAuthenticated());
-            Assert.False(connection.IsConnected());
-        }
+        return Task.CompletedTask;
     }
 }

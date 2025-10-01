@@ -40,7 +40,7 @@ public class MoneroWalletRpcIntegrationTest
         await moneroWalletRpc.SetDaemonConnection(await moneroWalletRpc.GetDaemonConnection(), true, null);
         if (await moneroWalletRpc.IsConnectedToDaemon())
         {
-            await moneroWalletRpc.StartSyncing((ulong)TestUtils.SYNC_PERIOD_IN_MS);
+            await moneroWalletRpc.StartSyncing((ulong)TestUtils.SyncPeriodInMs);
         }
 
         return moneroWalletRpc;
@@ -87,7 +87,7 @@ public class MoneroWalletRpcIntegrationTest
                 null); // set daemon as trusted
             if (await walletRpc.IsConnectedToDaemon())
             {
-                await walletRpc.StartSyncing((ulong)TestUtils.SYNC_PERIOD_IN_MS);
+                await walletRpc.StartSyncing(TestUtils.SyncPeriodInMs);
             }
 
             return walletRpc;
@@ -195,8 +195,8 @@ public class MoneroWalletRpcIntegrationTest
             string privateSpendKey = await _wallet.GetPrivateSpendKey();
 
             // recreate the test wallet from seed
-            IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.SEED)
-                .SetRestoreHeight(TestUtils.FIRST_RECEIVE_HEIGHT));
+            IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.Seed)
+                .SetRestoreHeight(TestUtils.FirstReceiveHeight));
             string path = await moneroWallet.GetPath();
 
             await TestWallet(async () =>
@@ -204,16 +204,15 @@ public class MoneroWalletRpcIntegrationTest
                 Assert.True(primaryAddress == await moneroWallet.GetPrimaryAddress());
                 Assert.True(privateViewKey == await moneroWallet.GetPrivateViewKey());
                 Assert.True(privateSpendKey == await moneroWallet.GetPrivateSpendKey());
-                Assert.True(TestUtils.SEED == await moneroWallet.GetSeed());
+                Assert.True(TestUtils.Seed == await moneroWallet.GetSeed());
             }, moneroWallet);
 
             // attempt to create a wallet with two missing words
             try
             {
-                string invalidMnemonic =
-                    "memoir desk algebra inbound innocent unplugs fully okay five inflamed giant factual ritual toyed topic snake unhappy guarded tweezers haunted inundate giant";
+                const string invalidMnemonic = "memoir desk algebra inbound innocent unplugs fully okay five inflamed giant factual ritual toyed topic snake unhappy guarded tweezers haunted inundate giant";
                 await CreateWallet(new MoneroWalletConfig().SetSeed(invalidMnemonic)
-                    .SetRestoreHeight(TestUtils.FIRST_RECEIVE_HEIGHT));
+                    .SetRestoreHeight(TestUtils.FirstReceiveHeight));
             }
             catch (Exception e)
             {
@@ -248,15 +247,15 @@ public class MoneroWalletRpcIntegrationTest
         try
         {
             // create a test wallet with offset
-            IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.SEED)
-                .SetRestoreHeight(TestUtils.FIRST_RECEIVE_HEIGHT).SetSeedOffset("my secret offset!"));
+            IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.Seed)
+                .SetRestoreHeight(TestUtils.FirstReceiveHeight).SetSeedOffset("my secret offset!"));
 
             await TestWallet(async () =>
             {
                 MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
-                Assert.True(TestUtils.SEED != await moneroWallet.GetSeed());
+                Assert.True(TestUtils.Seed != await moneroWallet.GetSeed());
                 MoneroUtils.ValidateAddress(await moneroWallet.GetPrimaryAddress());
-                Assert.True(TestUtils.ADDRESS != await moneroWallet.GetPrimaryAddress());
+                Assert.True(TestUtils.Address != await moneroWallet.GetPrimaryAddress());
             }, moneroWallet);
         }
         catch (Exception e)
@@ -287,7 +286,7 @@ public class MoneroWalletRpcIntegrationTest
                 Assert.True(primaryAddress == await moneroWallet.GetPrimaryAddress());
                 Assert.True(privateViewKey == await moneroWallet.GetPrivateViewKey());
                 Assert.True(privateSpendKey == await moneroWallet.GetPrivateSpendKey());
-                if (TestUtils.TESTS_INCONTAINER)
+                if (TestUtils.TestsInContainer)
                 {
                     Assert.True(await moneroWallet.IsConnectedToDaemon(),
                         "Wallet created from keys is not connected to authenticated daemon");
@@ -343,7 +342,7 @@ public class MoneroWalletRpcIntegrationTest
     {
         string seed = await _wallet.GetSeed();
         MoneroUtils.ValidateMnemonic(seed);
-        Assert.True(TestUtils.SEED == seed);
+        Assert.True(TestUtils.Seed == seed);
     }
 
     // Can get the language of the seed

@@ -9,7 +9,6 @@ public interface IMoneroDaemon
     void RemoveListener(MoneroDaemonListener listener);
     List<MoneroDaemonListener> GetListeners();
     Task<MoneroVersion> GetVersion();
-    Task<bool> IsTrusted();
     Task<ulong> GetHeight();
     Task<string> GetBlockHash(ulong height);
     Task<MoneroBlockTemplate> GetBlockTemplate(string walletAddress, int? reserveSize);
@@ -23,7 +22,7 @@ public interface IMoneroDaemon
     Task<List<string>> GetBlockHashes(List<string> blockHashes, ulong startHeight);
     Task<List<MoneroTx>> GetTxs(List<string> txHashes, bool prune);
     Task<List<string>> GetTxHexes(List<string> txHashes, bool prune);
-    Task<MoneroFeeEstimate> GetFeeEstimate(int? graceBlocks);
+    Task<MoneroFeeEstimate> GetFeeEstimate();
     Task<MoneroMinerTxSum> GetMinerTxSum(ulong height, ulong? numBlocks);
     Task<MoneroSubmitTxResult> SubmitTxHex(string txHex, bool doNotRelay);
     Task RelayTxsByHash(List<string> txHashes);

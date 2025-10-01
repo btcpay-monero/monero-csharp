@@ -108,31 +108,6 @@ public class MoneroWalletConfig
         return _server?.GetUri();
     }
 
-    public MoneroWalletConfig SetServerUri(string? serverUri)
-    {
-        if (string.IsNullOrEmpty(serverUri))
-        {
-            _server = null;
-            return this;
-        }
-
-        if (_server == null)
-        {
-            _server = new MoneroRpcConnection(serverUri);
-        }
-        else
-        {
-            _server.SetUri(serverUri);
-        }
-
-        if (_serverUsername != null && _serverPassword != null)
-        {
-            _server.SetCredentials(_serverUsername, _serverPassword);
-        }
-
-        return this;
-    }
-
     public string? GetServerUsername()
     {
         return _server?.GetUsername();

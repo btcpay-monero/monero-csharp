@@ -14,9 +14,6 @@ public class MoneroDaemonRpcIntegrationTest
 
     public MoneroDaemonRpcIntegrationTest()
     {
-        MoneroRpcConnection rpcConnection = _daemon.GetRpcConnection();
-
-        Assert.True(rpcConnection.IsConnected(), "Daemon offline");
         ulong daemonHeight = _daemon.GetHeight().GetAwaiter().GetResult();
         if (daemonHeight == 1)
         {
@@ -34,7 +31,7 @@ public class MoneroDaemonRpcIntegrationTest
         {
             // start mining if possible to help push the network along
             // TODO use wallet rpc address
-            string address = TestUtils.ADDRESS;
+            string address = TestUtils.Address;
             try { await _daemon.StartMining(address, 1, false, true); }
             catch (MoneroError)
             {
@@ -77,12 +74,6 @@ public class MoneroDaemonRpcIntegrationTest
         Assert.NotNull(version.IsRelease);
     }
 
-    [Fact]
-    public async Task TestIsTrusted()
-    {
-        Assert.True(await _daemon.IsTrusted());
-    }
-
     // Can get the blockchain height
     [Fact]
     public async Task TestGetHeight()
@@ -105,7 +96,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetBlockTemplate()
     {
-        MoneroBlockTemplate template = await _daemon.GetBlockTemplate(TestUtils.ADDRESS, 2);
+        MoneroBlockTemplate template = await _daemon.GetBlockTemplate(TestUtils.Address, 2);
         TestBlockTemplate(template);
     }
 
@@ -344,7 +335,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetFeeEstimate()
     {
-        MoneroFeeEstimate feeEstimate = await _daemon.GetFeeEstimate(null);
+        MoneroFeeEstimate feeEstimate = await _daemon.GetFeeEstimate();
         TestUtils.TestUnsignedBigInteger(feeEstimate.Fee, true);
         Assert.Equal(4, feeEstimate.Fees?.Count); // slow, normal, fast, fastest
         for (int i = 0; i < 4; i++)
@@ -640,7 +631,7 @@ public class MoneroDaemonRpcIntegrationTest
 
         // generate address to mine to
         // TODO use wallet rpc
-        string address = TestUtils.ADDRESS;
+        string address = TestUtils.Address;
         // start mining
         await _daemon.StartMining(address, 1, false, true);
 
@@ -674,7 +665,7 @@ public class MoneroDaemonRpcIntegrationTest
 
             // test status with mining
             // TODO use wallet rpc address
-            string address = TestUtils.ADDRESS;
+            string address = TestUtils.Address;
             ulong threadCount = 1;
             bool isBackground = false;
             await _daemon.StartMining(address, threadCount, isBackground, true);
@@ -701,7 +692,7 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestSubmitMinedBlock()
     {
         // get template to mine on
-        MoneroBlockTemplate template = await _daemon.GetBlockTemplate(TestUtils.ADDRESS, 0);
+        MoneroBlockTemplate template = await _daemon.GetBlockTemplate(TestUtils.Address, 0);
 
         // TODO monero rpc: way to get mining nonce when found in order to submit?
 
@@ -714,7 +705,7 @@ public class MoneroDaemonRpcIntegrationTest
         catch (MoneroRpcError e)
         {
             Assert.True(-7 == e.GetCode());
-            Assert.True("Block not accepted" == e.Message);
+            Assert.Equal("Block not accepted", e.Message);
         }
     }
 
@@ -778,7 +769,7 @@ public class MoneroDaemonRpcIntegrationTest
         await _daemon.Stop();
 
         // give the daemon time to shut down
-        GenUtils.WaitFor(TestUtils.SYNC_PERIOD_IN_MS);
+        GenUtils.WaitFor(TestUtils.SyncPeriodInMs);
         // try to interact with the daemon
         try
         {

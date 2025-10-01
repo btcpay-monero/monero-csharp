@@ -1,5 +1,4 @@
 using Monero.Common;
-using Monero.Wallet.Common;
 
 namespace Monero.Wallet;
 
@@ -128,30 +127,14 @@ internal class MoneroWalletPoller
         return _wallet.GetListeners();
     }
 
-    public async Task<List<ulong>> GetBalances(uint? accountIdx, uint? subaddressIdx)
+    private async Task<List<ulong>> GetBalances(uint? accountIdx, uint? subaddressIdx)
     {
         ulong balance = await _wallet.GetBalance(accountIdx, subaddressIdx);
         ulong unlockedBalance = await _wallet.GetUnlockedBalance(accountIdx, subaddressIdx);
         return [balance, unlockedBalance];
     }
 
-    protected void AnnounceSyncProgress(ulong height, ulong startHeight, ulong endHeight, double percentDone,
-        string message)
-    {
-        foreach (MoneroWalletListener listener in GetListeners())
-        {
-            try
-            {
-                listener.OnSyncProgress(height, startHeight, endHeight, percentDone, message);
-            }
-            catch (Exception e)
-            {
-                MoneroUtils.Log(0, "Error calling listener on sync progress: " + e.Message);
-            }
-        }
-    }
-
-    protected void AnnounceNewBlock(ulong height)
+    private void AnnounceNewBlock(ulong height)
     {
         foreach (MoneroWalletListener listener in GetListeners())
         {
@@ -166,7 +149,7 @@ internal class MoneroWalletPoller
         }
     }
 
-    protected void AnnounceBalancesChanged(ulong balance, ulong unlockedBalance)
+    private void AnnounceBalancesChanged(ulong balance, ulong unlockedBalance)
     {
         foreach (MoneroWalletListener listener in GetListeners())
         {
@@ -177,36 +160,6 @@ internal class MoneroWalletPoller
             catch (Exception e)
             {
                 MoneroUtils.Log(0, "Error calling listener on balances changed: " + e.Message);
-            }
-        }
-    }
-
-    protected void AnnounceOutputReceived(MoneroOutputWallet output)
-    {
-        foreach (MoneroWalletListener listener in GetListeners())
-        {
-            try
-            {
-                listener.OnOutputReceived(output);
-            }
-            catch (Exception e)
-            {
-                MoneroUtils.Log(0, "Error calling listener on output received: " + e.Message);
-            }
-        }
-    }
-
-    protected void AnnounceOutputSpent(MoneroOutputWallet output)
-    {
-        foreach (MoneroWalletListener listener in GetListeners())
-        {
-            try
-            {
-                listener.OnOutputSpent(output);
-            }
-            catch (Exception e)
-            {
-                MoneroUtils.Log(0, "Error calling listener on output spent: " + e.Message);
             }
         }
     }
