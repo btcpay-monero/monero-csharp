@@ -327,17 +327,6 @@ public static class MoneroUtils
         return new MoneroDecodedAddress(address, (MoneroAddressType)addressType, networkType.Type);
     }
 
-    public static MoneroIntegratedAddress GetIntegratedAddress(MoneroNetworkType networkType, string standardAddress)
-    {
-        return GetIntegratedAddress(networkType, standardAddress, null);
-    }
-
-    public static MoneroIntegratedAddress GetIntegratedAddress(MoneroNetworkType networkType, string standardAddress,
-        string? paymentId)
-    {
-        throw new NotImplementedException("MoneroUtils.GetIntegratedAddress(): not implemented.");
-    }
-
     private static bool IsValidAddressHash(string decodedAddrStr)
     {
         if (string.IsNullOrEmpty(decodedAddrStr) || decodedAddrStr.Length < 8)
@@ -484,10 +473,5 @@ public static class MoneroUtils
         }
 
         return builder.ToString();
-    }
-
-    public static Dictionary<string, object?> BinaryBlocksToMap(byte[] blocks)
-    {
-        throw new NotImplementedException("MoneroUtils.BinaryBlocksToMap(): not implemented");
     }
 }

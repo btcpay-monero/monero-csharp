@@ -14,21 +14,16 @@ internal abstract class TestUtils
     private static MoneroDaemonRpc? daemonRpc;
     private static MoneroWalletRpc? walletRpc;
 
-    // monero daemon rpc endpoint configuration (change per your configuration)
-    public static readonly bool TESTS_INCONTAINER = GetDefaultEnv("TESTS_INCONTAINER", "false") == "true";
-    public static readonly string DAEMON_RPC_URI = GetDefaultEnv("XMR_DAEMON_URI", "http://127.0.0.1:18081");
-    public static readonly string DAEMON_RPC_USERNAME = "";
-    public static readonly string DAEMON_RPC_PASSWORD = "";
+    public static readonly bool TestsInContainer = GetDefaultEnv("TESTS_INCONTAINER", "false") == "true";
 
-    public static readonly int WALLET_RPC_ZMQ_PORT_START = 58083;
-    public static readonly string WALLET_RPC_USERNAME = "";
-    public static readonly string WALLET_RPC_PASSWORD = "";
-    public static readonly string WALLET_RPC_ZMQ_DOMAIN = "127.0.0.1";
-    public static readonly string WALLET_RPC_URI = GetDefaultEnv("XMR_WALLET_1_URI", "http://127.0.0.1:18082");
-    public static readonly string CREATE_WALLET_RPC_URI = GetDefaultEnv("XMR_WALLET_2_URI", "http://127.0.0.1:18083");
+    public static readonly Uri DaemonRpcUri = new(GetDefaultEnv("XMR_DAEMON_URI", "http://127.0.0.1:18081"));
+    public const string DaemonRpcUsername = "";
+    public const string DaemonRpcPassword = "";
 
-    private static readonly string WALLET_RPC_ZMQ_URI =
-        "tcp://" + WALLET_RPC_ZMQ_DOMAIN + ":" + WALLET_RPC_ZMQ_PORT_START;
+    public static readonly Uri PrimaryWalletRpcUri = new(GetDefaultEnv("XMR_WALLET_1_URI", "http://127.0.0.1:18082"));
+    private static readonly Uri SecondaryWalletRpcUri = new(GetDefaultEnv("XMR_WALLET_2_URI", "http://127.0.0.1:18083"));
+    public const string WalletRpcUsername = "";
+    public const string WalletRpcPassword = "";
 
     // test wallet config
     private const string WalletName = "test_wallet_1";
@@ -37,41 +32,38 @@ internal abstract class TestUtils
     // test wallet constants
     public const MoneroNetworkType NetworkType = MoneroNetworkType.Mainnet;
 
-    public static readonly string SEED =
-        "arena fossil anchor tapestry iguana tubes javelin gotten cafe damp talent angled onslaught haggled moon roles gills cigar cowl awning vapidly sighting buzzer delayed iguana";
+    public const string Seed = "arena fossil anchor tapestry iguana tubes javelin gotten cafe damp talent angled onslaught haggled moon roles gills cigar cowl awning vapidly sighting buzzer delayed iguana";
 
-    public static readonly string ADDRESS =
-        "4B7nn4hBQhaJ2MBWHLpdUHQMoMqgE2BWtZfofNxTDAJoGgckeEGm4f9WaBuFJmCKuwZ7FE3Di7biKbdafqE4JDj19MWPvQ9";
+    public const string Address = "4B7nn4hBQhaJ2MBWHLpdUHQMoMqgE2BWtZfofNxTDAJoGgckeEGm4f9WaBuFJmCKuwZ7FE3Di7biKbdafqE4JDj19MWPvQ9";
 
-    public static readonly ulong
-        FIRST_RECEIVE_HEIGHT = 171; // NOTE: this value must be the height of the wallet's first tx for tests
+    public const ulong FirstReceiveHeight = 171; // NOTE: this value must be the height of the wallet's first tx for tests
 
-    public static readonly int SYNC_PERIOD_IN_MS = 5000; // period between wallet syncs in milliseconds
+    public const int SyncPeriodInMs = 5000; // period between wallet syncs in milliseconds
 
     public static MoneroDaemonRpc GetDaemonRpc()
     {
-        if (daemonRpc == null)
+        if (daemonRpc != null)
         {
-            MoneroRpcConnection rpc = new(DAEMON_RPC_URI, DAEMON_RPC_USERNAME, DAEMON_RPC_PASSWORD);
-            daemonRpc = new MoneroDaemonRpc(rpc);
+            return daemonRpc;
         }
+
+        MoneroRpcConnection rpc = new(DaemonRpcUri, DaemonRpcUsername, DaemonRpcPassword);
+        daemonRpc = new MoneroDaemonRpc(rpc);
 
         return daemonRpc;
     }
 
-    public static async Task<MoneroWalletRpc> GetCreateWallet()
+    public static Task<MoneroWalletRpc> GetCreateWallet()
     {
-        MoneroRpcConnection connection = new(CREATE_WALLET_RPC_URI);
-        await connection.CheckConnection();
-        return new MoneroWalletRpc(connection);
+        MoneroRpcConnection connection = new(SecondaryWalletRpcUri, WalletRpcUsername, WalletRpcPassword);
+        return Task.FromResult(new MoneroWalletRpc(connection));
     }
 
     public static async Task<MoneroWalletRpc> GetWalletRpc()
     {
         if (walletRpc == null)
         {
-            MoneroRpcConnection rpc = new(WALLET_RPC_URI, WALLET_RPC_USERNAME, WALLET_RPC_PASSWORD,
-                WALLET_RPC_ZMQ_URI, 2);
+            MoneroRpcConnection rpc = new(PrimaryWalletRpcUri, WalletRpcUsername, WalletRpcPassword);
             walletRpc = new MoneroWalletRpc(rpc);
         }
 
@@ -87,7 +79,7 @@ internal abstract class TestUtils
             {
                 // create wallet
                 await walletRpc.CreateWallet(new MoneroWalletConfig().SetPath(WalletName).SetPassword(WalletPassword)
-                    .SetSeed(SEED).SetRestoreHeight(FIRST_RECEIVE_HEIGHT));
+                    .SetSeed(Seed).SetRestoreHeight(FirstReceiveHeight));
             }
             else
             {
@@ -96,13 +88,13 @@ internal abstract class TestUtils
         }
 
         // ensure we're testing the right wallet
-        Assert.Equal(SEED, await walletRpc.GetSeed());
-        Assert.Equal(ADDRESS, await walletRpc.GetPrimaryAddress());
+        Assert.Equal(Seed, await walletRpc.GetSeed());
+        Assert.Equal(Address, await walletRpc.GetPrimaryAddress());
 
         // sync and save wallet
         await walletRpc.Sync(null, null);
         await walletRpc.Save();
-        await walletRpc.StartSyncing((ulong)SYNC_PERIOD_IN_MS);
+        await walletRpc.StartSyncing(SyncPeriodInMs);
 
         // return cached wallet rpc
         return walletRpc;

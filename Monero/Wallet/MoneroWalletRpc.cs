@@ -34,13 +34,6 @@ public class MoneroWalletRpc : IMoneroWallet
     public MoneroWalletRpc(MoneroRpcConnection connection)
     {
         _rpc = connection;
-        CheckRpcConnection();
-    }
-
-    public MoneroWalletRpc(string url, string? username = null, string? password = null)
-    {
-        _rpc = new MoneroRpcConnection(url, username, password);
-        CheckRpcConnection();
     }
 
     public List<MoneroWalletListener> GetListeners()
@@ -264,16 +257,6 @@ public class MoneroWalletRpc : IMoneroWallet
         throw new MoneroRpcError(e);
     }
 
-    private void CheckRpcConnection()
-    {
-        if (_rpc.IsConnected() == true)
-        {
-            return;
-        }
-
-        _rpc.CheckConnection(2000).GetAwaiter().GetResult();
-    }
-
     #endregion
 
     #region Common Wallet Methods
@@ -347,7 +330,11 @@ public class MoneroWalletRpc : IMoneroWallet
         await _rpc.SendJsonRequest<MoneroRpcResponse>("set_daemon", parameters);
         if (connection != null && !string.IsNullOrEmpty(connection.GetUri()))
         {
-            _daemonConnection = new MoneroRpcConnection(connection);
+            _daemonConnection = new MoneroRpcConnection(
+                new Uri(connection.GetUri()),
+                connection.GetUsername(),
+                connection.GetPassword()
+            );
         }
         else
         {
@@ -382,8 +369,7 @@ public class MoneroWalletRpc : IMoneroWallet
 
     public async Task<MoneroVersion> GetVersion()
     {
-        MoneroJsonRpcResponse<MoneroVersion> resp = await _rpc.SendJsonRequest<MoneroVersion>("get_version");
-        return resp.Result!;
+        return await _rpc.SendCommandAsync<NoRequestModel, MoneroVersion>("get_version", NoRequestModel.Instance);
     }
 
     public Task<string> GetPath()
@@ -395,7 +381,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("key_type", "mnemonic");
-        MoneroJsonRpcResponse<QueryKeyResult> resp = await _rpc.SendJsonRequest<QueryKeyResult>("query_key", parameters);
+        var resp = await _rpc.SendJsonRequest<QueryKeyResult>("query_key", parameters);
         QueryKeyResult result = resp.Result!;
         return result.Key;
     }
@@ -409,7 +395,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("key_type", "view_key");
-        MoneroJsonRpcResponse<QueryKeyResult> resp = await _rpc.SendJsonRequest<QueryKeyResult>("query_key", parameters);
+        var resp = await _rpc.SendJsonRequest<QueryKeyResult>("query_key", parameters);
         QueryKeyResult result = resp.Result!;
         return result.Key;
     }
@@ -418,7 +404,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("key_type", "public_view_key");
-        MoneroJsonRpcResponse<QueryKeyResult> resp = await _rpc.SendJsonRequest<QueryKeyResult>("query_key", parameters);
+        var resp = await _rpc.SendJsonRequest<QueryKeyResult>("query_key", parameters);
         QueryKeyResult result = resp.Result!;
         return result.Key;
     }
@@ -427,7 +413,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("key_type", "public_spend_key");
-        MoneroJsonRpcResponse<QueryKeyResult> resp = await _rpc.SendJsonRequest<QueryKeyResult>("query_key", parameters);
+        var resp = await _rpc.SendJsonRequest<QueryKeyResult>("query_key", parameters);
         QueryKeyResult result = resp.Result!;
         return result.Key;
     }
@@ -436,7 +422,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("key_type", "spend_key");
-        MoneroJsonRpcResponse<QueryKeyResult> resp = await _rpc.SendJsonRequest<QueryKeyResult>("query_key", parameters);
+        var resp = await _rpc.SendJsonRequest<QueryKeyResult>("query_key", parameters);
         QueryKeyResult result = resp.Result!;
         return result.Key;
     }
@@ -469,8 +455,7 @@ public class MoneroWalletRpc : IMoneroWallet
         {
             MoneroJsonRpcParams parameters = [];
             parameters.Add("address", address);
-            MoneroJsonRpcResponse<GetAddressIndexResult> resp =
-                await _rpc.SendJsonRequest<GetAddressIndexResult>("get_address_index", parameters);
+            var resp = await _rpc.SendJsonRequest<GetAddressIndexResult>("get_address_index", parameters);
             result = resp.Result!;
         }
         catch (MoneroRpcError e)
@@ -494,8 +479,7 @@ public class MoneroWalletRpc : IMoneroWallet
             MoneroJsonRpcParams parameters = [];
             parameters.Add("standard_address", standardAddress);
             parameters.Add("payment_id", paymentId);
-            MoneroJsonRpcResponse<MakeIntegratedAddressResult>
-                resp = await _rpc.SendJsonRequest<MakeIntegratedAddressResult>("make_integrated_address", parameters);
+            var resp = await _rpc.SendJsonRequest<MakeIntegratedAddressResult>("make_integrated_address", parameters);
             MakeIntegratedAddressResult result = resp.Result!;
             return await DecodeIntegratedAddress(result.IntegratedAddress);
         }
@@ -514,7 +498,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("integrated_address", integratedAddress);
-        MoneroJsonRpcResponse<SplitIntegratedAddressResult> resp =
+        var resp =
             await _rpc.SendJsonRequest<SplitIntegratedAddressResult>("split_integrated_address", parameters);
         SplitIntegratedAddressResult result = resp.Result!;
         return new MoneroIntegratedAddress(result.Address, result.PaymentId,
@@ -523,9 +507,8 @@ public class MoneroWalletRpc : IMoneroWallet
 
     public async Task<ulong> GetHeight()
     {
-        MoneroJsonRpcResponse<GetHeightResult> resp = await _rpc.SendJsonRequest<GetHeightResult>("get_height");
-        GetHeightResult result = resp.Result!;
-        return result.Height;
+        var response = await _rpc.SendCommandAsync<NoRequestModel, GetHeightResult>("get_height", NoRequestModel.Instance);
+        return response.Height;
     }
 
     public Task<ulong> GetDaemonHeight()
@@ -552,7 +535,7 @@ public class MoneroWalletRpc : IMoneroWallet
 
         try
         {
-            MoneroJsonRpcResponse<MoneroSyncResult> resp = await _rpc.SendJsonRequest<MoneroSyncResult>("refresh", parameters);
+            var resp = await _rpc.SendJsonRequest<MoneroSyncResult>("refresh", parameters);
             await Poll();
             MoneroSyncResult result = resp.Result!;
             _syncSem.Release();
@@ -615,12 +598,12 @@ public class MoneroWalletRpc : IMoneroWallet
 
     public async Task RescanSpent()
     {
-        await _rpc.SendJsonRequest<MoneroRpcResponse>("rescan_spent");
+        await _rpc.SendCommandAsync<NoRequestModel, MoneroRpcResponse>("rescan_spent", NoRequestModel.Instance);
     }
 
     public async Task RescanBlockchain()
     {
-        await _rpc.SendJsonRequest<MoneroRpcResponse>("rescan_blockchain");
+        await _rpc.SendCommandAsync<NoRequestModel, MoneroRpcResponse>("rescan_blockchain", NoRequestModel.Instance);
     }
 
     public async Task<ulong> GetBalance(uint? accountIdx, uint? subaddressIdx)
@@ -666,7 +649,7 @@ public class MoneroWalletRpc : IMoneroWallet
         // fetch accounts from rpc
         MoneroJsonRpcParams parameters = [];
         parameters.Add("tag", tag);
-        MoneroJsonRpcResponse<GetAccountsResult> resp = await _rpc.SendJsonRequest<GetAccountsResult>("get_accounts", parameters);
+        var resp = await _rpc.SendJsonRequest<GetAccountsResult>("get_accounts", parameters);
         GetAccountsResult result = resp.Result!;
 
         // build account objects and fetch subaddresses per account using get_address
@@ -698,7 +681,7 @@ public class MoneroWalletRpc : IMoneroWallet
             // fetch and merge info from get_balance
             parameters.Clear();
             parameters.Add("all_accounts", true);
-            MoneroJsonRpcResponse<GetBalanceResult> getBalanceResp = await _rpc.SendJsonRequest<GetBalanceResult>("get_balance", parameters);
+            var getBalanceResp = await _rpc.SendJsonRequest<GetBalanceResult>("get_balance", parameters);
             GetBalanceResult getBalanceResult = getBalanceResp.Result!;
 
             foreach (RpcBalanceInfo rpcSubaddress in getBalanceResult.PerSubaddress)
@@ -731,7 +714,7 @@ public class MoneroWalletRpc : IMoneroWallet
         label = string.IsNullOrEmpty(label) ? null : label;
         MoneroJsonRpcParams parameters = [];
         parameters.Add("label", label);
-        MoneroJsonRpcResponse<AccountInfo> resp = await _rpc.SendJsonRequest<AccountInfo>("create_account", parameters);
+        var resp = await _rpc.SendJsonRequest<AccountInfo>("create_account", parameters);
         AccountInfo result = resp.Result!;
         return result == null
             ? throw new InvalidOperationException("RPC response result was null.")
@@ -749,7 +732,7 @@ public class MoneroWalletRpc : IMoneroWallet
             parameters.Add("address_index", subaddressIndices);
         }
 
-        MoneroJsonRpcResponse<GetAddressResult> resp = await _rpc.SendJsonRequest<GetAddressResult>("get_address", parameters);
+        var resp = await _rpc.SendJsonRequest<GetAddressResult>("get_address", parameters);
         GetAddressResult result = resp.Result!;
 
         // initialize subaddresses
@@ -774,7 +757,7 @@ public class MoneroWalletRpc : IMoneroWallet
             }
 
             // fetch and initialize balances
-            MoneroJsonRpcResponse<GetBalanceResult> getBalanceResp = await _rpc.SendJsonRequest<GetBalanceResult>("get_balance", parameters);
+            var getBalanceResp = await _rpc.SendJsonRequest<GetBalanceResult>("get_balance", parameters);
             GetBalanceResult getBalanceResult = getBalanceResp.Result!;
             foreach (RpcBalanceInfo rpcSubaddress in
                      getBalanceResult.PerSubaddress)
@@ -817,15 +800,11 @@ public class MoneroWalletRpc : IMoneroWallet
         MoneroJsonRpcParams parameters = [];
         parameters.Add("account_index", accountIdx);
         parameters.Add("label", label);
-        MoneroJsonRpcResponse<CreateAddressResult> resp = await _rpc.SendJsonRequest<CreateAddressResult>("create_address", parameters);
+        var resp = await _rpc.SendJsonRequest<CreateAddressResult>("create_address", parameters);
         CreateAddressResult result = resp.Result!;
 
         // build subaddress object
-        MoneroSubaddress subaddress = new()
-        {
-            AccountIndex = accountIdx,
-            Index = Convert.ToUInt32(result.Index)
-        };
+        MoneroSubaddress subaddress = new() { AccountIndex = accountIdx, Index = Convert.ToUInt32(result.Index) };
         subaddress.SetAddress((string?)result.Address);
         subaddress.SetLabel(string.IsNullOrEmpty(label) ? "" : label);
         subaddress.SetBalance(0);
@@ -851,7 +830,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("all", all);
-        MoneroJsonRpcResponse<ImportExportOutputsResult> resp = await _rpc.SendJsonRequest<ImportExportOutputsResult>("export_outputs", parameters);
+        var resp = await _rpc.SendJsonRequest<ImportExportOutputsResult>("export_outputs", parameters);
         ImportExportOutputsResult result = resp.Result!;
         return result.Hex;
     }
@@ -860,7 +839,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("outputs_data_hex", outputsHex);
-        MoneroJsonRpcResponse<ImportExportOutputsResult> resp = await _rpc.SendJsonRequest<ImportExportOutputsResult>("import_outputs", parameters);
+        var resp = await _rpc.SendJsonRequest<ImportExportOutputsResult>("import_outputs", parameters);
         ImportExportOutputsResult result = resp.Result!;
         return result.NumImported;
     }
@@ -869,7 +848,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("all", all);
-        MoneroJsonRpcResponse<ExportKeyImagesResult> resp = await _rpc.SendJsonRequest<ExportKeyImagesResult>("export_key_images", parameters);
+        var resp = await _rpc.SendJsonRequest<ExportKeyImagesResult>("export_key_images", parameters);
         ExportKeyImagesResult result = resp.Result!;
         return result.SignedKeyImages;
     }
@@ -889,7 +868,7 @@ public class MoneroWalletRpc : IMoneroWallet
         // send rpc request
         MoneroJsonRpcParams parameters = [];
         parameters.Add("signed_key_images", rpcKeyImages);
-        MoneroJsonRpcResponse<MoneroKeyImageImportResult> resp = await _rpc.SendJsonRequest<MoneroKeyImageImportResult>("import_key_images", parameters);
+        var resp = await _rpc.SendJsonRequest<MoneroKeyImageImportResult>("import_key_images", parameters);
         return resp.Result!;
     }
 
@@ -926,16 +905,15 @@ public class MoneroWalletRpc : IMoneroWallet
 
         MoneroJsonRpcParams parameters = [];
         parameters.Add("key_image", keyImage);
-        MoneroJsonRpcResponse<FrozenResult> resp = await _rpc.SendJsonRequest<FrozenResult>("frozen", parameters);
+        var resp = await _rpc.SendJsonRequest<FrozenResult>("frozen", parameters);
         FrozenResult result = resp.Result!;
         return result.Frozen;
     }
 
     public async Task<MoneroTxPriority> GetDefaultFeePriority()
     {
-        MoneroJsonRpcResponse<GetDefaultFeePriorityResult> resp = await _rpc.SendJsonRequest<GetDefaultFeePriorityResult>("get_default_fee_priority");
-        GetDefaultFeePriorityResult result = resp.Result!;
-        return (MoneroTxPriority)result.Priority;
+        var response = await _rpc.SendCommandAsync<NoRequestModel, GetDefaultFeePriorityResult>("get_default_fee_priority", NoRequestModel.Instance);
+        return (MoneroTxPriority)response.Priority;
     }
 
     public async Task<string> RelayTx(string txMetadata)
@@ -947,7 +925,7 @@ public class MoneroWalletRpc : IMoneroWallet
 
         MoneroJsonRpcParams parameters = [];
         parameters.Add("hex", txMetadata);
-        MoneroJsonRpcResponse<RelayTxResult> resp = await _rpc.SendJsonRequest<RelayTxResult>("relay_tx", parameters);
+        var resp = await _rpc.SendJsonRequest<RelayTxResult>("relay_tx", parameters);
         RelayTxResult result = resp.Result!;
 
         await Poll(); // notify of changes
@@ -958,7 +936,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("tx_data_hex", signedTxHex);
-        MoneroJsonRpcResponse<SubmitTransferResult> resp = await _rpc.SendJsonRequest<SubmitTransferResult>("submit_transfer", parameters);
+        var resp = await _rpc.SendJsonRequest<SubmitTransferResult>("submit_transfer", parameters);
         await Poll();
         return resp.Result!.TxHashList;
     }
@@ -973,7 +951,7 @@ public class MoneroWalletRpc : IMoneroWallet
             signatureType == MoneroMessageSignatureType.SignWithSpendKey ? "spend" : "view");
         parameters.Add("account_index", accountIdx);
         parameters.Add("address_index", subaddressIdx);
-        MoneroJsonRpcResponse<SignatureResult> resp = await _rpc.SendJsonRequest<SignatureResult>("sign", parameters);
+        var resp = await _rpc.SendJsonRequest<SignatureResult>("sign", parameters);
         SignatureResult result = resp.Result!;
         return result.Signature;
     }
@@ -986,7 +964,7 @@ public class MoneroWalletRpc : IMoneroWallet
         parameters.Add("signature", signature);
         try
         {
-            MoneroJsonRpcResponse<MoneroMessageSignatureResult> resp = await _rpc.SendJsonRequest<MoneroMessageSignatureResult>("verify", parameters);
+            var resp = await _rpc.SendJsonRequest<MoneroMessageSignatureResult>("verify", parameters);
             return resp.Result!;
         }
         catch (MoneroRpcError e)
@@ -1006,7 +984,7 @@ public class MoneroWalletRpc : IMoneroWallet
         {
             MoneroJsonRpcParams parameters = [];
             parameters.Add("txid", txHash);
-            MoneroJsonRpcResponse<GetTxKeyResult> resp = await _rpc.SendJsonRequest<GetTxKeyResult>("get_tx_key", parameters);
+            var resp = await _rpc.SendJsonRequest<GetTxKeyResult>("get_tx_key", parameters);
             return resp.Result!.TxKey;
         }
         catch (MoneroRpcError e)
@@ -1026,7 +1004,7 @@ public class MoneroWalletRpc : IMoneroWallet
             parameters.Add("txid", txHash);
             parameters.Add("tx_key", txKey);
             parameters.Add("address", address);
-            MoneroJsonRpcResponse<MoneroCheckTx> resp = await _rpc.SendJsonRequest<MoneroCheckTx>("check_tx_key", parameters);
+            var resp = await _rpc.SendJsonRequest<MoneroCheckTx>("check_tx_key", parameters);
             return resp.Result!;
         }
         catch (MoneroRpcError e)
@@ -1045,7 +1023,7 @@ public class MoneroWalletRpc : IMoneroWallet
             parameters.Add("txid", txHash);
             parameters.Add("address", address);
             parameters.Add("message", message);
-            MoneroJsonRpcResponse<SignatureResult> resp = await _rpc.SendJsonRequest<SignatureResult>("get_tx_proof", parameters);
+            var resp = await _rpc.SendJsonRequest<SignatureResult>("get_tx_proof", parameters);
             SignatureResult result = resp.Result!;
             return result.Signature;
         }
@@ -1068,7 +1046,7 @@ public class MoneroWalletRpc : IMoneroWallet
             parameters.Add("address", address);
             parameters.Add("message", message);
             parameters.Add("signature", signature);
-            MoneroJsonRpcResponse<MoneroCheckTx> resp = await _rpc.SendJsonRequest<MoneroCheckTx>("check_tx_proof", parameters);
+            var resp = await _rpc.SendJsonRequest<MoneroCheckTx>("check_tx_proof", parameters);
 
             return resp.Result!;
         }
@@ -1092,7 +1070,7 @@ public class MoneroWalletRpc : IMoneroWallet
             MoneroJsonRpcParams parameters = [];
             parameters.Add("txid", txHash);
             parameters.Add("message", message);
-            MoneroJsonRpcResponse<SignatureResult> resp = await _rpc.SendJsonRequest<SignatureResult>("get_spend_proof", parameters);
+            var resp = await _rpc.SendJsonRequest<SignatureResult>("get_spend_proof", parameters);
             SignatureResult result = resp.Result!;
             return result.Signature;
         }
@@ -1112,8 +1090,7 @@ public class MoneroWalletRpc : IMoneroWallet
             parameters.Add("txid", txHash);
             parameters.Add("message", message);
             parameters.Add("signature", signature);
-            MoneroJsonRpcResponse<CheckSpendProofResult> resp =
-                await _rpc.SendJsonRequest<CheckSpendProofResult>("check_spend_proof", parameters);
+            var resp = await _rpc.SendJsonRequest<CheckSpendProofResult>("check_spend_proof", parameters);
             CheckSpendProofResult result = resp.Result!;
             return result.Good;
         }
@@ -1130,7 +1107,7 @@ public class MoneroWalletRpc : IMoneroWallet
         MoneroJsonRpcParams parameters = [];
         parameters.Add("all", true);
         parameters.Add("message", message);
-        MoneroJsonRpcResponse<SignatureResult> resp = await _rpc.SendJsonRequest<SignatureResult>("get_reserve_proof", parameters);
+        var resp = await _rpc.SendJsonRequest<SignatureResult>("get_reserve_proof", parameters);
         SignatureResult result = resp.Result!;
         return result.Signature;
     }
@@ -1141,7 +1118,7 @@ public class MoneroWalletRpc : IMoneroWallet
         parameters.Add("account_index", accountIdx);
         parameters.Add("amount", amount.ToString());
         parameters.Add("message", message);
-        MoneroJsonRpcResponse<SignatureResult> resp = await _rpc.SendJsonRequest<SignatureResult>("get_reserve_proof", parameters);
+        var resp = await _rpc.SendJsonRequest<SignatureResult>("get_reserve_proof", parameters);
         SignatureResult result = resp.Result!;
         return result.Signature;
     }
@@ -1153,7 +1130,7 @@ public class MoneroWalletRpc : IMoneroWallet
         parameters.Add("address", address);
         parameters.Add("message", message);
         parameters.Add("signature", signature);
-        MoneroJsonRpcResponse<MoneroCheckReserve> resp = await _rpc.SendJsonRequest<MoneroCheckReserve>("check_reserve_proof", parameters);
+        var resp = await _rpc.SendJsonRequest<MoneroCheckReserve>("check_reserve_proof", parameters);
         return resp.Result!;
     }
 
@@ -1161,7 +1138,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("txids", txHashes);
-        MoneroJsonRpcResponse<GetTxNotesResult> resp = await _rpc.SendJsonRequest<GetTxNotesResult>("get_tx_notes", parameters);
+        var resp = await _rpc.SendJsonRequest<GetTxNotesResult>("get_tx_notes", parameters);
         GetTxNotesResult result = resp.Result!;
         return result.Notes;
     }
@@ -1178,7 +1155,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("entries", entryIndices);
-        MoneroJsonRpcResponse<GetAddressBookResult> respMap = await _rpc.SendJsonRequest<GetAddressBookResult>("get_address_book", parameters);
+        var respMap = await _rpc.SendJsonRequest<GetAddressBookResult>("get_address_book", parameters);
         GetAddressBookResult resultMap = respMap.Result!;
         return resultMap.Entries;
     }
@@ -1188,7 +1165,7 @@ public class MoneroWalletRpc : IMoneroWallet
         MoneroJsonRpcParams parameters = [];
         parameters.Add("address", address);
         parameters.Add("description", description);
-        MoneroJsonRpcResponse<SetAddressBookResult> respMap = await _rpc.SendJsonRequest<SetAddressBookResult>("add_address_book", parameters);
+        var respMap = await _rpc.SendJsonRequest<SetAddressBookResult>("add_address_book", parameters);
         SetAddressBookResult resultMap = respMap.Result!;
         return resultMap.Index;
     }
@@ -1229,9 +1206,8 @@ public class MoneroWalletRpc : IMoneroWallet
 
     public async Task<List<MoneroAccountTag>> GetAccountTags()
     {
-        MoneroJsonRpcResponse<GetAccountTagsResult> respMap = await _rpc.SendJsonRequest<GetAccountTagsResult>("get_account_tags");
-        GetAccountTagsResult resultMap = respMap.Result!;
-        return resultMap.AccountTags;
+        var responseMap = await _rpc.SendCommandAsync<NoRequestModel, GetAccountTagsResult>("get_account_tags", NoRequestModel.Instance);
+        return responseMap.AccountTags;
     }
 
     public async Task SetAccountTagLabel(string tag, string label)
@@ -1258,7 +1234,7 @@ public class MoneroWalletRpc : IMoneroWallet
         parameters.Add("payment_id", config.GetPaymentId());
         parameters.Add("recipient_name", config.GetRecipientName());
         parameters.Add("tx_description", config.GetNote());
-        MoneroJsonRpcResponse<MakeUriResult> resp = await _rpc.SendJsonRequest<MakeUriResult>("make_uri", parameters);
+        var resp = await _rpc.SendJsonRequest<MakeUriResult>("make_uri", parameters);
         MakeUriResult result = resp.Result!;
         return result.Uri;
     }
@@ -1272,7 +1248,7 @@ public class MoneroWalletRpc : IMoneroWallet
 
         MoneroJsonRpcParams parameters = [];
         parameters.Add("uri", uri);
-        MoneroJsonRpcResponse<ParseUriResult> resp = await _rpc.SendJsonRequest<ParseUriResult>("parse_uri", parameters);
+        var resp = await _rpc.SendJsonRequest<ParseUriResult>("parse_uri", parameters);
         ParseUriResult result = resp.Result!;
         ParsedUri rpcUri = result.Uri;
         MoneroTxConfig config = new MoneroTxConfig().SetAddress(rpcUri.Address)
@@ -1309,7 +1285,7 @@ public class MoneroWalletRpc : IMoneroWallet
         parameters.Add("key", key);
         try
         {
-            MoneroJsonRpcResponse<GetAttributeResult> resp = await _rpc.SendJsonRequest<GetAttributeResult>("get_attribute", parameters);
+            var resp = await _rpc.SendJsonRequest<GetAttributeResult>("get_attribute", parameters);
             GetAttributeResult result = resp.Result!;
             return result.Value;
         }
@@ -1343,27 +1319,25 @@ public class MoneroWalletRpc : IMoneroWallet
 
     public async Task StopMining()
     {
-        await _rpc.SendJsonRequest<MoneroRpcResponse>("stop_mining");
+        await _rpc.SendCommandAsync<NoRequestModel, MoneroRpcResponse>("stop_mining", NoRequestModel.Instance);
     }
 
     public async Task<bool> IsMultisigImportNeeded()
     {
-        MoneroJsonRpcResponse<GetBalanceResult> resp = await _rpc.SendJsonRequest<GetBalanceResult>("get_balance");
-        GetBalanceResult result = resp.Result!;
-        return result.MultisigImportNeeded;
+        var response = await _rpc.SendCommandAsync<NoRequestModel, GetBalanceResult>("get_balance", NoRequestModel.Instance);
+        return response.MultisigImportNeeded;
     }
 
     public async Task<MoneroMultisigInfo> GetMultisigInfo()
     {
-        MoneroJsonRpcResponse<MoneroMultisigInfo> resp = await _rpc.SendJsonRequest<MoneroMultisigInfo>("is_multisig");
-        return resp.Result!;
+        return await _rpc.SendCommandAsync<NoRequestModel, MoneroMultisigInfo>("is_multisig", NoRequestModel.Instance);
     }
 
     public async Task<string> PrepareMultisig()
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("enable_multisig_experimental", true);
-        MoneroJsonRpcResponse<MultisigInfoResult> resp = await _rpc.SendJsonRequest<MultisigInfoResult>("prepare_multisig", parameters);
+        var resp = await _rpc.SendJsonRequest<MultisigInfoResult>("prepare_multisig", parameters);
         _addressCache.Clear();
         MultisigInfoResult result = resp.Result!;
         return result.Info;
@@ -1375,7 +1349,7 @@ public class MoneroWalletRpc : IMoneroWallet
         parameters.Add("multisig_info", multisigHexes);
         parameters.Add("threshold", threshold);
         parameters.Add("password", password);
-        MoneroJsonRpcResponse<MultisigInfoResult> resp = await _rpc.SendJsonRequest<MultisigInfoResult>("make_multisig", parameters);
+        var resp = await _rpc.SendJsonRequest<MultisigInfoResult>("make_multisig", parameters);
         _addressCache.Clear();
         MultisigInfoResult result = resp.Result!;
         return result.Info;
@@ -1387,15 +1361,10 @@ public class MoneroWalletRpc : IMoneroWallet
         MoneroJsonRpcParams parameters = [];
         parameters.Add("multisig_info", multisigHexes);
         parameters.Add("password", password);
-        MoneroJsonRpcResponse<MultisigInfoResult> resp =
-            await _rpc.SendJsonRequest<MultisigInfoResult>("exchange_multisig_keys", parameters);
+        var resp = await _rpc.SendJsonRequest<MultisigInfoResult>("exchange_multisig_keys", parameters);
         _addressCache.Clear();
         MultisigInfoResult result = resp.Result!;
-        MoneroMultisigInitResult msResult = new()
-        {
-            Address = result.Address,
-            MultisigHex = result.Info
-        };
+        MoneroMultisigInitResult msResult = new() { Address = result.Address, MultisigHex = result.Info };
         if (string.IsNullOrEmpty(msResult.Address))
         {
             msResult.Address = null;
@@ -1411,26 +1380,23 @@ public class MoneroWalletRpc : IMoneroWallet
 
     public async Task<string> ExportMultisigHex()
     {
-        MoneroJsonRpcResponse<MultisigInfoResult> resp = await _rpc.SendJsonRequest<MultisigInfoResult>("export_multisig_info");
-        MultisigInfoResult result = resp.Result!;
-        return result.Hex;
+        var response = await _rpc.SendCommandAsync<NoRequestModel, MultisigInfoResult>("export_multisig_info", NoRequestModel.Instance);
+        return response.Hex;
     }
 
     public async Task<int> ImportMultisigHex(List<string> multisigHexes)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("info", multisigHexes);
-        MoneroJsonRpcResponse<MultisigInfoResult>
-            resp = await _rpc.SendJsonRequest<MultisigInfoResult>("import_multisig_info", parameters);
-        MultisigInfoResult result = resp.Result!;
-        return result.Outputs;
+        var response = await _rpc.SendCommandAsync<MoneroJsonRpcParams, MultisigInfoResult>("import_multisig_info", parameters);
+        return response.Outputs;
     }
 
     public async Task<MoneroMultisigSignResult> SignMultisigTxHex(string multisigTxHex)
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("tx_data_hex", multisigTxHex);
-        MoneroJsonRpcResponse<MultisigInfoResult> resp = await _rpc.SendJsonRequest<MultisigInfoResult>("sign_multisig", parameters);
+        var resp = await _rpc.SendJsonRequest<MultisigInfoResult>("sign_multisig", parameters);
         MultisigInfoResult? result = resp.Result;
 
         if (result == null)
@@ -1448,7 +1414,7 @@ public class MoneroWalletRpc : IMoneroWallet
     {
         MoneroJsonRpcParams parameters = [];
         parameters.Add("tx_data_hex", signedMultisigTxHex);
-        MoneroJsonRpcResponse<MultisigInfoResult> resp = await _rpc.SendJsonRequest<MultisigInfoResult>("submit_multisig", parameters);
+        var resp = await _rpc.SendJsonRequest<MultisigInfoResult>("submit_multisig", parameters);
         if (resp.Result == null)
         {
             throw new MoneroError("Invalid response from submit_multisig: " + resp);
@@ -1467,7 +1433,7 @@ public class MoneroWalletRpc : IMoneroWallet
 
     public async Task Save()
     {
-        await _rpc.SendJsonRequest<MoneroRpcResponse>("store");
+        await _rpc.SendCommandAsync<NoRequestModel, MoneroRpcResponse>("store", NoRequestModel.Instance);
     }
 
     public async Task Close(bool save)
@@ -1510,11 +1476,6 @@ public class MoneroWalletRpc : IMoneroWallet
 
     private void RefreshListening()
     {
-        if (_rpc.GetZmqUri() != null)
-        {
-            return;
-        }
-
         if (_walletPoller == null && _listeners.Count > 0)
         {
             _walletPoller = new MoneroWalletPoller(this, _syncPeriodInMs);
@@ -1554,7 +1515,7 @@ public class MoneroWalletRpc : IMoneroWallet
         MoneroJsonRpcParams parameters = [];
         parameters.Add("account_index", accountIdx);
         parameters.Add("address_indices", subaddressIdx == null ? null : new List<uint?> { subaddressIdx });
-        MoneroJsonRpcResponse<GetBalanceResult> resp = await _rpc.SendJsonRequest<GetBalanceResult>("get_balance", parameters);
+        var resp = await _rpc.SendJsonRequest<GetBalanceResult>("get_balance", parameters);
         GetBalanceResult result = resp.Result!;
         if (subaddressIdx == null)
         {
@@ -1655,7 +1616,7 @@ public class MoneroWalletRpc : IMoneroWallet
         }
 
         // build txs using `get_transfers`
-        MoneroJsonRpcResponse<GetTransfersResult> resp = await _rpc.SendJsonRequest<GetTransfersResult>("get_transfers", parameters);
+        var resp = await _rpc.SendJsonRequest<GetTransfersResult>("get_transfers", parameters);
         return resp.Result!;
     }
 
@@ -1664,7 +1625,7 @@ public class MoneroWalletRpc : IMoneroWallet
         MoneroJsonRpcParams parameters = [];
         parameters.Add("txid", txId);
         parameters.Add("account_index", accountIndex);
-        MoneroJsonRpcResponse<GetTransferByTxIdResult> response = await _rpc.SendJsonRequest<GetTransferByTxIdResult>("get_transfer_by_txid", parameters);
+        var response = await _rpc.SendJsonRequest<GetTransferByTxIdResult>("get_transfer_by_txid", parameters);
         return response.Result!;
     }
 
