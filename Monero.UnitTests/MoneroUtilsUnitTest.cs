@@ -11,47 +11,6 @@ namespace Monero.UnitTests;
 
 public class MoneroUtilsUnitTest
 {
-    // Can get integrated addresses
-    [Fact(Skip = "MoneroUtils.GetIntegratedAddress(): not implemented")]
-    public void TestGetIntegratedAddresses()
-    {
-        string primaryAddress =
-            "58qRVVjZ4KxMX57TH6yWqGcH5AswvZZS494hWHcHPt6cDkP7V8AqxFhi3RKXZueVRgUnk8niQGHSpY5Bm9DjuWn16GDKXpF";
-        string subaddress =
-            "7B9w2xieXjhDumgPX39h1CAYELpsZ7Pe8Wqtr3pVL9jJ5gGDqgxjWt55gTYUCAuhahhM85ajEp6VbQfLDPETt4oT2ZRXa6n";
-        string paymentId = "03284e41c342f036";
-        MoneroNetworkType networkType = MoneroNetworkType.Stagenet;
-
-        // get integrated address with randomly generated payment id
-        MoneroIntegratedAddress integratedAddress = GetIntegratedAddress(networkType, primaryAddress);
-        True(primaryAddress == integratedAddress.GetStandardAddress());
-        True(16 == integratedAddress.GetPaymentId()!.Length);
-        True(106 == integratedAddress.GetIntegratedAddress()!.Length);
-
-        // get integrated address with specific payment id
-        integratedAddress = GetIntegratedAddress(networkType, primaryAddress, paymentId);
-        True(primaryAddress == integratedAddress.GetStandardAddress());
-        True(paymentId == integratedAddress.GetPaymentId());
-        True(106 == integratedAddress.GetIntegratedAddress()!.Length);
-
-        // get integrated address with subaddress
-        integratedAddress = GetIntegratedAddress(networkType, subaddress, paymentId);
-        True(subaddress == integratedAddress.GetStandardAddress());
-        True(paymentId == integratedAddress.GetPaymentId());
-        True(106 == integratedAddress.GetIntegratedAddress()!.Length);
-
-        // get integrated address with invalid payment id
-        try
-        {
-            GetIntegratedAddress(networkType, primaryAddress, "123");
-            throw new Exception("Getting integrated address with invalid payment id should have failed");
-        }
-        catch (MoneroError err)
-        {
-            True("Invalid payment id" == err.Message);
-        }
-    }
-
     // Can validate addresses
     [Fact]
     public void TestAddressValidation()
