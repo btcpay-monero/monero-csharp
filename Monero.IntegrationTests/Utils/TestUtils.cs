@@ -72,10 +72,10 @@ internal abstract class TestUtils
         {
             await walletRpc.OpenWallet(WalletName, WalletPassword);
         }
-        catch (MoneroRpcError e)
+        catch (JsonRpcApiException e)
         {
             // -1 returned when the wallet does not exist or fails to open e.g. it's already open by another application
-            if (e.GetCode() == -1)
+            if (e.Error.Code == -1)
             {
                 // create wallet
                 await walletRpc.CreateWallet(new MoneroWalletConfig().SetPath(WalletName).SetPassword(WalletPassword)

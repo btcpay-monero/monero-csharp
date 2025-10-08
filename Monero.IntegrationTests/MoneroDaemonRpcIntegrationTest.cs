@@ -17,7 +17,7 @@ public class MoneroDaemonRpcIntegrationTest
         ulong daemonHeight = _daemon.GetHeight().GetAwaiter().GetResult();
         if (daemonHeight == 1)
         {
-            MineBlocks();
+            _daemon.WaitForNextBlockHeader().GetAwaiter().GetResult();
         }
     }
 
@@ -29,15 +29,6 @@ public class MoneroDaemonRpcIntegrationTest
     {
         try
         {
-            // start mining if possible to help push the network along
-            // TODO use wallet rpc address
-            string address = TestUtils.Address;
-            try { await _daemon.StartMining(address, 1, false, true); }
-            catch (MoneroError)
-            {
-                // ignore
-            }
-
             // register a listener
             MoneroDaemonListener listener = new();
             _daemon.AddListener(listener);
@@ -785,21 +776,6 @@ public class MoneroDaemonRpcIntegrationTest
     #endregion
 
     #region Test Helpers
-
-    private static void MineBlocks()
-    {
-        try
-        {
-            StartMining.Start();
-            GenUtils.WaitFor(10000);
-            StopMining.Stop();
-            GenUtils.WaitFor(10000);
-        }
-        catch (Exception e)
-        {
-            MoneroUtils.Log(0, e.Message);
-        }
-    }
 
     private static void TestBlockHeader(MoneroBlockHeader? header, bool isFull)
     {

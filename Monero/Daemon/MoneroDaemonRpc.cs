@@ -243,8 +243,7 @@ public class MoneroDaemonRpc : IMoneroDaemon
 
     public async Task<MoneroBlockHeader> GetLastBlockHeader()
     {
-        var respMap = await _rpc.SendJsonRequest<GetLastBlockHeaderResult>("get_last_block_header", []);
-        GetLastBlockHeaderResult resultMap = respMap.Result!;
+        GetLastBlockHeaderResult resultMap = await _rpc.SendCommandAsync<MoneroJsonRpcParams, GetLastBlockHeaderResult>("get_last_block_header", []);
         CheckResponseStatus(resultMap);
         return resultMap.BlockHeader;
     }

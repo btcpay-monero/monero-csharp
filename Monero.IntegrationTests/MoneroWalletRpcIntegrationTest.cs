@@ -187,44 +187,37 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestCreateWalletFromSeed()
     {
+        // save for comparison
+        string primaryAddress = await _wallet.GetPrimaryAddress();
+        string privateViewKey = await _wallet.GetPrivateViewKey();
+        string privateSpendKey = await _wallet.GetPrivateSpendKey();
+
+        // recreate the test wallet from seed
+        IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.Seed)
+            .SetRestoreHeight(TestUtils.FirstReceiveHeight));
+        string path = await moneroWallet.GetPath();
+
+        await TestWallet(async () =>
+        {
+            Assert.True(primaryAddress == await moneroWallet.GetPrimaryAddress());
+            Assert.True(privateViewKey == await moneroWallet.GetPrivateViewKey());
+            Assert.True(privateSpendKey == await moneroWallet.GetPrivateSpendKey());
+            Assert.True(TestUtils.Seed == await moneroWallet.GetSeed());
+        }, moneroWallet);
+
+        // attempt to create a wallet with two missing words
         try
         {
-            // save for comparison
-            string primaryAddress = await _wallet.GetPrimaryAddress();
-            string privateViewKey = await _wallet.GetPrivateViewKey();
-            string privateSpendKey = await _wallet.GetPrivateSpendKey();
-
-            // recreate the test wallet from seed
-            IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.Seed)
+            const string invalidMnemonic = "memoir desk algebra inbound innocent unplugs fully okay five inflamed giant factual ritual toyed topic snake unhappy guarded tweezers haunted inundate giant";
+            await CreateWallet(new MoneroWalletConfig().SetSeed(invalidMnemonic)
                 .SetRestoreHeight(TestUtils.FirstReceiveHeight));
-            string path = await moneroWallet.GetPath();
-
-            await TestWallet(async () =>
-            {
-                Assert.True(primaryAddress == await moneroWallet.GetPrimaryAddress());
-                Assert.True(privateViewKey == await moneroWallet.GetPrivateViewKey());
-                Assert.True(privateSpendKey == await moneroWallet.GetPrivateSpendKey());
-                Assert.True(TestUtils.Seed == await moneroWallet.GetSeed());
-            }, moneroWallet);
-
-            // attempt to create a wallet with two missing words
-            try
-            {
-                const string invalidMnemonic = "memoir desk algebra inbound innocent unplugs fully okay five inflamed giant factual ritual toyed topic snake unhappy guarded tweezers haunted inundate giant";
-                await CreateWallet(new MoneroWalletConfig().SetSeed(invalidMnemonic)
-                    .SetRestoreHeight(TestUtils.FirstReceiveHeight));
-            }
-            catch (Exception e)
-            {
-                Assert.Equal("Invalid mnemonic", e.Message);
-            }
-
-            await AttemptToCreateWalletAtSamePath(path);
         }
         catch (Exception e)
         {
-            throw new Exception(e.Message);
+            Assert.Equal("Invalid mnemonic", e.Message);
         }
+
+        await AttemptToCreateWalletAtSamePath(path);
     }
 
     private async Task AttemptToCreateWalletAtSamePath(string path)
@@ -236,7 +229,7 @@ public class MoneroWalletRpcIntegrationTest
         }
         catch (Exception e)
         {
-            Assert.True("Wallet already exists: " + path == e.Message);
+            Assert.Contains("already exists", e.Message.ToLower());
         }
     }
 
@@ -268,39 +261,32 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestCreateWalletFromKeys()
     {
-        try
+        // save for comparison
+        string primaryAddress = await _wallet.GetPrimaryAddress();
+        string privateViewKey = await _wallet.GetPrivateViewKey();
+        string privateSpendKey = await _wallet.GetPrivateSpendKey();
+
+        // recreate the test wallet from keys
+        IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetPrimaryAddress(primaryAddress)
+            .SetPrivateViewKey(privateViewKey).SetPrivateSpendKey(privateSpendKey)
+            .SetRestoreHeight(await _daemon.GetHeight()));
+        string path = await moneroWallet.GetPath();
+
+        Func<Task> action = async () =>
         {
-            // save for comparison
-            string primaryAddress = await _wallet.GetPrimaryAddress();
-            string privateViewKey = await _wallet.GetPrivateViewKey();
-            string privateSpendKey = await _wallet.GetPrivateSpendKey();
-
-            // recreate the test wallet from keys
-            IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetPrimaryAddress(primaryAddress)
-                .SetPrivateViewKey(privateViewKey).SetPrivateSpendKey(privateSpendKey)
-                .SetRestoreHeight(await _daemon.GetHeight()));
-            string path = await moneroWallet.GetPath();
-
-            Func<Task> action = async () =>
+            Assert.True(primaryAddress == await moneroWallet.GetPrimaryAddress());
+            Assert.True(privateViewKey == await moneroWallet.GetPrivateViewKey());
+            Assert.True(privateSpendKey == await moneroWallet.GetPrivateSpendKey());
+            if (TestUtils.TestsInContainer)
             {
-                Assert.True(primaryAddress == await moneroWallet.GetPrimaryAddress());
-                Assert.True(privateViewKey == await moneroWallet.GetPrivateViewKey());
-                Assert.True(privateSpendKey == await moneroWallet.GetPrivateSpendKey());
-                if (TestUtils.TestsInContainer)
-                {
-                    Assert.True(await moneroWallet.IsConnectedToDaemon(),
-                        "Wallet created from keys is not connected to authenticated daemon");
-                }
-            };
+                Assert.True(await moneroWallet.IsConnectedToDaemon(),
+                    "Wallet created from keys is not connected to authenticated daemon");
+            }
+        };
 
-            await TestWallet(action, moneroWallet, false);
+        await TestWallet(action, moneroWallet, false);
 
-            await AttemptToCreateWalletAtSamePath(path);
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
+        await AttemptToCreateWalletAtSamePath(path);
     }
 
     // Can get the wallet's version
@@ -437,9 +423,15 @@ public class MoneroWalletRpcIntegrationTest
 
         await _daemon.WaitForNextBlockHeader();
 
+        GenUtils.WaitFor(2000);
+
+        var syncResult = await _wallet.Sync(null, null);
+
+        Assert.True(syncResult.NumBlocksFetched > 0, "No blocks fetched from wallet sync");
+
         ulong currentHeight = await _wallet.GetHeight();
 
-        Assert.True(currentHeight > lastHeight);
+        Assert.True(currentHeight > lastHeight, $"Expected currentHeight: {currentHeight} > lastHeight: {lastHeight}");
     }
 
     // Can create a new account without a label

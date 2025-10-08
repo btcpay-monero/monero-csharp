@@ -61,7 +61,7 @@ public class MoneroWalletRpc : IMoneroWallet
         MoneroJsonRpcParams parameters = [];
         parameters.Add("filename", config.GetPath());
         parameters.Add("password", config.GetPassword() ?? "");
-        await _rpc.SendJsonRequest<MoneroRpcResponse>("open_wallet", parameters);
+        await _rpc.SendCommandAsync<MoneroJsonRpcParams, MoneroRpcResponse>("open_wallet", parameters);
         Clear();
         _path = config.GetPath();
 
@@ -151,8 +151,8 @@ public class MoneroWalletRpc : IMoneroWallet
         }
 
         MoneroJsonRpcParams parameters = PrepareWalletCreationParameters(config);
-        try { await _rpc.SendJsonRequest<MoneroRpcResponse>("create_wallet", parameters); }
-        catch (MoneroRpcError e) { HandleCreateWalletError(config.GetPath(), e); }
+        try { await _rpc.SendCommandAsync<MoneroJsonRpcParams, MoneroRpcResponse>("create_wallet", parameters); }
+        catch (JsonRpcApiException e) { HandleCreateWalletError(config.GetPath(), e); }
 
         Clear();
         _path = config.GetPath();
@@ -183,8 +183,8 @@ public class MoneroWalletRpc : IMoneroWallet
         parameters.Add("autosave_current", config.GetSaveCurrent());
         parameters.Add("enable_multisig_experimental", config.IsMultisig());
 
-        try { await _rpc.SendJsonRequest<MoneroRpcResponse>("restore_deterministic_wallet", parameters); }
-        catch (MoneroRpcError e) { HandleCreateWalletError(config.GetPath(), e); }
+        try { await _rpc.SendCommandAsync<MoneroJsonRpcParams, MoneroRpcResponse>("restore_deterministic_wallet", parameters); }
+        catch (JsonRpcApiException e) { HandleCreateWalletError(config.GetPath(), e); }
 
         Clear();
         _path = config.GetPath();
@@ -214,13 +214,13 @@ public class MoneroWalletRpc : IMoneroWallet
         parameters.Add("autosave_current", config.GetSaveCurrent());
 
         try { await _rpc.SendCommandAsync<MoneroJsonRpcParams, MoneroRpcResponse>("generate_from_keys", parameters); }
-        catch (MoneroRpcError e) { HandleCreateWalletError(config.GetPath(), e); }
+        catch (JsonRpcApiException e) { HandleCreateWalletError(config.GetPath(), e); }
 
         Clear();
         _path = config.GetPath();
     }
 
-    private static void HandleCreateWalletError(string? name, MoneroRpcError? e)
+    private static void HandleCreateWalletError(string? name, JsonRpcApiException? e)
     {
         if (e == null)
         {
@@ -229,13 +229,12 @@ public class MoneroWalletRpc : IMoneroWallet
 
         if (e.Message.Equals("Cannot create wallet. Already exists."))
         {
-            throw new MoneroRpcError("Wallet already exists: " + (name ?? "unkown"), e.GetCode(), e.GetRpcMethod(),
-                e.GetRpcParams());
+            throw new MoneroRpcError("Wallet already exists: " + (name ?? "unkown"), e.Error.Code);
         }
 
         if (e.Message.Equals("Electrum-style word list failed verification"))
         {
-            throw new MoneroRpcError("Invalid mnemonic", e.GetCode(), e.GetRpcMethod(), e.GetRpcParams());
+            throw new MoneroRpcError("Invalid mnemonic", e.Error.Code);
         }
 
         throw e;
@@ -361,7 +360,7 @@ public class MoneroWalletRpc : IMoneroWallet
                 ""); // TODO (monero-project): provide better way to know if wallet rpc is connected to daemon
             throw new Exception("check reserve expected to fail");
         }
-        catch (MoneroError e)
+        catch (JsonRpcApiException e)
         {
             return !e.Message.Contains("Failed to connect to daemon");
         }
@@ -1099,8 +1098,7 @@ public class MoneroWalletRpc : IMoneroWallet
         parameters.Add("address", address);
         parameters.Add("message", message);
         parameters.Add("signature", signature);
-        var resp = await _rpc.SendJsonRequest<MoneroCheckReserve>("check_reserve_proof", parameters);
-        return resp.Result!;
+        return await _rpc.SendCommandAsync<MoneroJsonRpcParams, MoneroCheckReserve>("check_reserve_proof", parameters);
     }
 
     public async Task<List<string>> GetTxNotes(List<string> txHashes)
@@ -1181,7 +1179,7 @@ public class MoneroWalletRpc : IMoneroWallet
         MoneroJsonRpcParams parameters = [];
         parameters.Add("tag", tag);
         parameters.Add("description", label);
-        await _rpc.SendJsonRequest<MoneroRpcResponse>("set_account_tag_description", parameters);
+        await _rpc.SendCommandAsync<MoneroJsonRpcParams, MoneroRpcResponse>("set_account_tag_description", parameters);
     }
 
     public async Task<string> GetPaymentUri(MoneroTxConfig config)
@@ -1249,13 +1247,12 @@ public class MoneroWalletRpc : IMoneroWallet
         parameters.Add("key", key);
         try
         {
-            var resp = await _rpc.SendJsonRequest<GetAttributeResult>("get_attribute", parameters);
-            GetAttributeResult result = resp.Result!;
+            GetAttributeResult result = await _rpc.SendCommandAsync<MoneroJsonRpcParams, GetAttributeResult>("get_attribute", parameters);
             return result.Value;
         }
-        catch (MoneroRpcError e)
+        catch (JsonRpcApiException e)
         {
-            if (-45 == e.GetCode())
+            if (-45 == e.Error.Code)
             {
                 return null; // -45: attribute not found
             }

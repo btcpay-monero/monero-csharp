@@ -139,15 +139,6 @@ public class MoneroRpcConnection(Uri uri, string username, string password, Http
     }
 
     // TODO migrate to SendCommandAsync
-    public async Task<MoneroJsonRpcResponse<T>> SendJsonRequest<T>(string method, MoneroJsonRpcParams parameters)
-    {
-        MoneroJsonRpcRequest rpcRequest = new(method, parameters);
-        MoneroJsonRpcResponse<T>? rpcResponse =
-            await SendRequest<MoneroJsonRpcResponse<T>>("json_rpc", rpcRequest);
-
-        ValidateRpcResponse(rpcResponse, rpcRequest.Method, rpcRequest.Params);
-        return rpcResponse!;
-    }
 
     public async Task<T> SendPathRequest<T>(string path, MoneroJsonRpcParams parameters)
     {
@@ -203,16 +194,6 @@ public class MoneroRpcConnection(Uri uri, string username, string password, Http
 
             throw new MoneroRpcError(message, code, method, parameters);
         }
-    }
-
-    private void ValidateRpcResponse<T>(MoneroJsonRpcResponse<T>? rpcResponse, string method, object? parameters)
-    {
-        if (rpcResponse == null)
-        {
-            throw new MoneroRpcInvalidResponseError(method, uri, parameters);
-        }
-
-        HandleRpcError(rpcResponse.Error, method, parameters);
     }
 
     private void ValidateRpcResponse<T>(T? rpcResponse, string method, object? parameters)
