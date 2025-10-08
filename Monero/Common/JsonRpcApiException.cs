@@ -1,8 +1,8 @@
 namespace Monero.Common;
 
-public class JsonRpcApiException(JsonRpcResultError error) : Exception
+public class JsonRpcApiException(JsonRpcResponseError error) : Exception
 {
-    public JsonRpcResultError Error { get; set; } = error;
+    public JsonRpcResponseError Error { get; set; } = error;
 
     public override string Message => Error.Message;
 }

@@ -326,15 +326,15 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetFeeEstimate()
     {
-        MoneroFeeEstimate feeEstimate = await _daemon.GetFeeEstimate();
-        TestUtils.TestUnsignedBigInteger(feeEstimate.Fee, true);
-        Assert.Equal(4, feeEstimate.Fees?.Count); // slow, normal, fast, fastest
+        GetFeeEstimateResponse feeEstimateResponse = await _daemon.GetFeeEstimate(null);
+        TestUtils.TestUnsignedBigInteger(feeEstimateResponse.Fee, true);
+        Assert.Equal(4, feeEstimateResponse.Fees?.Count); // slow, normal, fast, fastest
         for (int i = 0; i < 4; i++)
         {
-            TestUtils.TestUnsignedBigInteger(feeEstimate?.Fees?[i], true);
+            TestUtils.TestUnsignedBigInteger(feeEstimateResponse?.Fees?[i], true);
         }
 
-        TestUtils.TestUnsignedBigInteger(feeEstimate?.QuantizationMask, true);
+        TestUtils.TestUnsignedBigInteger(feeEstimateResponse?.QuantizationMask, true);
     }
 
     // Can get hashes of transactions in the transaction pool (binary)
@@ -704,14 +704,14 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact(Skip = "Not supported by regtest daemon")]
     public async Task TestPruneBlockchain()
     {
-        MoneroPruneResult result = await _daemon.PruneBlockchain(true);
-        if (result.IsPruned == true)
+        MoneroPruneResponse response = await _daemon.PruneBlockchain(true);
+        if (response.IsPruned == true)
         {
-            Assert.True(result.PruningSeed > 0);
+            Assert.True(response.PruningSeed > 0);
         }
         else
         {
-            Assert.True(0 == result.PruningSeed);
+            Assert.True(0 == response.PruningSeed);
         }
     }
 
@@ -719,8 +719,8 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact(Skip = "Unstable update call")]
     public async Task TestCheckForUpdate()
     {
-        MoneroDaemonUpdateCheckResult result = await _daemon.CheckForUpdate();
-        TestUpdateCheckResult(result);
+        MoneroDaemonUpdateCheckResponse response = await _daemon.CheckForUpdate();
+        TestUpdateCheckResult(response);
     }
 
     // Can download an update
@@ -728,16 +728,16 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestDownloadUpdate()
     {
         // download to a default path
-        MoneroDaemonUpdateDownloadResult result = await _daemon.DownloadUpdate("");
-        TestUpdateDownloadResult(result, null);
+        MoneroDaemonUpdateDownloadResponse response = await _daemon.DownloadUpdate("");
+        TestUpdateDownloadResult(response, null);
 
         // download to a defined path
         string path = "test_download_" + DateTime.Now + ".tar.bz2";
-        result = await _daemon.DownloadUpdate(path);
-        TestUpdateDownloadResult(result, path);
+        response = await _daemon.DownloadUpdate(path);
+        TestUpdateDownloadResult(response, path);
 
         // test invalid path
-        if (result.IsUpdateAvailable == true)
+        if (response.IsUpdateAvailable == true)
         {
             try
             {
@@ -1408,43 +1408,43 @@ public class MoneroDaemonRpcIntegrationTest
         Assert.True(peer.PruningSeed == null || peer.PruningSeed >= 0);
     }
 
-    private static void TestUpdateCheckResult(MoneroDaemonUpdateCheckResult result)
+    private static void TestUpdateCheckResult(MoneroDaemonUpdateCheckResponse response)
     {
-        Assert.NotNull(result.IsUpdateAvailable);
-        if (result.IsUpdateAvailable == true)
+        Assert.NotNull(response.IsUpdateAvailable);
+        if (response.IsUpdateAvailable == true)
         {
-            Assert.True(result.AutoUri!.Length > 0, "No auto uri; is daemon online?");
-            Assert.True(result.UserUri!.Length > 0);
-            Assert.True(result.Version!.Length > 0);
-            Assert.True(result.Hash!.Length > 0);
-            Assert.Equal(64, result.Hash!.Length);
+            Assert.True(response.AutoUri!.Length > 0, "No auto uri; is daemon online?");
+            Assert.True(response.UserUri!.Length > 0);
+            Assert.True(response.Version!.Length > 0);
+            Assert.True(response.Hash!.Length > 0);
+            Assert.Equal(64, response.Hash!.Length);
         }
         else
         {
-            Assert.Null(result.AutoUri);
-            Assert.Null(result.UserUri);
-            Assert.Null(result.Version);
-            Assert.Null(result.Hash);
+            Assert.Null(response.AutoUri);
+            Assert.Null(response.UserUri);
+            Assert.Null(response.Version);
+            Assert.Null(response.Hash);
         }
     }
 
-    private static void TestUpdateDownloadResult(MoneroDaemonUpdateDownloadResult result, string? path)
+    private static void TestUpdateDownloadResult(MoneroDaemonUpdateDownloadResponse response, string? path)
     {
-        TestUpdateCheckResult(result);
-        if (result.IsUpdateAvailable == true)
+        TestUpdateCheckResult(response);
+        if (response.IsUpdateAvailable == true)
         {
             if (path != null)
             {
-                Assert.True(path == result.DownloadPath);
+                Assert.True(path == response.DownloadPath);
             }
             else
             {
-                Assert.NotNull(result.DownloadPath);
+                Assert.NotNull(response.DownloadPath);
             }
         }
         else
         {
-            Assert.Null(result.DownloadPath);
+            Assert.Null(response.DownloadPath);
         }
     }
 

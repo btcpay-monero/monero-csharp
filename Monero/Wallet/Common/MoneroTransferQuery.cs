@@ -9,15 +9,15 @@ public class MoneroTransferQuery : MoneroTx
     private ulong? _unlockTime;
     private ulong? _height;
     private bool? _includeOutputs;
-    private ulong? _maxHeight;
-    private ulong? _minHeight;
-    private uint? _accountIndex;
+    internal uint? MaxHeight { get; set; }
+    internal uint? MinHeight { get; set; }
+    internal uint? AccountIndex { get; set; }
     private string? _address;
     private List<string>? _addresses;
-    private List<MoneroDestination>? _destinations;
+    private List<TransferDestination>? _destinations;
     private bool? _hasDestinations;
     private bool? _isIncoming;
-    private uint? _subaddressIndex;
+    internal uint? SubaddressIndex { get; set; }
     private List<uint>? _subaddressIndices;
     private string? _hash;
 
@@ -34,7 +34,7 @@ public class MoneroTransferQuery : MoneroTx
             _addresses = query._addresses;
         }
 
-        _subaddressIndex = query._subaddressIndex;
+        SubaddressIndex = query.SubaddressIndex;
         if (query._subaddressIndices != null)
         {
             _subaddressIndices = query._subaddressIndices;
@@ -43,7 +43,7 @@ public class MoneroTransferQuery : MoneroTx
         if (query._destinations != null)
         {
             _destinations = [];
-            foreach (MoneroDestination destination in query._destinations)
+            foreach (TransferDestination destination in query._destinations)
             {
                 _destinations.Add(destination);
             }
@@ -112,28 +112,6 @@ public class MoneroTransferQuery : MoneroTx
         return this;
     }
 
-    public ulong? GetAccountIndex()
-    {
-        return _accountIndex;
-    }
-
-    public MoneroTransferQuery SetAccountIndex(uint? subaddressIdx)
-    {
-        _accountIndex = subaddressIdx;
-        return this;
-    }
-
-    public uint? GetSubaddressIndex()
-    {
-        return _subaddressIndex;
-    }
-
-    public MoneroTransferQuery SetSubaddressIndex(uint? subaddressIndex)
-    {
-        _subaddressIndex = subaddressIndex;
-        return this;
-    }
-
     public List<uint>? GetSubaddressIndices()
     {
         return _subaddressIndices;
@@ -145,12 +123,12 @@ public class MoneroTransferQuery : MoneroTx
         return this;
     }
 
-    public List<MoneroDestination>? GetDestinations()
+    public List<TransferDestination>? GetDestinations()
     {
         return _destinations;
     }
 
-    public MoneroTransferQuery SetDestinations(List<MoneroDestination>? destinations)
+    public MoneroTransferQuery SetDestinations(List<TransferDestination>? destinations)
     {
         _destinations = destinations;
         return this;
@@ -167,7 +145,7 @@ public class MoneroTransferQuery : MoneroTx
         return this;
     }
 
-    public bool MeetsCriteria(MoneroTransfer? transfer)
+    public bool MeetsCriteria(TransferItem? transfer)
     {
         throw new NotImplementedException();
     }
@@ -192,28 +170,6 @@ public class MoneroTransferQuery : MoneroTx
     public MoneroTransferQuery SetHeight(ulong? height)
     {
         _height = height;
-        return this;
-    }
-
-    public ulong? GetMinHeight()
-    {
-        return _minHeight;
-    }
-
-    public MoneroTransferQuery SetMinHeight(ulong? minHeight)
-    {
-        _minHeight = minHeight;
-        return this;
-    }
-
-    public ulong? GetMaxHeight()
-    {
-        return _maxHeight;
-    }
-
-    public MoneroTransferQuery SetMaxHeight(ulong? maxHeight)
-    {
-        _maxHeight = maxHeight;
         return this;
     }
 

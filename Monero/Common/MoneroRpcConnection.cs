@@ -37,10 +37,10 @@ public class MoneroRpcConnection(Uri uri, string username, string password, Http
         rawResult.EnsureSuccessStatusCode();
         var rawJson = await rawResult.Content.ReadAsStringAsync(cts);
 
-        JsonRpcResult<TResponse>? response;
+        JsonRpcResponse<TResponse>? response;
         try
         {
-            response = JsonSerializer.Deserialize<JsonRpcResult<TResponse>>(rawJson, jsonSerializer);
+            response = JsonSerializer.Deserialize<JsonRpcResponse<TResponse>>(rawJson, jsonSerializer);
         }
         catch (Exception e)
         {
@@ -51,7 +51,7 @@ public class MoneroRpcConnection(Uri uri, string username, string password, Http
 
         if (response == null)
         {
-            throw new JsonRpcApiException(new JsonRpcResultError(500, "Response is null", new Object()));
+            throw new JsonRpcApiException(new JsonRpcResponseError(500, "Response is null", new Object()));
         }
 
         if (response.Error != null)

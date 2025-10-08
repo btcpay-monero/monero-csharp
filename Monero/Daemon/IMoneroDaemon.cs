@@ -9,7 +9,7 @@ public interface IMoneroDaemon
     void RemoveListener(MoneroDaemonListener listener);
     List<MoneroDaemonListener> GetListeners();
     Task<MoneroVersion> GetVersion();
-    Task<ulong> GetHeight();
+    Task<uint> GetHeight();
     Task<string> GetBlockHash(ulong height);
     Task<MoneroBlockTemplate> GetBlockTemplate(string walletAddress, int? reserveSize);
     Task<MoneroBlockHeader> GetLastBlockHeader();
@@ -22,9 +22,9 @@ public interface IMoneroDaemon
     Task<List<string>> GetBlockHashes(List<string> blockHashes, ulong startHeight);
     Task<List<MoneroTx>> GetTxs(List<string> txHashes, bool prune);
     Task<List<string>> GetTxHexes(List<string> txHashes, bool prune);
-    Task<MoneroFeeEstimate> GetFeeEstimate();
+    Task<GetFeeEstimateResponse> GetFeeEstimate(int? graceBlocks);
     Task<MoneroMinerTxSum> GetMinerTxSum(ulong height, ulong? numBlocks);
-    Task<MoneroSubmitTxResult> SubmitTxHex(string txHex, bool doNotRelay);
+    Task<MoneroSubmitTxResponse> SubmitTxHex(string txHex, bool doNotRelay);
     Task RelayTxsByHash(List<string> txHashes);
     Task<List<MoneroTx>> GetTxPool();
     Task<List<string>> GetTxPoolHashes();
@@ -60,9 +60,9 @@ public interface IMoneroDaemon
     Task StopMining();
     Task<MoneroMiningStatus> GetMiningStatus();
     Task SubmitBlocks(List<string> blockBlobs);
-    Task<MoneroPruneResult> PruneBlockchain(bool check);
-    Task<MoneroDaemonUpdateCheckResult> CheckForUpdate();
-    Task<MoneroDaemonUpdateDownloadResult> DownloadUpdate(string? path);
+    Task<MoneroPruneResponse> PruneBlockchain(bool check);
+    Task<MoneroDaemonUpdateCheckResponse> CheckForUpdate();
+    Task<MoneroDaemonUpdateDownloadResponse> DownloadUpdate(string? path);
     Task Stop();
     Task<MoneroBlockHeader> WaitForNextBlockHeader();
 }

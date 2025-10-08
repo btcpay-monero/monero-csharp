@@ -10,7 +10,7 @@ public class MoneroTxConfig
     private uint? _accountIndex;
     private ulong? _belowAmount;
     private bool? _canSplit;
-    private List<MoneroDestination>? _destinations;
+    private List<TransferDestination>? _destinations;
     private ulong? _fee;
     private string? _keyImage;
     private string? _note;
@@ -112,7 +112,7 @@ public class MoneroTxConfig
         return new MoneroTxConfig(this);
     }
 
-    public MoneroTxConfig SetAddress(string? address)
+    public MoneroTxConfig SetAddress(string address)
     {
         if (_destinations == null)
         {
@@ -125,7 +125,7 @@ public class MoneroTxConfig
         }
 
         _destinations.Clear();
-        _destinations.Add(new MoneroDestination { Address = address, Amount = 0 });
+        _destinations.Add(new TransferDestination { Address = address, Amount = 0 });
         return this;
     }
 
@@ -139,7 +139,7 @@ public class MoneroTxConfig
         return _destinations[0].Address;
     }
 
-    public MoneroTxConfig SetAmount(ulong? amount)
+    public MoneroTxConfig SetAmount(ulong amount)
     {
         if (_destinations != null && _destinations.Count > 1)
         {
@@ -148,7 +148,7 @@ public class MoneroTxConfig
 
         if (_destinations == null || _destinations.Count == 0)
         {
-            AddDestination(new MoneroDestination { Address = null, Amount = amount });
+            AddDestination(new TransferDestination { Address = "", Amount = amount });
         }
         else
         {
@@ -176,10 +176,10 @@ public class MoneroTxConfig
 
     public MoneroTxConfig AddDestination(string address, ulong amount)
     {
-        return AddDestination(new MoneroDestination { Address = address, Amount = amount });
+        return AddDestination(new TransferDestination { Address = address, Amount = amount });
     }
 
-    public MoneroTxConfig AddDestination(MoneroDestination destination)
+    public MoneroTxConfig AddDestination(TransferDestination destination)
     {
         if (_destinations == null)
         {
@@ -190,12 +190,12 @@ public class MoneroTxConfig
         return this;
     }
 
-    public List<MoneroDestination>? GetDestinations()
+    public List<TransferDestination>? GetDestinations()
     {
         return _destinations;
     }
 
-    public MoneroTxConfig SetDestinations(List<MoneroDestination> destinations)
+    public MoneroTxConfig SetDestinations(List<TransferDestination> destinations)
     {
         _destinations = destinations;
         return this;

@@ -390,7 +390,7 @@ public class MoneroWalletRpcIntegrationTest
             foreach (MoneroSubaddress subaddress in account.Subaddresses!)
             {
                 Assert.True(subaddress.GetAddress() ==
-                            await _wallet.GetAddress((uint)account.Index!, (uint)subaddress.Index!));
+                            await _wallet.GetAddress((uint)account.AccountIndex!, (uint)subaddress.Index!));
             }
         }
     }
@@ -535,7 +535,7 @@ public class MoneroWalletRpcIntegrationTest
         Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
-            uint? accountIndex = account.Index;
+            uint? accountIndex = account.AccountIndex;
 
             if (accountIndex == null)
             {
@@ -547,7 +547,7 @@ public class MoneroWalletRpcIntegrationTest
             foreach (MoneroSubaddress subaddress in subaddresses)
             {
                 TestSubaddress(subaddress);
-                Assert.Equal(account.Index, subaddress.AccountIndex);
+                Assert.Equal(account.AccountIndex, subaddress.AccountIndex);
             }
         }
     }
@@ -560,7 +560,7 @@ public class MoneroWalletRpcIntegrationTest
         Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
-            uint? accountIndex = account.Index;
+            uint? accountIndex = account.AccountIndex;
             if (accountIndex == null)
             {
                 throw new MoneroError("Account index is null");
@@ -613,7 +613,7 @@ public class MoneroWalletRpcIntegrationTest
         Assert.True(accounts.Count > 0);
         foreach (MoneroAccount account in accounts)
         {
-            uint? accountIdx = account.Index;
+            uint? accountIdx = account.AccountIndex;
 
             if (accountIdx == null)
             {
@@ -664,9 +664,9 @@ public class MoneroWalletRpcIntegrationTest
         ulong numBlocks = 100;
         ulong chainHeight = await _daemon.GetHeight();
         Assert.True(chainHeight >= numBlocks);
-        MoneroSyncResult result = await _wallet.Sync(chainHeight - numBlocks, null); // sync end of a chain
-        Assert.True(result.NumBlocksFetched >= 0);
-        Assert.NotNull(result.ReceivedMoney);
+        MoneroSyncResponse response = await _wallet.Sync(chainHeight - numBlocks, null); // sync end of a chain
+        Assert.True(response.NumBlocksFetched >= 0);
+        Assert.NotNull(response.ReceivedMoney);
     }
 
     // Can get the locked and unlocked balances of the wallet, accounts, and subaddresses
@@ -700,9 +700,9 @@ public class MoneroWalletRpcIntegrationTest
                     subaddress.GetUnlockedBalance().ToString());
             }
 
-            Assert.Equal((await _wallet.GetBalance(account.Index, null)).ToString(),
+            Assert.Equal((await _wallet.GetBalance(account.AccountIndex, null)).ToString(),
                 subaddressesBalance.ToString());
-            Assert.Equal((await _wallet.GetUnlockedBalance(account.Index, null)).ToString(),
+            Assert.Equal((await _wallet.GetUnlockedBalance(account.AccountIndex, null)).ToString(),
                 subaddressesUnlockedBalance.ToString());
         }
 
@@ -768,7 +768,7 @@ public class MoneroWalletRpcIntegrationTest
     {
         // test account
         Assert.NotNull(account);
-        uint? accountIndex = account.Index;
+        uint? accountIndex = account.AccountIndex;
         Assert.NotNull(accountIndex);
         MoneroUtils.ValidateAddress(account.PrimaryAddress, TestUtils.NetworkType);
         TestUtils.TestUnsignedBigInteger(account.Balance);

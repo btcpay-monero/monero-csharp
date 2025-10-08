@@ -82,9 +82,9 @@ public interface IMoneroWallet
 
     Task<MoneroSubaddress> CreateSubaddress(uint accountIdx, string? label);
 
-    Task<GetTransfersResult> GetTransfers(MoneroTransferQuery query);
+    Task<GetTransfersResponse> GetTransfers(MoneroTransferQuery query);
 
-    Task<GetTransferByTxIdResult> GetTransferByTxId(string txId, int? accountIndex);
+    Task<GetTransferByTransactionIdResponse> GetTransferByTxId(string txId, int? accountIndex);
 
     Task<string> ExportOutputs(bool all);
 
@@ -92,7 +92,7 @@ public interface IMoneroWallet
 
     Task<List<MoneroKeyImage>> ExportKeyImages(bool all);
 
-    Task<MoneroKeyImageImportResult> ImportKeyImages(List<MoneroKeyImage> keyImages);
+    Task<MoneroKeyImageImportResponse> ImportKeyImages(List<MoneroKeyImage> keyImages);
 
     Task FreezeOutput(string keyImage);
 
@@ -109,7 +109,7 @@ public interface IMoneroWallet
     Task<string> SignMessage(string message, MoneroMessageSignatureType signatureType, uint accountIdx,
         uint subaddressIdx);
 
-    Task<MoneroMessageSignatureResult> VerifyMessage(string message, string address, string signature);
+    Task<MoneroMessageSignatureResponse> VerifyMessage(string message, string address, string signature);
 
     Task<string> GetTxKey(string txHash);
 
@@ -172,13 +172,13 @@ public interface IMoneroWallet
 
     Task<string> MakeMultisig(List<string> multisigHexes, int threshold, string password);
 
-    Task<MoneroMultisigInitResult> ExchangeMultisigKeys(List<string> multisigHexes, string password);
+    Task<MoneroMultisigInitResponse> ExchangeMultisigKeys(List<string> multisigHexes, string password);
 
     Task<string> ExportMultisigHex();
 
     Task<int> ImportMultisigHex(List<string> multisigHexes);
 
-    Task<MoneroMultisigSignResult> SignMultisigTxHex(string multisigTxHex);
+    Task<MoneroMultisigSignResponse> SignMultisigTxHex(string multisigTxHex);
 
     Task<List<string>> SubmitMultisigTxHex(string signedMultisigTxHex);
 

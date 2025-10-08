@@ -15,7 +15,7 @@ public class MoneroWalletConfig
     private string? _primaryAddress;
     private string? _privateSpendKey;
     private string? _privateViewKey;
-    private ulong? _restoreHeight;
+    private uint? _restoreHeight;
     private bool? _saveCurrent;
     private string? _seed;
     private string? _seedOffset;
@@ -195,12 +195,12 @@ public class MoneroWalletConfig
         return this;
     }
 
-    public ulong? GetRestoreHeight()
+    public uint? GetRestoreHeight()
     {
         return _restoreHeight;
     }
 
-    public MoneroWalletConfig SetRestoreHeight(ulong? restoreHeight)
+    public MoneroWalletConfig SetRestoreHeight(uint? restoreHeight)
     {
         _restoreHeight = restoreHeight;
         return this;

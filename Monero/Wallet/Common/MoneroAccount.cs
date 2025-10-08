@@ -8,7 +8,10 @@ public class MoneroAccount
     public ulong Balance { get; set; }
 
     [JsonPropertyName("account_index")]
-    public uint? Index { get; set; }
+    public uint? AccountIndex { get; set; }
+
+    [JsonPropertyName("label")]
+    public string Label { get; set; }
 
     [JsonPropertyName("base_address")]
     public string? PrimaryAddress { get; set; }
@@ -21,9 +24,10 @@ public class MoneroAccount
     [JsonPropertyName("unlocked_balance")]
     public ulong UnlockedBalance { get; set; }
 
-    public MoneroAccount(uint? index, string? primaryAddress)
+    public MoneroAccount(uint? accountIndex, string? primaryAddress)
     {
-        Index = index;
+        AccountIndex = accountIndex;
+        Label = "";
         PrimaryAddress = primaryAddress;
         Balance = 0;
         UnlockedBalance = 0;

@@ -36,7 +36,7 @@ internal abstract class TestUtils
 
     public const string Address = "4B7nn4hBQhaJ2MBWHLpdUHQMoMqgE2BWtZfofNxTDAJoGgckeEGm4f9WaBuFJmCKuwZ7FE3Di7biKbdafqE4JDj19MWPvQ9";
 
-    public const ulong FirstReceiveHeight = 171; // NOTE: this value must be the height of the wallet's first tx for tests
+    public const uint FirstReceiveHeight = 171; // NOTE: this value must be the height of the wallet's first tx for tests
 
     public const int SyncPeriodInMs = 5000; // period between wallet syncs in milliseconds
 

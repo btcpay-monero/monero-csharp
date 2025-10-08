@@ -46,7 +46,7 @@ public class MoneroDaemonInfo : MoneroRpcResponse
     public ulong? HeightWithoutBootstrap { get; set; }
 
     [JsonPropertyName("busy_syncing")]
-    public bool IsBusySyncing { get; set; }
+    public bool BusySyncing { get; set; }
 
     [JsonPropertyName("offline")]
     public bool IsOffline { get; set; }
