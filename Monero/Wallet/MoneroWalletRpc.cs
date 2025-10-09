@@ -1541,10 +1541,10 @@ public class MoneroWalletRpc : IMoneroWallet
             transfersRequest.AccountIndex = query.AccountIndex;
 
             // set subaddress indices param
-            HashSet<uint> subaddressIndices = [];
+            HashSet<long> subaddressIndices = [];
             if (query.SubaddressIndex != null)
             {
-                subaddressIndices.Add((uint)query.SubaddressIndex);
+                subaddressIndices.Add((long)query.SubaddressIndex);
             }
 
             if (query.GetSubaddressIndices() != null)

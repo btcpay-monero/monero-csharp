@@ -228,10 +228,10 @@ public static class MoneroUtils
         Console.WriteLine(message);
     }
 
-    public static ulong XmrToAtomicUnits(double amountXmr)
+    public static long XmrToAtomicUnits(double amountXmr)
     {
         decimal precise = Math.Round((decimal)amountXmr * XmrAuMultiplier, 0, MidpointRounding.AwayFromZero);
-        return (ulong)new BigInteger(precise);
+        return (long)new BigInteger(precise);
     }
 
     public static double AtomicUnitsToXmr(ulong amountAtomicUnits)

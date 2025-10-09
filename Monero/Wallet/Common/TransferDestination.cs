@@ -9,5 +9,5 @@ public class TransferDestination
     public required string Address { get; set; }
 
     [JsonPropertyName("amount")]
-    public ulong Amount { get; set; }
+    public long Amount { get; set; }
 }

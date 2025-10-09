@@ -328,10 +328,10 @@ public class MoneroDaemonRpcIntegrationTest
     {
         GetFeeEstimateResponse feeEstimateResponse = await _daemon.GetFeeEstimate(null);
         TestUtils.TestUnsignedBigInteger(feeEstimateResponse.Fee, true);
-        Assert.Equal(4, feeEstimateResponse.Fees?.Count); // slow, normal, fast, fastest
+        Assert.Equal(4, feeEstimateResponse.Fees.Count); // slow, normal, fast, fastest
         for (int i = 0; i < 4; i++)
         {
-            TestUtils.TestUnsignedBigInteger(feeEstimateResponse?.Fees?[i], true);
+            TestUtils.TestUnsignedBigInteger(feeEstimateResponse?.Fees[i], true);
         }
 
         TestUtils.TestUnsignedBigInteger(feeEstimateResponse?.QuantizationMask, true);

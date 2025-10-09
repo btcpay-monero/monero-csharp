@@ -12,7 +12,7 @@ public class GetTransfersRequest
     [JsonPropertyName("filter_by_height ")] public bool? FilterByHeight { get; set; }
     [JsonPropertyName("min_height")] public uint? MinHeight { get; set; }
     [JsonPropertyName("max_height")] public uint? MaxHeight { get; set; }
-    [JsonPropertyName("account_index")] public uint? AccountIndex { get; set; }
-    [JsonPropertyName("subaddr_indices")] public IEnumerable<uint>? SubaddrIndices { get; set; }
+    [JsonPropertyName("account_index")] public long? AccountIndex { get; set; }
+    [JsonPropertyName("subaddr_indices")] public IEnumerable<long>? SubaddrIndices { get; set; }
     [JsonPropertyName("all_accounts")] public bool? AllAccounts { get; set; }
 }

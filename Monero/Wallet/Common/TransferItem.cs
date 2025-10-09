@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 
-
 namespace Monero.Wallet.Common;
 
 public abstract class TransferItem
@@ -9,16 +8,16 @@ public abstract class TransferItem
     public required string Address { get; set; }
 
     [JsonPropertyName("amount")]
-    public ulong Amount { get; set; }
+    public long Amount { get; set; }
 
     [JsonPropertyName("amounts")]
-    public List<ulong> Amounts { get; set; } = [];
+    public List<long> Amounts { get; set; } = [];
 
     [JsonPropertyName("destinations")]
     public List<TransferDestination> Destinations { get; set; } = [];
 
     [JsonPropertyName("confirmations")]
-    public ulong Confirmations { get; set; }
+    public int Confirmations { get; set; }
 
     [JsonPropertyName("fee")]
     public ulong Fee { get; set; }
@@ -57,5 +56,5 @@ public abstract class TransferItem
     public required string Type { get; set; }
 
     [JsonPropertyName("unlock_time")]
-    public ulong UnlockTime { get; set; }
+    public int UnlockTime { get; set; }
 }

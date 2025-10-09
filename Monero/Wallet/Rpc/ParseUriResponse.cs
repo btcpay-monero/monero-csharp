@@ -6,7 +6,7 @@ public class ParsedUri
 {
     [JsonPropertyName("address")] public string Address { get; set; } = "";
     [JsonPropertyName("amount")]
-    public ulong Amount { get; set; }
+    public long Amount { get; set; }
 
     [JsonPropertyName("payment_id")] public string PaymentId { get; set; } = "";
     [JsonPropertyName("recipient_name")] public string RecipientName { get; set; } = "";

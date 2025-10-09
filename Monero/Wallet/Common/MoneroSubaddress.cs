@@ -5,10 +5,10 @@ namespace Monero.Wallet.Common;
 public class MoneroSubaddress
 {
     [JsonPropertyName("major")]
-    public uint? AccountIndex { get; set; }
+    public uint AccountIndex { get; set; }
 
     [JsonPropertyName("minor")]
-    public uint? Index { get; set; }
+    public uint Index { get; set; }
 
     private string? _address;
     private ulong? _balance;

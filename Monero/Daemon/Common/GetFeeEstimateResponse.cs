@@ -5,11 +5,11 @@ namespace Monero.Daemon.Common;
 public class GetFeeEstimateResponse : MoneroRpcResponse
 {
     [JsonPropertyName("fee")]
-    public ulong? Fee { get; set; }
+    public uint Fee { get; set; }
 
     [JsonPropertyName("fees")]
-    public List<ulong>? Fees { get; set; }
+    public required List<uint> Fees { get; set; }
 
     [JsonPropertyName("quantization_mask")]
-    public ulong? QuantizationMask { get; set; }
+    public uint QuantizationMask { get; set; }
 }

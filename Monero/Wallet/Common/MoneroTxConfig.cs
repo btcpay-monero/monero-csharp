@@ -76,11 +76,8 @@ public class MoneroTxConfig
         sb.Append(config.GetAddress());
 
         StringBuilder paramSb = new();
-        ulong? amount = config.GetAmount();
-        if (amount != null)
-        {
-            paramSb.Append("&tx_amount=").Append(MoneroUtils.AtomicUnitsToXmr((ulong)amount));
-        }
+        long amount = config.GetAmount();
+        paramSb.Append("&tx_amount=").Append(MoneroUtils.AtomicUnitsToXmr((ulong)amount));
 
         if (!string.IsNullOrEmpty(config.GetRecipientName()))
         {
@@ -139,7 +136,7 @@ public class MoneroTxConfig
         return _destinations[0].Address;
     }
 
-    public MoneroTxConfig SetAmount(ulong amount)
+    public MoneroTxConfig SetAmount(long amount)
     {
         if (_destinations != null && _destinations.Count > 1)
         {
@@ -160,11 +157,11 @@ public class MoneroTxConfig
 
     public MoneroTxConfig SetAmount(string amount)
     {
-        return SetAmount(ulong.Parse(amount));
+        return SetAmount(long.Parse(amount));
     }
 
 
-    public ulong? GetAmount()
+    public long GetAmount()
     {
         if (_destinations == null || _destinations.Count != 1)
         {
@@ -174,7 +171,7 @@ public class MoneroTxConfig
         return _destinations[0].Amount;
     }
 
-    public MoneroTxConfig AddDestination(string address, ulong amount)
+    public MoneroTxConfig AddDestination(string address, long amount)
     {
         return AddDestination(new TransferDestination { Address = address, Amount = amount });
     }
