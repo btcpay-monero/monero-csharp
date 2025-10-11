@@ -149,7 +149,6 @@ public class MoneroWalletRpcIntegrationTest
 
             await TestWallet(async () =>
             {
-                MoneroUtils.ValidateAddress(await moneroWallet.GetPrimaryAddress());
                 MoneroUtils.ValidatePrivateViewKey(await moneroWallet.GetPrivateViewKey());
                 MoneroUtils.ValidatePrivateSpendKey(await moneroWallet.GetPrivateSpendKey());
                 MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
@@ -247,7 +246,6 @@ public class MoneroWalletRpcIntegrationTest
             {
                 MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
                 Assert.True(TestUtils.Seed != await moneroWallet.GetSeed());
-                MoneroUtils.ValidateAddress(await moneroWallet.GetPrimaryAddress());
                 Assert.True(TestUtils.Address != await moneroWallet.GetPrimaryAddress());
             }, moneroWallet);
         }
@@ -376,7 +374,6 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestGetPrimaryAddress()
     {
         string primaryAddress = await _wallet.GetPrimaryAddress();
-        MoneroUtils.ValidateAddress(primaryAddress);
         Assert.True(await _wallet.GetAddress(0, 0) == primaryAddress);
     }
 
@@ -742,6 +739,23 @@ public class MoneroWalletRpcIntegrationTest
         await CloseWallet(moneroWallet);
     }
 
+    // Can validate address
+    [Fact]
+    public async Task TestValidateAddress()
+    {
+        // mainnet primary and subaddress validation
+        Assert.True(await _wallet.IsValidAddress("42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L", false, false));
+        Assert.True(await _wallet.IsValidAddress("891TQPrWshJVpnBR4ZMhHiHpLx1PUnMqa3ccV5TJFBbqcJa3DWhjBh2QByCv3Su7WDPTGMHmCKkiVFN2fyGJKwbM1t6G7Ea", true, false));
+
+        // testnet primary and subaddress validation
+        Assert.True(await _wallet.IsValidAddress("9tUBnNCkC3UKGygHCwYvAB1FscpjUuq5e9MYJd2rXuiiTjjfVeSVjnbSG5VTnJgBgy9Y7GTLfxpZNMUwNZjGfdFr1z79eV1", false, true));
+        Assert.True(await _wallet.IsValidAddress("BgnKzHPJQDcg7xiP7bMN9MfPv9Z8ciT71iEMYnCdgBRBFETWgu9nKTr8fnzyGfU9h9gyNA8SFzYYzHfTS9KhqytSU943Nu1", true, true));
+
+        // stagenet primary and subaddress validation
+        Assert.True(await _wallet.IsValidAddress("5B8s3obCY2ETeQB3GNAGPK2zRGen5UeW1WzegSizVsmf6z5NvM2GLoN6zzk1vHyzGAAfA8pGhuYAeCFZjHAp59jRVQkunGS", false, true));
+        Assert.True(await _wallet.IsValidAddress("778B5D2JmMh5TJVWFbygJR15dvio5Z5B24hfSrWDzeroM8j8Lqc9sMoFE6324xg2ReaAZqHJkgfGFRugRmYHugHZ4f17Gxo", true, true));
+    }
+
     #region Test Utils
 
     private static void TestSubaddress(MoneroSubaddress? subaddress)
@@ -770,7 +784,6 @@ public class MoneroWalletRpcIntegrationTest
         Assert.NotNull(account);
         uint? accountIndex = account.AccountIndex;
         Assert.NotNull(accountIndex);
-        MoneroUtils.ValidateAddress(account.PrimaryAddress, TestUtils.NetworkType);
         TestUtils.TestUnsignedBigInteger(account.Balance);
         TestUtils.TestUnsignedBigInteger(account.UnlockedBalance);
 

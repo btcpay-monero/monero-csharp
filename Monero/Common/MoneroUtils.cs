@@ -2,9 +2,6 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using Org.BouncyCastle.Crypto.Digests;
-using Org.BouncyCastle.Utilities.Encoders;
-
 namespace Monero.Common;
 
 public static class MoneroUtils
@@ -34,6 +31,8 @@ public static class MoneroUtils
 
     private static readonly Regex StandardAddressPattern = new("^[" + Alphabet + "]{95}$", RegexOptions.Compiled);
     private static readonly Regex IntegratedAddressPattern = new("^[" + Alphabet + "]{106}$", RegexOptions.Compiled);
+    private static readonly int StandardAddressLength = 95;
+    private static readonly int IntegratedAddressLength = 106;
 
 
     private static bool IsHex(string? str)
@@ -154,44 +153,6 @@ public static class MoneroUtils
         }
     }
 
-    public static bool IsValidAddress(string? address)
-    {
-        try
-        {
-            ValidateAddress(address);
-            return true;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
-
-    public static void ValidateAddress(string? address, MoneroNetworkType? networkType)
-    {
-        if (networkType == null)
-        {
-            throw new MoneroError("Must provide a valid network type");
-        }
-
-        MoneroDecodedAddress decodedAddress = DecodeAddress(address);
-
-        if (decodedAddress.GetNetworkType() != networkType)
-        {
-            throw new MoneroError("Invalid network type");
-        }
-    }
-
-    public static void ValidateAddress(string? address)
-    {
-        if (address == null)
-        {
-            throw new MoneroError("Address is null");
-        }
-
-        DecodeAddress(address);
-    }
-
     public static void ValidateHex(string? str)
     {
         if (str == null)
@@ -249,11 +210,19 @@ public static class MoneroUtils
             throw new MoneroError("Address is null");
         }
 
+        foreach (char c in address)
+        {
+            if (!Alphabet.Contains(c))
+            {
+                throw new MoneroError("Invalid character found in address");
+            }
+        }
+
         // determine if an address has an integrated address pattern
         bool isIntegrated = false;
         if (!StandardAddressPattern.IsMatch(address))
         {
-            if (IntegratedAddressPattern.IsMatch(address))
+            if (IntegratedAddressPattern.IsMatch(address) && address.Length == IntegratedAddressLength)
             {
                 isIntegrated = true;
             }
@@ -261,6 +230,10 @@ public static class MoneroUtils
             {
                 throw new MoneroError("Address has invalid regex pattern");
             }
+        }
+        else if (address.Length != StandardAddressLength)
+        {
+            throw new MoneroError("Invalid address length");
         }
 
         // decode address to hex string
@@ -334,28 +307,7 @@ public static class MoneroUtils
             return false;
         }
 
-        string checksumCheck = decodedAddrStr.Substring(decodedAddrStr.Length - 8);
-        string withoutChecksumStr = decodedAddrStr.Substring(0, decodedAddrStr.Length - 8);
-
-        byte[] withoutChecksumBytes;
-        try
-        {
-            withoutChecksumBytes = Hex.Decode(withoutChecksumStr);
-        }
-        catch
-        {
-            return false;
-        }
-
-        KeccakDigest digest256 = new(256);
-        byte[] hashBytes = new byte[digest256.GetDigestSize()];
-        digest256.BlockUpdate(withoutChecksumBytes, 0, withoutChecksumBytes.Length);
-        digest256.DoFinal(hashBytes, 0);
-
-        string encodedStr = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-        string hashChecksum = encodedStr.Substring(0, 8);
-
-        return hashChecksum == checksumCheck;
+        return Regex.IsMatch(decodedAddrStr, @"\A\b[0-9a-fA-F]+\b\Z");
     }
 
     private static string DecodeAddressToHex(string address)

@@ -39,10 +39,6 @@
         <None Include="..\logo.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2"/>
-    </ItemGroup>
-
     <!-- Workaround for https://github.com/dotnet/roslyn/issues/41640 -->
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>

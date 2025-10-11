@@ -1391,6 +1391,21 @@ public class MoneroWalletRpc : IMoneroWallet
         await _rpc.SendCommandAsync<MoneroJsonRpcParams, MoneroRpcResponse>("close_wallet", parameters);
     }
 
+    public async Task<bool> IsValidAddress(string address, bool subaddress, bool anyNetType)
+    {
+        ValidateAddressRequest request = new() { Address = address, AnyNetType = anyNetType };
+
+        ValidateAddressResponse response =
+            await _rpc.SendCommandAsync<ValidateAddressRequest, ValidateAddressResponse>("validate_address", request);
+
+        if (!response.Valid || (subaddress && !response.Subaddress))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public async Task<bool> IsClosed()
     {
         try
