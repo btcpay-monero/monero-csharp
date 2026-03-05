@@ -58,10 +58,12 @@ public class MoneroWalletRpc : IMoneroWallet
         // TODO: ensure other fields are uninitialized?
 
         // open wallet on rpc server
-        MoneroJsonRpcParams parameters = [];
-        parameters.Add("filename", config.GetPath());
-        parameters.Add("password", config.GetPassword() ?? "");
-        await _rpc.SendCommandAsync<MoneroJsonRpcParams, MoneroRpcResponse>("open_wallet", parameters);
+        OpenWalletRequest openWalletRequest = new()
+        {
+            Filename = config.GetPath(),
+            Password = config.GetPassword()
+        };
+        await _rpc.SendCommandAsync<OpenWalletRequest, MoneroRpcResponse>("open_wallet", openWalletRequest);
         Clear();
         _path = config.GetPath();
 

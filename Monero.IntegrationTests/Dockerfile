@@ -7,7 +7,7 @@ COPY . .
 ARG CONFIGURATION_NAME=Release
 WORKDIR /source/Monero.IntegrationTests
 RUN dotnet build --configuration ${CONFIGURATION_NAME} /p:CI_TESTS=true /p:RazorCompileOnBuild=true
-RUN dotnet tool install --global JetBrains.DotCover.CommandLineTools --version 2025.1.6
+RUN dotnet tool install --global JetBrains.DotCover.CommandLineTools --version 2025.1.8
 ENV PATH="$PATH:/root/.dotnet/tools"
 ENV CONFIGURATION_NAME=${CONFIGURATION_NAME}
 ENTRYPOINT ["./docker-entrypoint.sh"]

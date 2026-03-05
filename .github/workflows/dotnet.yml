@@ -37,7 +37,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          dotnet tool install --global JetBrains.dotCover.CommandLineTools --version 2025.1.6
+          dotnet tool install --global JetBrains.dotCover.CommandLineTools --version 2025.1.8
           dotCover cover-dotnet --TargetArguments="test Monero.UnitTests/Monero.UnitTests.csproj -c Release --no-build" --output=coverage/dotCover.UnitTests.output.dcvr
 
       - name: Run integration tests
