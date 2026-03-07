@@ -40,6 +40,9 @@ jobs:
       - name: Install DocFX
         run: dotnet tool install -g docfx
 
+      - name: Generate metadata
+        run: docfx metadata docs/docfx.json
+
       - name: Build Documentation
         run: docfx build docs/docfx.json
 
