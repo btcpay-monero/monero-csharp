@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Monero.Wallet.Common;
 
-public abstract class TransferItem
+public class TransferItem
 {
     [JsonPropertyName("address")]
     public required string Address { get; set; }
