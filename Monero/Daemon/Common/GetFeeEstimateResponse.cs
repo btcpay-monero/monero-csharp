@@ -8,7 +8,7 @@ public class GetFeeEstimateResponse : MoneroRpcResponse
     public uint Fee { get; set; }
 
     [JsonPropertyName("fees")]
-    public required List<uint> Fees { get; set; }
+    public List<uint>? Fees { get; set; }
 
     [JsonPropertyName("quantization_mask")]
     public uint QuantizationMask { get; set; }

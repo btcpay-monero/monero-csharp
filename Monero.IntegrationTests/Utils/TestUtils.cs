@@ -16,7 +16,7 @@ internal abstract class TestUtils
 
     public static readonly bool TestsInContainer = GetDefaultEnv("TESTS_INCONTAINER", "false") == "true";
 
-    public static readonly Uri DaemonRpcUri = new(GetDefaultEnv("XMR_DAEMON_URI", "http://127.0.0.1:18081"));
+    public static readonly Uri DaemonRpcUri = new(GetDefaultEnv("XMR_DAEMON_URI", "http://127.0.0.1:28081"));
     public const string DaemonRpcUsername = "";
     public const string DaemonRpcPassword = "";
 
@@ -29,12 +29,9 @@ internal abstract class TestUtils
     private const string WalletName = "test_wallet_1";
     public const string WalletPassword = "supersecretpassword123";
 
-    // test wallet constants
-    public const MoneroNetworkType NetworkType = MoneroNetworkType.Mainnet;
+    public const string Seed = "origin hickory pavements tudor sizes hornet tether segments sack technical elbow unsafe legion nitrogen adapt yearbook idols fuzzy pitched goes tusks elbow erase fossil erase";
 
-    public const string Seed = "arena fossil anchor tapestry iguana tubes javelin gotten cafe damp talent angled onslaught haggled moon roles gills cigar cowl awning vapidly sighting buzzer delayed iguana";
-
-    public const string Address = "4B7nn4hBQhaJ2MBWHLpdUHQMoMqgE2BWtZfofNxTDAJoGgckeEGm4f9WaBuFJmCKuwZ7FE3Di7biKbdafqE4JDj19MWPvQ9";
+    public const string Address = "9xSyMy1r9h3BVjMrF3CTqQCQy36yCfkpn7uVfMyTUbez3hhumqBUqGUNNALjcd7f1HJBRdeH82bCC3veFHW7z3xm28gug4d";
 
     public const uint FirstReceiveHeight = 171; // NOTE: this value must be the height of the wallet's first tx for tests
 

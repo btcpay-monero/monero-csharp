@@ -68,13 +68,13 @@ public class MoneroUtilsUnitTest
     {
         MoneroTxConfig config = new MoneroTxConfig()
             .SetAddress(
-                "42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L")
+                "9xSyMy1r9h3BVjMrF3CTqQCQy36yCfkpn7uVfMyTUbez3hhumqBUqGUNNALjcd7f1HJBRdeH82bCC3veFHW7z3xm28gug4d")
             .SetAmount(XmrToAtomicUnits(0.25))
             .SetRecipientName("John Doe")
             .SetNote("My transfer to wallet");
         string paymentUri = "";
         True(
-            "monero:42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L?tx_amount=0.25&recipient_name=John%20Doe&tx_description=My%20transfer%20to%20wallet" ==
+            "monero:9xSyMy1r9h3BVjMrF3CTqQCQy36yCfkpn7uVfMyTUbez3hhumqBUqGUNNALjcd7f1HJBRdeH82bCC3veFHW7z3xm28gug4d?tx_amount=0.25&recipient_name=John%20Doe&tx_description=My%20transfer%20to%20wallet" ==
             paymentUri);
     }
 

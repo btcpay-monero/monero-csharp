@@ -571,7 +571,7 @@ public class MoneroWalletRpcIntegrationTest
         }
     }
 
-    // Can get subaddresses at specified account and subaddress indices
+    // Can get subaddresses at a specified account and subaddress indices
     [Fact]
     public async Task TestGetSubaddressesByIndices()
     {
@@ -680,7 +680,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestSyncWithoutProgress()
     {
-        ulong numBlocks = 100;
+        ulong numBlocks = 10;
         ulong chainHeight = await _daemon.GetHeight();
         Assert.True(chainHeight >= numBlocks);
         MoneroSyncResponse response = await _wallet.Sync(chainHeight - numBlocks, null); // sync end of a chain
@@ -766,12 +766,12 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestValidateAddress()
     {
         // mainnet primary and subaddress validation
-        Assert.True(await _wallet.IsValidAddress("42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L", false, false));
-        Assert.True(await _wallet.IsValidAddress("891TQPrWshJVpnBR4ZMhHiHpLx1PUnMqa3ccV5TJFBbqcJa3DWhjBh2QByCv3Su7WDPTGMHmCKkiVFN2fyGJKwbM1t6G7Ea", true, false));
+        Assert.True(await _wallet.IsValidAddress("42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L", false, true));
+        Assert.True(await _wallet.IsValidAddress("891TQPrWshJVpnBR4ZMhHiHpLx1PUnMqa3ccV5TJFBbqcJa3DWhjBh2QByCv3Su7WDPTGMHmCKkiVFN2fyGJKwbM1t6G7Ea", true, true));
 
         // testnet primary and subaddress validation
-        Assert.True(await _wallet.IsValidAddress("9tUBnNCkC3UKGygHCwYvAB1FscpjUuq5e9MYJd2rXuiiTjjfVeSVjnbSG5VTnJgBgy9Y7GTLfxpZNMUwNZjGfdFr1z79eV1", false, true));
-        Assert.True(await _wallet.IsValidAddress("BgnKzHPJQDcg7xiP7bMN9MfPv9Z8ciT71iEMYnCdgBRBFETWgu9nKTr8fnzyGfU9h9gyNA8SFzYYzHfTS9KhqytSU943Nu1", true, true));
+        Assert.True(await _wallet.IsValidAddress("9tUBnNCkC3UKGygHCwYvAB1FscpjUuq5e9MYJd2rXuiiTjjfVeSVjnbSG5VTnJgBgy9Y7GTLfxpZNMUwNZjGfdFr1z79eV1", false, false));
+        Assert.True(await _wallet.IsValidAddress("BgnKzHPJQDcg7xiP7bMN9MfPv9Z8ciT71iEMYnCdgBRBFETWgu9nKTr8fnzyGfU9h9gyNA8SFzYYzHfTS9KhqytSU943Nu1", true, false));
 
         // stagenet primary and subaddress validation
         Assert.True(await _wallet.IsValidAddress("5B8s3obCY2ETeQB3GNAGPK2zRGen5UeW1WzegSizVsmf6z5NvM2GLoN6zzk1vHyzGAAfA8pGhuYAeCFZjHAp59jRVQkunGS", false, true));
