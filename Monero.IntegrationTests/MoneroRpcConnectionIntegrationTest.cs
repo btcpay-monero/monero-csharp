@@ -31,7 +31,7 @@ public class MoneroRpcConnectionIntegrationTest
     [Fact]
     public async Task TestSendRequest()
     {
-        // Setup connection
+        // Set up a connection
 
         MoneroRpcConnection connection = new(TestUtils.DaemonRpcUri, TestUtils.DaemonRpcUsername, TestUtils.DaemonRpcPassword);
 
@@ -39,7 +39,7 @@ public class MoneroRpcConnectionIntegrationTest
 
         // Test monerod JSON request
 
-        var jsonResponse = await connection.SendCommandAsync<NoRequestModel, MoneroDaemonInfo>("get_info", NoRequestModel.Instance);
+        var jsonResponse = await connection.SendCommandAsync<NoRequestModel, MoneroDaemonInfo>("get_info", NoRequestModel.Instance, Xunit.TestContext.Current.CancellationToken);
 
         Assert.NotNull(jsonResponse);
         Assert.Null(jsonResponse.Error);

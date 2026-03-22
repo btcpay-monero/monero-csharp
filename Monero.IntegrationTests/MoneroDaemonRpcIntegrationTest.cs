@@ -626,7 +626,7 @@ public class MoneroDaemonRpcIntegrationTest
         // start mining
         await _daemon.StartMining(address, 1, false, true);
 
-        GenUtils.WaitFor(30);
+        await GenUtils.WaitForAsync(30, Xunit.TestContext.Current.CancellationToken);
 
         // stop mining
         await _daemon.StopMining();
@@ -760,7 +760,7 @@ public class MoneroDaemonRpcIntegrationTest
         await _daemon.Stop();
 
         // give the daemon time to shut down
-        GenUtils.WaitFor(TestUtils.SyncPeriodInMs);
+        await GenUtils.WaitForAsync(TestUtils.SyncPeriodInMs, Xunit.TestContext.Current.CancellationToken);
         // try to interact with the daemon
         try
         {

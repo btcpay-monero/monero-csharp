@@ -417,17 +417,27 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestGetHeight()
     {
         ulong lastHeight = await _wallet.GetHeight();
-
         await _daemon.WaitForNextBlockHeader();
 
-        GenUtils.WaitFor(2000);
+        const int maxRetries = 15;
+        const int delayMs = 1000;
+        bool blockFetched = false;
+        ulong currentHeight = lastHeight;
 
-        var syncResult = await _wallet.Sync(null, null);
+        for (int i = 0; i < maxRetries; i++)
+        {
+            var syncResult = await _wallet.Sync(null, null);
+            currentHeight = await _wallet.GetHeight();
 
-        Assert.True(syncResult.NumBlocksFetched > 0, "No blocks fetched from wallet sync");
+            if (syncResult.NumBlocksFetched > 0 && currentHeight > lastHeight)
+            {
+                blockFetched = true;
+                break;
+            }
+            await GenUtils.WaitForAsync(delayMs, Xunit.TestContext.Current.CancellationToken);
+        }
 
-        ulong currentHeight = await _wallet.GetHeight();
-
+        Assert.True(blockFetched, $"No blocks fetched after {maxRetries}s. Last height: {lastHeight}, current height: {currentHeight}");
         Assert.True(currentHeight > lastHeight, $"Expected currentHeight: {currentHeight} > lastHeight: {lastHeight}");
     }
 

@@ -177,15 +177,8 @@ public static class GenUtils
         return subarray;
     }
 
-    public static void WaitFor(int durationMs)
+    public static async Task WaitForAsync(int durationMs, CancellationToken cancellationToken)
     {
-        try
-        {
-            Thread.Sleep(durationMs);
-        }
-        catch (ThreadInterruptedException)
-        {
-            throw new Exception("Thread was interrupted while sleeping");
-        }
+        await Task.Delay(durationMs, cancellationToken);
     }
 }
