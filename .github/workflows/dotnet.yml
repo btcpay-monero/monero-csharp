@@ -38,7 +38,10 @@ jobs:
       - name: Run unit tests
         run: |
           dotnet tool install --global JetBrains.dotCover.CommandLineTools --version 2025.1.8
-          dotCover cover-dotnet --TargetArguments="test Monero.UnitTests/Monero.UnitTests.csproj -c Release --no-build" --output=coverage/dotCover.UnitTests.output.dcvr
+          dotCover cover-dotnet \
+            --TargetArguments="test Monero.UnitTests/Monero.UnitTests.csproj -c Release --no-build" \
+            --output=coverage/dotCover.UnitTests.output.dcvr \
+            --filters="-:Assembly=Monero.UnitTests;-:Assembly=testhost;-:Assembly=xunit.v3.*"
 
       - name: Run integration tests
         run: docker compose -f Monero.IntegrationTests/docker-compose.yml run tests

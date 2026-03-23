@@ -4,7 +4,7 @@ set -e
 dotCover cover-dotnet \
   --TargetArguments="test -c ${CONFIGURATION_NAME} --no-build" \
   --Output=/coverage/dotCover.IntegrationTests.output.dcvr \
-  --filters="-:Assembly=Monero.IntegrationTests;-:Assembly=Monero.UnitTests;-:Assembly=testhost"
+  --filters="-:Assembly=Monero.IntegrationTests;-:Assembly=testhost;-:Assembly=xunit.v3.*"
 
 dotCover merge \
   --Source=/coverage/dotCover.IntegrationTests.output.dcvr,/coverage/dotCover.UnitTests.output.dcvr \
