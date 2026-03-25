@@ -8,18 +8,8 @@ using Xunit;
 
 namespace Monero.IntegrationTests;
 
-public class MoneroDaemonRpcIntegrationTest
+public class MoneroDaemonRpcIntegrationTest : MoneroIntegrationTestBase
 {
-    private readonly MoneroDaemonRpc _daemon = TestUtils.GetDaemonRpc(); // daemon instance to test
-
-    public MoneroDaemonRpcIntegrationTest()
-    {
-        ulong daemonHeight = _daemon.GetHeight().GetAwaiter().GetResult();
-        if (daemonHeight == 1)
-        {
-            _daemon.WaitForNextBlockHeader().GetAwaiter().GetResult();
-        }
-    }
 
     #region Notification Tests
 
@@ -31,11 +21,11 @@ public class MoneroDaemonRpcIntegrationTest
         {
             // register a listener
             MoneroDaemonListener listener = new();
-            _daemon.AddListener(listener);
+            Daemon.AddListener(listener);
 
             // wait for the next block notification
-            MoneroBlockHeader header = await _daemon.WaitForNextBlockHeader();
-            _daemon.RemoveListener(listener); // unregister listener so daemon does not keep polling
+            MoneroBlockHeader header = await Daemon.WaitForNextBlockHeader();
+            Daemon.RemoveListener(listener); // unregister listener so daemon does not keep polling
             TestBlockHeader(header, true);
 
             // test that listener was called with the equivalent header
@@ -44,7 +34,7 @@ public class MoneroDaemonRpcIntegrationTest
         finally
         {
             // stop mining
-            try { await _daemon.StopMining(); }
+            try { await Daemon.StopMining(); }
             catch (MoneroError)
             {
                 // ignore
@@ -56,10 +46,28 @@ public class MoneroDaemonRpcIntegrationTest
 
     #region Non Relays Tests
 
+    // Can send a request to RPC
+    [Fact]
+    public async Task TestSendRequest()
+    {
+        // Test monerod JSON request
+        var jsonResponse = await Daemon.GetInfo();
+
+        Assert.NotNull(jsonResponse);
+        Assert.Null(jsonResponse.Error);
+
+        // Test monerod PATH request
+
+        MoneroDaemonInfo pathResponse = await Daemon.GetRpcConnection().SendPathRequest<MoneroDaemonInfo>("get_info", []);
+
+        Assert.NotNull(pathResponse);
+        Assert.Null(pathResponse.Error);
+    }
+
     [Fact]
     public async Task TestGetVersion()
     {
-        MoneroVersion version = await _daemon.GetVersion();
+        MoneroVersion version = await Daemon.GetVersion();
         Assert.NotNull(version.Number);
         Assert.True(version.Number > 0);
         Assert.NotNull(version.IsRelease);
@@ -69,7 +77,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetHeight()
     {
-        ulong height = await _daemon.GetHeight();
+        ulong height = await Daemon.GetHeight();
         Assert.True(height > 0, "Height must be greater than 0");
     }
 
@@ -77,8 +85,8 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetBlockIdByHeight()
     {
-        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
-        string hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
+        MoneroBlockHeader lastHeader = await Daemon.GetLastBlockHeader();
+        string hash = await Daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
         Assert.NotNull(hash);
         Assert.Equal(64, hash.Length);
     }
@@ -87,7 +95,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetBlockTemplate()
     {
-        MoneroBlockTemplate template = await _daemon.GetBlockTemplate(TestUtils.Address, 2);
+        MoneroBlockTemplate template = await Daemon.GetBlockTemplate(TestUtils.Address, 2);
         TestBlockTemplate(template);
     }
 
@@ -95,7 +103,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetLastBlockHeader()
     {
-        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
+        MoneroBlockHeader lastHeader = await Daemon.GetLastBlockHeader();
         TestBlockHeader(lastHeader, true);
     }
 
@@ -104,15 +112,15 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestGetBlockHeaderByHash()
     {
         // retrieve by hash of the last block
-        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
-        string hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
-        MoneroBlockHeader header = await _daemon.GetBlockHeaderByHash(hash);
+        MoneroBlockHeader lastHeader = await Daemon.GetLastBlockHeader();
+        string hash = await Daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
+        MoneroBlockHeader header = await Daemon.GetBlockHeaderByHash(hash);
         TestBlockHeader(header, true);
         Assert.True(lastHeader.Equals(header));
 
         // retrieve by hash of previous to last block
-        hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()! - 1);
-        header = await _daemon.GetBlockHeaderByHash(hash);
+        hash = await Daemon.GetBlockHash((ulong)lastHeader.GetHeight()! - 1);
+        header = await Daemon.GetBlockHeaderByHash(hash);
         TestBlockHeader(header, true);
         Assert.True(lastHeader.GetHeight() - 1 == (ulong)header.GetHeight()!);
     }
@@ -122,13 +130,13 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestGetBlockHeaderByHeight()
     {
         // retrieve by height of the last block
-        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
-        MoneroBlockHeader header = await _daemon.GetBlockHeaderByHeight((ulong)lastHeader.GetHeight()!);
+        MoneroBlockHeader lastHeader = await Daemon.GetLastBlockHeader();
+        MoneroBlockHeader header = await Daemon.GetBlockHeaderByHeight((ulong)lastHeader.GetHeight()!);
         TestBlockHeader(header, true);
         Assert.True(lastHeader.Equals(header));
 
         // retrieve by height of previous to last block
-        header = await _daemon.GetBlockHeaderByHeight((ulong)lastHeader.GetHeight()! - 1);
+        header = await Daemon.GetBlockHeaderByHeight((ulong)lastHeader.GetHeight()! - 1);
         TestBlockHeader(header, true);
         Assert.True(lastHeader.GetHeight() - 1 == (ulong)header.GetHeight()!);
     }
@@ -141,13 +149,13 @@ public class MoneroDaemonRpcIntegrationTest
         // determine start and end height based on the number of blocks and how many blocks ago
         ulong numBlocks = 10;
         ulong numBlocksAgo = 10;
-        ulong currentHeight = await _daemon.GetHeight();
+        ulong currentHeight = await Daemon.GetHeight();
         ulong startHeight = currentHeight - numBlocksAgo;
         ulong endHeight = currentHeight - 1;
 
         // fetch headers
         List<MoneroBlockHeader> headers = await
-            _daemon.GetBlockHeadersByRange(startHeight, endHeight);
+            Daemon.GetBlockHeadersByRange(startHeight, endHeight);
 
         // test headers
         Assert.True(numBlocks == (ulong)headers.Count);
@@ -169,18 +177,18 @@ public class MoneroDaemonRpcIntegrationTest
         TestContext ctx = new() { HasHex = true, HasTxs = false, HeaderIsFull = true };
 
         // retrieve by hash of the last block
-        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
-        string hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
-        MoneroBlock block = await _daemon.GetBlockByHash(hash);
+        MoneroBlockHeader lastHeader = await Daemon.GetLastBlockHeader();
+        string hash = await Daemon.GetBlockHash((ulong)lastHeader.GetHeight()!);
+        MoneroBlock block = await Daemon.GetBlockByHash(hash);
         TestBlock(block, ctx);
-        Assert.True((await _daemon.GetBlockByHeight((ulong)block.GetHeight()!)).Equals(block));
+        Assert.True((await Daemon.GetBlockByHeight((ulong)block.GetHeight()!)).Equals(block));
         Assert.Null(block.Txs);
 
         // retrieve by hash of previous to last block
-        hash = await _daemon.GetBlockHash((ulong)lastHeader.GetHeight()! - 1);
-        block = await _daemon.GetBlockByHash(hash);
+        hash = await Daemon.GetBlockHash((ulong)lastHeader.GetHeight()! - 1);
+        block = await Daemon.GetBlockByHash(hash);
         TestBlock(block, ctx);
-        Assert.True((await _daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()! - 1)).Equals(block));
+        Assert.True((await Daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()! - 1)).Equals(block));
         Assert.Null(block.Txs);
     }
 
@@ -202,13 +210,13 @@ public class MoneroDaemonRpcIntegrationTest
         ctx.HasTxs = false;
 
         // retrieve by height of the last block
-        MoneroBlockHeader lastHeader = await _daemon.GetLastBlockHeader();
-        MoneroBlock block = await _daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()!);
+        MoneroBlockHeader lastHeader = await Daemon.GetLastBlockHeader();
+        MoneroBlock block = await Daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()!);
         TestBlock(block, ctx);
-        Assert.True((await _daemon.GetBlockByHeight((ulong)block.GetHeight()!)).Equals(block));
+        Assert.True((await Daemon.GetBlockByHeight((ulong)block.GetHeight()!)).Equals(block));
 
         // retrieve by height of previous to last block
-        block = await _daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()! - 1);
+        block = await Daemon.GetBlockByHeight((ulong)lastHeader.GetHeight()! - 1);
         TestBlock(block, ctx);
         Assert.True(lastHeader.GetHeight() - 1 == (ulong)block.GetHeight()!);
     }
@@ -218,7 +226,7 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestGetTxByHash()
     {
         // fetch transaction hashes to test
-        List<string> txHashes = await GetConfirmedTxHashes(_daemon);
+        List<string> txHashes = await GetConfirmedTxHashes(Daemon);
 
         // context for testing txs
         TestContext ctx = new() { IsPruned = false, IsConfirmed = true, FromGetTxPool = false };
@@ -226,7 +234,7 @@ public class MoneroDaemonRpcIntegrationTest
         // fetch each tx by hash without pruning
         if (txHashes.Count > 0)
         {
-            List<MoneroTx> txs = await _daemon.GetTxs(txHashes, false);
+            List<MoneroTx> txs = await Daemon.GetTxs(txHashes, false);
             foreach (MoneroTx tx in txs)
             {
                 TestTx(tx, ctx);
@@ -236,7 +244,7 @@ public class MoneroDaemonRpcIntegrationTest
         // fetch each tx by hash with pruning
         if (txHashes.Count > 0)
         {
-            List<MoneroTx> prunedTxs = await _daemon.GetTxs(txHashes, true);
+            List<MoneroTx> prunedTxs = await Daemon.GetTxs(txHashes, true);
             foreach (MoneroTx tx in prunedTxs)
             {
                 ctx.IsPruned = true;
@@ -247,7 +255,7 @@ public class MoneroDaemonRpcIntegrationTest
         // fetch invalid hash
         try
         {
-            await _daemon.GetTxs(["invalid tx hash"], false);
+            await Daemon.GetTxs(["invalid tx hash"], false);
             throw new MoneroError("fail");
         }
         catch (MoneroError e)
@@ -261,15 +269,15 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestGetTxHexByHash()
     {
         // fetch transaction hashes to test
-        List<string> txHashes = await GetConfirmedTxHashes(_daemon);
+        List<string> txHashes = await GetConfirmedTxHashes(Daemon);
 
         // fetch each tx hex by hash with and without pruning
         List<string> hexes = [];
         List<string> hexesPruned = [];
         if (txHashes.Count > 0)
         {
-            hexes.AddRange(await _daemon.GetTxHexes(txHashes, false));
-            hexesPruned.AddRange(await _daemon.GetTxHexes(txHashes, true));
+            hexes.AddRange(await Daemon.GetTxHexes(txHashes, false));
+            hexesPruned.AddRange(await Daemon.GetTxHexes(txHashes, true));
         }
 
         // test results
@@ -278,7 +286,7 @@ public class MoneroDaemonRpcIntegrationTest
         // fetch invalid hash
         try
         {
-            await _daemon.GetTxHexes(["invalid tx hash"], false);
+            await Daemon.GetTxHexes(["invalid tx hash"], false);
             throw new MoneroError("fail");
         }
         catch (MoneroError e)
@@ -292,11 +300,11 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestGetTxHexesByHashes()
     {
         // fetch transaction hashes to test
-        List<string> txHashes = await GetConfirmedTxHashes(_daemon);
+        List<string> txHashes = await GetConfirmedTxHashes(Daemon);
 
         // fetch tx hexes by hash with and without pruning
-        List<string> hexes = await _daemon.GetTxHexes(txHashes, false);
-        List<string> hexesPruned = await _daemon.GetTxHexes(txHashes, true);
+        List<string> hexes = await Daemon.GetTxHexes(txHashes, false);
+        List<string> hexesPruned = await Daemon.GetTxHexes(txHashes, true);
 
         // test results
         TestTxHexes(hexes, hexesPruned, txHashes);
@@ -305,7 +313,7 @@ public class MoneroDaemonRpcIntegrationTest
         txHashes.Add("invalid tx hash");
         try
         {
-            await _daemon.GetTxHexes(txHashes, false);
+            await Daemon.GetTxHexes(txHashes, false);
             throw new MoneroError("fail");
         }
         catch (MoneroError e)
@@ -318,7 +326,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact(Skip = "Not supported by regtest daemon")]
     public async Task TestGetMinerTxSum()
     {
-        MoneroMinerTxSum sum = await _daemon.GetMinerTxSum(0, Math.Min(50000, await _daemon.GetHeight()));
+        MoneroMinerTxSum sum = await Daemon.GetMinerTxSum(0, Math.Min(50000, await Daemon.GetHeight()));
         TestMinerTxSum(sum);
     }
 
@@ -326,7 +334,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact(Skip = "Not supported by testnet daemon")]
     public async Task TestGetFeeEstimate()
     {
-        GetFeeEstimateResponse feeEstimateResponse = await _daemon.GetFeeEstimate(null);
+        GetFeeEstimateResponse feeEstimateResponse = await Daemon.GetFeeEstimate(null);
         TestUtils.TestUnsignedBigInteger(feeEstimateResponse.Fee, true);
         Assert.Equal(4, feeEstimateResponse.Fees?.Count); // slow, normal, fast, fastest
         for (int i = 0; i < 4; i++)
@@ -372,7 +380,7 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestGetOutputHistogramBinary()
     {
         List<MoneroOutputHistogramEntry> entries = await
-            _daemon.GetOutputHistogram([], null, null, null, null);
+            Daemon.GetOutputHistogram([], null, null, null, null);
         Assert.True(entries.Count > 0);
         foreach (MoneroOutputHistogramEntry entry in entries)
         {
@@ -384,16 +392,18 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact(Skip = "Binary request not implemented")]
     public async Task TestGetOutputDistributionBinary()
     {
-        List<ulong> amounts = [];
-        amounts.Add(0);
-        amounts.Add(1);
-        amounts.Add(10);
-        amounts.Add(100);
-        amounts.Add(1000);
-        amounts.Add(10000);
-        amounts.Add(100000);
-        amounts.Add(1000000);
-        List<MoneroOutputDistributionEntry> entries = await _daemon.GetOutputDistribution(amounts, false, null, null);
+        List<ulong> amounts =
+        [
+            0,
+            1,
+            10,
+            100,
+            1000,
+            10000,
+            100000,
+            1000000
+        ];
+        List<MoneroOutputDistributionEntry> entries = await Daemon.GetOutputDistribution(amounts, false, null, null);
         foreach (MoneroOutputDistributionEntry entry in entries)
         {
             TestOutputDistributionEntry(entry);
@@ -404,7 +414,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetGeneralInformation()
     {
-        MoneroDaemonInfo info = await _daemon.GetInfo();
+        MoneroDaemonInfo info = await Daemon.GetInfo();
         TestInfo(info);
     }
 
@@ -412,7 +422,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetSyncInformation()
     {
-        MoneroDaemonSyncInfo syncInfo = await _daemon.GetSyncInfo();
+        MoneroDaemonSyncInfo syncInfo = await Daemon.GetSyncInfo();
         TestSyncInfo(syncInfo);
     }
 
@@ -420,7 +430,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetHardForkInformation()
     {
-        MoneroHardForkInfo hardForkInfo = await _daemon.GetHardForkInfo();
+        MoneroHardForkInfo hardForkInfo = await Daemon.GetHardForkInfo();
         TestHardForkInfo(hardForkInfo);
     }
 
@@ -428,7 +438,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetAlternativeChains()
     {
-        List<MoneroAltChain> altChains = await _daemon.GetAltChains();
+        List<MoneroAltChain> altChains = await Daemon.GetAltChains();
         foreach (MoneroAltChain altChain in altChains)
         {
             TestAltChain(altChain);
@@ -439,7 +449,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestGetAlternativeBlockIds()
     {
-        List<string> altBlockIds = await _daemon.GetAltBlockHashes();
+        List<string> altBlockIds = await Daemon.GetAltBlockHashes();
         foreach (string altBlockId in altBlockIds)
         {
             Assert.NotNull(altBlockId);
@@ -451,18 +461,18 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestSetDownloadBandwidth()
     {
-        int initVal = await _daemon.GetDownloadLimit();
+        int initVal = await Daemon.GetDownloadLimit();
         Assert.True(initVal > 0);
         int setVal = initVal * 2;
-        await _daemon.SetDownloadLimit(setVal);
-        Assert.True(setVal == await _daemon.GetDownloadLimit());
-        int resetVal = await _daemon.ResetDownloadLimit();
+        await Daemon.SetDownloadLimit(setVal);
+        Assert.True(setVal == await Daemon.GetDownloadLimit());
+        int resetVal = await Daemon.ResetDownloadLimit();
         Assert.True(initVal == resetVal);
 
         // test invalid limits
         try
         {
-            await _daemon.SetDownloadLimit(0);
+            await Daemon.SetDownloadLimit(0);
             throw new MoneroError("Should have thrown error on invalid input");
         }
         catch (MoneroError e)
@@ -470,25 +480,25 @@ public class MoneroDaemonRpcIntegrationTest
             Assert.Equal("Download limit must be an integer greater than 0", e.Message);
         }
 
-        Assert.True(await _daemon.GetDownloadLimit() == initVal);
+        Assert.True(await Daemon.GetDownloadLimit() == initVal);
     }
 
     // Can get, set, and reset an upload bandwidth limit
     [Fact]
     public async Task TestSetUploadBandwidth()
     {
-        int initVal = await _daemon.GetUploadLimit();
+        int initVal = await Daemon.GetUploadLimit();
         Assert.True(initVal > 0);
         int setVal = initVal * 2;
-        await _daemon.SetUploadLimit(setVal);
-        Assert.True(setVal == await _daemon.GetUploadLimit());
-        int resetVal = await _daemon.ResetUploadLimit();
+        await Daemon.SetUploadLimit(setVal);
+        Assert.True(setVal == await Daemon.GetUploadLimit());
+        int resetVal = await Daemon.ResetUploadLimit();
         Assert.True(initVal == resetVal);
 
         // test invalid limits
         try
         {
-            await _daemon.SetUploadLimit(0);
+            await Daemon.SetUploadLimit(0);
             throw new Exception("Should have thrown error on invalid input");
         }
         catch (MoneroError e)
@@ -496,14 +506,14 @@ public class MoneroDaemonRpcIntegrationTest
             Assert.Equal("Upload limit must be an integer greater than 0", e.Message);
         }
 
-        Assert.True(initVal == await _daemon.GetUploadLimit());
+        Assert.True(initVal == await Daemon.GetUploadLimit());
     }
 
     // Can get peers with active incoming or outgoing connections
     [Fact]
     public async Task TestGetPeers()
     {
-        List<MoneroPeer> peers = await _daemon.GetPeers();
+        List<MoneroPeer> peers = await Daemon.GetPeers();
         Assert.True(peers.Count > 0, "Daemon has no incoming or outgoing peers to test");
         foreach (MoneroPeer peer in peers)
         {
@@ -515,7 +525,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact(Skip = "Daemon has no known peers to test")]
     public async Task TestGetKnownPeers()
     {
-        List<MoneroPeer> peers = await _daemon.GetKnownPeers();
+        List<MoneroPeer> peers = await Daemon.GetKnownPeers();
         Assert.True(peers.Count > 0, "Daemon has no known peers to test");
         foreach (MoneroPeer peer in peers)
         {
@@ -527,18 +537,18 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact]
     public async Task TestSetOutgoingPeerLimit()
     {
-        await _daemon.SetOutgoingPeerLimit(0);
-        await _daemon.SetOutgoingPeerLimit(8);
-        await _daemon.SetOutgoingPeerLimit(10);
+        await Daemon.SetOutgoingPeerLimit(0);
+        await Daemon.SetOutgoingPeerLimit(8);
+        await Daemon.SetOutgoingPeerLimit(10);
     }
 
     // Can limit the number of incoming peers
     [Fact]
     public async Task TestSetIncomingPeerLimit()
     {
-        await _daemon.SetIncomingPeerLimit(0);
-        await _daemon.SetIncomingPeerLimit(8);
-        await _daemon.SetIncomingPeerLimit(10);
+        await Daemon.SetIncomingPeerLimit(0);
+        await Daemon.SetIncomingPeerLimit(8);
+        await Daemon.SetIncomingPeerLimit(10);
     }
 
     // Can ban a peer
@@ -552,10 +562,10 @@ public class MoneroDaemonRpcIntegrationTest
             IsBanned = true,
             Seconds = 60
         };
-        await _daemon.SetPeerBans([ban]);
+        await Daemon.SetPeerBans([ban]);
 
         // test ban
-        List<MoneroBan> bans = await _daemon.GetPeerBans();
+        List<MoneroBan> bans = await Daemon.GetPeerBans();
         bool found = false;
         foreach (MoneroBan aBan in bans)
         {
@@ -574,34 +584,30 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestBanPeers()
     {
         // set bans
-        MoneroBan ban1 = new();
-        ban1.Host = "192.168.1.52";
-        ban1.IsBanned = true;
-        ban1.Seconds = 60;
-        MoneroBan ban2 = new();
-        ban2.Host = "192.168.1.53";
-        ban2.IsBanned = true;
-        ban2.Seconds = 60;
-        List<MoneroBan> bans = [];
-        bans.Add(ban1);
-        bans.Add(ban2);
-        await _daemon.SetPeerBans(bans);
+        MoneroBan ban1 = new() { Host = "192.168.1.52", IsBanned = true, Seconds = 60 };
+        MoneroBan ban2 = new() { Host = "192.168.1.53", IsBanned = true, Seconds = 60 };
+        List<MoneroBan> bans =
+        [
+            ban1,
+            ban2
+        ];
+        await Daemon.SetPeerBans(bans);
 
         // test bans
-        bans = await _daemon.GetPeerBans();
+        bans = await Daemon.GetPeerBans();
         bool found1 = false;
         bool found2 = false;
         foreach (MoneroBan aBan in bans)
         {
             TestMoneroBan(aBan);
-            if ("192.168.1.52".Equals(aBan.Host))
+            switch (aBan.Host)
             {
-                found1 = true;
-            }
-
-            if ("192.168.1.53".Equals(aBan.Host))
-            {
-                found2 = true;
+                case "192.168.1.52":
+                    found1 = true;
+                    break;
+                case "192.168.1.53":
+                    found2 = true;
+                    break;
             }
         }
 
@@ -614,7 +620,7 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestMining()
     {
         // stop mining at the beginning of the test
-        try { await _daemon.StopMining(); }
+        try { await Daemon.StopMining(); }
         catch (MoneroError)
         {
             // ignore
@@ -624,12 +630,12 @@ public class MoneroDaemonRpcIntegrationTest
         // TODO use wallet rpc
         string address = TestUtils.Address;
         // start mining
-        await _daemon.StartMining(address, 1, false, true);
+        await Daemon.StartMining(address, 1, false, true);
 
         await GenUtils.WaitForAsync(30, Xunit.TestContext.Current.CancellationToken);
 
         // stop mining
-        await _daemon.StopMining();
+        await Daemon.StopMining();
     }
 
     // Can get mining status
@@ -640,14 +646,14 @@ public class MoneroDaemonRpcIntegrationTest
         try
         {
             // stop mining at the beginning of the test
-            try { await _daemon.StopMining(); }
+            try { await Daemon.StopMining(); }
             catch (MoneroError)
             {
                 // ignore
             }
 
             // test status without mining
-            MoneroMiningStatus status = await _daemon.GetMiningStatus();
+            MoneroMiningStatus status = await Daemon.GetMiningStatus();
             Assert.False(status.IsActive);
             Assert.Null(status.Address);
             Assert.Equal(0, (long)status.Speed!);
@@ -659,8 +665,8 @@ public class MoneroDaemonRpcIntegrationTest
             string address = TestUtils.Address;
             ulong threadCount = 1;
             bool isBackground = false;
-            await _daemon.StartMining(address, threadCount, isBackground, true);
-            status = await _daemon.GetMiningStatus();
+            await Daemon.StartMining(address, threadCount, isBackground, true);
+            status = await Daemon.GetMiningStatus();
             Assert.True(status.IsActive);
             Assert.True(address == status.Address);
             Assert.True(status.Speed >= 0);
@@ -670,7 +676,7 @@ public class MoneroDaemonRpcIntegrationTest
         finally
         {
             // stop mining at the end of the test
-            try { await _daemon.StopMining(); }
+            try { await Daemon.StopMining(); }
             catch (MoneroError)
             {
                 // ignore
@@ -683,14 +689,14 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestSubmitMinedBlock()
     {
         // get template to mine on
-        MoneroBlockTemplate template = await _daemon.GetBlockTemplate(TestUtils.Address, 0);
+        MoneroBlockTemplate template = await Daemon.GetBlockTemplate(TestUtils.Address, 0);
 
         // TODO monero rpc: way to get mining nonce when found in order to submit?
 
         // try to submit a block hashing blob without nonce
         try
         {
-            await _daemon.SubmitBlocks([template.BlockTemplateBlob!]);
+            await Daemon.SubmitBlocks([template.BlockTemplateBlob!]);
             throw new Exception("Should have thrown error");
         }
         catch (MoneroRpcError e)
@@ -704,7 +710,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact(Skip = "Not supported by regtest daemon")]
     public async Task TestPruneBlockchain()
     {
-        MoneroPruneResponse response = await _daemon.PruneBlockchain(true);
+        MoneroPruneResponse response = await Daemon.PruneBlockchain(true);
         if (response.IsPruned == true)
         {
             Assert.True(response.PruningSeed > 0);
@@ -719,7 +725,7 @@ public class MoneroDaemonRpcIntegrationTest
     [Fact(Skip = "Unstable update call")]
     public async Task TestCheckForUpdate()
     {
-        MoneroDaemonUpdateCheckResponse response = await _daemon.CheckForUpdate();
+        MoneroDaemonUpdateCheckResponse response = await Daemon.CheckForUpdate();
         TestUpdateCheckResult(response);
     }
 
@@ -728,12 +734,12 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestDownloadUpdate()
     {
         // download to a default path
-        MoneroDaemonUpdateDownloadResponse response = await _daemon.DownloadUpdate("");
+        MoneroDaemonUpdateDownloadResponse response = await Daemon.DownloadUpdate("");
         TestUpdateDownloadResult(response, null);
 
         // download to a defined path
         string path = "test_download_" + DateTime.Now + ".tar.bz2";
-        response = await _daemon.DownloadUpdate(path);
+        response = await Daemon.DownloadUpdate(path);
         TestUpdateDownloadResult(response, path);
 
         // test invalid path
@@ -741,7 +747,7 @@ public class MoneroDaemonRpcIntegrationTest
         {
             try
             {
-                await _daemon.DownloadUpdate("./ohhai/there");
+                await Daemon.DownloadUpdate("./ohhai/there");
                 throw new Exception("Should have thrown error");
             }
             catch (MoneroRpcError e)
@@ -757,14 +763,14 @@ public class MoneroDaemonRpcIntegrationTest
     public async Task TestStop()
     {
         // stop the daemon
-        await _daemon.Stop();
+        await Daemon.Stop();
 
         // give the daemon time to shut down
         await GenUtils.WaitForAsync(TestUtils.SyncPeriodInMs, Xunit.TestContext.Current.CancellationToken);
         // try to interact with the daemon
         try
         {
-            await _daemon.GetHeight();
+            await Daemon.GetHeight();
             throw new Exception("Should have thrown error");
         }
         catch (MoneroError e)

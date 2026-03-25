@@ -1,5 +1,4 @@
 using Monero.Common;
-using Monero.Daemon;
 using Monero.IntegrationTests.Utils;
 using Monero.Wallet;
 using Monero.Wallet.Common;
@@ -8,11 +7,8 @@ using Xunit;
 
 namespace Monero.IntegrationTests;
 
-public class MoneroWalletRpcIntegrationTest
+public class MoneroWalletRpcIntegrationTest : MoneroIntegrationTestBase
 {
-    private readonly MoneroDaemonRpc _daemon = TestUtils.GetDaemonRpc(); // daemon instance to test
-
-    private readonly MoneroWalletRpc _wallet = TestUtils.GetWalletRpc().Result; // wallet instance to test
 
     private async Task<IMoneroWallet> OpenWallet(MoneroWalletConfig? config)
     {
@@ -29,7 +25,7 @@ public class MoneroWalletRpcIntegrationTest
 
         if (config.GetServer() == null)
         {
-            config.SetServer(_daemon.GetRpcConnection());
+            config.SetServer(Daemon.GetRpcConnection());
         }
 
         // create a client connected to an internal monero-wallet-rpc process
@@ -73,7 +69,7 @@ public class MoneroWalletRpcIntegrationTest
 
         if (config.GetServer() == null)
         {
-            config.SetServer(_daemon.GetRpcConnection());
+            config.SetServer(Daemon.GetRpcConnection());
         }
 
         // create a client connected to xmr_wallet_2 container
@@ -187,9 +183,9 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestCreateWalletFromSeed()
     {
         // save for comparison
-        string primaryAddress = await _wallet.GetPrimaryAddress();
-        string privateViewKey = await _wallet.GetPrivateViewKey();
-        string privateSpendKey = await _wallet.GetPrivateSpendKey();
+        string primaryAddress = await Wallet.GetPrimaryAddress();
+        string privateViewKey = await Wallet.GetPrivateViewKey();
+        string privateSpendKey = await Wallet.GetPrivateSpendKey();
 
         // recreate the test wallet from seed
         IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetSeed(TestUtils.Seed)
@@ -207,7 +203,8 @@ public class MoneroWalletRpcIntegrationTest
         // attempt to create a wallet with two missing words
         try
         {
-            const string invalidMnemonic = "memoir desk algebra inbound innocent unplugs fully okay five inflamed giant factual ritual toyed topic snake unhappy guarded tweezers haunted inundate giant";
+            const string invalidMnemonic =
+                "memoir desk algebra inbound innocent unplugs fully okay five inflamed giant factual ritual toyed topic snake unhappy guarded tweezers haunted inundate giant";
             await CreateWallet(new MoneroWalletConfig().SetSeed(invalidMnemonic)
                 .SetRestoreHeight(TestUtils.FirstReceiveHeight));
         }
@@ -260,14 +257,14 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestCreateWalletFromKeys()
     {
         // save for comparison
-        string primaryAddress = await _wallet.GetPrimaryAddress();
-        string privateViewKey = await _wallet.GetPrivateViewKey();
-        string privateSpendKey = await _wallet.GetPrivateSpendKey();
+        string primaryAddress = await Wallet.GetPrimaryAddress();
+        string privateViewKey = await Wallet.GetPrivateViewKey();
+        string privateSpendKey = await Wallet.GetPrivateSpendKey();
 
         // recreate the test wallet from keys
         IMoneroWallet moneroWallet = await CreateWallet(new MoneroWalletConfig().SetPrimaryAddress(primaryAddress)
             .SetPrivateViewKey(privateViewKey).SetPrivateSpendKey(privateSpendKey)
-            .SetRestoreHeight(await _daemon.GetHeight()));
+            .SetRestoreHeight(await Daemon.GetHeight()));
         string path = await moneroWallet.GetPath();
 
         Func<Task> action = async () =>
@@ -291,7 +288,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetVersion()
     {
-        MoneroVersion version = await _wallet.GetVersion();
+        MoneroVersion version = await Wallet.GetVersion();
         Assert.NotNull(version.Number);
         Assert.True(version.Number > 0);
         Assert.NotNull(version.IsRelease);
@@ -324,7 +321,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetSeed()
     {
-        string seed = await _wallet.GetSeed();
+        string seed = await Wallet.GetSeed();
         MoneroUtils.ValidateMnemonic(seed);
         Assert.True(TestUtils.Seed == seed);
     }
@@ -333,7 +330,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact(Skip = "monero-wallet-rpc does not support getting seed language")]
     public async Task TestGetSeedLanguage()
     {
-        string language = await _wallet.GetSeedLanguage();
+        string language = await Wallet.GetSeedLanguage();
         Assert.True(IMoneroWallet.DefaultLanguage == language);
     }
 
@@ -341,7 +338,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetPrivateViewKey()
     {
-        string privateViewKey = await _wallet.GetPrivateViewKey();
+        string privateViewKey = await Wallet.GetPrivateViewKey();
         MoneroUtils.ValidatePrivateViewKey(privateViewKey);
     }
 
@@ -349,7 +346,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetPrivateSpendKey()
     {
-        string privateSpendKey = await _wallet.GetPrivateSpendKey();
+        string privateSpendKey = await Wallet.GetPrivateSpendKey();
         MoneroUtils.ValidatePrivateSpendKey(privateSpendKey);
     }
 
@@ -357,7 +354,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact(Skip = "Enable after monero-project fix (https://github.com/monero-project/monero/pull/9364)")]
     public async Task TestGetPublicViewKey()
     {
-        string publicViewKey = await _wallet.GetPublicViewKey();
+        string publicViewKey = await Wallet.GetPublicViewKey();
         MoneroUtils.ValidatePrivateSpendKey(publicViewKey);
     }
 
@@ -365,7 +362,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact(Skip = "Enable after monero-project fix (https://github.com/monero-project/monero/pull/9364)")]
     public async Task TestGetPublicSpendKey()
     {
-        string publicSpendKey = await _wallet.GetPublicSpendKey();
+        string publicSpendKey = await Wallet.GetPublicSpendKey();
         MoneroUtils.ValidatePrivateSpendKey(publicSpendKey);
     }
 
@@ -373,21 +370,21 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetPrimaryAddress()
     {
-        string primaryAddress = await _wallet.GetPrimaryAddress();
-        Assert.True(await _wallet.GetAddress(0, 0) == primaryAddress);
+        string primaryAddress = await Wallet.GetPrimaryAddress();
+        Assert.True(await Wallet.GetAddress(0, 0) == primaryAddress);
     }
 
     // Can get the address of a subaddress at a specified account and subaddress index
     [Fact]
     public async Task TestGetSubaddressAddress()
     {
-        Assert.True(await _wallet.GetPrimaryAddress() == (await _wallet.GetSubaddress(0, 0)).GetAddress());
-        foreach (MoneroAccount account in await _wallet.GetAccounts(true, true, null))
+        Assert.True(await Wallet.GetPrimaryAddress() == (await Wallet.GetSubaddress(0, 0)).GetAddress());
+        foreach (MoneroAccount account in await Wallet.GetAccounts(true, true, null))
         {
             foreach (MoneroSubaddress subaddress in account.Subaddresses!)
             {
                 Assert.True(subaddress.GetAddress() ==
-                            await _wallet.GetAddress((uint)account.AccountIndex!, (uint)subaddress.Index!));
+                            await Wallet.GetAddress((uint)account.AccountIndex!, subaddress.Index));
             }
         }
     }
@@ -396,7 +393,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetSubaddressAddressOutOfRange()
     {
-        List<MoneroAccount> accounts = await _wallet.GetAccounts(true, true, null);
+        List<MoneroAccount> accounts = await Wallet.GetAccounts(true, true, null);
         int accountIdx = accounts.Count - 1;
         MoneroAccount account = accounts[accountIdx];
         List<MoneroSubaddress>? subaddresses = account.Subaddresses;
@@ -407,7 +404,7 @@ public class MoneroWalletRpcIntegrationTest
         }
 
         int subaddressIdx = subaddresses.Count;
-        string? address = await _wallet.GetAddress((uint)accountIdx, (uint)subaddressIdx);
+        string? address = await Wallet.GetAddress((uint)accountIdx, (uint)subaddressIdx);
         Assert.Null(address);
     }
 
@@ -416,8 +413,8 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetHeight()
     {
-        ulong lastHeight = await _wallet.GetHeight();
-        await _daemon.WaitForNextBlockHeader();
+        ulong lastHeight = await Wallet.GetHeight();
+        await Daemon.WaitForNextBlockHeader();
 
         const int maxRetries = 15;
         const int delayMs = 1000;
@@ -426,18 +423,20 @@ public class MoneroWalletRpcIntegrationTest
 
         for (int i = 0; i < maxRetries; i++)
         {
-            var syncResult = await _wallet.Sync(null, null);
-            currentHeight = await _wallet.GetHeight();
+            var syncResult = await Wallet.Sync(null, null);
+            currentHeight = await Wallet.GetHeight();
 
             if (syncResult.NumBlocksFetched > 0 && currentHeight > lastHeight)
             {
                 blockFetched = true;
                 break;
             }
+
             await GenUtils.WaitForAsync(delayMs, Xunit.TestContext.Current.CancellationToken);
         }
 
-        Assert.True(blockFetched, $"No blocks fetched after {maxRetries}s. Last height: {lastHeight}, current height: {currentHeight}");
+        Assert.True(blockFetched,
+            $"No blocks fetched after {maxRetries}s. Last height: {lastHeight}, current height: {currentHeight}");
         Assert.True(currentHeight > lastHeight, $"Expected currentHeight: {currentHeight} > lastHeight: {lastHeight}");
     }
 
@@ -445,17 +444,17 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestCreateAccountWithoutLabel()
     {
-        List<MoneroAccount> accountsBefore = await _wallet.GetAccounts(false, true, null);
-        MoneroAccount createdAccount = await _wallet.CreateAccount(null);
+        List<MoneroAccount> accountsBefore = await Wallet.GetAccounts(false, true, null);
+        MoneroAccount createdAccount = await Wallet.CreateAccount(null);
         TestAccount(createdAccount);
-        Assert.Equal(accountsBefore.Count, (await _wallet.GetAccounts(false, true, null)).Count - 1);
+        Assert.Equal(accountsBefore.Count, (await Wallet.GetAccounts(false, true, null)).Count - 1);
     }
 
     // Can get accounts without subaddresses
     [Fact]
     public async Task TestGetAccountsWithoutSubaddresses()
     {
-        List<MoneroAccount> accounts = await _wallet.GetAccounts(false, true, null);
+        List<MoneroAccount> accounts = await Wallet.GetAccounts(false, true, null);
         Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
@@ -468,7 +467,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetAccountsWithSubaddresses()
     {
-        List<MoneroAccount> accounts = await _wallet.GetAccounts(true, false, null);
+        List<MoneroAccount> accounts = await Wallet.GetAccounts(true, false, null);
         Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
@@ -483,19 +482,19 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestSetAccountLabel()
     {
         // create an account
-        if ((await _wallet.GetAccounts(false, true, null)).Count < 2)
+        if ((await Wallet.GetAccounts(false, true, null)).Count < 2)
         {
             // create an account
-            if ((await _wallet.GetAccounts(false, true, null)).Count < 2)
+            if ((await Wallet.GetAccounts(false, true, null)).Count < 2)
             {
-                await _wallet.CreateAccount(null);
+                await Wallet.CreateAccount(null);
             }
         }
 
         // set account label
         string label = GenUtils.GetGuid();
-        await _wallet.SetAccountLabel(1, 0, label);
-        Assert.Equal(label, (await _wallet.GetSubaddress(1, 0)).GetLabel());
+        await Wallet.SetAccountLabel(1, 0, label);
+        Assert.Equal(label, (await Wallet.GetSubaddress(1, 0)).GetLabel());
     }
 
     // Can create an address with and without a label
@@ -503,32 +502,32 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestCreateAddress()
     {
         // create addresses across accounts
-        List<MoneroAccount> accounts = await _wallet.GetAccounts(true, false, null);
+        List<MoneroAccount> accounts = await Wallet.GetAccounts(true, false, null);
         if (accounts.Count < 2)
         {
-            await _wallet.CreateAccount(null);
+            await Wallet.CreateAccount(null);
         }
 
-        accounts = await _wallet.GetAccounts(true, false, null);
+        accounts = await Wallet.GetAccounts(true, false, null);
         Assert.True(accounts.Count > 1);
         for (uint accountIdx = 0; accountIdx < 2; accountIdx++)
         {
             // create an address with no label
-            List<MoneroSubaddress> subaddresses = await _wallet.GetSubaddresses(accountIdx, false, null);
-            MoneroSubaddress subaddress = (await _wallet.CreateAddress(accountIdx, null))[0];
+            List<MoneroSubaddress> subaddresses = await Wallet.GetSubaddresses(accountIdx, false, null);
+            MoneroSubaddress subaddress = (await Wallet.CreateAddress(accountIdx, null))[0];
             Assert.Equal("", subaddress.GetLabel());
             TestSubaddress(subaddress);
-            List<MoneroSubaddress> subaddressesNew = await _wallet.GetSubaddresses(accountIdx, false, null);
+            List<MoneroSubaddress> subaddressesNew = await Wallet.GetSubaddresses(accountIdx, false, null);
             Assert.Equal(subaddressesNew.Count - 1, subaddresses.Count);
             Assert.True(subaddress.Equals(subaddressesNew[subaddressesNew.Count - 1]));
 
             // create an address with label
-            subaddresses = await _wallet.GetSubaddresses(accountIdx, false, null);
+            subaddresses = await Wallet.GetSubaddresses(accountIdx, false, null);
             string uuid = GenUtils.GetGuid();
-            subaddress = (await _wallet.CreateAddress(accountIdx, uuid))[0];
+            subaddress = (await Wallet.CreateAddress(accountIdx, uuid))[0];
             Assert.Equal(uuid, subaddress.GetLabel());
             TestSubaddress(subaddress);
-            subaddressesNew = await _wallet.GetSubaddresses(accountIdx, false, null);
+            subaddressesNew = await Wallet.GetSubaddresses(accountIdx, false, null);
             Assert.Equal(subaddresses.Count, subaddressesNew.Count - 1);
             Assert.True(subaddress.Equals(subaddressesNew[subaddressesNew.Count - 1]));
         }
@@ -539,8 +538,8 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestCreateAddressMultiple()
     {
         const uint count = 3;
-        List<MoneroSubaddress> subaddressesBeforeCreate = await _wallet.GetSubaddresses(0, false, null);
-        List<MoneroSubaddress> created = await _wallet.CreateAddress(0, null, count);
+        List<MoneroSubaddress> subaddressesBeforeCreate = await Wallet.GetSubaddresses(0, false, null);
+        List<MoneroSubaddress> created = await Wallet.CreateAddress(0, null, count);
         Assert.Equal((int)count, created.Count);
 
         foreach (MoneroSubaddress subaddress in created)
@@ -552,7 +551,7 @@ public class MoneroWalletRpcIntegrationTest
             TestSubaddress(subaddress);
         }
 
-        List<MoneroSubaddress> subaddressesAfterCreate = await _wallet.GetSubaddresses(0, false, null);
+        List<MoneroSubaddress> subaddressesAfterCreate = await Wallet.GetSubaddresses(0, false, null);
         Assert.Equal(subaddressesBeforeCreate.Count + count, subaddressesAfterCreate.Count);
     }
 
@@ -560,7 +559,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetSubaddresses()
     {
-        List<MoneroAccount> accounts = await _wallet.GetAccounts(true, false, null);
+        List<MoneroAccount> accounts = await Wallet.GetAccounts(true, false, null);
         Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
@@ -571,7 +570,7 @@ public class MoneroWalletRpcIntegrationTest
                 throw new MoneroError("Account index is null");
             }
 
-            List<MoneroSubaddress> subaddresses = await _wallet.GetSubaddresses((uint)accountIndex, false, null);
+            List<MoneroSubaddress> subaddresses = await Wallet.GetSubaddresses((uint)accountIndex, false, null);
             Assert.NotEmpty(subaddresses);
             foreach (MoneroSubaddress subaddress in subaddresses)
             {
@@ -585,7 +584,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetSubaddressesByIndices()
     {
-        List<MoneroAccount> accounts = await _wallet.GetAccounts(false, true, null);
+        List<MoneroAccount> accounts = await Wallet.GetAccounts(false, true, null);
         Assert.NotEmpty(accounts);
         foreach (MoneroAccount account in accounts)
         {
@@ -596,7 +595,7 @@ public class MoneroWalletRpcIntegrationTest
             }
 
             // get subaddresses
-            List<MoneroSubaddress> subaddresses = await _wallet.GetSubaddresses((uint)accountIndex, true, null);
+            List<MoneroSubaddress> subaddresses = await Wallet.GetSubaddresses((uint)accountIndex, true, null);
             Assert.True(subaddresses.Count > 0);
             // remove a subaddress for a query if possible
             if (subaddresses.Count > 1)
@@ -621,7 +620,7 @@ public class MoneroWalletRpcIntegrationTest
             Assert.True(subaddressIndices.Count > 0);
             // fetch subaddresses by indices
             List<MoneroSubaddress> fetchedSubaddresses =
-                await _wallet.GetSubaddresses((uint)accountIndex, true, subaddressIndices);
+                await Wallet.GetSubaddresses((uint)accountIndex, true, subaddressIndices);
 
             // original subaddresses (minus one removed if applicable) is equal to fetched subaddresses
             int i = 0;
@@ -638,7 +637,7 @@ public class MoneroWalletRpcIntegrationTest
     [Fact]
     public async Task TestGetSubaddressByIndex()
     {
-        List<MoneroAccount> accounts = await _wallet.GetAccounts(false, false, null);
+        List<MoneroAccount> accounts = await Wallet.GetAccounts(false, false, null);
         Assert.True(accounts.Count > 0);
         foreach (MoneroAccount account in accounts)
         {
@@ -649,7 +648,7 @@ public class MoneroWalletRpcIntegrationTest
                 throw new MoneroError("Account index is null");
             }
 
-            List<MoneroSubaddress> subaddresses = await _wallet.GetSubaddresses((uint)accountIdx, false, null);
+            List<MoneroSubaddress> subaddresses = await Wallet.GetSubaddresses((uint)accountIdx, false, null);
             Assert.True(subaddresses.Count > 0);
 
             foreach (MoneroSubaddress subaddress in subaddresses)
@@ -658,9 +657,9 @@ public class MoneroWalletRpcIntegrationTest
                 uint? subaddressIdx = subaddress.Index;
                 if (subaddressIdx == null) { throw new MoneroError("Subaddress index is null"); }
 
-                Assert.True(subaddress.Equals(await _wallet.GetSubaddress((uint)accountIdx, (uint)subaddressIdx)));
+                Assert.True(subaddress.Equals(await Wallet.GetSubaddress((uint)accountIdx, (uint)subaddressIdx)));
                 Assert.True(subaddress.Equals(
-                    (await _wallet.GetSubaddresses((uint)accountIdx, false, [(uint)subaddressIdx]))
+                    (await Wallet.GetSubaddresses((uint)accountIdx, false, [(uint)subaddressIdx]))
                     .First())); // test a plural call with a single subaddress number
             }
         }
@@ -671,18 +670,18 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestSetSubaddressLabel()
     {
         // create subaddresses
-        while ((await _wallet.GetSubaddresses(0, true, null)).Count < 3)
+        while ((await Wallet.GetSubaddresses(0, true, null)).Count < 3)
         {
-            await _wallet.CreateAddress(0, null);
+            await Wallet.CreateAddress(0, null);
         }
 
-        uint subaddressesCount = (uint)(await _wallet.GetSubaddresses(0, true, null)).Count;
+        uint subaddressesCount = (uint)(await Wallet.GetSubaddresses(0, true, null)).Count;
         // set subaddress labels
         for (uint subaddressIdx = 0; subaddressIdx < subaddressesCount; subaddressIdx++)
         {
             string label = GenUtils.GetGuid();
-            await _wallet.SetAccountLabel(0, subaddressIdx, label);
-            Assert.Equal(label, (await _wallet.GetSubaddress(0, subaddressIdx)).GetLabel());
+            await Wallet.SetAccountLabel(0, subaddressIdx, label);
+            Assert.Equal(label, (await Wallet.GetSubaddress(0, subaddressIdx)).GetLabel());
         }
     }
 
@@ -691,9 +690,9 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestSyncWithoutProgress()
     {
         ulong numBlocks = 10;
-        ulong chainHeight = await _daemon.GetHeight();
+        ulong chainHeight = await Daemon.GetHeight();
         Assert.True(chainHeight >= numBlocks);
-        MoneroSyncResponse response = await _wallet.Sync(chainHeight - numBlocks, null); // sync end of a chain
+        MoneroSyncResponse response = await Wallet.Sync(chainHeight - numBlocks, null); // sync end of a chain
         Assert.True(response.NumBlocksFetched >= 0);
         Assert.NotNull(response.ReceivedMoney);
     }
@@ -703,7 +702,7 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestGetAllBalances()
     {
         // fetch accounts with all info as reference
-        List<MoneroAccount> accounts = await _wallet.GetAccounts(true, false, null);
+        List<MoneroAccount> accounts = await Wallet.GetAccounts(true, false, null);
 
         // test that balances add up between accounts and wallet
         ulong accountsBalance = 0;
@@ -722,23 +721,23 @@ public class MoneroWalletRpcIntegrationTest
                 subaddressesUnlockedBalance += subaddress.GetUnlockedBalance() ?? 0;
 
                 // test that balances are consistent with getAccounts() call
-                Assert.Equal((await _wallet.GetBalance(subaddress.AccountIndex, subaddress.Index)).ToString(),
+                Assert.Equal((await Wallet.GetBalance(subaddress.AccountIndex, subaddress.Index)).ToString(),
                     subaddress.GetBalance().ToString());
                 Assert.Equal(
-                    (await _wallet.GetUnlockedBalance(subaddress.AccountIndex, subaddress.Index)).ToString(),
+                    (await Wallet.GetUnlockedBalance(subaddress.AccountIndex, subaddress.Index)).ToString(),
                     subaddress.GetUnlockedBalance().ToString());
             }
 
-            Assert.Equal((await _wallet.GetBalance(account.AccountIndex, null)).ToString(),
+            Assert.Equal((await Wallet.GetBalance(account.AccountIndex, null)).ToString(),
                 subaddressesBalance.ToString());
-            Assert.Equal((await _wallet.GetUnlockedBalance(account.AccountIndex, null)).ToString(),
+            Assert.Equal((await Wallet.GetUnlockedBalance(account.AccountIndex, null)).ToString(),
                 subaddressesUnlockedBalance.ToString());
         }
 
         TestUtils.TestUnsignedBigInteger(accountsBalance);
         TestUtils.TestUnsignedBigInteger(accountsUnlockedBalance);
-        Assert.Equal((await _wallet.GetBalance(null, null)).ToString(), accountsBalance.ToString());
-        Assert.Equal((await _wallet.GetUnlockedBalance(null, null)).ToString(), accountsUnlockedBalance.ToString());
+        Assert.Equal((await Wallet.GetBalance(null, null)).ToString(), accountsBalance.ToString());
+        Assert.Equal((await Wallet.GetUnlockedBalance(null, null)).ToString(), accountsUnlockedBalance.ToString());
     }
 
     // Can save and close the wallet in a single call
@@ -776,16 +775,28 @@ public class MoneroWalletRpcIntegrationTest
     public async Task TestValidateAddress()
     {
         // mainnet primary and subaddress validation
-        Assert.True(await _wallet.IsValidAddress("42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L", false, true));
-        Assert.True(await _wallet.IsValidAddress("891TQPrWshJVpnBR4ZMhHiHpLx1PUnMqa3ccV5TJFBbqcJa3DWhjBh2QByCv3Su7WDPTGMHmCKkiVFN2fyGJKwbM1t6G7Ea", true, true));
+        Assert.True(await Wallet.IsValidAddress(
+            "42U9v3qs5CjZEePHBZHwuSckQXebuZu299NSmVEmQ41YJZQhKcPyujyMSzpDH4VMMVSBo3U3b54JaNvQLwAjqDhKS3rvM3L", false,
+            true));
+        Assert.True(await Wallet.IsValidAddress(
+            "891TQPrWshJVpnBR4ZMhHiHpLx1PUnMqa3ccV5TJFBbqcJa3DWhjBh2QByCv3Su7WDPTGMHmCKkiVFN2fyGJKwbM1t6G7Ea", true,
+            true));
 
         // testnet primary and subaddress validation
-        Assert.True(await _wallet.IsValidAddress("9tUBnNCkC3UKGygHCwYvAB1FscpjUuq5e9MYJd2rXuiiTjjfVeSVjnbSG5VTnJgBgy9Y7GTLfxpZNMUwNZjGfdFr1z79eV1", false, false));
-        Assert.True(await _wallet.IsValidAddress("BgnKzHPJQDcg7xiP7bMN9MfPv9Z8ciT71iEMYnCdgBRBFETWgu9nKTr8fnzyGfU9h9gyNA8SFzYYzHfTS9KhqytSU943Nu1", true, false));
+        Assert.True(await Wallet.IsValidAddress(
+            "9tUBnNCkC3UKGygHCwYvAB1FscpjUuq5e9MYJd2rXuiiTjjfVeSVjnbSG5VTnJgBgy9Y7GTLfxpZNMUwNZjGfdFr1z79eV1", false,
+            false));
+        Assert.True(await Wallet.IsValidAddress(
+            "BgnKzHPJQDcg7xiP7bMN9MfPv9Z8ciT71iEMYnCdgBRBFETWgu9nKTr8fnzyGfU9h9gyNA8SFzYYzHfTS9KhqytSU943Nu1", true,
+            false));
 
         // stagenet primary and subaddress validation
-        Assert.True(await _wallet.IsValidAddress("5B8s3obCY2ETeQB3GNAGPK2zRGen5UeW1WzegSizVsmf6z5NvM2GLoN6zzk1vHyzGAAfA8pGhuYAeCFZjHAp59jRVQkunGS", false, true));
-        Assert.True(await _wallet.IsValidAddress("778B5D2JmMh5TJVWFbygJR15dvio5Z5B24hfSrWDzeroM8j8Lqc9sMoFE6324xg2ReaAZqHJkgfGFRugRmYHugHZ4f17Gxo", true, true));
+        Assert.True(await Wallet.IsValidAddress(
+            "5B8s3obCY2ETeQB3GNAGPK2zRGen5UeW1WzegSizVsmf6z5NvM2GLoN6zzk1vHyzGAAfA8pGhuYAeCFZjHAp59jRVQkunGS", false,
+            true));
+        Assert.True(await Wallet.IsValidAddress(
+            "778B5D2JmMh5TJVWFbygJR15dvio5Z5B24hfSrWDzeroM8j8Lqc9sMoFE6324xg2ReaAZqHJkgfGFRugRmYHugHZ4f17Gxo", true,
+            true));
     }
 
     #region Test Utils
