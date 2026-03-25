@@ -1,22 +1,22 @@
 using Monero.Common;
 
-using Xunit;
+using NUnit.Framework;
 
 namespace Monero.UnitTests;
 
 public class MoneroEventTest
 {
-    [Fact]
+    [Test]
     public void DefaultInitialization_ShouldHaveNullProperties()
     {
         var moneroEvent = new MoneroEvent();
 
-        Assert.Null(moneroEvent.BlockHash);
-        Assert.Null(moneroEvent.TransactionHash);
-        Assert.Null(moneroEvent.CryptoCode);
+        Assert.That(moneroEvent.BlockHash, Is.Null);
+        Assert.That(moneroEvent.TransactionHash, Is.Null);
+        Assert.That(moneroEvent.CryptoCode, Is.Null);
     }
 
-    [Fact]
+    [Test]
     public void PropertyAssignment_ShouldSetAndRetrieveValues()
     {
         var moneroEvent = new MoneroEvent
@@ -26,13 +26,12 @@ public class MoneroEventTest
             CryptoCode = "XMR"
         };
 
-        Assert.Equal("block123", moneroEvent.BlockHash);
-        Assert.Equal("tx456", moneroEvent.TransactionHash);
-        Assert.Equal("XMR", moneroEvent.CryptoCode);
+        Assert.That(moneroEvent.BlockHash, Is.EqualTo("block123"));
+        Assert.That(moneroEvent.TransactionHash, Is.EqualTo("tx456"));
+        Assert.That(moneroEvent.CryptoCode, Is.EqualTo("XMR"));
     }
 
-    [Theory]
-    [InlineData("block123", "tx456", "XMR", "XMR: Tx Update New Block (tx456block123)")]
+    [TestCase("block123", "tx456", "XMR", "XMR: Tx Update New Block (tx456block123)")]
     public void ToString_ShouldReturnCorrectString(string blockHash, string transactionHash, string cryptoCode, string expected)
     {
         var moneroEvent = new MoneroEvent
@@ -44,8 +43,6 @@ public class MoneroEventTest
 
         var result = moneroEvent.ToString();
 
-        Assert.Equal(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
-
-
 }

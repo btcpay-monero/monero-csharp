@@ -5,7 +5,7 @@ using Monero.Daemon;
 using Monero.Wallet;
 using Monero.Wallet.Common;
 
-using Xunit;
+using NUnit.Framework;
 
 namespace Monero.IntegrationTests.Utils;
 
@@ -85,8 +85,8 @@ internal abstract class TestUtils
         }
 
         // ensure we're testing the right wallet
-        Assert.Equal(Seed, await walletRpc.GetSeed());
-        Assert.Equal(Address, await walletRpc.GetPrimaryAddress());
+        Assert.That(await walletRpc.GetSeed(), Is.EqualTo(Seed));
+        Assert.That(await walletRpc.GetPrimaryAddress(), Is.EqualTo(Address));
 
         // sync and save wallet
         await walletRpc.Sync(null, null);

@@ -44,7 +44,7 @@ jobs:
           dotnet validate package local nuget-packages/MoneroNet.${{ env.VERSION }}.nupkg
 
       - name: Upload NuGet package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nuget-package-${{ github.sha }}
           path: nuget-packages/MoneroNet.${{ env.VERSION }}.nupkg

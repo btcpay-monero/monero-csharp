@@ -1,86 +1,84 @@
 using Monero.Common;
 using Monero.Wallet.Common;
 
-using Xunit;
+using NUnit.Framework;
 
 using static Monero.Common.MoneroUtils;
-
-using static Xunit.Assert;
 
 namespace Monero.UnitTests;
 
 public class MoneroUtilsUnitTest
 {
     // Can validate keys
-    [Fact]
+    [Test]
     public void TestKeyValidation()
     {
         // test private view key validation
-        True(IsValidPrivateViewKey("86cf351d10894769feba29b9e201e12fb100b85bb52fc5825c864eef55c5840d"));
+        Assert.That(IsValidPrivateViewKey("86cf351d10894769feba29b9e201e12fb100b85bb52fc5825c864eef55c5840d"), Is.True);
         TestInvalidPrivateViewKey("");
         TestInvalidPrivateViewKey(null);
         TestInvalidPrivateViewKey(
             "5B8s3obCY2ETeQB3GNAGPK2zRGen5UeW1WzegSizVsmf6z5NvM2GLoN6zzk1vHyzGAAfA8pGhuYAeCFZjHAp59jRVQkunGS");
 
         // test public view key validation
-        True(IsValidPublicViewKey("99873d76ca874ff1aad676b835dd303abcb21c9911ca8a3d9130abc4544d8a0a"));
+        Assert.That(IsValidPublicViewKey("99873d76ca874ff1aad676b835dd303abcb21c9911ca8a3d9130abc4544d8a0a"), Is.True);
         TestInvalidPublicViewKey("");
         TestInvalidPublicViewKey(null);
         TestInvalidPublicViewKey("z86cf351d10894769feba29b9e201e12fb100b85bb52fc5825c864eef55c5840d");
 
         // test private spend key validation
-        True(IsValidPrivateSpendKey("e9ba887e93620ef9fafdfe0c6d3022949f1c5713cbd9ef631f18a0fb00421dee"));
+        Assert.That(IsValidPrivateSpendKey("e9ba887e93620ef9fafdfe0c6d3022949f1c5713cbd9ef631f18a0fb00421dee"), Is.True);
         TestInvalidPrivateSpendKey("");
         TestInvalidPrivateSpendKey(null);
         TestInvalidPrivateSpendKey("z86cf351d10894769feba29b9e201e12fb100b85bb52fc5825c864eef55c5840d");
 
         // test public spend key validation
-        True(IsValidPublicSpendKey("3e48df9e9d8038dbf6f5382fac2becd8686273cda5bd87187e45dca7ec5af37b"));
+        Assert.That(IsValidPublicSpendKey("3e48df9e9d8038dbf6f5382fac2becd8686273cda5bd87187e45dca7ec5af37b"), Is.True);
         TestInvalidPublicSpendKey("");
         TestInvalidPublicSpendKey(null);
         TestInvalidPublicSpendKey("z86cf351d10894769feba29b9e201e12fb100b85bb52fc5825c864eef55c5840d");
     }
 
     // Can convert between XMR and atomic units
-    [Fact]
+    [Test]
     public void TestAtomicUnitConversion()
     {
-        True(1000000000000 == XmrToAtomicUnits(1));
-        True(1 == AtomicUnitsToXmr(1000000000000));
-        True(1000000000 == XmrToAtomicUnits(0.001));
-        True(.001 == AtomicUnitsToXmr(1000000000));
-        True(250000000000 == XmrToAtomicUnits(.25));
-        True(.25 == AtomicUnitsToXmr(250000000000));
-        True(1250000000000 == XmrToAtomicUnits(1.25));
-        True(1.25 == AtomicUnitsToXmr(1250000000000));
-        True(2796726190000 == XmrToAtomicUnits(2.79672619));
-        True(2.79672619 == AtomicUnitsToXmr(2796726190000));
-        True(2796726190001 == XmrToAtomicUnits(2.796726190001));
-        True(2.796726190001 == AtomicUnitsToXmr(2796726190001));
-        True(2796726189999 == XmrToAtomicUnits(2.796726189999));
-        True(2.796726189999 == AtomicUnitsToXmr(2796726189999));
-        True(2796726180000 == XmrToAtomicUnits(2.79672618));
-        True(2.79672618 == AtomicUnitsToXmr(2796726180000));
+        Assert.That(XmrToAtomicUnits(1), Is.EqualTo(1000000000000));
+        Assert.That(AtomicUnitsToXmr(1000000000000), Is.EqualTo(1));
+        Assert.That(XmrToAtomicUnits(0.001), Is.EqualTo(1000000000));
+        Assert.That(AtomicUnitsToXmr(1000000000), Is.EqualTo(0.001));
+        Assert.That(XmrToAtomicUnits(0.25), Is.EqualTo(250000000000));
+        Assert.That(AtomicUnitsToXmr(250000000000), Is.EqualTo(0.25));
+        Assert.That(XmrToAtomicUnits(1.25), Is.EqualTo(1250000000000));
+        Assert.That(AtomicUnitsToXmr(1250000000000), Is.EqualTo(1.25));
+        Assert.That(XmrToAtomicUnits(2.79672619), Is.EqualTo(2796726190000));
+        Assert.That(AtomicUnitsToXmr(2796726190000), Is.EqualTo(2.79672619));
+        Assert.That(XmrToAtomicUnits(2.796726190001), Is.EqualTo(2796726190001));
+        Assert.That(AtomicUnitsToXmr(2796726190001), Is.EqualTo(2.796726190001));
+        Assert.That(XmrToAtomicUnits(2.796726189999), Is.EqualTo(2796726189999));
+        Assert.That(AtomicUnitsToXmr(2796726189999), Is.EqualTo(2.796726189999));
+        Assert.That(XmrToAtomicUnits(2.79672618), Is.EqualTo(2796726180000));
+        Assert.That(AtomicUnitsToXmr(2796726180000), Is.EqualTo(2.79672618));
     }
 
-    [Fact(Skip = "GetPaymentUri is not implemented yet")]
+    [Test]
+    [Ignore("GetPaymentUri is not implemented yet")]
     public void TestGetPaymentUri()
     {
-        MoneroTxConfig config = new MoneroTxConfig()
+        MoneroTxConfig unused = new MoneroTxConfig()
             .SetAddress(
                 "9xSyMy1r9h3BVjMrF3CTqQCQy36yCfkpn7uVfMyTUbez3hhumqBUqGUNNALjcd7f1HJBRdeH82bCC3veFHW7z3xm28gug4d")
             .SetAmount(XmrToAtomicUnits(0.25))
             .SetRecipientName("John Doe")
             .SetNote("My transfer to wallet");
-        string paymentUri = "";
-        True(
-            "monero:9xSyMy1r9h3BVjMrF3CTqQCQy36yCfkpn7uVfMyTUbez3hhumqBUqGUNNALjcd7f1HJBRdeH82bCC3veFHW7z3xm28gug4d?tx_amount=0.25&recipient_name=John%20Doe&tx_description=My%20transfer%20to%20wallet" ==
-            paymentUri);
+        const string paymentUri = "";
+        Assert.That(paymentUri, Is.EqualTo(
+            "monero:9xSyMy1r9h3BVjMrF3CTqQCQy36yCfkpn7uVfMyTUbez3hhumqBUqGUNNALjcd7f1HJBRdeH82bCC3veFHW7z3xm28gug4d?tx_amount=0.25&recipient_name=John%20Doe&tx_description=My%20transfer%20to%20wallet"));
     }
 
     private static void TestInvalidPrivateViewKey(string? privateViewKey)
     {
-        False(IsValidPrivateViewKey(privateViewKey));
+        Assert.That(IsValidPrivateViewKey(privateViewKey), Is.False);
         try
         {
             ValidatePrivateViewKey(privateViewKey);
@@ -88,13 +86,13 @@ public class MoneroUtilsUnitTest
         }
         catch (MoneroError e)
         {
-            True(e.Message.Length > 0);
+            Assert.That(e.Message.Length > 0, Is.True);
         }
     }
 
     private static void TestInvalidPublicViewKey(string? publicViewKey)
     {
-        False(IsValidPublicViewKey(publicViewKey));
+        Assert.That(IsValidPublicViewKey(publicViewKey), Is.False);
         try
         {
             ValidatePublicViewKey(publicViewKey);
@@ -102,7 +100,7 @@ public class MoneroUtilsUnitTest
         }
         catch (MoneroError e)
         {
-            True(e.Message.Length > 0);
+            Assert.That(e.Message.Length > 0, Is.True);
         }
     }
 
@@ -110,27 +108,25 @@ public class MoneroUtilsUnitTest
     {
         try
         {
-            False(IsValidPrivateSpendKey(privateSpendKey));
+            Assert.That(IsValidPublicSpendKey(privateSpendKey), Is.False);
             ValidatePrivateSpendKey(privateSpendKey);
-            throw new Exception("Should have thrown exception");
         }
         catch (MoneroError e)
         {
-            True(e.Message.Length > 0);
+            Assert.That(e.Message.Length > 0, Is.True);
         }
     }
 
     private static void TestInvalidPublicSpendKey(string? publicSpendKey)
     {
-        False(IsValidPublicSpendKey(publicSpendKey));
+        Assert.That(IsValidPublicSpendKey(publicSpendKey), Is.False);
         try
         {
             ValidatePublicSpendKey(publicSpendKey);
-            throw new Exception("Should have thrown exception");
         }
         catch (MoneroError e)
         {
-            True(e.Message.Length > 0);
+            Assert.That(e.Message.Length > 0, Is.True);
         }
     }
 }

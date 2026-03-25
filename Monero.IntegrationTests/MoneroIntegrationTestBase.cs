@@ -14,11 +14,5 @@ public abstract class MoneroIntegrationTestBase
     {
         Daemon = TestUtils.GetDaemonRpc();
         Wallet = TestUtils.GetWalletRpc().Result;
-
-        ulong daemonHeight = Daemon.GetHeight().GetAwaiter().GetResult();
-        if (daemonHeight == 1)
-        {
-            Daemon.WaitForNextBlockHeader().GetAwaiter().GetResult();
-        }
     }
 }

@@ -51,13 +51,13 @@ jobs:
         run: docker compose -f Monero.IntegrationTests/docker-compose.yml down -v
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage/dotcover.xml
 
       - name: Upload NuGet package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nuget-package-${{ github.sha }}
           path: nuget-packages/MoneroNet.1.0.0.nupkg
