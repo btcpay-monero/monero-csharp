@@ -2,7 +2,6 @@ using Monero.Common;
 using Monero.Daemon;
 using Monero.Daemon.Common;
 using Monero.Daemon.Rpc;
-using Monero.IntegrationTests.Utils;
 
 using NUnit.Framework;
 
@@ -10,36 +9,23 @@ namespace Monero.IntegrationTests;
 
 public class MoneroDaemonRpcIntegrationTest : MoneroIntegrationTestBase
 {
-
     #region Notification Tests
 
     // Can notify listeners when a new block is added to the chain
     [Test]
     public async Task TestBlockListener()
     {
-        try
-        {
-            // register a listener
-            MoneroDaemonListener listener = new();
-            Daemon.AddListener(listener);
+        // register a listener
+        MoneroDaemonListener listener = new();
+        Daemon.AddListener(listener);
 
-            // wait for the next block notification
-            MoneroBlockHeader header = await Daemon.WaitForNextBlockHeader();
-            Daemon.RemoveListener(listener); // unregister listener so daemon does not keep polling
-            TestBlockHeader(header, true);
+        // wait for the next block notification
+        MoneroBlockHeader header = await Daemon.WaitForNextBlockHeader();
+        Daemon.RemoveListener(listener); // unregister listener so daemon does not keep polling
+        TestBlockHeader(header, true);
 
-            // test that listener was called with the equivalent header
-            Assert.That(header.Equals(listener.GetLastBlockHeader()));
-        }
-        finally
-        {
-            // stop mining
-            try { await Daemon.StopMining(); }
-            catch (MoneroError)
-            {
-                // ignore
-            }
-        }
+        // test that listener was called with the equivalent header
+        Assert.That(header.Equals(listener.GetLastBlockHeader()));
     }
 
     #endregion

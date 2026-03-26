@@ -1,5 +1,4 @@
 using Monero.Daemon;
-using Monero.IntegrationTests.Utils;
 using Monero.Wallet;
 
 namespace Monero.IntegrationTests;

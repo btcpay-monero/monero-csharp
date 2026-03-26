@@ -7,7 +7,7 @@ using Monero.Wallet.Common;
 
 using NUnit.Framework;
 
-namespace Monero.IntegrationTests.Utils;
+namespace Monero.IntegrationTests;
 
 internal abstract class TestUtils
 {
