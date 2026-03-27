@@ -12,6 +12,6 @@ public abstract class MoneroIntegrationTestBase
     static MoneroIntegrationTestBase()
     {
         Daemon = TestUtils.GetDaemonRpc();
-        Wallet = TestUtils.GetWalletRpc().Result;
+        Wallet = TestUtils.GetWalletRpc();
     }
 }

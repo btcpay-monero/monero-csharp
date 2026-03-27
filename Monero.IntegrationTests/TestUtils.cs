@@ -3,9 +3,6 @@ using System.Numerics;
 using Monero.Common;
 using Monero.Daemon;
 using Monero.Wallet;
-using Monero.Wallet.Common;
-
-using NUnit.Framework;
 
 namespace Monero.IntegrationTests;
 
@@ -26,7 +23,7 @@ internal abstract class TestUtils
     public const string WalletRpcPassword = "";
 
     // test wallet config
-    private const string WalletName = "test_wallet_1";
+    public const string WalletName = "test_wallet_1";
     public const string WalletPassword = "supersecretpassword123";
 
     public const string Seed = "origin hickory pavements tudor sizes hornet tether segments sack technical elbow unsafe legion nitrogen adapt yearbook idols fuzzy pitched goes tusks elbow erase fossil erase";
@@ -56,44 +53,16 @@ internal abstract class TestUtils
         return Task.FromResult(new MoneroWalletRpc(connection));
     }
 
-    public static async Task<MoneroWalletRpc> GetWalletRpc()
+    public static MoneroWalletRpc GetWalletRpc()
     {
-        if (walletRpc == null)
+        if (walletRpc != null)
         {
-            MoneroRpcConnection rpc = new(PrimaryWalletRpcUri, WalletRpcUsername, WalletRpcPassword);
-            walletRpc = new MoneroWalletRpc(rpc);
+            return walletRpc;
         }
 
-        // attempt to open a test wallet
-        try
-        {
-            await walletRpc.OpenWallet(WalletName, WalletPassword);
-        }
-        catch (JsonRpcApiException e)
-        {
-            // -1 returned when the wallet does not exist or fails to open e.g. it's already open by another application
-            if (e.Error.Code == -1)
-            {
-                // create wallet
-                await walletRpc.CreateWallet(new MoneroWalletConfig().SetPath(WalletName).SetPassword(WalletPassword)
-                    .SetSeed(Seed).SetRestoreHeight(FirstReceiveHeight));
-            }
-            else
-            {
-                throw;
-            }
-        }
+        MoneroRpcConnection rpc = new(PrimaryWalletRpcUri, WalletRpcUsername, WalletRpcPassword);
+        walletRpc = new MoneroWalletRpc(rpc);
 
-        // ensure we're testing the right wallet
-        Assert.That(await walletRpc.GetSeed(), Is.EqualTo(Seed));
-        Assert.That(await walletRpc.GetPrimaryAddress(), Is.EqualTo(Address));
-
-        // sync and save wallet
-        await walletRpc.Sync(null, null);
-        await walletRpc.Save();
-        await walletRpc.StartSyncing(SyncPeriodInMs);
-
-        // return cached wallet rpc
         return walletRpc;
     }
 
