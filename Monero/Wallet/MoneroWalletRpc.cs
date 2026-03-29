@@ -73,11 +73,6 @@ public class MoneroWalletRpc : IMoneroWallet
         }
     }
 
-    public async Task OpenWallet(string path, string? password = null)
-    {
-        await OpenWallet(new MoneroWalletConfig().SetPath(path).SetPassword(password));
-    }
-
     public async Task CreateWallet(MoneroWalletConfig config)
     {
         // validate config
@@ -232,7 +227,7 @@ public class MoneroWalletRpc : IMoneroWallet
 
         if (e.Message.Equals("Cannot create wallet. Already exists."))
         {
-            throw new MoneroRpcError("Wallet already exists: " + (name ?? "unkown"), e.Error.Code);
+            throw new MoneroRpcError("Wallet already exists: " + (name ?? "unknown"), e.Error.Code);
         }
 
         if (e.Message.Equals("Electrum-style word list failed verification"))
@@ -446,7 +441,7 @@ public class MoneroWalletRpc : IMoneroWallet
 
     public async Task<MoneroSubaddress> GetAddressIndex(string address)
     {
-        // fetch response and normalize error if address does not belong to the wallet
+        // fetch response and normalize error if the address does not belong to the wallet
         GetAddressIndexResponse response;
         try
         {
@@ -678,13 +673,13 @@ public class MoneroWalletRpc : IMoneroWallet
                 MoneroSubaddress subaddress = ConvertRpcSubaddress(rpcSubaddress);
 
                 // merge info
-                MoneroAccount account = accounts[(int)subaddress.AccountIndex!];
+                MoneroAccount account = accounts[(int)subaddress.AccountIndex];
                 if (account.AccountIndex != subaddress.AccountIndex)
                 {
                     throw new MoneroError("RPC accounts are out of order"); // would need to switch lookup to loop
                 }
 
-                MoneroSubaddress tgtSubaddress = account.Subaddresses![(int)subaddress.Index!];
+                MoneroSubaddress tgtSubaddress = account.Subaddresses![(int)subaddress.Index];
                 if (tgtSubaddress.Index != subaddress.Index)
                 {
                     throw new MoneroError("RPC subaddresses are out of order");
@@ -730,7 +725,7 @@ public class MoneroWalletRpc : IMoneroWallet
         }
 
         // fetch and initialize subaddress balances
-        if (skipBalances != true)
+        if (!skipBalances)
         {
             // these fields are not initialized if the subaddress is unused and therefore not returned from `get_balance`
             foreach (MoneroSubaddress subaddress in subaddresses)
@@ -754,7 +749,7 @@ public class MoneroWalletRpc : IMoneroWallet
                 {
                     if (tgtSubaddress.Index != subaddress.Index)
                     {
-                        continue; // skip to subaddress with same index
+                        continue; // skip to a subaddress with the same index
                     }
 
                     InitSubaddress(tgtSubaddress, subaddress);
@@ -772,7 +767,7 @@ public class MoneroWalletRpc : IMoneroWallet
 
         foreach (MoneroSubaddress subaddress in subaddresses)
         {
-            subaddressMap[(uint)subaddress.Index!] = subaddress.GetAddress();
+            subaddressMap[subaddress.Index] = subaddress.GetAddress();
         }
 
         // return results
@@ -1506,7 +1501,7 @@ public class MoneroWalletRpc : IMoneroWallet
 
     public async Task<GetTransfersResponse> GetTransfers(MoneroTransferQuery? query)
     {
-        // copy and normalize query up to block
+        // copy and normalize a query up to a block
         if (query == null)
         {
             query = new MoneroTransferQuery();
@@ -1591,6 +1586,35 @@ public class MoneroWalletRpc : IMoneroWallet
 
         // build txs using `get_transfers`
         return await _rpc.SendCommandAsync<GetTransfersRequest, GetTransfersResponse>("get_transfers", transfersRequest);
+    }
+
+    public async Task<TransferResponse> TransferAsync(
+        List<TransferDestination> destinations,
+        uint accountIndex = 0,
+        IEnumerable<uint>? subaddressIndices = null,
+        IEnumerable<uint>? subtractFeeFromOutputs = null,
+        uint priority = 0,
+        ulong unlockTime = 0,
+        bool getTxKey = true,
+        bool getTxHex = false,
+        bool getTxMetadata = false,
+        bool doNotRelay = false)
+    {
+        var request = new TransferRequest
+        {
+            Destinations = destinations,
+            AccountIndex = accountIndex,
+            SubaddressIndices = subaddressIndices?.ToList(),
+            SubtractFeeFromOutputs = subtractFeeFromOutputs?.ToList(),
+            Priority = priority,
+            UnlockTime = unlockTime,
+            GetTxKey = getTxKey,
+            GetTxHex = getTxHex,
+            GetTxMetadata = getTxMetadata,
+            DoNotRelay = doNotRelay
+        };
+
+        return await _rpc.SendCommandAsync<TransferRequest, TransferResponse>("transfer", request);
     }
 
     public async Task<GetTransferByTransactionIdResponse> GetTransferByTxId(string txId, int? accountIndex)

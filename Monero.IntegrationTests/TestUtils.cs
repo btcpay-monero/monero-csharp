@@ -47,10 +47,10 @@ internal abstract class TestUtils
         return daemonRpc;
     }
 
-    public static Task<MoneroWalletRpc> GetCreateWallet()
+    public static MoneroWalletRpc GetCreateWallet()
     {
         MoneroRpcConnection connection = new(SecondaryWalletRpcUri, WalletRpcUsername, WalletRpcPassword);
-        return Task.FromResult(new MoneroWalletRpc(connection));
+        return new MoneroWalletRpc(connection);
     }
 
     public static MoneroWalletRpc GetWalletRpc()

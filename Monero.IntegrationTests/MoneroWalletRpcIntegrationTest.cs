@@ -1,6 +1,7 @@
 using Monero.Common;
 using Monero.Wallet;
 using Monero.Wallet.Common;
+using Monero.Wallet.Rpc;
 
 using NUnit.Framework;
 
@@ -27,7 +28,7 @@ public class MoneroWalletRpcIntegrationTest : MoneroIntegrationTestBase
         }
 
         // create a client connected to an internal monero-wallet-rpc process
-        MoneroWalletRpc moneroWalletRpc = await TestUtils.GetCreateWallet();
+        MoneroWalletRpc moneroWalletRpc = TestUtils.GetCreateWallet();
 
         // open wallet
         await moneroWalletRpc.OpenWallet(config);
@@ -40,14 +41,8 @@ public class MoneroWalletRpcIntegrationTest : MoneroIntegrationTestBase
         return moneroWalletRpc;
     }
 
-    private async Task<IMoneroWallet> CreateWallet(MoneroWalletConfig? config)
+    private async Task<IMoneroWallet> CreateWallet(MoneroWalletConfig config)
     {
-        // assign defaults
-        if (config == null)
-        {
-            config = new MoneroWalletConfig();
-        }
-
         bool random = config.GetSeed() == null && config.GetPrimaryAddress() == null;
 
         if (config.GetPath() == null)
@@ -71,7 +66,7 @@ public class MoneroWalletRpcIntegrationTest : MoneroIntegrationTestBase
         }
 
         // create a client connected to xmr_wallet_2 container
-        MoneroWalletRpc walletRpc = await TestUtils.GetCreateWallet();
+        MoneroWalletRpc walletRpc = TestUtils.GetCreateWallet();
 
         // create wallet
         try
@@ -129,6 +124,29 @@ public class MoneroWalletRpcIntegrationTest : MoneroIntegrationTestBase
         {
             MoneroUtils.ValidateMnemonic(await moneroWallet.GetSeed());
         }
+    }
+
+    [Test]
+    public async Task ShouldProcessPaymentBetweenWallets()
+    {
+        // given
+        IMoneroWallet receivingWallet = await CreateWallet(new MoneroWalletConfig());
+        List<MoneroSubaddress> subaddresses = await receivingWallet.CreateAddress(0, "Test payment");
+        string recipientAddress = subaddresses.First().GetAddress()!;
+        var destinations = new List<TransferDestination>
+        {
+            new() {
+                Address = recipientAddress,
+                Amount = 100_000_000_000 // 0.1 XMR in atomic units
+            }
+        };
+        // when
+        TransferResponse response = await Wallet.TransferAsync(destinations);
+        // then
+        Assert.That(response, Is.Not.Null, "Response should not be null");
+        Assert.That(response.AmountsByDestination.Amounts.First(), Is.EqualTo(100_000_000_000UL), "Sent amount should match");
+        Assert.That(response.TxHash, Is.Not.Null.And.Not.Empty, "TxHash should not be null or empty");
+        await NUnit.Framework.TestContext.Progress.WriteLineAsync($"Transaction sent: {response.TxHash}");
     }
 
     // Can create a random wallet
