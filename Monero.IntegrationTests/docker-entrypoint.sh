@@ -1,28 +1,9 @@
 #!/bin/sh
 set -e
 
-dotCover cover-dotnet \
-  --TargetArguments="test -c ${CONFIGURATION_NAME} --no-build -v n" \
-  --Output=/coverage/dotCover.IntegrationTests.output.dcvr \
-  --filters="-:Assembly=Monero.IntegrationTests;-:Assembly=testhost"
+dotnet test -c "${CONFIGURATION_NAME}" --no-build -v n /p:CollectCoverage=true /p:CoverletOutput=/coverage/integration/ /p:CoverletOutputFormat=cobertura
 
-dotCover merge \
-  --Source=/coverage/dotCover.IntegrationTests.output.dcvr,/coverage/dotCover.UnitTests.output.dcvr \
-  --Output=/coverage/mergedCoverage.dcvr
-
-dotCover report \
-  --Source=/coverage/mergedCoverage.dcvr \
-  --ReportType=HTML \
-  --Output=/coverage/mergedCoverage.html \
-  --ReportType=DetailedXML \
-  --Output=/coverage/dotcover.xml
-  
-dotCover report \
-  --Source=/coverage/dotCover.UnitTests.output.dcvr \
-  --ReportType=HTML \
-  --Output=/coverage/unitCoverage.html
-  
-dotCover report \
-  --Source=/coverage/dotCover.IntegrationTests.output.dcvr \
-  --ReportType=HTML \
-  --Output=/coverage/integrationCoverage.html
+reportgenerator \
+  -reports:"/coverage/unit/coverage.cobertura.xml;/coverage/integration/coverage.cobertura.xml" \
+  -targetdir:"/coverage/merged" \
+  -reporttypes:"HtmlSummary;Cobertura"
