@@ -4,6 +4,9 @@
 # Explicitly set Unix LF endings for .sh files
 *.sh text eol=lf
 
+# Explicitly set Unix LF endings for .yml files
+*.yml text eol=lf
+
 # Denote all files that are truly binary and should not be modified.
 *.png binary
 *.jpg binary
