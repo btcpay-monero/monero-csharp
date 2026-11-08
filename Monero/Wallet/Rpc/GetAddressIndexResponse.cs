@@ -6,5 +6,5 @@ namespace Monero.Wallet.Rpc;
 
 public class GetAddressIndexResponse
 {
-    [JsonPropertyName("index")] public required MoneroSubaddress Index;
+    [JsonPropertyName("index")] public required MoneroSubaddress Index { get; set; }
 }
