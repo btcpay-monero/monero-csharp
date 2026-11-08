@@ -34,6 +34,7 @@ public class MoneroTransferQuery : MoneroTx
             _addresses = query._addresses;
         }
 
+        AccountIndex = query.AccountIndex;
         SubaddressIndex = query.SubaddressIndex;
         if (query._subaddressIndices != null)
         {
@@ -198,6 +199,28 @@ public class MoneroTransferQuery : MoneroTx
     public MoneroTransferQuery SetHashes(List<string>? hashes)
     {
         _hashes = hashes;
+        return this;
+    }
+
+    public uint? GetAccountIndex()
+    {
+        return AccountIndex;
+    }
+
+    public MoneroTransferQuery SetAccountIndex(uint? accountIndex)
+    {
+        AccountIndex = accountIndex;
+        return this;
+    }
+
+    public uint? GetSubaddressIndex()
+    {
+        return SubaddressIndex;
+    }
+
+    public MoneroTransferQuery SetSubaddressIndex(uint? subaddressIndex)
+    {
+        SubaddressIndex = subaddressIndex;
         return this;
     }
 }
