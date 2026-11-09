@@ -449,12 +449,12 @@ public class MoneroWalletRpc : IMoneroWallet
             parameters.Add("address", address);
             response = await _rpc.SendCommandAsync<MoneroJsonRpcParams, GetAddressIndexResponse>("get_address_index", parameters);
         }
-        catch (MoneroRpcError e)
+        catch (JsonRpcApiException e)
         {
             MoneroUtils.Log(0, e.Message);
-            if (-2 == e.GetCode())
+            if (-2 == e.Error.Code)
             {
-                throw new MoneroError(e.Message, e.GetCode());
+                throw new MoneroError(e.Message, e.Error.Code);
             }
 
             throw;
