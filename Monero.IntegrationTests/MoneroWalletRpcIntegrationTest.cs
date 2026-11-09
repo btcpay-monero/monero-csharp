@@ -693,6 +693,117 @@ public class MoneroWalletRpcIntegrationTest : MoneroIntegrationTestBase
         }
     }
 
+    // Can get the account and subaddress index of an address
+    [Test]
+    public async Task TestGetAddressIndex()
+    {
+        // create a new account and a subaddress inside it so we have non-zero indices to look up
+        MoneroAccount account = await Wallet.CreateAccount(null);
+        uint accountIdx = (uint)account.AccountIndex!;
+        MoneroSubaddress created = (await Wallet.CreateAddress(accountIdx, null)).First();
+        MoneroSubaddress result = await Wallet.GetAddressIndex(created.GetAddress()!);
+
+        // verify the result account and subaddress indices match the created subaddress
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.AccountIndex, Is.EqualTo(accountIdx));
+        Assert.That(result.Index, Is.EqualTo(created.Index));
+
+        // looking up a valid address that does not belong to the wallet should throw MoneroError with code -2
+        MoneroError? ex = await Assert.ThrowsAsync<MoneroError>(async () =>
+            await Wallet.GetAddressIndex(
+                "9tUBnNCkC3UKGygHCwYvAB1FscpjUuq5e9MYJd2rXuiiTjjfVeSVjnbSG5VTnJgBgy9Y7GTLfxpZNMUwNZjGfdFr1z79eV1"));
+        Assert.That(ex!.GetCode(), Is.EqualTo(-2));
+    }
+
+    // Can get the index of the primary address
+    [Test]
+    public async Task TestGetAddressIndexOfPrimaryAddress()
+    {
+        MoneroSubaddress result = await Wallet.GetAddressIndex(await Wallet.GetPrimaryAddress());
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.AccountIndex, Is.EqualTo(0));
+        Assert.That(result.Index, Is.EqualTo(0));
+    }
+
+    // Filtering transfers for a freshly created account returns no transfers (excludes account 0's transfers)
+    [Test]
+    public async Task TestGetTransfersForEmptyAccountReturnsNothing()
+    {
+        // verify the wallet actually has transfers in account 0 so the filter is meaningfully tested
+        // needed so you can see the when the .SetAccountIndex filter is failing,
+        // because account 0's transfers would be visible in emptyAccount's transfers
+        // even when the filter is applied
+        GetTransfersResponse account0Transfers = await Wallet.GetTransfers(
+            new MoneroTransferQuery().SetAccountIndex(0));
+        Assert.That(account0Transfers.IncomingTransfers, Is.Not.Empty);
+
+        // create a fresh account that has never sent or received any funds and query its transfers
+        // with filter for that account index included
+        MoneroAccount emptyAccount = await Wallet.CreateAccount(null);
+        GetTransfersResponse none = await Wallet.GetTransfers(
+            new MoneroTransferQuery().SetAccountIndex(emptyAccount.AccountIndex));
+
+        // verify that account 0's transfers are excluded and every transfer category is empty
+        Assert.That(none.IncomingTransfers, Is.Empty);
+        Assert.That(none.OutgoingTransfers, Is.Empty);
+        Assert.That(none.PooledTransfers, Is.Empty);
+        Assert.That(none.PendingTransfers, Is.Empty);
+        Assert.That(none.FailedTransfers, Is.Empty);
+    }
+
+    // Filtering transfers by subaddress index returns only transfers for that subaddress and excludes others in the same account
+    [Test]
+    public async Task TestGetTransfersFilteredBySubaddressExcludesOtherSubaddresses()
+    {
+        // create an isolated account with two subaddresses (index 0 and index 1) so existing wallet transfers don't interfere
+        MoneroAccount account = await Wallet.CreateAccount(null);
+        uint accountIdx = (uint)account.AccountIndex!;
+        string address0 = account.PrimaryAddress!;
+
+        MoneroSubaddress subaddress1 = (await Wallet.CreateAddress(accountIdx, null)).First();
+        Assert.That(subaddress1.Index, Is.EqualTo(1u));
+        string address1 = subaddress1.GetAddress()!;
+
+        // send one transfer to subaddress 0 and a separate transfer to subaddress 1 so each subaddress 
+        // has its own distinct transaction that can be verified for a given subaddress index filter
+        TransferResponse tx0 = await Wallet.TransferAsync([
+            new TransferDestination { Address = address0, Amount = 100_000_000_000 }
+        ]);
+        TransferResponse tx1 = await Wallet.TransferAsync([
+            new TransferDestination { Address = address1, Amount = 200_000_000_000 }
+        ]);
+
+        // verify two distinct transactions were created and sync the wallet so it sees the new transfers
+        Assert.That(tx0.TxHash, Is.Not.EqualTo(tx1.TxHash));
+        await Wallet.Sync(null, null);
+
+        // query the whole account without a subaddress filter to confirm both transfers arrived (either mined or still in the pool)
+        GetTransfersResponse allTransfers = await Wallet.GetTransfers(
+            new MoneroTransferQuery().SetAccountIndex(accountIdx));
+        List<TransferItem> accountReceived = [.. allTransfers.IncomingTransfers, .. allTransfers.PooledTransfers];
+
+        // verify the account as a whole sees both transactions on their respective subaddress indices
+        Assert.That(accountReceived, Has.Count.EqualTo(2));
+        Assert.That(accountReceived.Any(
+            t => t.TransactionId == tx0.TxHash && t.SubaddressIndex.Index == 0), Is.True);
+        Assert.That(accountReceived.Any(
+            t => t.TransactionId == tx1.TxHash && t.SubaddressIndex.Index == 1), Is.True);
+
+        // query the same account again, but filter specifically for subaddress index 0
+        GetTransfersResponse sub0Response = await Wallet.GetTransfers(
+            new MoneroTransferQuery().SetAccountIndex(accountIdx).SetSubaddressIndex(0));
+        List<TransferItem> sub0Received = [.. sub0Response.IncomingTransfers, .. sub0Response.PooledTransfers];
+
+        // verify only subaddress 0's transfer is returned and subaddress 1's transfer is excluded
+        Assert.That(sub0Received, Has.Count.EqualTo(1));
+        Assert.That(sub0Received[0].TransactionId, Is.EqualTo(tx0.TxHash));
+        Assert.That(sub0Received[0].SubaddressIndex.AccountIndex, Is.EqualTo(accountIdx));
+        Assert.That(sub0Received[0].SubaddressIndex.Index, Is.EqualTo(0u));
+        Assert.That(sub0Received.Any(t => t.TransactionId == tx1.TxHash), Is.False);
+        Assert.That(sub0Received.Any(t => t.SubaddressIndex.Index == 1u), Is.False);
+    }
+
     // Can sync (without progress)
     [Test]
     public async Task TestSyncWithoutProgress()
