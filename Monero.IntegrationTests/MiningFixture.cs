@@ -18,6 +18,8 @@ public class MiningFixture : MoneroIntegrationTestBase
                 .SetRestoreHeight(0)
             );
         await MineToHeight(71);
+        // Force sysnc to ensure that the wallet is aware of the mined blocks and can accurately report balances
+        await Wallet.Sync(null, null);
         List<MoneroAccount> moneroAccounts = await Wallet.GetAccounts(true, false, null);
         foreach (MoneroAccount account in moneroAccounts)
         {
