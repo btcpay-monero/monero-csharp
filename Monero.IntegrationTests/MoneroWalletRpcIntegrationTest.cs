@@ -722,8 +722,8 @@ public class MoneroWalletRpcIntegrationTest : MoneroIntegrationTestBase
         MoneroSubaddress result = await Wallet.GetAddressIndex(await Wallet.GetPrimaryAddress());
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.AccountIndex, Is.EqualTo(0));
-        Assert.That(result.Index, Is.EqualTo(0));
+        Assert.That(result.AccountIndex, Is.EqualTo(0u));
+        Assert.That(result.Index, Is.EqualTo(0u));
     }
 
     // Filtering transfers for a freshly created account returns no transfers (excludes account 0's transfers)
